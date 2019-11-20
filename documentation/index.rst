@@ -42,6 +42,7 @@
    linux_application_develop/filesystem_system_call
    linux_application_develop/led_subsystem
    linux_application_develop/gpio_subsystem
+   linux_application_develop/input_subsystem
 
 
 
