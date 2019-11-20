@@ -25,6 +25,7 @@
    linux_basis/command_line
    linux_basis/software_package
    linux_basis/editor
+   linux_basis/ebf6ull_hardware
 
 
 
