@@ -10,4 +10,23 @@
    :maxdepth: 2
 
    foreword
-   linux_basis/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: 搭建并熟悉开发环境
+   :numbered:
+
+   linux_basis/why_learning_linux
+   linux_basis/i_mx_series
+   linux_basis/linux_brief
+   linux_basis/installing_linux
+   linux_basis/linux_directory
+   linux_basis/user_group
+   linux_basis/command_line
+   linux_basis/software_package
+
+
+
+..   foreword
+..   linux_basis/index
+
