@@ -9,6 +9,8 @@
 .. toctree::
    :maxdepth: 1
 
+   TODO
+   about_us
    foreword
 
 .. toctree::
@@ -45,7 +47,12 @@
    linux_application_develop/input_subsystem
    linux_application_develop/uart_tty
 
+.. toctree::
+   :maxdepth: 1
+   :caption: 贡献与投稿
+   :numbered:
 
+   contribute/how_to_contribute
 
 
 ..   foreword

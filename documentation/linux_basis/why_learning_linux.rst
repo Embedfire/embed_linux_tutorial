@@ -25,7 +25,9 @@ Linux的应用场景主要是由其特点决定的，其特点主要有：开源
 
 感兴趣的读者可以访问Netcraft 网站 http:// www.netcraft.com，可以查询到其它网站是运行在什么操作系统上的，具体见图 1‑1和图 1‑2。
 
-|whylea002|
+.. image:: media/whylea002.png
+   :align: center
+   :alt: Netcraft网站输入要查询的网址
 
 图 1‑1 Netcraft网站输入要查询的网址
 
