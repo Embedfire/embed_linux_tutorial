@@ -18,4 +18,5 @@
    linux_brief
    installing_linux
    linux_directory
+   user_group
 
