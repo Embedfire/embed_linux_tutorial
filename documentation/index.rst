@@ -38,6 +38,7 @@
    :numbered:
 
    linux_application_develop/mount_nfs
+   linux_application_develop/gcc_hello_world
 
 
 
