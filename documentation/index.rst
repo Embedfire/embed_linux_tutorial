@@ -39,6 +39,7 @@
 
    linux_application_develop/mount_nfs
    linux_application_develop/gcc_hello_world
+   linux_application_develop/led_subsystem
 
 
 
