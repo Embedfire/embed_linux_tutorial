@@ -26,6 +26,7 @@
    linux_basis/software_package
    linux_basis/editor
    linux_basis/ebf6ull_hardware
+   linux_basis/board_startup
 
 
 
