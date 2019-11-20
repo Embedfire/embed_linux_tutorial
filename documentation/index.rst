@@ -7,12 +7,12 @@
 ========================================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    foreword
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: 搭建并熟悉开发环境
    :numbered:
 
@@ -30,6 +30,15 @@
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: 在Linux下开发应用程序
+   :numbered:
+
+   linux_application_develop/mount_nfs
+
 
 
 
