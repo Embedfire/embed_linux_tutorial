@@ -43,6 +43,7 @@
    linux_application_develop/led_subsystem
    linux_application_develop/gpio_subsystem
    linux_application_develop/input_subsystem
+   linux_application_develop/uart_tty
 
 
 
