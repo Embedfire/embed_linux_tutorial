@@ -29,6 +29,7 @@
    linux_basis/board_startup
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
+   linux_basis/script_hardware_testing
 
 
 
