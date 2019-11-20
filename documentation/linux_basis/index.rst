@@ -19,4 +19,5 @@
    installing_linux
    linux_directory
    user_group
+   command_line
 
