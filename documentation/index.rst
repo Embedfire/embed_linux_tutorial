@@ -24,6 +24,7 @@
    linux_basis/user_group
    linux_basis/command_line
    linux_basis/software_package
+   linux_basis/editor
 
 
 
