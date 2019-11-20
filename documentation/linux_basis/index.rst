@@ -15,4 +15,5 @@
 
    why_learning_linux
    i_mx_series
+   linux_brief
 
