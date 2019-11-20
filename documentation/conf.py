@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = '[野火]i.MX Linux开发实战指南'
-copyright = '2019, embedfire-野火'
-author = 'embedfire-野火'
+copyright = '2019, embedfire-野火 www.embedfire.com'
+author = 'embedfire-野火 www.embedfire.com'
 
 
 # -- General configuration ---------------------------------------------------
