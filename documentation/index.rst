@@ -39,13 +39,13 @@
    :caption: 在Linux下开发应用程序
    :numbered:
 
-   linux_application_develop/mount_nfs
-   linux_application_develop/gcc_hello_world
-   linux_application_develop/filesystem_system_call
-   linux_application_develop/led_subsystem
-   linux_application_develop/gpio_subsystem
-   linux_application_develop/input_subsystem
-   linux_application_develop/uart_tty
+   linux_app/mount_nfs
+   linux_app/gcc_hello_world
+   linux_app/filesystem_system_call
+   linux_app/led_subsystem
+   linux_app/gpio_subsystem
+   linux_app/input_subsystem
+   linux_app/uart_tty
 
 .. toctree::
    :maxdepth: 1
