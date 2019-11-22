@@ -134,33 +134,53 @@ mkdir -p ~/workdir/example/hello_c #创建hello_c目录
 
 代码清单 16‑1 hello.c文件内容
 
-1
+.. literalinclude:: ../../../base_code/linux_app/hello_c/hello.c
+   :caption: ../../../base_code/linux_app/hello_c/hello.c
+   :language: c
+   :linenos:
 
-2 #include <stdio.h>
+aaaaaaaaaa |RST| rst
 
-3
+.. literalinclude:: |RST|
+   :caption: base_code/linux_app/hello_c/hello.c
+   :language: c
+   :linenos:
 
-4 int main()
+.. |RST| replace:: hello.c
 
-5 {
+hello.c raw
 
-6 printf("hello, world! This is a C program.\n");
+.. literalinclude:: hello.c
+   :caption: base_code/linux_app/hello_c/hello.c
+   :language: c
+   :linenos:
 
-7 for(int i=0;i<10;i++ )
 
-8 {
+hello.c
 
-9 printf("output i=%d\n",i);
+|hello| ggg
 
-10 }
+.. literalinclude:: ../hello2.c
+   :caption: ../hello2.c
+   :language: c
+   :linenos:
 
-11
+hello3.c
 
-12 return 0;
+.. literalinclude:: ../../hello3.c
+   :caption: ../../hello3.c
+   :language: c
+   :linenos:   
 
-13 }
 
-14
+.. literalinclude:: ../../base_code/linux_app/hello_c/hello.c
+   :caption: ../../base_code/linux_app/hello_c/hello.c
+   :language: c
+   :linenos:   
+
+.. |jpg| replace:: media/gcchel006.jpg
+
+
 
 这是一个非常通用的C Hello World代码，在Windows下和Linux下并没有什么区别，甚至跟STM32或RT1052等MCU的裸机代码差异也不大，只是在MCU平台下会多了一些硬件初始化的内容。
 

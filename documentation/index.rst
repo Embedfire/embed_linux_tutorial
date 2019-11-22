@@ -9,9 +9,10 @@
 .. toctree::
    :maxdepth: 1
 
-   TODO
+
+   README
    about_us
-   foreword
+   TODO
 
 .. toctree::
    :maxdepth: 1
@@ -55,6 +56,17 @@
    contribute/how_to_contribute
 
 
-..   foreword
-..   linux_basis/index
+.. toctree::
+   :maxdepth: 2
+   :caption: 常见问题
+
+   faq/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: 版权
+
+   LICENSE
+
+
 
