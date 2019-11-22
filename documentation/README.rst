@@ -4,6 +4,7 @@
 ==============
 
 本项目通过git开源：
+
 - github仓库地址：https://github.com/Embdefire/embed_linux_tutorial
 - gitee 仓库地址：https://gitee.com/wildfireteam/embed_linux_tutorial
 
