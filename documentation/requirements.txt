@@ -3,5 +3,5 @@ sphinx-markdown-tables
 
 #theme
 
-crate-docs-theme
+#crate-docs-theme
 sphinx-rtd-theme
