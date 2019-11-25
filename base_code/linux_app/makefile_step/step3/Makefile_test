@@ -1,0 +1,11 @@
+VAR_A = FILEA
+VAR_B = $(VAR_A)
+VAR_C := $(VAR_A)
+VAR_A += FILEB
+VAR_D ?= FILED
+.PHONY:check
+check:
+	@echo "VAR_A:"$(VAR_A)
+	@echo "VAR_B:"$(VAR_B)
+	@echo "VAR_C:"$(VAR_C)
+	@echo "VAR_D:"$(VAR_D)

@@ -23,7 +23,7 @@ Linux的应用场景主要是由其特点决定的，其特点主要有：开源
 
 在商业应用中，在服务器运行的操作系统主要有Linux、Windows和UNIX，其中由于Linux系统开源、使用成本低而且安全稳定，所以Linux在服务器使用的系统中占据了绝大多数。
 
-感兴趣的读者可以访问Netcraft 网站 http:// www.netcraft.com，可以查询到其它网站是运行在什么操作系统上的，具体见图 1‑1和图 1‑2。
+感兴趣的读者可以访问Netcraft 网站 http://www.netcraft.com，可以查询到其它网站是运行在什么操作系统上的，具体见图 1‑1和图 1‑2。
 
 .. image:: media/whylea002.png
    :align: center

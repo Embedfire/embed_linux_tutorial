@@ -45,9 +45,9 @@ Ubuntu衍生自Debian，由于其易用性，可以说是最成功的Linux桌面
 
 Debian和Ubuntu官网有非常丰富的使用教程，而且中文支持也很好，推荐初学者多多浏览其中的内容，尤其是Debian。
 
-Debian官网：\ https://www.debian.org
+Debian官网：https://www.debian.org
 
-Ubuntu官网：https:// ubuntu.com
+Ubuntu官网：https://ubuntu.com
 
 Fedora派系
 ^^^^^^^^^^^^^^^^
