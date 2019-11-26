@@ -47,6 +47,7 @@
    linux_app/gpio_subsystem
    linux_app/input_subsystem
    linux_app/uart_tty
+   linux_app/i2c_bus
 
 .. toctree::
    :maxdepth: 1

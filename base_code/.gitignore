@@ -1,0 +1,6 @@
+*.o
+/hello_c/hello.i
+/hello_c/*.s
+/hello_crosscompile/hello
+build_x86
+build_arm
