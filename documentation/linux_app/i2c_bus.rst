@@ -177,14 +177,154 @@ I2C的数据和地址传输都带响应。响应包括“应答(ACK)”和“非
 传输时主机产生时钟，在第9个时钟时，数据发送端会释放SDA的控制权，由数据接收端控制SDA，若SDA为高电平，表示非应答信号(NACK)，低电平表示应答信号(ACK)。
 
 
+Linux的I2C及总线设备
+^^^^^^^^^^^^^^^^^^^^^^^^^
+由于一个I2C总线上可以挂载多个设备，
+
+
+/sys/bus/i2c
+
+::
+
+    #以下命令在开发板上的终端上运行
+    #查看系统存在的I2C总线
+    ls  /sys/bus/i2c/devices
+
+    #根据具体的输出查看存在的I2C设备和总线
+
+    #查看I2C总线的属性
+    ls /sys/bus/i2c/devices/i2c-0
+    #查看I2C总线的名字
+    cat /sys/bus/i2c/devices/i2c-0/name
+
+    #查看I2C设备的属性
+    ls /sys/bus/i2c/deivces/0-005d
+    #查看I2C设备的名字
+    cat /sys/bus/i2c/devices/0-005d/name
+
+
+在用户态添加一个I2C设备
+
+::
+
+  #未测试，参数为设备名及设备地址
+  echo eeprom 0x50 > /sys/bus/i2c/devices/i2c-3/new_device
+
+
+在用户态删除一个I2C设备
+
+::
+
+  #未测试,参数为要删除设备的设备地址
+  echo 0x50  > /sys/bus/i2c/devices/i2c-3/delete_device
 
 
 i2c-detect工具
 ^^^^^^^^^^^^^^^^^^^^^
+使用i2c-tools工具包提供了一些非常方便的工具来对系统的I2C总线进行调试。
+
+可以通过如下指令安装
+::
+
+  #以下命令在主机上运行
+  sudo apt install i2c-tools
+
+
+安装后可使用的命令有i2cdetect、i2cdump、i2cset以及i2cget,
+它们分别用于扫描I2C总线上的设备、读写指定设备的寄存器内容
 
 
 
++ i2cdetect ：用于扫描I2C总线上的设备。它会打印一个表，其中包含了总线上检测到的设备。
+~~~
+    相关命令语法：
+       i2cdetect [-y] [-a] [-q|-r] i2cbus [first last]：
+       参数说明：
+       >参数y：关闭交互模式，使用该参数时，不会提示警告信息。
+       >参数a：扫描总线上的所有设备。
+       >参数q：使用SMBus的“quick write”命令进行检测，不建议使用该参数。
+       >参数r：使用SMBus的“receive byte”命令进行检测，不建议使用该参数。
+       >参数i2cbus：指定i2c总线的编号
+       >参数first、last：扫描的地址范围
 
+       返回值说明：
+       >'--'：表示该地址被检测，但没有芯片应答；
+       >'UU'：表示该地址当前由内核驱动程序使用。
+       >'**'：**表示以十六进制表示的设备地址编号，如 “2d”或“4e”。
+
+       i2cdetect -F i2cbus：查询i2c总线的功能，参数i2cbus表示i2c总线编号
+
+       i2cdetect -V：打印软件的版本号
+
+       i2cdetect -l：检测当前系统有几组i2c总线
+~~~
+
++ i2cget 
+~~~
+    相关命令语法：
+        i2cget [-f] [-y] i2cbus chip-address [data-address [mode]]
+        参数说明：
+        >参数f：强制访问设备。
+        >参数y：关闭交互模式，使用该参数时，不会提示警告信息。
+        >参数i2cbus：指定i2c总线的编号
+        >参数chip-address：i2c设备地址
+        >参数data-address：设备的寄存器的地址
+        >参数mode：参考i2cdump命令。
+~~~
+
++ i2cset 
+~~~
+    相关命令语法：
+       i2cset  [-f]  [-y]  [-m  mask]  [-r]  i2cbus  chip-address data-address [value] ...  [mode]
+       参数说明：
+       >参数f：强制访问设备。
+       >参数y：关闭交互模式，使用该参数时，不会提示警告信息。
+       >参数m：
+       >参数r：写入后立即回读寄存器值，并将结果与写入的值进行比较。
+       >参数i2cbus：指定i2c总线的编号
+       >参数chip-address：i2c设备地址
+       >参数data-address：设备的寄存器的地址
+       >参数value：要写入寄存器的值
+       >参数mode：参考i2cdump命令。
+~~~
+
++ i2cdump：读取I2C总线上某个设备的寄存器值。
+~~~
+    相关命令语法：
+       i2cdump   [-f]   [-r first-last]  [-y]  i2cbus  address  [mode [bank [bankreg]]]
+       >参数r：指定寄存器范围，只扫描从first到last区域；
+       >参数f：强制访问设备。
+       >参数y：关闭人机交互模式；
+       >参数i2cbus：指定i2c总线的编号
+       >参数address：指定设备的地址
+       >参数mode：指定读取的大小， 可以是b, w, s或i，分别对应了字节，字，SMBus块, I2C块
+       i2cdump -V：打印软件的版本号
+~~~
+
+
+
+## MPU6050实验
+
+i2cset -f -y -r 0 0x68 0x6B 0
+
+i2cset -f -y -r 0 0x68 0x19 7
+
+i2cset -f -y -r 0 0x68 0x1A 6
+
+i2cset -f -y -r 0 0x68 0x1C 1
+
+i2cdump -f -y -r 0x3B-0x48 0 0x68
+
+
+读取陀螺仪的ID
+
+::
+
+  i2cget 0 0x68  0x75
+
+其中0x68是陀螺仪设备的7位I2C地址，0x75是陀螺仪的WHO_AM_I寄存器，
+
+数据地址支持的范围为0x00~0xFF,所以对于触摸屏使用16位表示寄存器地址的设备不适用。
 
 读取陀螺仪传感器数据
 ^^^^^^^^^^^^^^^^^^^^^
