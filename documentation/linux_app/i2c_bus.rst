@@ -203,6 +203,8 @@ Linux的I2C及总线设备
     cat /sys/bus/i2c/devices/0-005d/name
 
 
+
+
 在用户态添加一个I2C设备
 
 ::
@@ -217,6 +219,10 @@ Linux的I2C及总线设备
 
   #未测试,参数为要删除设备的设备地址
   echo 0x50  > /sys/bus/i2c/devices/i2c-3/delete_device
+
+
+/dev/i2c-0
+
 
 
 i2c-detect工具
