@@ -55,6 +55,7 @@
    :titlesonly:
 
    submission/rst-testfile
+   submission/ubuntu16-rootfs
 
 .. toctree::
    :maxdepth: 1
