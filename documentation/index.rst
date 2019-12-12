@@ -56,6 +56,7 @@
 
    submission/rst-testfile
    submission/ubuntu16-rootfs
+   submission/debian9-rootfs
 
 .. toctree::
    :maxdepth: 1
