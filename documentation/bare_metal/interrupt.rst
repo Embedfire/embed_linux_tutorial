@@ -1,7 +1,7 @@
 .. vim: syntax=rst
 
 中断
---
+------------------
 
 相比STM32的NVIC，i.MX 6ULL的中断控制系统更复杂，它的中断管理器使用的是GIC V2，GIC V2的实现方式与我们熟知的NVIC差别较大。本章重点讲解i.MX 6U的GIC基本结构以及实现方法，更详细的介绍可以参考《ARM® Generic Interrupt Controller》
 
