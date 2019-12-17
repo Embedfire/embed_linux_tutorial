@@ -96,6 +96,10 @@
    bare_metal/gpio_key
    bare_metal/sorting_project
    bare_metal/interrupt
+   bare_metal/ccm
+   bare_metal/uart
+   bare_metal/ddr
+
 
 .. toctree::
    :maxdepth: 1
