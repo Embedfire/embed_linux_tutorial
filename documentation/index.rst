@@ -99,6 +99,7 @@
    bare_metal/ccm
    bare_metal/uart
    bare_metal/ddr
+   bare_metal/lcd
 
 
 .. toctree::
