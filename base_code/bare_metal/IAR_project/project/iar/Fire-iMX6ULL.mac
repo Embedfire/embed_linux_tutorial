@@ -1,0 +1,84 @@
+_DDR_Init() {
+ __var tmp;
+ tmp = __readMemory32(0x021B0000,"Memory");  //read MMDC_MDCTL
+ if(!(tmp & 0x80000000)){
+ __message "---- Enabling i.MX6ULL DDR3L ----" ;
+
+  __message "---- Enable all clocks ----" ;
+ __writeMemory32(0xffffffff,0x020c4068, "Memory");
+ __writeMemory32(0xffffffff,0x020c406c, "Memory");
+ __writeMemory32(0xffffffff,0x020c4070, "Memory");
+ __writeMemory32(0xffffffff,0x020c4074, "Memory");
+ __writeMemory32(0xffffffff,0x020c4078, "Memory");
+ __writeMemory32(0xffffffff,0x020c407c, "Memory");
+ __writeMemory32(0xffffffff,0x020c4080, "Memory");
+  
+  __message "---- Config IOMUX for ddr ----" ;
+  __writeMemory32(0x000C0000,0x020E04B4, "Memory");
+  __writeMemory32(0x00000000,0x020E04AC, "Memory");
+  __writeMemory32(0x00000030,0x020E027C, "Memory");
+  __writeMemory32(0x00000030,0x020E0250, "Memory");
+  __writeMemory32(0x00000030,0x020E024C, "Memory");
+  __writeMemory32(0x00000030,0x020E0490, "Memory");
+  __writeMemory32(0x00000030,0x020E0288, "Memory");
+  __writeMemory32(0x00000000,0x020E0270, "Memory");
+  __writeMemory32(0x00000030,0x020E0260, "Memory");
+  __writeMemory32(0x00000030,0x020E0264, "Memory");
+  __writeMemory32(0x00000030,0x020E04A0, "Memory");
+
+  __writeMemory32(0x00020000,0x020E0494, "Memory");
+  __writeMemory32(0x00000030,0x020E0280, "Memory");
+  __writeMemory32(0x00000030,0x020E0284, "Memory");
+  __writeMemory32(0x00020000,0x020E04B0, "Memory");
+  __writeMemory32(0x00000030,0x020E0498, "Memory");
+  __writeMemory32(0x00000030,0x020E04A4, "Memory");
+  __writeMemory32(0x00000030,0x020E0244, "Memory");
+  __writeMemory32(0x00000030,0x020E0248, "Memory");
+  
+  __message "---- Config DDR Controller Registers ----" ;
+  __writeMemory32(0x00008000,0x021B001C, "Memory");
+  __writeMemory32(0xA1390003,0x021B0800, "Memory");
+  __writeMemory32(0x00150019,0x021B080C, "Memory");
+  __writeMemory32(0x41550153,0x021B083C, "Memory");
+  __writeMemory32(0x40403A3E,0x021B0848, "Memory");
+  __writeMemory32(0x40402F2A,0x021B0850, "Memory");
+  __writeMemory32(0x33333333,0x021B081C, "Memory");
+  __writeMemory32(0x33333333,0x021B0820, "Memory");
+  
+  __writeMemory32(0xf3333333,0x021B082C, "Memory");
+  __writeMemory32(0xf3333333,0x021B0830, "Memory");
+  __writeMemory32(0x00944009,0x021B08C0, "Memory");
+  __writeMemory32(0x00000800,0x021B08b8, "Memory");
+
+  __message "---- Config MMDC init ----" ;  
+  __writeMemory32(0x0002002D,0x021B0004, "Memory");
+  __writeMemory32(0x1B333030,0x021B0008, "Memory");
+  __writeMemory32(0x676B52F3,0x021B000C, "Memory");
+  __writeMemory32(0xB66D0B63,0x021B0010, "Memory");
+  __writeMemory32(0x01FF00DB,0x021B0014, "Memory");
+  __writeMemory32(0x00201740,0x021B0018, "Memory");
+ 
+  __writeMemory32(0x00008000,0x021B001C, "Memory");
+  __writeMemory32(0x000026D2,0x021B002C, "Memory");
+  __writeMemory32(0x006B1023,0x021B0030, "Memory");
+  __writeMemory32(0x0000005F,0x021B0040, "Memory");
+  __writeMemory32(0x85180000,0x021B0000, "Memory");
+  __writeMemory32(0x00400000,0x021B0890, "Memory");
+  __writeMemory32(0x02008032,0x021B001C, "Memory");
+  __writeMemory32(0x00008033,0x021B001C, "Memory");
+  __writeMemory32(0x00048031,0x021B001C, "Memory");
+  __writeMemory32(0x15208030,0x021B001C, "Memory");
+  __writeMemory32(0x04008040,0x021B001C, "Memory");
+  __writeMemory32(0x00000800,0x021B0020, "Memory");
+  
+  __writeMemory32(0x00000227,0x021B0818, "Memory");
+  __writeMemory32(0x0002552D,0x021B0004, "Memory");
+  __writeMemory32(0x00011006,0x021B0404, "Memory");
+  __writeMemory32(0x00000000,0x021B001C, "Memory");
+  }
+
+}
+
+execUserPreload() {
+  _DDR_Init();
+}
