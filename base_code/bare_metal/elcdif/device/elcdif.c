@@ -4,13 +4,13 @@
 
 
 
-/*¶¨Òå elcdf »º³åÇø*/
+/*å®šä¹‰ elcdf ç¼“å†²åŒº*/
 uint32_t s_frameBuffer[2][APP_IMG_HEIGHT][APP_IMG_WIDTH];
 
 
 
 
-/* elcdif ÏÔÊ¾½Ó¿ÚÍâ²¿Òý½Å³õÊ¼»¯
+/* elcdif æ˜¾ç¤ºæŽ¥å£å¤–éƒ¨å¼•è„šåˆå§‹åŒ–
 *
 */
 void lcdif_pin_config(void)
@@ -104,19 +104,19 @@ void lcdif_pin_config(void)
 
 
 
-/*³õÊ¼»¯ elcdf µÄÊ±ÖÓ
+/*åˆå§‹åŒ– elcdf çš„æ—¶é’Ÿ
 */
 void lcdif_clock_init(void)
 {
-    /*ÉèÖÃ PLL5  µÄÊä³öÊ±ÖÓ*/
-    CCM_ANALOG->PLL_VIDEO_NUM &= (0x3 << 30);   //ÇåÁãPLL ·ÖÊý·ÖÆµµÄ·Ö×Ó¼Ä´æÆ÷
-    CCM_ANALOG->PLL_VIDEO_DENOM &= (0x3 << 30); //ÇåÁãPLL ·ÖÊý·ÖÆµµÄ·ÖÄ¸¼Ä´æÆ÷
+    /*è®¾ç½® PLL5  çš„è¾“å‡ºæ—¶é’Ÿ*/
+    CCM_ANALOG->PLL_VIDEO_NUM &= (0x3 << 30);   //æ¸…é›¶PLL åˆ†æ•°åˆ†é¢‘çš„åˆ†å­å¯„å­˜å™¨
+    CCM_ANALOG->PLL_VIDEO_DENOM &= (0x3 << 30); //æ¸…é›¶PLL åˆ†æ•°åˆ†é¢‘çš„åˆ†æ¯å¯„å­˜å™¨
 
     /*
-     * ÉèÖÃÊ±ÖÓ·ÖÆµ
+     * è®¾ç½®æ—¶é’Ÿåˆ†é¢‘
      *
      * ------------------------------------------------------------------------
-     * |        ·ÖÆµÊý       | PLL_VIDEO[POST_DIV_SELECT]  | MISC2[VIDEO_DIV] |
+     * |        åˆ†é¢‘æ•°       | PLL_VIDEO[POST_DIV_SELECT]  | MISC2[VIDEO_DIV] |
      * ------------------------------------------------------------------------
      * |         1           |            2                |        0         |
      * ------------------------------------------------------------------------
@@ -130,65 +130,65 @@ void lcdif_clock_init(void)
      * ------------------------------------------------------------------------
      */
     CCM_ANALOG->PLL_VIDEO = 0;
-    CCM_ANALOG->PLL_VIDEO &= ~(0x3 << 19); // ÇåÁãPLL_VIDEO[POST_DIV_SELECT]
-    CCM_ANALOG->PLL_VIDEO |= (0x01 << 19); //ÉèÖÃ·ÖÆµÏµÊýÎª2
+    CCM_ANALOG->PLL_VIDEO &= ~(0x3 << 19); // æ¸…é›¶PLL_VIDEO[POST_DIV_SELECT]
+    CCM_ANALOG->PLL_VIDEO |= (0x01 << 19); //è®¾ç½®åˆ†é¢‘ç³»æ•°ä¸º2
 
-    CCM_ANALOG->MISC2 &= ~(0xC0000000); //ÇåÁãVIDEO_DIVÎ»
-    CCM_ANALOG->MISC2 |= (0x3 << 30);// ÅäºÏCCM_ANALOG->PLL_VIDEO¼Ä´æÆ÷ÉèÖÃÊ±ÖÓ·ÖÆµ
+    CCM_ANALOG->MISC2 &= ~(0xC0000000); //æ¸…é›¶VIDEO_DIVä½
+    CCM_ANALOG->MISC2 |= (0x3 << 30);// é…åˆCCM_ANALOG->PLL_VIDEOå¯„å­˜å™¨è®¾ç½®æ—¶é’Ÿåˆ†é¢‘
 
 
-    CCM_ANALOG->PLL_VIDEO &= ~(0x7F); // ÇåÁãÊ±ÖÓ·ÖÆµ
-    CCM_ANALOG->PLL_VIDEO |= (0x1F);  //ÉèÖÃÊ±ÖÓ·ÖÆµÎª 31(Ê®½øÖÆ)
+    CCM_ANALOG->PLL_VIDEO &= ~(0x7F); // æ¸…é›¶æ—¶é’Ÿåˆ†é¢‘
+    CCM_ANALOG->PLL_VIDEO |= (0x1F);  //è®¾ç½®æ—¶é’Ÿåˆ†é¢‘ä¸º 31(åè¿›åˆ¶)
 
-    CCM_ANALOG->PLL_VIDEO |= 1 << 13; //Ê¹ÄÜPLL5Ê±ÖÓÊä³ö
+    CCM_ANALOG->PLL_VIDEO |= 1 << 13; //ä½¿èƒ½PLL5æ—¶é’Ÿè¾“å‡º
 
-    /*µÈ´ýÉèÖÃÉúÐ§*/
+    /*ç­‰å¾…è®¾ç½®ç”Ÿæ•ˆ*/
     while ((CCM_ANALOG->PLL_VIDEO & CCM_ANALOG_PLL_VIDEO_LOCK_MASK) == 0)
     {
     }
 
-    /*ÉèÖÃ´ÓPLL5  µ½ elcdf ¸ùÊ±ÖÓËù¾­¹ýµÄÊ±ÖÓÑ¡ÔñºÍÊ±ÖÓ·ÖÆµ¼Ä´æÆ÷*/
-    CCM->CSCDR2 &= ~(0x07 << 15); //ÇåÁã
-    CCM->CSCDR2 |= (0x02 << 15);  //ÉèÖÃCSCDR2[LCDIF1_PRE_CLK_SEL] Ñ¡Ôñ PLL5 Êä³öÊ±ÖÓ
+    /*è®¾ç½®ä»ŽPLL5  åˆ° elcdf æ ¹æ—¶é’Ÿæ‰€ç»è¿‡çš„æ—¶é’Ÿé€‰æ‹©å’Œæ—¶é’Ÿåˆ†é¢‘å¯„å­˜å™¨*/
+    CCM->CSCDR2 &= ~(0x07 << 15); //æ¸…é›¶
+    CCM->CSCDR2 |= (0x02 << 15);  //è®¾ç½®CSCDR2[LCDIF1_PRE_CLK_SEL] é€‰æ‹© PLL5 è¾“å‡ºæ—¶é’Ÿ
 
-    CCM->CSCDR2 &= ~(0x07 << 12); //ÇåÁã
-    CCM->CSCDR2 |= (0x01 << 12);  //ÉèÖÃ CSCDR2[LCDIF1_PRED]Ê±ÖÓ·ÖÆµÖµ
+    CCM->CSCDR2 &= ~(0x07 << 12); //æ¸…é›¶
+    CCM->CSCDR2 |= (0x01 << 12);  //è®¾ç½® CSCDR2[LCDIF1_PRED]æ—¶é’Ÿåˆ†é¢‘å€¼
 
-    CCM->CBCMR &= ~(0x07 << 23); //ÇåÁãCBCMR[LCDIF1_PODF] Ê±ÖÓ·ÖÆµÖµ
+    CCM->CBCMR &= ~(0x07 << 23); //æ¸…é›¶CBCMR[LCDIF1_PODF] æ—¶é’Ÿåˆ†é¢‘å€¼
     CCM->CBCMR |= (0x01 << 23);
 
-    CCM->CSCDR2 &= ~(0x07 << 9); //ÇåÁã
-    CCM->CSCDR2 |= (0x00 << 9);  //Ñ¡Ôñ CSCDR2[LCDIF1_CLK_SEL] Ñ¡Ôñ PLL5 Êä³öÊ±ÖÓ
+    CCM->CSCDR2 &= ~(0x07 << 9); //æ¸…é›¶
+    CCM->CSCDR2 |= (0x00 << 9);  //é€‰æ‹© CSCDR2[LCDIF1_CLK_SEL] é€‰æ‹© PLL5 è¾“å‡ºæ—¶é’Ÿ
 }
 
 
 
 
 
-/* ³õÊ¼»¯ LCD_DISP,µãÁÁ ÏÔÊ¾ÆÁ */
+/* åˆå§‹åŒ– LCD_DISP,ç‚¹äº® æ˜¾ç¤ºå± */
 void BOARD_InitLcd(void)
 {
-    volatile uint32_t i = 0x100U; //´óÖÂÉè¶¨elcdf¸´Î»ÐÅºÅµÄ³ÖÐøÊ±¼ä
+    volatile uint32_t i = 0x100U; //å¤§è‡´è®¾å®šelcdfå¤ä½ä¿¡å·çš„æŒç»­æ—¶é—´
 
-    GPIO5->GDIR |= (1 << 9); //ÉèÖÃGPIO5_09ÎªÊä³öÄ£Ê½
-    GPIO5->DR &= ~(1 << 9);  //ÉèÖÃGPIO5_09Êä³öµçÆ½ÎªµÍµçÆ½
+    GPIO5->GDIR |= (1 << 9); //è®¾ç½®GPIO5_09ä¸ºè¾“å‡ºæ¨¡å¼
+    GPIO5->DR &= ~(1 << 9);  //è®¾ç½®GPIO5_09è¾“å‡ºç”µå¹³ä¸ºä½Žç”µå¹³
 
-    /*µÈ´ýÒ»¶ÎÊ±¼ä£¬elcdf¸´Î»ÐÅºÅ±£³ÖÒ»¶ÎÊ±¼ä*/
+    /*ç­‰å¾…ä¸€æ®µæ—¶é—´ï¼Œelcdfå¤ä½ä¿¡å·ä¿æŒä¸€æ®µæ—¶é—´*/
     while (i--)
     {
     }
-    GPIO5->DR |= (1 << 9); //ÉèÖÃGPIO5_09Êä³öµçÆ½Îª¸ßµçÆ½¡£ Íê³Éelcdf¸´Î»
+    GPIO5->DR |= (1 << 9); //è®¾ç½®GPIO5_09è¾“å‡ºç”µå¹³ä¸ºé«˜ç”µå¹³ã€‚ å®Œæˆelcdfå¤ä½
 
-    /* ÉèÖÃ LCD DµÄ±³¹â¿ØÖÆÒý½ÅÎª¸ßµçÆ½ */
-    CCM_CCGR1_CG13(0x3);     //¿ªÆôGPIO1µÄÊ±ÖÓ
-    GPIO1->GDIR |= (1 << 8); //ÉèÖÃGPIO1_08ÎªÊä³öÄ£Ê½
-    GPIO1->DR |= (1 << 8);   //ÉèÖÃGPIO1_08Êä³öµçÆ½Îª¸ßµçÆ½
+    /* è®¾ç½® LCD Dçš„èƒŒå…‰æŽ§åˆ¶å¼•è„šä¸ºé«˜ç”µå¹³ */
+    CCM_CCGR1_CG13(0x3);     //å¼€å¯GPIO1çš„æ—¶é’Ÿ
+    GPIO1->GDIR |= (1 << 8); //è®¾ç½®GPIO1_08ä¸ºè¾“å‡ºæ¨¡å¼
+    GPIO1->DR |= (1 << 8);   //è®¾ç½®GPIO1_08è¾“å‡ºç”µå¹³ä¸ºé«˜ç”µå¹³
 }
 
 
 
 
-/*¸´Î» elcdf*/
+/*å¤ä½ elcdf*/
 void ELCDIF_Reset(void)
 {
     volatile uint32_t i = 0x100;
@@ -220,57 +220,57 @@ void ELCDIF_Reset(void)
 
 
 
-/*½« elcdf ³õÊ¼»¯Îª rgb 888 Ä£Ê½
+/*å°† elcdf åˆå§‹åŒ–ä¸º rgb 888 æ¨¡å¼
 */
 void ELCDIF_RgbModeInit(void)
 {
 
-    CCM_CCGR3_CG5(0x3); //¿ªÆôGPIO5µÄÊ±ÖÓ
+    CCM_CCGR3_CG5(0x3); //å¼€å¯GPIO5çš„æ—¶é’Ÿ
     /* Reset. */
     ELCDIF_Reset();
 
 
-    LCDIF->CTRL &= ~(0x300); //¸ù¾ÝÑÕÉ«¸ñÊ½ÉèÖÃ CTRL ¼Ä´æÆ÷ ÑÕÉ«¸öÊÂÎªRGB888
+    LCDIF->CTRL &= ~(0x300); //æ ¹æ®é¢œè‰²æ ¼å¼è®¾ç½® CTRL å¯„å­˜å™¨ é¢œè‰²ä¸ªäº‹ä¸ºRGB888
     LCDIF->CTRL |= (0x3 << 8);
 
-    LCDIF->CTRL &= ~(0xC00); //ÉèÖÃÊý¾Ý¿í¶ÈÎª24Î»¿í
+    LCDIF->CTRL &= ~(0xC00); //è®¾ç½®æ•°æ®å®½åº¦ä¸º24ä½å®½
     LCDIF->CTRL |= (0x3 << 10);
 
-    LCDIF->CTRL |= (0x20000); // Ñ¡Ôñ RGB Ä£Ê½
-    LCDIF->CTRL |= (0x80000); // Ñ¡Ôñ RGB Ä£Ê½ ¿ªÆôÏÔÊ¾
-    LCDIF->CTRL |= (0x20);    //ÉèÖÃelcdf½Ó¿ÚÎªÖ÷Ä£Ê½
+    LCDIF->CTRL |= (0x20000); // é€‰æ‹© RGB æ¨¡å¼
+    LCDIF->CTRL |= (0x80000); // é€‰æ‹© RGB æ¨¡å¼ å¼€å¯æ˜¾ç¤º
+    LCDIF->CTRL |= (0x20);    //è®¾ç½®elcdfæŽ¥å£ä¸ºä¸»æ¨¡å¼
 
 
 
-    LCDIF->CTRL1 &= ~(0xF0000);   //ÇåÁã32Î»Êý¾ÝÓÐÐ§Î»
-    LCDIF->CTRL1 |= (0x07 << 16); // ÉèÖÃ32Î»ÓÐÐ§Î»µÄµÍ24Î»ÓÐÐ§¡£
+    LCDIF->CTRL1 &= ~(0xF0000);   //æ¸…é›¶32ä½æ•°æ®æœ‰æ•ˆä½
+    LCDIF->CTRL1 |= (0x07 << 16); // è®¾ç½®32ä½æœ‰æ•ˆä½çš„ä½Ž24ä½æœ‰æ•ˆã€‚
 
 
-    // LCDIF->TRANSFER_COUNT = 0;//ÇåÁã·Ö±æÂÊÉèÖÃ¼Ä´æÆ÷
-    LCDIF->TRANSFER_COUNT |= APP_IMG_HEIGHT << 16; //ÉèÖÃÒ»ÁÐ ÏñËØÊý  480
-    LCDIF->TRANSFER_COUNT |= APP_IMG_WIDTH << 0;   //ÉèÖÃÒ»ÐÐ ÏñËØÊý  800
+    // LCDIF->TRANSFER_COUNT = 0;//æ¸…é›¶åˆ†è¾¨çŽ‡è®¾ç½®å¯„å­˜å™¨
+    LCDIF->TRANSFER_COUNT |= APP_IMG_HEIGHT << 16; //è®¾ç½®ä¸€åˆ— åƒç´ æ•°  480
+    LCDIF->TRANSFER_COUNT |= APP_IMG_WIDTH << 0;   //è®¾ç½®ä¸€è¡Œ åƒç´ æ•°  800
 
 
 
-    LCDIF->VDCTRL0 |= LCDIF_VDCTRL0_ENABLE_PRESENT_MASK;         //Éú³ÉÊ¹ÄÜÐÅºÅ
-    LCDIF->VDCTRL0 |= LCDIF_VDCTRL0_VSYNC_PERIOD_UNIT_MASK;      //ÉèÖÃVSYNCÖÜÆÚ µÄµ¥Î»ÎªÏÔÊ¾Ê±ÖÓµÄÊ±ÖÓÖÜÆÚ
-    LCDIF->VDCTRL0 |= LCDIF_VDCTRL0_VSYNC_PULSE_WIDTH_UNIT_MASK; //ÉèÖÃVSYNC Âö³å¿í¶ÈµÄµ¥Î»ÎªÏÔÊ¾Ê±ÖÓµÄÊ±ÖÓÖÜÆÚ
+    LCDIF->VDCTRL0 |= LCDIF_VDCTRL0_ENABLE_PRESENT_MASK;         //ç”Ÿæˆä½¿èƒ½ä¿¡å·
+    LCDIF->VDCTRL0 |= LCDIF_VDCTRL0_VSYNC_PERIOD_UNIT_MASK;      //è®¾ç½®VSYNCå‘¨æœŸ çš„å•ä½ä¸ºæ˜¾ç¤ºæ—¶é’Ÿçš„æ—¶é’Ÿå‘¨æœŸ
+    LCDIF->VDCTRL0 |= LCDIF_VDCTRL0_VSYNC_PULSE_WIDTH_UNIT_MASK; //è®¾ç½®VSYNC è„‰å†²å®½åº¦çš„å•ä½ä¸ºæ˜¾ç¤ºæ—¶é’Ÿçš„æ—¶é’Ÿå‘¨æœŸ
 
 
-    LCDIF->VDCTRL0 |= (1 << 24);    //ÉèÖÃ Êý¾ÝÊ¹ÄÜÐÅºÅµÄÓÐÐ§µçÆ½Îª¸ßµçÆ½
-    LCDIF->VDCTRL0 &= ~(0x8000000); //ÉèÖÃ VSYNC ÓÐÐ§µçÆ½ÎªµÍµçÆ½
-    LCDIF->VDCTRL0 &= ~(0x4000000); //ÉèÖÃHSYNCÓÐÐ§µçÆ½ÎªµÍµçÆ½
-    LCDIF->VDCTRL0 |= (0x2000000);  // ÉèÖÃÔÚÊ±ÖÓµÄÏÂ½µÑØÊä³öÊý¾Ý£¬ÔÚÊ±ÖÓµÄÉÏÉýÑØ²¶»ñÊý¾Ý¡£
+    LCDIF->VDCTRL0 |= (1 << 24);    //è®¾ç½® æ•°æ®ä½¿èƒ½ä¿¡å·çš„æœ‰æ•ˆç”µå¹³ä¸ºé«˜ç”µå¹³
+    LCDIF->VDCTRL0 &= ~(0x8000000); //è®¾ç½® VSYNC æœ‰æ•ˆç”µå¹³ä¸ºä½Žç”µå¹³
+    LCDIF->VDCTRL0 &= ~(0x4000000); //è®¾ç½®HSYNCæœ‰æ•ˆç”µå¹³ä¸ºä½Žç”µå¹³
+    LCDIF->VDCTRL0 |= (0x2000000);  // è®¾ç½®åœ¨æ—¶é’Ÿçš„ä¸‹é™æ²¿è¾“å‡ºæ•°æ®ï¼Œåœ¨æ—¶é’Ÿçš„ä¸Šå‡æ²¿æ•èŽ·æ•°æ®ã€‚
 
     LCDIF->VDCTRL0 |= APP_VSW;
 
 
-    //     ÒÔÏÔÊ¾Ê±ÖÓÎªµ¥Î»µÄÖÜÆÚ¡£
+    //     ä»¥æ˜¾ç¤ºæ—¶é’Ÿä¸ºå•ä½çš„å‘¨æœŸã€‚
 
-    LCDIF->VDCTRL1 = APP_VSW + APP_IMG_HEIGHT + APP_VFP + APP_VBP; //ÉèÖÃVSYNC ÐÅºÅÖÜÆÚ
+    LCDIF->VDCTRL1 = APP_VSW + APP_IMG_HEIGHT + APP_VFP + APP_VBP; //è®¾ç½®VSYNC ä¿¡å·å‘¨æœŸ
 
-    LCDIF->VDCTRL2 |= (APP_HSW << 18);                               //HSYNC ÐÅºÅÓÐÐ§µçÆ½³¤¶È
-    LCDIF->VDCTRL2 |= (APP_HFP + APP_HBP + APP_IMG_WIDTH + APP_HSW); //HSYNC ÐÅºÅÖÜÆÚ
+    LCDIF->VDCTRL2 |= (APP_HSW << 18);                               //HSYNC ä¿¡å·æœ‰æ•ˆç”µå¹³é•¿åº¦
+    LCDIF->VDCTRL2 |= (APP_HFP + APP_HBP + APP_IMG_WIDTH + APP_HSW); //HSYNC ä¿¡å·å‘¨æœŸ
 
     LCDIF->VDCTRL3 |= (APP_HBP + APP_HSW) << 16;
     LCDIF->VDCTRL3 |= (APP_VBP + APP_VSW);

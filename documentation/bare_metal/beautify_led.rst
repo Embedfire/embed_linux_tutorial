@@ -18,6 +18,10 @@
 
 -  使用官方定义的寄存器、引脚设置函数实现RGB灯程序。
 
+
+
+
+
 官方库文件介绍
 ~~~~~~~
 
@@ -26,169 +30,109 @@
 寄存器定义文件
 ^^^^^^^
 
-在官方SDK的“SDK_2.2_MCIM6ULL_EBF6ULL\devices\MCIMX6Y2”目录下，头文件“MCIMX6Y2.h”保存了i.MX 6U芯片几乎所有的寄存器定义以及中断编号的定义，本章我们只关心寄存器的定义，有关中断以及中断编号将会在中断章节详细介绍。部分寄存器定义如代码清单
-51‑1所示。
+在官方SDK的“SDK_2.2_MCIM6ULL_EBF6ULL\devices\MCIMX6Y2”目录下，头文件“MCIMX6Y2.h”保存了i.MX 6U芯片几乎所有的寄存器定义以及中断编号的定义，本章我们只关心寄存器的定义，有关中断以及中断编号将会在中断章节详细介绍。部分寄存器定义如下所示。
 
-代码清单 51‑1寄存器定义
 
-1 typedef struct {
 
-2 \__IO uint32_t DR; /**< GPIO data register, offset: 0x0 \*/
 
-3 \__IO uint32_t GDIR; /**< GPIO direction register, offset: 0x4 \*/
+.. code-block:: c
+   :caption: 寄存器定义
+   :linenos:
 
-4 \__I uint32_t PSR; /**< GPIO pad status register, offset: 0x8 \*/
+    typedef struct {
+        __IO uint32_t DR;     /**< GPIO data register, offset: 0x0 */
+        __IO uint32_t GDIR;   /**< GPIO direction register, offset: 0x4 */
+        __I  uint32_t PSR;    /**< GPIO pad status register, offset: 0x8 */
+        __IO uint32_t ICR1;   /**< GPIO interrupt configuration register1,*/
+        __IO uint32_t ICR2;   /**< GPIO interrupt configuration register2, */
+        __IO uint32_t IMR;   /**< GPIO interrupt mask register, offset: 0x14 */
+        __IO uint32_t ISR; /**< GPIO interrupt status register, offset: 0x18 */
+        __IO uint32_t EDGE_SEL;/**< GPIO edge select register, offset: 0x1C */
+    } GPIO_Type;
 
-5 \__IO uint32_t ICR1; /**< GPIO interrupt configuration register1,*/
+    /*********************以下代码省略***************************8*/
+    /** Peripheral GPIO1 base address */
+    #define GPIO1_BASE                               (0x209C000u)
+    /** Peripheral GPIO1 base pointer */
+    #define GPIO1                                    ((GPIO_Type *)GPIO1_BASE)
 
-6 \__IO uint32_t ICR2; /**< GPIO interrupt configuration register2, \*/
 
-7 \__IO uint32_t IMR; /**< GPIO interrupt mask register, offset: 0x14 \*/
-
-8 \__IO uint32_t ISR; /**< GPIO interrupt status register, offset: 0x18 \*/
-
-9 \__IO uint32_t EDGE_SEL;/**< GPIO edge select register, offset: 0x1C \*/
-
-10 } GPIO_Type;
-
-11
-
-12 /以下代码省略8*/
-
-13 /*\* Peripheral GPIO1 base address \*/
-
-14 #define GPIO1_BASE (0x209C000u)
-
-15 /*\* Peripheral GPIO1 base pointer \*/
-
-16 #define GPIO1 ((GPIO_Type \*)GPIO1_BASE)
 
 这里只列GPIO1相关寄存器的部分截图。其他寄存器定义与此类似。添加这些定义之后我们就可以直接使用“GPIO1->DR”语句操作GPIO1的DR寄存器。操作方法与STM32非常相似。
 
 引脚复用和引脚属性定义文件
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-使用每一个引脚之前我们都要选择引脚的复用功能以及引脚的pad属性。在官方SDK中定义了所有可用引脚以及这些引脚的所有复用功能，我们需要哪种复用功能只需要选择即可，并且官方SDK中提供了初始化函数。如代码清单 51‑2所示：
 
-代码清单 51‑2引脚复用与PAD属性定义（fsl_iomuxc.h）
+使用每一个引脚之前我们都要选择引脚的复用功能以及引脚的pad属性。在官方SDK中定义了所有可用引脚以及这些引脚的所有复用功能，我们需要哪种复用功能只需要选择即可，并且官方SDK中提供了初始化函数。如下所示：
 
-1 /第一部分/
 
-2 #define IOMUXC_GPIO1_IO00_I2C2_SCL
 
-3 \\ 0x020E005CU, 0x0U, 0x020E05ACU, 0x1U, 0x020E02E8U
+.. code-block:: c
+   :caption: 引脚复用与PAD属性定义（fsl_iomuxc.h）
+   :linenos:
 
-4 #define IOMUXC_GPIO1_IO00_GPT1_CAPTURE1L
+    /***************************第一部分***************************/
+    #define IOMUXC_GPIO1_IO00_I2C2_SCL \       
+     0x020E005CU, 0x0U, 0x020E05ACU, 0x1U, 0x020E02E8U
+    #define IOMUXC_GPIO1_IO00_GPT1_CAPTURE1L \       
+    0x020E005CU, 0x1U, 0x020E058CU, 0x0U, 0x020E02E8U
+    #define IOMUXC_GPIO1_IO00_ANATOP_OTG1_IDL   \     
+    0x020E005CU, 0x2U, 0x020E04B8U, 0x0U, 0x020E02E8U
+    #define IOMUXC_GPIO1_IO00_ENET1_REF_CLK1L  \      
+    0x020E005CU, 0x3U, 0x020E0574U, 0x0U, 0x020E02E8U
+    #define IOMUXC_GPIO1_IO00_MQS_RIGHTL  \      
+    0x020E005CU, 0x4U, 0x00000000U, 0x0U, 0x020E02E8U
+    #define IOMUXC_GPIO1_IO00_GPIO1_IO00L  \      
+    0x020E005CU, 0x5U, 0x00000000U, 0x0U, 0x020E02E8U
+    #define IOMUXC_GPIO1_IO00_ENET1_1588_EVENT0_INL \       
+    0x020E005CU, 0x6U, 0x00000000U, 0x0U, 0x020E02E8U
+    #define IOMUXC_GPIO1_IO00_SRC_SYSTEM_RESETL  \      
+    0x020E005CU, 0x7U, 0x00000000U, 0x0U, 0x020E02E8U
+    #define IOMUXC_GPIO1_IO00_WDOG3_WDOG_BL   \     
+    0x020E005CU, 0x8U, 0x00000000U, 0x0U, 0x020E02E8U
+    #define IOMUXC_GPIO1_IO01_I2C2_SDAL    \    
+    0x020E0060U, 0x0U, 0x020E05B0U, 0x1U, 0x020E02ECU
+    #define IOMUXC_GPIO1_IO01_GPT1_COMPARE1L  \      
+    0x020E0060U, 0x1U, 0x00000000U, 0x0U, 0x020E02ECU
+    #define IOMUXC_GPIO1_IO01_USB_OTG1_OCL    \    
+    0x020E0060U, 0x2U, 0x020E0664U, 0x0U, 0x020E02ECU
 
-5 \\ 0x020E005CU, 0x1U, 0x020E058CU, 0x0U, 0x020E02E8U
+    /***************************第二部分***************************/
+    static inline void IOMUXC_SetPinMux(uint32_t muxRegister,
+                                        uint32_t muxMode,
+                                        uint32_t inputRegister,
+                                        uint32_t inputDaisy,
+                                        uint32_t configRegister,
+                                        uint32_t inputOnfield)
+    {
+        *((volatile uint32_t *)muxRegister) =
+    IOMUXC_SW_MUX_CTL_PAD_MUX_MODE(muxMode) |\
+        IOMUXC_SW_MUX_CTL_PAD_SION(inputOnfield);
 
-6 #define IOMUXC_GPIO1_IO00_ANATOP_OTG1_IDL
+        if (inputRegister)
+        {
+        *((volatile uint32_t *)inputRegister) = \
+        IOMUXC_SELECT_INPUT_DAISY(inputDaisy);
+        }
+    }
 
-7 \\ 0x020E005CU, 0x2U, 0x020E04B8U, 0x0U, 0x020E02E8U
 
-8 #define IOMUXC_GPIO1_IO00_ENET1_REF_CLK1L
+    /***************************第三部分***************************/
+    static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
+                                            uint32_t muxMode,
+                                            uint32_t inputRegister,
+                                            uint32_t inputDaisy,
+                                            uint32_t configRegister,
+                                            uint32_t configValue)
+    {
+        if (configRegister)
+        {
+            *((volatile uint32_t *)configRegister) = configValue;
+        }
+    }
 
-9 \\ 0x020E005CU, 0x3U, 0x020E0574U, 0x0U, 0x020E02E8U
 
-10 #define IOMUXC_GPIO1_IO00_MQS_RIGHTL
-
-11 \\ 0x020E005CU, 0x4U, 0x00000000U, 0x0U, 0x020E02E8U
-
-12 #define IOMUXC_GPIO1_IO00_GPIO1_IO00L
-
-13 \\ 0x020E005CU, 0x5U, 0x00000000U, 0x0U, 0x020E02E8U
-
-14 #define IOMUXC\_GPIO1_IO00_ENET1_1588_EVENT0_INL
-
-15 \\ 0x020E005CU, 0x6U, 0x00000000U, 0x0U, 0x020E02E8U
-
-16 #define IOMUXC_GPIO1_IO00_SRC_SYSTEM_RESETL
-
-17 \\ 0x020E005CU, 0x7U, 0x00000000U, 0x0U, 0x020E02E8U
-
-18 #define IOMUXC_GPIO1_IO00_WDOG3_WDOG_BL
-
-19 \\ 0x020E005CU, 0x8U, 0x00000000U, 0x0U, 0x020E02E8U
-
-20 #define IOMUXC_GPIO1_IO01_I2C2_SDAL
-
-21 \\ 0x020E0060U, 0x0U, 0x020E05B0U, 0x1U, 0x020E02ECU
-
-22 #define IOMUXC_GPIO1_IO01_GPT1_COMPARE1L
-
-23 \\ 0x020E0060U, 0x1U, 0x00000000U, 0x0U, 0x020E02ECU
-
-24 #define IOMUXC_GPIO1_IO01_USB_OTG1_OCL
-
-25 \\ 0x020E0060U, 0x2U, 0x020E0664U, 0x0U, 0x020E02ECU
-
-26
-
-27 /第二部分/
-
-28 static inline void IOMUXC_SetPinMux(uint32_t muxRegister,
-
-29 uint32_t muxMode,
-
-30 uint32_t inputRegister,
-
-31 uint32_t inputDaisy,
-
-32 uint32_t configRegister,
-
-33 uint32_t inputOnfield)
-
-34 {
-
-35 \*((volatile uint32_t \*)muxRegister) =
-
-36 IOMUXC_SW_MUX_CTL_PAD_MUX_MODE(muxMode) \|\\
-
-37 IOMUXC_SW_MUX_CTL_PAD_SION(inputOnfield);
-
-38
-
-39 if (inputRegister)
-
-40 {
-
-41 \*((volatile uint32_t \*)inputRegister) = \\
-
-42 IOMUXC_SELECT_INPUT_DAISY(inputDaisy);
-
-43 }
-
-44 }
-
-45
-
-46
-
-47 /第三部分/
-
-48 static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
-
-49 uint32_t muxMode,
-
-50 uint32_t inputRegister,
-
-51 uint32_t inputDaisy,
-
-52 uint32_t configRegister,
-
-53 uint32_t configValue)
-
-54 {
-
-55 if (configRegister)
-
-56 {
-
-57 \*((volatile uint32_t \*)configRegister) = configValue;
-
-58 }
-
-59 }
 
 这里只截取了一小部分代码，结合代码各部分说明如下：
 
@@ -205,45 +149,33 @@
 宏定义实现PAD属性设置
 ^^^^^^^^^^^^
 
-通常情况下一个引脚要设置8中PAD属性，而这些属性只能通过数字指定。为简化PAD属性设置我们编写了一个PAD属性配置文件“pad_config.h”，这里使用宏定义了引脚可选的PAD属性值，并且通过宏定义的名字很容易知道宏代表的属性值。如代码清单 51‑3所示。
+通常情况下一个引脚要设置8中PAD属性，而这些属性只能通过数字指定。为简化PAD属性设置我们编写了一个PAD属性配置文件“pad_config.h”，这里使用宏定义了引脚可选的PAD属性值，并且通过宏定义的名字很容易知道宏代表的属性值。如下所示。
 
-代码清单 51‑3PAD属性设置宏定义(pad_config.h)
 
-1 /第一部分/
+.. code-block:: c
+   :caption: 引脚复用与PAD属性定义（fsl_iomuxc.h）
+   :linenos:
 
-2 /\* SPEED 带宽配置 \*/
+    /*********************第一部分*******************/
+     /* SPEED 带宽配置 */
+     #define SPEED_0_LOW_50MHz       IOMUXC_SW_PAD_CTL_PAD_SPEED(0)
+     #define SPEED_1_MEDIUM_100MHz   IOMUXC_SW_PAD_CTL_PAD_SPEED(1)
+     #define SPEED_2_MEDIUM_100MHz   IOMUXC_SW_PAD_CTL_PAD_SPEED(2)
+     #define SPEED_3_MAX_200MHz      IOMUXC_SW_PAD_CTL_PAD_SPEED(3)
 
-3 #define SPEED_0_LOW_50MHz IOMUXC_SW_PAD_CTL_PAD_SPEED(0)
+     /*********************第二部分*******************/
+     /* PUE 选择使用保持器还是上下拉 */
+     #define PUE_0_KEEPER_SELECTED       IOMUXC_SW_PAD_CTL_PAD_PUE(0)   
+     #define PUE_1_PULL_SELECTED         IOMUXC_SW_PAD_CTL_PAD_PUE(1)   
+    
+     /*********************第三部分*******************/
+     /* PUS 上下拉配置 */
+     #define PUS_0_100K_OHM_PULL_DOWN  IOMUXC_SW_PAD_CTL_PAD_PUS(0)     
+     #define PUS_1_47K_OHM_PULL_UP     IOMUXC_SW_PAD_CTL_PAD_PUS(1)   
+     #define PUS_2_100K_OHM_PULL_UP    IOMUXC_SW_PAD_CTL_PAD_PUS(2)   
+     #define PUS_3_22K_OHM_PULL_UP     IOMUXC_SW_PAD_CTL_PAD_PUS(3)
 
-4 #define SPEED_1_MEDIUM_100MHz IOMUXC_SW_PAD_CTL_PAD_SPEED(1)
 
-5 #define SPEED_2_MEDIUM_100MHz IOMUXC_SW_PAD_CTL_PAD_SPEED(2)
-
-6 #define SPEED_3_MAX_200MHz IOMUXC_SW_PAD_CTL_PAD_SPEED(3)
-
-7
-
-8 /第二部分/
-
-9 /\* PUE 选择使用保持器还是上下拉 \*/
-
-10 #define PUE_0_KEEPER_SELECTED IOMUXC_SW_PAD_CTL_PAD_PUE(0)
-
-11 #define PUE_1_PULL_SELECTED IOMUXC_SW_PAD_CTL_PAD_PUE(1)
-
-12
-
-13 /第三部分/
-
-14 /\* PUS 上下拉配置 \*/
-
-15 #define PUS_0_100K_OHM_PULL_DOWN IOMUXC_SW_PAD_CTL_PAD_PUS(0)
-
-16 #define PUS_1_47K_OHM_PULL_UP IOMUXC_SW_PAD_CTL_PAD_PUS(1)
-
-17 #define PUS_2_100K_OHM_PULL_UP IOMUXC_SW_PAD_CTL_PAD_PUS(2)
-
-18 #define PUS_3_22K_OHM_PULL_UP IOMUXC_SW_PAD_CTL_PAD_PUS(3)
 
 这里只列出了文件“pad_config.h”部分代码，其他部分类似，结合代码各部分简单说明如下：
 
@@ -256,205 +188,114 @@
 RGB灯代码实现
 ^^^^^^^^
 
-与手动定义寄存器类似，这里使用官方SDK定义的寄存器并使用SDK提供的基本函数实现RGB灯功能，代码如代码清单 51‑4所示。
+与手动定义寄存器类似，这里使用官方SDK定义的寄存器并使用SDK提供的基本函数实现RGB灯功能，代码如下所示。
+
+
+.. code-block:: c
+   :caption: RGB灯实现代码
+   :linenos:
+
+    /*************************第一部分************************/
+     #include "MCIMX6Y2.h"
+     #include "fsl_iomuxc.h"
+     #include "pad_config.h"
+    
+     /*************************第二部分************************/
+     /*LED GPIO端口、引脚号及IOMUXC复用宏定义*/
+     #define RGB_RED_LED_GPIO                GPIO1
+     #define RGB_RED_LED_GPIO_PIN            (4U)
+     #define RGB_RED_LED_IOMUXC              IOMUXC_GPIO1_IO04_GPIO1_IO04
+    
+     #define RGB_GREEN_LED_GPIO              GPIO4
+     #define RGB_GREEN_LED_GPIO_PIN          (20U)
+     #define RGB_GREEN_LED_IOMUXC            IOMUXC_CSI_HSYNC_GPIO4_IO20
+    
+     #define RGB_BLUE_LED_GPIO               GPIO4
+     #define RGB_BLUE_LED_GPIO_PIN           (19U)
+     #define RGB_BLUE_LED_IOMUXC             IOMUXC_CSI_VSYNC_GPIO4_IO19
+    
+    
+     /*************************第三部分************************/
+     /* 所有引脚均使用同样的PAD配置 */
+     #define LED_PAD_CONFIG_DATA            (SRE_0_SLOW_SLEW_RATE| \
+                                             DSE_6_R0_6| \
+                                             SPEED_2_MEDIUM_100MHz| \
+                                             ODE_0_OPEN_DRAIN_DISABLED| \
+                                             PKE_0_PULL_KEEPER_DISABLED| \
+                                             PUE_0_KEEPER_SELECTED| \
+                                             PUS_0_100K_OHM_PULL_DOWN| \
+                                             HYS_0_HYSTERESIS_DISABLED)   
+         /* 配置说明 : */
+         /* 转换速率: 转换速率慢
+           驱动强度: R0/6 
+           带宽配置 : medium(100MHz)
+           开漏配置: 关闭 
+           拉/保持器配置: 关闭
+           拉/保持器选择: 保持器（上面已关闭，配置无效）
+           上拉/下拉选择: 100K欧姆下拉（上面已关闭，配置无效）
+           滞回器配置: 关闭 */  
+    
+     /*************************第四部分************************/
+     /*简单延时函数*/
+     void delay(uint32_t count)
+     {
+         volatile uint32_t i = 0;
+         for (i = 0; i < count; ++i)
+         {
+             __asm("NOP"); /* 调用nop空指令 */
+         }
+     }
+    
+    
+     int main()
+     {
+         /*************************第五部分************************/
+         CCM_CCGR1_CG13(0x3);//开启GPIO1的时钟
+         CCM_CCGR3_CG6(0x3); //开启GPIO4的时钟
+    
+         /*************************第六部分************************/
+         /*设置 红灯 引脚的复用功能以及PAD属性*/
+         IOMUXC_SetPinMux(RGB_RED_LED_IOMUXC,0);     
+         IOMUXC_SetPinConfig(RGB_RED_LED_IOMUXC, LED_PAD_CONFIG_DATA); 
+    
+         /*设置 绿灯 引脚的复用功能以及PAD属性*/
+         IOMUXC_SetPinMux(RGB_GREEN_LED_IOMUXC,0);     
+         IOMUXC_SetPinConfig(RGB_GREEN_LED_IOMUXC, LED_PAD_CONFIG_DATA); 
+    
+         /*设置 蓝灯 引脚的复用功能以及PAD属性*/
+         IOMUXC_SetPinMux(RGB_BLUE_LED_IOMUXC,0);     
+         IOMUXC_SetPinConfig(RGB_BLUE_LED_IOMUXC, LED_PAD_CONFIG_DATA); 
+    
+         /*************************第七部分************************/
+         GPIO1->GDIR |= (1<<4);  //设置GPIO1_04为输出模式
+         GPIO1->DR |= (1<<4);    //设置GPIO1_04输出电平为高电平
+    
+         GPIO4->GDIR |= (1<<20);  //设置GPIO4_20为输出模式
+         GPIO4->DR |= (1<<20);    //设置GPIO4_20输出电平为高电平
+    
+         GPIO4->GDIR |= (1<<19);  //设置GPIO4_19为输出模式
+         GPIO4->DR |= (1<<19);    //设置GPIO4_19输出电平为高电平
+    
+         /*************************第八部分************************/
+         while(1)
+         {
+              GPIO1->DR &= ~(1<<4); //红灯亮
+              delay(0xFFFFF);
+              GPIO1->DR |= (1<<4); //红灯灭
+    
+              GPIO4->DR &= ~(1<<20); //绿灯亮
+              delay(0xFFFFF);
+              GPIO4->DR |= (1<<20); //绿灯灭
+    
+              GPIO4->DR &= ~(1<<19); //蓝灯亮
+              delay(0xFFFFF);
+              GPIO4->DR |= (1<<19); //蓝灯灭
+         }
+         return 0;    
+     }
 
-代码清单 51‑4RGB灯实现代码
 
-1 /第一部分/
 
-2 #include "MCIMX6Y2.h"
-
-3 #include "fsl_iomuxc.h"
-
-4 #include "pad_config.h"
-
-5
-
-6 /第二部分/
-
-7 /*LED GPIO端口、引脚号及IOMUXC复用宏定义*/
-
-8 #define RGB_RED_LED_GPIO GPIO1
-
-9 #define RGB_RED_LED_GPIO_PIN (4U)
-
-10 #define RGB_RED_LED_IOMUXC IOMUXC_GPIO1_IO04_GPIO1_IO04
-
-11
-
-12 #define RGB_GREEN_LED_GPIO GPIO4
-
-13 #define RGB_GREEN_LED_GPIO_PIN (20U)
-
-14 #define RGB_GREEN_LED_IOMUXC IOMUXC_CSI_HSYNC_GPIO4_IO20
-
-15
-
-16 #define RGB_BLUE_LED_GPIO GPIO4
-
-17 #define RGB_BLUE_LED_GPIO_PIN (19U)
-
-18 #define RGB_BLUE_LED_IOMUXC IOMUXC_CSI_VSYNC_GPIO4_IO19
-
-19
-
-20
-
-21 /第三部分/
-
-22 /\* 所有引脚均使用同样的PAD配置 \*/
-
-23 #define LED_PAD_CONFIG_DATA (SRE_0_SLOW_SLEW_RATE\| \\
-
-24 DSE_6_R0_6\| \\
-
-25 SPEED_2_MEDIUM_100MHz\| \\
-
-26 ODE_0_OPEN_DRAIN_DISABLED\| \\
-
-27 PKE_0_PULL_KEEPER_DISABLED\| \\
-
-28 PUE_0_KEEPER_SELECTED\| \\
-
-29 PUS_0_100K_OHM_PULL_DOWN\| \\
-
-30 HYS_0_HYSTERESIS_DISABLED)
-
-31 /\* 配置说明 : \*/
-
-32 /\* 转换速率: 转换速率慢
-
-33 驱动强度: R0/6
-
-34 带宽配置 : medium(100MHz)
-
-35 开漏配置: 关闭
-
-36 拉/保持器配置: 关闭
-
-37 拉/保持器选择: 保持器（上面已关闭，配置无效）
-
-38 上拉/下拉选择: 100K欧姆下拉（上面已关闭，配置无效）
-
-39 滞回器配置: 关闭 \*/
-
-40
-
-41 /第四部分/
-
-42 /*简单延时函数*/
-
-43 void delay(uint32_t count)
-
-44 {
-
-45 volatile uint32_t i = 0;
-
-46 for (i = 0; i < count; ++i)
-
-47 {
-
-48 \__asm("NOP"); /\* 调用nop空指令 \*/
-
-49 }
-
-50 }
-
-51
-
-52
-
-53 int main()
-
-54 {
-
-55 /第五部分/
-
-56 CCM_CCGR1_CG13(0x3);//开启GPIO1的时钟
-
-57 CCM_CCGR3_CG6(0x3); //开启GPIO4的时钟
-
-58
-
-59 /第六部分/
-
-60 /*设置 红灯 引脚的复用功能以及PAD属性*/
-
-61 IOMUXC_SetPinMux(RGB_RED_LED_IOMUXC,0);
-
-62 IOMUXC_SetPinConfig(RGB_RED_LED_IOMUXC, LED_PAD_CONFIG_DATA);
-
-63
-
-64 /*设置 绿灯 引脚的复用功能以及PAD属性*/
-
-65 IOMUXC_SetPinMux(RGB_GREEN_LED_IOMUXC,0);
-
-66 IOMUXC_SetPinConfig(RGB_GREEN_LED_IOMUXC, LED_PAD_CONFIG_DATA);
-
-67
-
-68 /*设置 蓝灯 引脚的复用功能以及PAD属性*/
-
-69 IOMUXC_SetPinMux(RGB_BLUE_LED_IOMUXC,0);
-
-70 IOMUXC_SetPinConfig(RGB_BLUE_LED_IOMUXC, LED_PAD_CONFIG_DATA);
-
-71
-
-72 /第七部分/
-
-73 GPIO1->GDIR \|= (1<<4); //设置GPIO1_04为输出模式
-
-74 GPIO1->DR \|= (1<<4); //设置GPIO1_04输出电平为高电平
-
-75
-
-76 GPIO4->GDIR \|= (1<<20); //设置GPIO4_20为输出模式
-
-77 GPIO4->DR \|= (1<<20); //设置GPIO4_20输出电平为高电平
-
-78
-
-79 GPIO4->GDIR \|= (1<<19); //设置GPIO4_19为输出模式
-
-80 GPIO4->DR \|= (1<<19); //设置GPIO4_19输出电平为高电平
-
-81
-
-82 /第八部分/
-
-83 while(1)
-
-84 {
-
-85 GPIO1->DR &= ~(1<<4); //红灯亮
-
-86 delay(0xFFFFF);
-
-87 GPIO1->DR \|= (1<<4); //红灯灭
-
-88
-
-89 GPIO4->DR &= ~(1<<20); //绿灯亮
-
-90 delay(0xFFFFF);
-
-91 GPIO4->DR \|= (1<<20); //绿灯灭
-
-92
-
-93 GPIO4->DR &= ~(1<<19); //蓝灯亮
-
-94 delay(0xFFFFF);
-
-95 GPIO4->DR \|= (1<<19); //蓝灯灭
-
-96 }
-
-97 return 0;
-
-98 }
 
 代码很容易理解，这里只做简单的说明。
 

@@ -35,63 +35,41 @@ LED灯源码程序包含两部分内容，第一部分在汇编文件中设置�
 
 首先在“/home/section4”文件夹下创建目录led_c文件，用于存放本章代码。将“汇编点亮led灯的源码led.S复制到”led_c目录下，并更名为start.S。
 
-在start.S的基础上增加“栈”设置和执行跳转指令，如代码清单 50‑1所示。
+在start.S的基础上增加“栈”设置和执行跳转指令，如下所示。
 
-代码清单 50‑1极简启动文件（start.S）
 
-1 /第一部分/
+.. code-block:: asm
+   :caption: 极简启动文件（start.S）
+   :linenos: 
 
-2 .text //代码段
+    /***********************第一部分*********************/
+     .text            //代码段
+     .align 2         //设置字节对齐
+     .global _start   //定义全局变量
+    
+     _start:          //程序的开始
+       b reset      //跳转到reset标号处
+    
+         reset:
+         mrc     p15, 0, r0, c1, c0, 0     /*读取CP15系统控制寄存器   */
+         bic     r0,  r0, #(0x1 << 12)     /*  清除第12位（I位）禁用 I Cache  */
+         bic     r0,  r0, #(0x1 <<  2)     /*  清除第 2位（C位）禁用 D Cache  */
+         bic     r0,  r0, #0x2             /*  清除第 1位（A位）禁止严格对齐   */
+         bic     r0,  r0, #(0x1 << 11)     /*  清除第11位（Z位）分支预测   */
+         bic     r0,  r0, #0x1             /*  清除第 0位（M位）禁用 MMU   */
+         mcr     p15, 0, r0, c1, c0, 0     /*  将修改后的值写回CP15寄存器   */
+    
+     /***********************第二部分*********************/
+         ldr sp, =0x84000000   //设置栈地址64M
+         b main                //跳转到main函数
+    
+     /***********************第三部分*******************/  
+       /*跳转到light_led函数*/
+       //   bl light_led  
+       /*进入死循环*/
+     loop:
+         b loop
 
-3 .align 2 //设置字节对齐
-
-4 .global \_start //定义全局变量
-
-5
-
-6 \_start: //程序的开始
-
-7 b reset //跳转到reset标号处
-
-8
-
-9 reset:
-
-10 mrc p15, 0, r0, c1, c0, 0 /*读取CP15系统控制寄存器 \*/
-
-11 bic r0, r0, #(0x1 << 12) /\* 清除第12位（I位）禁用 I Cache \*/
-
-12 bic r0, r0, #(0x1 << 2) /\* 清除第 2位（C位）禁用 D Cache \*/
-
-13 bic r0, r0, #0x2 /\* 清除第 1位（A位）禁止严格对齐 \*/
-
-14 bic r0, r0, #(0x1 << 11) /\* 清除第11位（Z位）分支预测 \*/
-
-15 bic r0, r0, #0x1 /\* 清除第 0位（M位）禁用 MMU \*/
-
-16 mcr p15, 0, r0, c1, c0, 0 /\* 将修改后的值写回CP15寄存器 \*/
-
-17
-
-18 /第二部分/
-
-19 ldr sp, =0x84000000 //设置栈地址64M
-
-20 b main //跳转到main函数
-
-21
-
-22 /第三部分/
-
-23 /*跳转到light_led函数*/
-
-24 // bl light_led
-
-25 /*进入死循环*/
-
-26 loop:
-
-27 b loop
 
 代码总共分为三部分，第一、三部分与“汇编点亮led灯”完全相同，下面重点说明第二部分代码。
 
@@ -102,51 +80,34 @@ LED灯源码程序包含两部分内容，第一部分在汇编文件中设置�
 点亮LED灯——C语言部分
 ^^^^^^^^^^^^^
 
-C源码非常简单，只需把“汇编点亮led灯”例程中有关GPIO寄存器操作换成C语言即可，源码如代码清单 50‑2所示。
+C源码非常简单，只需把“汇编点亮led灯”例程中有关GPIO寄存器操作换成C语言即可，源码如下所示。
 
-代码清单 50‑2C语言实现点亮LED灯
+.. code-block:: c
+   :caption: 语言实现点亮LED灯
+   :linenos:  
 
-1 /第一部分/
+    /*************************第一部分***************************/
+     #define CCM_CCGR1 (volatile unsigned long*)0x20C406C       //时钟控制寄存器
+     //GPIO1_04复用功能选择寄存器
+    #define IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04 (volatile unsigned long*)0x20E006C
+     //PAD属性设置寄存器
+    #define IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04 (volatile unsigned long*)0x20E02F8 
+    #define GPIO1_GDIR (volatile unsigned long*)0x0209C004//GPIO方向设置寄存器
+     #define GPIO1_DR (volatile unsigned long*)0x0209C000   //GPIO输出状态寄存器
+    
+     /*************************第二部分***************************/
+     int main()
+     {
+         *(CCM_CCGR1) = 0xFFFFFFFF;   //开启GPIO1的时钟
+         *(IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04) = 0x5;//设置PAD复用功能为GPIO
+         *(IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04) = 0x1F838;//设置PAD属性
+         *(GPIO1_GDIR) = 0x10;//设置GPIO为输出模式
+         *(GPIO1_DR) = 0x0;   //设置输出电平为低电平
+    
+         while(1);
+         return 0;    
+     }
 
-2 #define CCM_CCGR1 (volatile unsigned long*)0x20C406C //时钟控制寄存器
-
-3 //GPIO1_04复用功能选择寄存器
-
-4#define IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04 (volatile unsigned long*)0x20E006C
-
-5 //PAD属性设置寄存器
-
-6#define IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04 (volatile unsigned long*)0x20E02F8
-
-7#define GPIO1_GDIR (volatile unsigned long*)0x0209C004//GPIO方向设置寄存器
-
-8 #define GPIO1_DR (volatile unsigned long*)0x0209C000 //GPIO输出状态寄存器
-
-9
-
-10 /第二部分/
-
-11 int main()
-
-12 {
-
-13 \*(CCM_CCGR1) = 0xFFFFFFFF; //开启GPIO1的时钟
-
-14 \*(IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04) = 0x5;//设置PAD复用功能为GPIO
-
-15 \*(IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04) = 0x1F838;//设置PAD属性
-
-16 \*(GPIO1_GDIR) = 0x10;//设置GPIO为输出模式
-
-17 \*(GPIO1_DR) = 0x0; //设置输出电平为低电平
-
-18
-
-19 while(1);
-
-20 return 0;
-
-21 }
 
 结合代码，各部分讲解如下：
 
@@ -168,59 +129,37 @@ led.o”命令完成了源码的编译、汇编工作，生成了.o文件。编�
 链接脚本介绍
 
 
-链接器脚本主要由SECTIONS、段、“.”运算符以及变量组成，一个简单的链接脚本如代码清单 50‑3所示。我们将基于它讲解连接脚本的基本用法。
+链接器脚本主要由SECTIONS、段、“.”运算符以及变量组成，一个简单的链接脚本如下所示。我们将基于它讲解连接脚本的基本用法。
 
-代码清单 50‑3链接脚本lds
 
-1 ENTRY(_start)（1）
 
-2 SECTIONS { （2）
+.. code-block:: c
+   :caption: 链接脚本lds
+   :linenos:  
 
-3.
-= 0x80000000;（3）
+    ENTRY(_start)（1）
+    SECTIONS {  （2）
+      . = 0x80000000;（3）
+    
+      . = ALIGN(4);（4）
+      .text :（5）
+      {
+      start.o (.text)（6）
+      *(.text)（7）
+      }
 
-4
-
-5.
-= ALIGN(4);（4）
-
-6 .text :（5）
-
-7 {
-
-8 start.o (.text)（6）
-
-9 \*(.text)（7）
-
-10 }
-
-11
-
-12.
-= ALIGN(4);（8）
-
-13 .data :
-
-14 {
-
-15 \*(.data)
-
-16 }
-
-17
-
-18.
-= ALIGN(4);（9）
-
-19 .bss :
-
-20 {
-
-21 \*(.bss)
-
-22 }
-
-23 }
+      . = ALIGN(4);（8）
+      .data : 
+      {
+      *(.data)
+      }
+    
+      . = ALIGN(4);（9）
+      .bss : 
+      {
+      *(.bss) 
+      }
+    }
 
 结合代码各部分讲解如下：
 
@@ -248,35 +187,26 @@ led.o”命令完成了源码的编译、汇编工作，生成了.o文件。编�
 
 在“在汇编点亮LED灯”章节，我们程序编写完成后需要依次输入编译、链接、格式转换命令才能最终生成二进制文件。这种编译方式效率低、容易出错。本 小节讲解裸机下的makefile的编写。
 
-点亮LED灯程序的makefile比较简单，仅实现了最基本的功能，后面使用到复杂功能是我们再进行修改，源码如代码清单 50‑4所示。
+点亮LED灯程序的makefile比较简单，仅实现了最基本的功能，后面使用到复杂功能是我们再进行修改，源码如下所示。
 
-代码清单 50‑4makefile文件实现
 
-1 all: start.o led.o （1）
+.. code-block:: c
+   :caption: makefile文件实现
+   :linenos:  
 
-2 arm-none-eabi-ld -Tled.lds $^ -o led.elf（2）
-
-3 arm-none-eabi-objcopy -O binary -S -g led.elf led.bin（3）
-
-4
-
-5 %.o : %.S（4）
-
-6 arm-none-eabi-gcc -g -c $^ -o start.o
-
-7 %.o : %.c（5）
-
-8 arm-none-eabi-gcc -g -c $^ -o led.o
-
-9
-
-10
-
-11 .PHONY: clean（6）
-
-12 clean:
-
-13 rm \*.o \*.elf \*.bin
+    all: start.o led.o （1）
+       arm-none-eabi-ld -Tled.lds  $^ -o led.elf（2）
+       arm-none-eabi-objcopy -O binary -S -g led.elf led.bin（3）
+    
+     %.o : %.S（4）
+       arm-none-eabi-gcc -g -c $^ -o start.o
+     %.o : %.c（5）
+       arm-none-eabi-gcc -g -c $^ -o led.o
+    
+    
+     .PHONY: clean（6）
+     clean:
+       rm *.o *.elf *.bin
 
 makefile文件很简短，因为是第一个裸机makefile，下面将详细分析每一行代码。
 

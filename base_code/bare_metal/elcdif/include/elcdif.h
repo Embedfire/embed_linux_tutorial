@@ -6,7 +6,7 @@
 #include "pad_config.h"
 
 
-/*¶¨Òå ÏÔÊ¾ÆÁÐÅÏ¢ */
+/*å®šä¹‰ æ˜¾ç¤ºå±ä¿¡æ¯ */
 #define APP_IMG_HEIGHT 480    
 #define APP_IMG_WIDTH 800
 #define APP_HSW 41
@@ -16,11 +16,11 @@
 #define APP_VFP 4
 #define APP_VBP 2
 
-/* ¶¨Òå elcdf ÏÔÊ¾¿ØÖÆÒý½Å*/
+/* å®šä¹‰ elcdf æ˜¾ç¤ºæŽ§åˆ¶å¼•è„š*/
 #define LCD_DISP_GPIO GPIO5
 #define LCD_DISP_GPIO_PIN 9
 
-/* ¶¨Òå elcdf ±³¹â¿ØÖÆÒý½Å */
+/* å®šä¹‰ elcdf èƒŒå…‰æŽ§åˆ¶å¼•è„š */
 #define LCD_BL_GPIO GPIO1
 #define LCD_BL_GPIO_PIN 8
 
@@ -28,7 +28,7 @@
 #define true 1
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
-/* ËùÓÐÒý½Å¾ùÊ¹ÓÃÍ¬ÑùµÄPADÅäÖÃ */
+/* æ‰€æœ‰å¼•è„šå‡ä½¿ç”¨åŒæ ·çš„PADé…ç½® */
 #define LCD_PAD_CONFIG_DATA (SRE_1_FAST_SLEW_RATE |      \
                              DSE_6_R0_6 |                \
                              SPEED_3_MAX_200MHz |        \
@@ -37,15 +37,15 @@
                              PUE_0_KEEPER_SELECTED |     \
                              PUS_0_100K_OHM_PULL_DOWN |  \
                              HYS_0_HYSTERESIS_DISABLED)
-/* ÅäÖÃËµÃ÷ : */
-/* ×ª»»ËÙÂÊ: ×ª»»ËÙÂÊ¿ì
-        Çý¶¯Ç¿¶È: R0/6 
-        ´ø¿íÅäÖÃ : max(200MHz)
-        ¿ªÂ©ÅäÖÃ: ¹Ø±Õ 
-        À­/±£³ÖÆ÷ÅäÖÃ: Ê¹ÄÜ
-        À­/±£³ÖÆ÷Ñ¡Ôñ: ±£³ÖÆ÷
-        ÉÏÀ­/ÏÂÀ­Ñ¡Ôñ: 100KÅ·Ä·ÏÂÀ­(Ñ¡ÔñÁË±£³ÖÆ÷´ËÅäÖÃÎÞÐ§)
-        ÖÍ»ØÆ÷ÅäÖÃ: ½ûÖ¹ */
+/* é…ç½®è¯´æ˜Ž : */
+/* è½¬æ¢é€ŸçŽ‡: è½¬æ¢é€ŸçŽ‡å¿«
+        é©±åŠ¨å¼ºåº¦: R0/6 
+        å¸¦å®½é…ç½® : max(200MHz)
+        å¼€æ¼é…ç½®: å…³é—­ 
+        æ‹‰/ä¿æŒå™¨é…ç½®: ä½¿èƒ½
+        æ‹‰/ä¿æŒå™¨é€‰æ‹©: ä¿æŒå™¨
+        ä¸Šæ‹‰/ä¸‹æ‹‰é€‰æ‹©: 100Kæ¬§å§†ä¸‹æ‹‰(é€‰æ‹©äº†ä¿æŒå™¨æ­¤é…ç½®æ— æ•ˆ)
+        æ»žå›žå™¨é…ç½®: ç¦æ­¢ */
 
 
 

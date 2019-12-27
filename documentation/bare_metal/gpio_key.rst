@@ -12,49 +12,57 @@ GPIO输入—按键查询检测
 硬件设计
 ~~~~
 
-按键机械触点断开、闭合时，由于触点的弹性作用，按键开关不会马上稳定接通或一下子断开，使用按键时会产生图 52‑1中的带波纹信号，需要用软件消抖处理滤波，不方便输入检测。不过i.MX 6U的GPIO引脚带有施密特触发器功能，使用该功能可以对信号实现消抖处理，见图 52‑2和图
-52‑3，从而简化了软件的工作，软件只需要直接检测引脚的电平即可。
+按键机械触点断开、闭合时，由于触点的弹性作用，按键开关不会马上稳定接通或一下子断开，使用按键时会产生图 52‑1中的带波纹信号，需要用软件消抖处理滤波，不方便输入检测。不过i.MX 6U的GPIO引脚带有施密特触发器功能，使用该功能可以对信号实现消抖处理，见下图，从而简化了软件的工作，软件只需要直接检测引脚的电平即可。
 
-|gpioke002|
+.. image:: media/gpioke002.jpeg
+   :align: center
+   :alt: 未找到图片
 
-图 52‑1 按键抖动说明图
 
-   |gpioke003|
 
-图 52‑2施密特触发器的转换特性
 
-|gpioke004|
+.. image:: media/gpioke003.png
+   :align: center
+   :alt: 未找到图片
 
-图 52‑3 在CMOS模式和滞后模式（施密特触发器）下的接收器输出
+
+.. image:: media/gpioke004.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 在Pro底板中包含了4个按键：
 
 (1) RST复位按键。该按键连接至i.MX 6U的POR引脚，当该引脚为低电平时会引起i.MX
-6U芯片的复位（复位的基本现象是程序从头开始运行）。从按键的原理图可知，该按键在没有被按下的时候，引脚状态为高电平，当按键按下时，引脚状态为低电平(按键所在的电路导通，引脚接到地)。所以，平时POR_B引脚保持高电平，芯片正常运行，按下按键时产生复位。 如图 52‑4所示。
+6U芯片的复位（复位的基本现象是程序从头开始运行）。从按键的原理图可知，该按键在没有被按下的时候，引脚状态为高电平，当按键按下时，引脚状态为低电平(按键所在的电路导通，引脚接到地)。所以，平时POR_B引脚保持高电平，芯片正常运行，按下按键时产生复位。 如下所示。
 
-|gpioke005|
+.. image:: media/gpioke005.png
+   :align: center
+   :alt: 未找到图片
 
-图 52‑4复位按键
 
 (2) MODE按键。MODE按键最为特殊，它通过一系列电路连接至两个引脚BOOT_MODE[0]和BOOT_MODE[1]，当该按键按下时，BOOT_MODE[0]引脚状态为高电平，BOOT_MODE[1]则相反为低电平。BOOT_MODE[0]和BOOT_MODE[1]都具有GPIO的功能，即我
 们可以选取这二者中任意一个设置成GPIO的输入模式并检测相应的输入电平，来判断按键是否被按下。MODE按键这样设计是为了方便切换芯片的启动方式，芯片复位启动后会检测这两个引脚的电平，根据BOOT_MODE[0]和BOOT_MODE[1]的电平状态来选择FLASH还是USB的启动方式。在本章实验中我们
-不使用该按键。MODE按键在原理图中的位置如图 52‑5所示。
+不使用该按键。MODE按键在原理图中的位置如下所示。
 
-|gpioke006|
+.. image:: media/gpioke006.png
+   :align: center
+   :alt: 未找到图片
 
-图 52‑5MODE按键
 
-(3) ON/OFF按键。该按键连接至i.MX 6U的ONOFF引脚，长按可以实现开关机。该按键不要用作普通按键使用。ON/OFF按键在原理图中的位置如图 52‑6所示。
+(3) ON/OFF按键。该按键连接至i.MX 6U的ONOFF引脚，长按可以实现开关机。该按键不要用作普通按键使用。ON/OFF按键在原理图中的位置如下图所示。
 
-(4) KEY按键。该按键连接至SNVS_TAMPER1引脚，用作普通的按键。本实验将用该按键实现GPIO输出功能。KEY按键在原理图中的位置如图 52‑6所示。
+(4) KEY按键。该按键连接至SNVS_TAMPER1引脚，用作普通的按键。本实验将用该按键实现GPIO输出功能。KEY按键在原理图中的位置如下图所示。
 
-|gpioke007|
+.. image:: media/gpioke007.png
+   :align: center
+   :alt: 未找到图片
 
-图 52‑6KEY按键和ON/OFF按键
 
-对这4个按键的信息及相应GPIO端口引脚号的总结具体见表格 52‑1。
+对这4个按键的信息及相应GPIO端口引脚号的总结具体见下表。
 
-表格 52‑1各个按键的信息及GPIO端口引脚号
+表 各个按键的信息及GPIO端口引脚号
 
 =========== ======== ======================== ==================== ================
 按键        丝印编号 GPIO功能                 按键按下时的电平     其它功能
@@ -85,187 +93,117 @@ MODE按键    SW4      BOOT_MODE[0]：           BOOT_MODE[0]：高电平 选择
 复制RGB灯程序
 ^^^^^^^^
 
-本程序在RGB等程序基础上修改，复制“/section4/led_rgb_c”灯程序到“/section4/button”目录下，如图 52‑7所示。
+本程序在RGB等程序基础上修改，复制“/section4/led_rgb_c”灯程序到“/section4/button”目录下，如下图所示。
 
-|gpioke008|
+.. image:: media/gpioke008.png
+   :align: center
+   :alt: 未找到图片
 
-图 52‑7复制ed_rgb_c程序到buttom文件夹
+
 
 将文件“led.c”和“led.lds”分别修改为“button.c”和“button.lds”，添加按键代码我们只需要修改“makefile”文件以及“button.c”文件。
 
 修改makefile
 ^^^^^^^^^^
 
-makefile文件主要是修改文件名，将“led”修改为button，其他内容并没有修改，修改过的makefile 如代码清单 52‑1所示。
+makefile文件主要是修改文件名，将“led”修改为button，其他内容并没有修改，修改过的makefile 如下所示。
 
-代码清单 52‑1 makefile 文件
 
-1 all: start.o button.o
+.. code-block:: c
+   :caption: makefile 文件
+   :linenos:
 
-2 arm-none-eabi-ld -Tbutton.lds $^ -o button.elf
+   all: start.o button.o
+   arm-none-eabi-ld -Tbutton.lds $^ -o button.elf
+   arm-none-eabi-objcopy -O binary -S -g button.elf button.bin
+   %.o : %.S
+   arm-none-eabi-gcc -g -c $^ -o start.o
+   %.o : %.c
+   arm-none-eabi-gcc -g -c $^ -o button.o
+   
+    .PHONY: clean
+    clean:
+    rm \*.o \*.elf \*.bin
 
-3 arm-none-eabi-objcopy -O binary -S -g button.elf button.bin
-
-4
-
-5 %.o : %.S
-
-6 arm-none-eabi-gcc -g -c $^ -o start.o
-
-7 %.o : %.c
-
-8 arm-none-eabi-gcc -g -c $^ -o button.o
-
-9
-
-10
-
-11 .PHONY: clean
-
-12 clean:
-
-13 rm \*.o \*.elf \*.bin
 
 为简化难度暂时这样修改，后面章节将会介绍更简单易用的修改方式。
 
 修改button.c
 ^^^^^^^^^^
 
-与led灯引脚设置方法相同，只是配置稍有不同，具体代码如代码清单 52‑2所示，这里只列出了按键相关的代码，完整代码请参考本章配套例程。
+与led灯引脚设置方法相同，只是配置稍有不同，具体代码如下所示，这里只列出了按键相关的代码，完整代码请参考本章配套例程。
+
+.. code-block:: c
+   :caption: 添加按键初始化代码
+   :linenos:
+
+       /********************第一部分******************/
+    /*按键2 GPIO端口、引脚号及IOMUXC复用宏定义*/
+    #define button2_GPIO               GPIO5
+    #define button2_GPIO_PIN           (1U)
+    #define button2_IOMUXC             IOMUXC_SNVS_SNVS_TAMPER1_GPIO5_IO01
+   
+        /********************第二部分******************/
+    /* 按键PAD配置 */
+    #define button_PAD_CONFIG_DATA            (SRE_0_SLOW_SLEW_RATE| \
+                                            DSE_6_R0_6| \
+                                            SPEED_2_MEDIUM_100MHz| \
+                                            ODE_0_OPEN_DRAIN_DISABLED| \
+                                            PKE_0_PULL_KEEPER_DISABLED| \
+                                            PUE_0_KEEPER_SELECTED| \
+                                            PUS_0_100K_OHM_PULL_DOWN| \
+                                            HYS_1_HYSTERESIS_ENABLED)   
+        /* 配置说明 : */
+        /* 转换速率: 转换速率慢
+          驱动强度: R0/6 
+          带宽配置 : medium(100MHz)
+          开漏配置: 关闭 
+          拉/保持器配置: 关闭
+          拉/保持器选择: 保持器（上面已关闭，配置无效）
+          上拉/下拉选择: 100K欧姆下拉（上面已关闭，配置无效）
+          滞回器配置: 开启 */ 
+   
+    int main()
+    {
+        /********************以下省略RGB灯初始化相关的代码******************/
+   
+   
+        /********************第三部分******************/
+        /*按键初始化*/
+        CCM_CCGR1_CG15(0x3);  //开启GPIO5的时钟
+   
+        /*设置 绿灯 引脚的复用功能以及PAD属性*/
+        IOMUXC_SetPinMux(RGB_GREEN_LED_IOMUXC,0);     
+        IOMUXC_SetPinConfig(RGB_GREEN_LED_IOMUXC, button_PAD_CONFIG_DATA); 
+   
+        GPIO5->GDIR &= ~(1<<1);  //设置GPIO5_01为输入模式
+   
+        /********************第四部分******************/
+        while(1)
+        {
+            if((GPIO5->DR)&(1<<1))
+            {
+                delay(0xFF);
+                if((GPIO5->DR)&(1<<1))
+                {
+                    /*有按键按下，执行绿色led灯翻转*/
+                    if((GPIO4->DR)&(1<<20))
+                    {
+                        GPIO4->DR &= ~(1<<20);    //绿灯亮
+                        while((GPIO5->DR)&(1<<1));//等待按键松开
+                    }
+                    else
+                    {
+                        GPIO4->DR |= (1<<20);     //绿灯灭
+                        while((GPIO5->DR)&(1<<1));//等待按键松开
+                    }
+                }
+            }
+
+        }
+        return 0;    
+    }
 
-代码清单 52‑2添加按键初始化代码
-
-1 /第一部分/
-
-2 /*按键2 GPIO端口、引脚号及IOMUXC复用宏定义*/
-
-3 #define button2_GPIO GPIO5
-
-4 #define button2_GPIO_PIN (1U)
-
-5 #define button2_IOMUXC IOMUXC_SNVS_SNVS_TAMPER1_GPIO5_IO01
-
-6
-
-7 /第二部分/
-
-8 /\* 按键PAD配置 \*/
-
-9 #define button_PAD_CONFIG_DATA (SRE_0_SLOW_SLEW_RATE\| \\
-
-10 DSE_6_R0_6\| \\
-
-11 SPEED_2_MEDIUM_100MHz\| \\
-
-12 ODE_0_OPEN_DRAIN_DISABLED\| \\
-
-13 PKE_0_PULL_KEEPER_DISABLED\| \\
-
-14 PUE_0_KEEPER_SELECTED\| \\
-
-15 PUS_0_100K_OHM_PULL_DOWN\| \\
-
-16 HYS_1_HYSTERESIS_ENABLED)
-
-17 /\* 配置说明 : \*/
-
-18 /\* 转换速率: 转换速率慢
-
-19 驱动强度: R0/6
-
-20 带宽配置 : medium(100MHz)
-
-21 开漏配置: 关闭
-
-22 拉/保持器配置: 关闭
-
-23 拉/保持器选择: 保持器（上面已关闭，配置无效）
-
-24 上拉/下拉选择: 100K欧姆下拉（上面已关闭，配置无效）
-
-25 滞回器配置: 开启 \*/
-
-26
-
-27 int main()
-
-28 {
-
-29 /以下省略RGB灯初始化相关的代码/
-
-30
-
-31
-
-32 /第三部分/
-
-33 /*按键初始化*/
-
-34 CCM_CCGR1_CG15(0x3); //开启GPIO5的时钟
-
-35
-
-36 /*设置 绿灯 引脚的复用功能以及PAD属性*/
-
-37 IOMUXC_SetPinMux(RGB_GREEN_LED_IOMUXC,0);
-
-38 IOMUXC_SetPinConfig(RGB_GREEN_LED_IOMUXC, button_PAD_CONFIG_DATA);
-
-39
-
-40 GPIO5->GDIR &= ~(1<<1); //设置GPIO5_01为输入模式
-
-41
-
-42 /第四部分/
-
-43 while(1)
-
-44 {
-
-45 if((GPIO5->DR)&(1<<1))
-
-46 {
-
-47 delay(0xFF);
-
-48 if((GPIO5->DR)&(1<<1))
-
-49 {
-
-50 /*有按键按下，执行绿色led灯翻转*/
-
-51 if((GPIO4->DR)&(1<<20))
-
-52 {
-
-53 GPIO4->DR &= ~(1<<20); //绿灯亮
-
-54 while((GPIO5->DR)&(1<<1));//等待按键松开
-
-55 }
-
-56 else
-
-57 {
-
-58 GPIO4->DR \|= (1<<20); //绿灯灭
-
-59 while((GPIO5->DR)&(1<<1));//等待按键松开
-
-60 }
-
-61 }
-
-62 }
-
-63
-
-64 }
-
-65 return 0;
-
-66 }
 
 结合代码各部分简单说明如下：
 

@@ -21,17 +21,23 @@ llo world”工程，并烧写到SD卡，最终放在我们的开发板上运行
 SDK程序编译、烧写流程分析
 ~~~~~~~~~~~~~~
 
-学习本章请打开SDK源码目录。打开任意一个工程，可以看到每个工程有两个版本如图 46‑1所示。
+学习本章请打开SDK源码目录。打开任意一个工程，可以看到每个工程有两个版本如下所示。
 
-|buildi002|
 
-图 46‑1SDK版本选择
+.. image:: media/buildi002.png
+   :align: center
+   :alt: 未找到图片
 
-由于我们要在linux下编译、下载，所以我们需要选择armgcc版本工程。打开“armgcc”文件夹如图 46‑2所示。
 
-|buildi003|
 
-图 46‑2armgcc文件
+
+由于我们要在linux下编译、下载，所以我们需要选择armgcc版本工程。打开“armgcc”文件夹如下所示。
+
+.. image:: media/buildi003.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 可以看到arngcc文件夹下包含很多build_xx脚本，这些脚本用于在linux环境下编译生成.bin 可执行文件，所以我们需要一个arm gcc
 交叉编译器。CMakeList.txt用于生成编译过程中需要的Makefile，所以我们还需要一个CMake工具。以.ld结尾的文件是链接器脚本相关文件，根据运行的脚本不同，脚本会自动调用相应的链接文件。
@@ -46,18 +52,28 @@ SDK程序编译、烧写流程分析
 
 执行以下命令：
 
-sudo apt-get install cmake
+.. code-block:: c
+   :linenos:
+
+    sudo apt-get install cmake
 
 安装交叉编译工具
 ^^^^^^^^
 
 执行以下命令：
 
-sudo apt-get install gcc-arm-none-eabi
+.. code-block:: c
+   :linenos:
+
+    sudo apt-get install gcc-arm-none-eabi
 
 添加临时环境变量，执行以下命令：
 
-export ARMGCC_DIR=/usr
+
+.. code-block:: c
+   :linenos:
+
+    export ARMGCC_DIR=/usr
 
 注：使用以上命令添加的环境变量只在当前终端上有效，如果虚拟机重启或者重新打开了终端需要再次执行添加环境变量命令。该环境变量只有在编译官方SDK时才用得到，需要时动态添加即可。
 
@@ -69,15 +85,20 @@ export ARMGCC_DIR=/usr
 
 使用共享文件夹将“SDK_2.2_MCIM6ULL_RFP_Linux.run” 拷贝到Linux下，存放位置自定。然后运行.run文件生成SDK linux下的源文件命令如下。
 
-sudo ./ SDK_2.2_MCIM6ULL_RFP_Linux.run
+.. code-block:: c
+   :linenos:
+
+    sudo ./ SDK_2.2_MCIM6ULL_RFP_Linux.run
 
 注：运行SDK_xxx_xxx.run时可能会出现输入SDK_xxx_xxx.run时“tab”键无法自动补齐，并且手动输入完整文件名也不能运行。原因大多是当前用户没有SDK_xxx_xxx.run文件的执行权限。修改SDK_xxx_xxx.run文件的执行权限即可。
 
-SDK_xxx_xxx.run运行后会弹出图形化的界面，不过鼠标无法对界面上的选项进行操作，只能通过键盘上的方向键选择。例如在路径选择界面如图 46‑3所示。
+SDK_xxx_xxx.run运行后会弹出图形化的界面，不过鼠标无法对界面上的选项进行操作，只能通过键盘上的方向键选择。例如在路径选择界面如下所示。
 
-|buildi004|
+.. image:: media/buildi004.png
+   :align: center
+   :alt: 未找到图片
 
-图 46‑3路径选择界面
+
 
 我们通过“上下”方向键选择生成的SDK文件保存位置。“左右”方向键选择“Select”或“Abort Installation”。需要说明的是图 46‑3中选项1表示生成的SDK保存在你当前登录的用户文件夹下，不同用户路径不同。
 
@@ -88,16 +109,20 @@ SDK_xxx_xxx.run运行结束后会在我们制定的目录生成Linux下的SDK。
 
 Linux下的SDK生成后，进入工程文件，“SDK_2.2_MCIM6ULL \\boards\evkmcimx6ull\demo_apps\hello_world\armgcc”运行build_ddr_release.sh脚本，命令如下：
 
-./build_ddr_release.sh
+.. code-block:: c
+   :linenos:
+
+    ./build_ddr_release.sh
 
 build_ddr_release.sh用于生成*.bin文件，运行成功后会在当前文件夹下生成“ddr_release”文件夹，在文件夹中存在一个sdk20-app.bin文件，将sdk20-app.bin放到SD卡程序并不能直接运行，根据存储设备不同还要在sdk20-app.bin添加相应的头文件
 然后才能在开发板上运行。
 
-注：运行build_ddr_release.sh常见错误如图 46‑4所示。
+注：运行build_ddr_release.sh常见错误如下所示。
 
-|buildi005|
+.. image:: media/buildi004.png
+   :align: center
+   :alt: 未找到图片
 
-图 46‑4build_ddr_release.sh错误
 
 从错误提示不难看出，错误原因是没有添加ARMGCC_DIR环境变量，根据之前讲解添加环境变量命令“export ARMGCC_DIR=/usr”只在当前端口有效，所以在当前端口再次执行命令“export
 ARMGCC_DIR=/usr”添加环境变量即可(不建议将环境变量添加到系统环境变量中，因为该环境变量只有编译官方SDK程序才用的到，后面章节主要是自己写程序)。
@@ -121,11 +146,14 @@ ARMGCC_DIR=/usr”添加环境变量即可(不建议将环境变量添加到系�
 
 将USB读卡器接入电脑，默认链接到主机，首先我们要讲USB读卡器链接到虚拟机。
 
-首先将鼠标放到USB图标上（虚拟机右下角状态栏），单击鼠标右键如图 46‑5所示。
+首先将鼠标放到USB图标上（虚拟机右下角状态栏），单击鼠标右键如下所示。
 
-|buildi006|
+.. image:: media/buildi006.png
+   :align: center
+   :alt: 未找到图片
 
-图 46‑5连接USB读卡器到虚拟机
+
+
 
 如何确定那个是USB读卡器？我们可以比较拔出和插入USB读卡器时列表中的内容从而确定那个是USB读卡器。
 
@@ -136,11 +164,15 @@ ARMGCC_DIR=/usr”添加环境变量即可(不建议将环境变量添加到系�
 
 ./mkImage.sh 烧写文件路径
 
-烧写命令其实是运行 mkImage.sh脚本，并且将要烧写的.bin文件的路径作为参数，执行该命令后会列出可烧写的磁盘。如图 46‑6所示。
+烧写命令其实是运行 mkImage.sh脚本，并且将要烧写的.bin文件的路径作为参数，执行该命令后会列出可烧写的磁盘。如下所示。
 
-|buildi007|
 
-图 46‑6设备列表
+.. image:: media/buildi007.png
+   :align: center
+   :alt: 未找到图片
+
+
+
 
 没有确定哪个是SD，不要执行烧写！！！
 

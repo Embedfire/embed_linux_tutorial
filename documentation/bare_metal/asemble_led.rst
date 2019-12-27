@@ -24,29 +24,29 @@ i.MX 6U芯片的GPIO被分成很5组,并且每组GPIO的数量不尽相同，例
 Manual》第26章General Purpose Input/Output (GPIO)（P1133），和STM32以及RT1052类似。
 
 GPIO框图剖析
-~~~~~~~~
 
-|asembl002|
+.. image:: media/asembl002.png
+   :align: center
 
-图 48‑1 GPIO结构框图
 
 通过GPIO硬件结构框图，就可以从整体上深入了解GPIO外设及它的各种应用模式。该图从最右端看起，①中的就表示i.MX 6U芯片引出的GPIO引脚，其余部件都位于芯片内部。
 
 基本结构分析
 ^^^^^^
 
-下面我们按图 49‑1中的编号对GPIO端口的结构部件进行说明。
+下面我们按图中的编号对GPIO端口的结构部件进行说明。
 
 PAD
 '''
 
 PAD代表了一个i.MX 6U的GPIO引脚。在它的左侧是一系列信号通道及控制线，如input_on控制输入开关，Dir控制引脚的输入输出方向，Data_out控制引脚输出高低电平，Data_in作为信号输入，这些信号都经过一个IOMUX的器件连接到左侧的寄存器。
 
-另外，对于每个引脚都有很多关于属性的配置，这些配置是由图 49‑2中的框架结构实现的。
+另外，对于每个引脚都有很多关于属性的配置如下所示：
 
-|asembl003|
+.. image:: media/asembl003.png
+   :align: center
 
-图 48‑2 PAD接口框架
+
 
 ①PAD引脚
 
@@ -82,15 +82,20 @@ DSE可以调整芯片内部与引脚串联电阻R0的大小，从而改变引脚
 
 -  HYS滞后使能
 
-i.MX 6U的输入检测可以使用普通的CMOS检测或施密特触发器模式（滞后模式）。施密特触发器具有滞后效应，对正向和负向变化的输入信号有不同的阈值电压，常被用于电子开关、波形变换等场合，其转换特性和对比见图 49‑3及图 49‑4，如检测按键时，使用施密特模式即可起到消抖的功能。
+i.MX 6U的输入检测可以使用普通的CMOS检测或施密特触发器模式（滞后模式）。施密特触发器具有滞后效应，对正向和负向变化的输入信号有不同的阈值电压，常被用于电子开关、波形变换等场合，其转换特性和对比如下，如检测按键时，使用施密特模式即可起到消抖的功能。
 
-   |asembl004|
 
-图 48‑3施密特触发器的转换特性
+.. image:: media/asembl004.png
+   :align: center
 
-|asembl005|
 
-图 48‑4 在CMOS模式和滞后模式下的接收器输出
+
+
+.. image:: media/asembl005.png
+   :align: center
+
+
+
 
 ④Pull/Keeper上下拉、保持器
 
@@ -117,7 +122,7 @@ PUS可配置项可选为100K欧下拉以及22K欧、47K欧及100K欧上拉。
 IOMUX复用选择器
 ''''''''''
 
-继续分析图 49‑1，图中标注的第2部分IOMUX译为IO复用选择器。i.MX 6U的芯片每个GPIO都通过IOMUX支持多种功能，例如一个IO可用于网络外设ENET的数据接收引脚，也可以被配置成PWM外设的输出引脚，这样的设计大大增加了芯片的适用性，这样可选的功能就是由IOMUX实现的。IOMUX
+IOMUX译为IO复用选择器。i.MX 6U的芯片每个GPIO都通过IOMUX支持多种功能，例如一个IO可用于网络外设ENET的数据接收引脚，也可以被配置成PWM外设的输出引脚，这样的设计大大增加了芯片的适用性，这样可选的功能就是由IOMUX实现的。IOMUX
 相当于增加了多根内部信号线与IO引脚相连，最多有8根，也就是说一个IO最多可支持8种可选的功能。
 
 IOMUX由其左侧的IOMUXC控制（C表示Controler），IOMUXC提供寄存器给用户进行配置，它又分成MUX Mode（IO模式控制）以及Pad Settings（Pad配置）两个部分：
@@ -130,9 +135,9 @@ MUX Mode就是用来配置引脚的复用功能，按上面的例子，即是具
 
 Pad Settings用于配置引脚的属性，例如驱动能力，是否使用上下拉电阻，是否使用保持器，是否使用开漏模式以及使用施密特模式还是CMOS模式等。关于属性的介绍会在后面给出，在学习各种外设时，也将会接触到这些属性在不同场合下的应用。
 
-在IOMUXC外设中关于MUX Mode和Pad Settings寄存器命名格式见表格 49‑1。
+在IOMUXC外设中关于MUX Mode和Pad Settings寄存器命名格式如下。
 
-表格 48‑1 IOMUXC寄存器命名的方式
+
 
 ============== ==========================
 IOMUXC控制类型 寄存器名称
@@ -147,11 +152,12 @@ GPIO1_IO04，以下简称MUX寄存器及PAD寄存器。根据寄存器说明即�
 IOMUXC_SW_MUX_CTL_PAD_XXXX引脚模式寄存器
 
 
-下面以GPIO1_IO04引脚为例对 MUX寄存器进行说明，该引脚相应的MUX寄存器在参考手册中的描述见图 49‑5。
+下面以GPIO1_IO04引脚为例对 MUX寄存器进行说明，该引脚相应的MUX寄存器在参考手册中的描述如下。
 
-|asembl006|
+.. image:: media/asembl006.png
+   :align: center
 
-图 48‑5 参考手册中对GPIO1.4引脚MUX配置寄存器的说明
+
 
 可以看到，该寄存器主要有两个配置域，分别是SION和MUX_MODE，其中SION用于设置引脚在输出模式下同时开启输入通道。重点是MUX_MODE的配置，它使用4个寄存器位表示可选的ALT0~ALT7这8个模式，如ALT2模式就是用于usb外设的USB_OTG1_PWR信号；若配置为ALT5则引脚会
 用作普通的GPIO功能，用于输出高、低电平。 这也是本章所需要的。
@@ -159,13 +165,13 @@ IOMUXC_SW_MUX_CTL_PAD_XXXX引脚模式寄存器
 IOMUXC_SW\_ PAD_CTL_PAD_XXXX引脚属性寄存器
 
 
-类似地，以GPIO1_IO04引脚中PAD寄存器在参考手册中的描述见图 49‑6。
+类似地，以GPIO1_IO04引脚中PAD寄存器在参考手册中的描述如下。
 
-|asembl007|
+.. image:: media/asembl007.png
+   :align: center
 
-图 48‑6 参考手册中对GPIO1.4引脚PAD配置寄存器的说明（部分）
 
-相对来说PAD寄存器的配置项就更丰富了，而且图中仅是该寄存器的部分说明，仔细看这些配置项，它们就是前面图 49‑2介绍的各项属性，如HYS设置使用施密特模式的滞后功能，PUS配置上下拉电阻的阻值，其它的还包含PUE、PKE、ODE、SPEED、DSE及SRE的配置。
+相对来说PAD寄存器的配置项就更丰富了，而且图中仅是该寄存器的部分说明，仔细看这些配置项，它们就是前面介绍的各项属性，如HYS设置使用施密特模式的滞后功能，PUS配置上下拉电阻的阻值，其它的还包含PUE、PKE、ODE、SPEED、DSE及SRE的配置。
 
 Block外设功能控制块
 ''''''''''''
@@ -183,22 +189,26 @@ GPIO.GDIR方向寄存器
 
 控制一个GPIO引脚时，要先用GDIR方向寄存器配置该引脚用于输出电平信号还是用作输入检测。典型的例子是使用输出模式可以控制LED灯的亮灭，输入模式时可以用来检测按键是否按下。
 
-GDIR寄存器的每一个数据位代表一个引脚的方向，对应的位被设置为0时该引脚为输入模式，被设置为1时该引脚为输出模式，具体见图 49‑7。
+GDIR寄存器的每一个数据位代表一个引脚的方向，对应的位被设置为0时该引脚为输入模式，被设置为1时该引脚为输出模式。
 
-|asembl008|
+.. image:: media/asembl008.png
+   :align: center
 
-图 48‑7 参考手册中对GDIR的寄存器说明
+
+
 
 例如，对GPIO1的GDIR寄存器的bit3位被写入为1，那么GPIO1.3引脚的模式即为输出。
 
 GPIO.DR数据寄存器
 
 
-DR数据寄存器直接代表了引脚的电平状态，它也使用1个数据位表示1个引脚的电平，每位用1表示高电平，用0表示低电平。DR寄存器在参考手册中的说明见图 49‑8。
+DR数据寄存器直接代表了引脚的电平状态，它也使用1个数据位表示1个引脚的电平，每位用1表示高电平，用0表示低电平。DR寄存器在参考手册中的说明如下。
 
-|asembl009|
+.. image:: media/asembl009.png
+   :align: center
 
-图 48‑8 参考手册中对DR数据寄存器的说明
+
+
 
 当GDIR方向寄存器设置引脚为输出模式时，写入DR数据寄存器对应的位即可控制该引脚输出的电平状态，如这时GPIO1的DR寄存器的bit4被写入为1，则引脚为输出高电平。
 
@@ -245,11 +255,12 @@ LED初始化流程大致可分为以下三步：
 硬件连接
 ^^^^
 
-打开《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》原理图文档来查看硬件连接，LED灯部分见图 48‑9。
+打开《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》原理图文档来查看硬件连接，LED灯部分如下。
 
-|asembl010|
+.. image:: media/asembl010.png
+   :align: center
 
-图 48‑9 RGB灯电路连接图，摘自《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》
+
 
 这些LED灯的阴极都是连接到i.MX 6U的GPIO引脚，只要我们控制GPIO引脚的电平输出状态，即可控制LED灯的亮灭。若你使用的实验板LED灯的连接方式或引脚不一样，只需根据我们的工程修改引脚即可，程序的控制原理相同。
 
@@ -261,34 +272,35 @@ LED初始化流程大致可分为以下三步：
 查看核心板原理图
 ^^^^^^^^
 
-打开《野火_EBF6ULL S1 邮票孔核心板_V1.0_原理图》，在PDF阅读器的搜索框输入前面的GPIO_4、CSI_HSYNC、CSI_VSYNC标号，找到它们在i.MX 6U芯片中的标号说明，具体见图 48‑10。
+打开《野火_EBF6ULL S1 邮票孔核心板_V1.0_原理图》，在PDF阅读器的搜索框输入前面的GPIO_4、CSI_HSYNC、CSI_VSYNC标号，找到它们在i.MX 6U芯片中的标号说明，具体如下。
 
-|asembl011|
+.. image:: media/asembl011.png
+   :align: center
 
-图 48‑10 核心板上i.MX 6U的信号连接，摘自《野火_EBF6ULL S1 邮票孔核心板_V1.0_原理图》
 
-通过这样32 21 29 29 11的方式，我们查找到了GPIO_4信号的具体引脚名为GPIO1_IO04。但是当我们使用同样的方法查找时发现只能找到CSI_HSYNC、CSI_VSYNC，并没有我们熟悉的GPIOx_IOx标注的引脚名，如图 48‑11所示。
+通过这样32 21 29 29 11的方式，我们查找到了GPIO_4信号的具体引脚名为GPIO1_IO04。但是当我们使用同样的方法查找时发现只能找到CSI_HSYNC、CSI_VSYNC，并没有我们熟悉的GPIOx_IOx标注的引脚名，如下。
 
-|asembl012|
+.. image:: media/asembl012.png
+   :align: center
 
-图 48‑11RGB灯引脚
+
 
 原因很简单，这两个引脚默认情况下不用作GPIO，而是用作摄像头的某一功能引脚，但是它可以复用为GPIO，我们怎么找到对应的GPIO呢？
 
-第一种，在《i.MX 6UltraLite Applications Processor Reference Manual》的第4章External Signals and Pin Multiplexing搜索引脚名，以CSI_HSYNC为例，如图 49‑13所示。
+第一种，在《i.MX 6UltraLite Applications Processor Reference Manual》的第4章External Signals and Pin Multiplexing搜索引脚名，以CSI_HSYNC为例，如下所示。
 
-|asembl013|
+.. image:: media/asembl013.png
+   :align: center
 
-图 48‑12在参考手册根据引脚号查找其复用功能
+
 
 从中可以看出CSI_HSYNC对应的GPIO引脚为GPIO4_IO20。
 
-第二种，在官方写好的文件中查找，我们打开“fsl_iomuxc.h”文件（可以打开IAR工程找到该文件也可以在工程目录下直接搜索）。直接在“fsl_iomuxc.h”文件中搜索图 49‑12所搜得到的LED灯对应的引脚CSI_HSYNC（或CSI_VSYNC）得到如图
-49‑14所示的结果（以CSI_HSYNC为例）。
+第二种，在官方写好的文件中查找，我们打开“fsl_iomuxc.h”文件（可以打开IAR工程找到该文件也可以在工程目录下直接搜索）。直接在“fsl_iomuxc.h”文件中搜索得到的LED灯对应的引脚CSI_HSYNC（或CSI_VSYNC）得到如下所示的结果（以CSI_HSYNC为例）。
 
-|asembl014|
+.. image:: media/asembl014.png
+   :align: center
 
-图 48‑13fsl_iomuxc.h文件
 
 从图中不难看出这就是我们要找的引脚，每个宏定义分“三段”，以宏IOMUXC_CSI_HSYNC_I2C2_SCL为例，IOMUXC代表这是一个引脚复用宏定义，CSI_HSYNC代表原理图上实际的芯片引脚名，I2C2_SCL代表引脚的复用功能。一个引脚有多个复用功能，本章要把CSI_HSYNC用作GP
 IO控制LED灯，所以本实验要选择IOMUXC_CSI_HSYNC_GPIO4_IO20宏定义引脚CSI_HSYNC复用为GPIO4_IO20，具体怎么使用程序中再详细介绍。
@@ -318,171 +330,95 @@ B灯   CSI_VSYNC    CSI_VSYNC  GPIO4_IO19
 源码讲解
 ''''
 
-完整汇编点亮LED程序如代码清单 48‑1所示
+完整汇编点亮LED程序如下所示
+
+.. code-block:: c
+   :caption: led汇编源码（led.S）
+   :linenos:
+
+   /*************************第一部分*************************/
+    .text            //代码段
+    .align 2         //设置字节对齐
+    .global _start   //定义全局变量
+   
+    /*************************第二部分*************************/
+    _start:          //程序的开始
+      b reset      //跳转到reset标号处
+   
+    /*************************第三部分*************************/
+        reset:
+        mrc     p15, 0, r0, c1, c0, 0     /*读取CP15系统控制寄存器   */
+        bic     r0,  r0, #(0x1 << 12)     /*  清除第12位（I位）禁用 I Cache  */
+        bic     r0,  r0, #(0x1 <<  2)     /*  清除第 2位（C位）禁用 D Cache  */
+        bic     r0,  r0, #0x2             /*  清除第 1位（A位）禁止严格对齐   */
+        bic     r0,  r0, #(0x1 << 11)     /*  清除第11位（Z位）分支预测   */
+        bic     r0,  r0, #0x1             /*  清除第 0位（M位）禁用 MMU   */
+        mcr     p15, 0, r0, c1, c0, 0     /*  将修改后的值写回CP15寄存器   */
+   
+    /*************************第四部分*************************/
+        /*跳转到light_led函数*/
+        bl light_led  
+        /*进入死循环*/
+    /*************************第五部分*************************/
+    loop:
+        b loop
+   
+   
+    /*************************第六部分*************************/
+    /*CCM_CCGR1 时钟使能寄存器地址，默认时钟全部开启*/
+    #define gpio1_clock_enible_ccm_ccgr1  0x20C406C
+   
+   
+    /*IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04 
+    寄存器地址，用于设置GPIO1_iIO04的复用功能*/
+    #define gpio1_io04_mux_ctl_register  0x20E006C
+    /*IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04寄存器地址，用于设置GPIO的PAD属性*/
+    #define gpio1_io04_pad_ctl_register  0x20E02F8
+   
+   
+    /*GPIO1_GDIR寄存器，用于设置GPIO为输入或者输出*/
+    #define  gpio1_gdir_register  0x0209C004
+    /*GPIO1_DR寄存器，用于设置GPIO输出的电平状态*/
+    #define  gpio1_dr_register  0x0209C000
+   
+   
+   
+    /*************************第七部分*************************/
+    light_led:
+        /*开启GPIO1的时钟*/
+        ldr r0, =gpio1_clock_enible_ccm_ccgr1
+      ldr r1, =0xFFFFFFFF
+      str r1, [r0]
+   
+   
+    /*************************第八部分*************************/
+        /*将PAD引脚复用为GPIO*/
+      ldr r0, =gpio1_io04_mux_ctl_register
+      ldr r1, =0x5
+      str r1, [r0]
+   
+    /*************************第九部分*************************/
+        /*设置GPIO PAD属性*/
+      ldr r0, =gpio1_io04_pad_ctl_register
+      ldr r1, =0x1F838
+      str r1, [r0]
+    /*************************第十部分*************************/
+        /*将GPIO_GDIR.[4] 设置为1， gpio1_io04设置为输出模式*/
+      ldr r0, =gpio1_gdir_register
+      ldr r1, =0x10
+      str r1, [r0]
+
+    /*************************第十一部分*************************/
+        /*将GPIO_DR 设置为0， gpio1全部输出为低电平*/
+      ldr r0, =gpio1_dr_register
+      ldr r1, =0x0
+      str r1, [r0]
+   
+    /*************************第十二部分*************************/
+        /*跳出light_led函数，返回跳转位置*/
+      mov pc, lr
 
-代码清单 48‑1led汇编源码（led.S）
 
-1 /第一部分/
-
-2 .text //代码段
-
-3 .align 2 //设置字节对齐
-
-4 .global \_start //定义全局变量
-
-5
-
-6 /第二部分/
-
-7 \_start: //程序的开始
-
-8 b reset //跳转到reset标号处
-
-9
-
-10 /第三部分/
-
-11 reset:
-
-12 mrc p15, 0, r0, c1, c0, 0 /*读取CP15系统控制寄存器 \*/
-
-13 bic r0, r0, #(0x1 << 12) /\* 清除第12位（I位）禁用 I Cache \*/
-
-14 bic r0, r0, #(0x1 << 2) /\* 清除第 2位（C位）禁用 D Cache \*/
-
-15 bic r0, r0, #0x2 /\* 清除第 1位（A位）禁止严格对齐 \*/
-
-16 bic r0, r0, #(0x1 << 11) /\* 清除第11位（Z位）分支预测 \*/
-
-17 bic r0, r0, #0x1 /\* 清除第 0位（M位）禁用 MMU \*/
-
-18 mcr p15, 0, r0, c1, c0, 0 /\* 将修改后的值写回CP15寄存器 \*/
-
-19
-
-20 /第四部分/
-
-21 /*跳转到light_led函数*/
-
-22 bl light_led
-
-23 /*进入死循环*/
-
-24 /第五部分/
-
-25 loop:
-
-26 b loop
-
-27
-
-28
-
-29 /第六部分/
-
-30 /*CCM_CCGR1 时钟使能寄存器地址，默认时钟全部开启*/
-
-31 #define gpio1_clock_enible_ccm_ccgr1 0x20C406C
-
-32
-
-33
-
-34 /*IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04
-
-35 寄存器地址，用于设置GPIO1_iIO04的复用功能*/
-
-36 #define gpio1_io04_mux_ctl_register 0x20E006C
-
-37 /*IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04寄存器地址，用于设置GPIO的PAD属性*/
-
-38 #define gpio1_io04_pad_ctl_register 0x20E02F8
-
-39
-
-40
-
-41 /*GPIO1_GDIR寄存器，用于设置GPIO为输入或者输出*/
-
-42 #define gpio1_gdir_register 0x0209C004
-
-43 /*GPIO1_DR寄存器，用于设置GPIO输出的电平状态*/
-
-44 #define gpio1_dr_register 0x0209C000
-
-45
-
-46
-
-47
-
-48 /第七部分/
-
-49 light_led:
-
-50 /*开启GPIO1的时钟*/
-
-51 ldr r0, =gpio1_clock_enible_ccm_ccgr1
-
-52 ldr r1, =0xFFFFFFFF
-
-53 str r1, [r0]
-
-54
-
-55
-
-56 /第八部分/
-
-57 /*将PAD引脚复用为GPIO*/
-
-58 ldr r0, =gpio1_io04_mux_ctl_register
-
-59 ldr r1, =0x5
-
-60 str r1, [r0]
-
-61
-
-62 /第九部分/
-
-63 /*设置GPIO PAD属性*/
-
-64 ldr r0, =gpio1_io04_pad_ctl_register
-
-65 ldr r1, =0x1F838
-
-66 str r1, [r0]
-
-67 /第十部分/
-
-68 /*将GPIO_GDIR.[4] 设置为1， gpio1_io04设置为输出模式*/
-
-69 ldr r0, =gpio1_gdir_register
-
-70 ldr r1, =0x10
-
-71 str r1, [r0]
-
-72
-
-73 /第十一部分/
-
-74 /*将GPIO_DR 设置为0， gpio1全部输出为低电平*/
-
-75 ldr r0, =gpio1_dr_register
-
-76 ldr r1, =0x0
-
-77 str r1, [r0]
-
-78
-
-79 /第十二部分/
-
-80 /*跳出light_led函数，返回跳转位置*/
-
-81 mov pc, lr
 
 整个源码按照功能分成了十部分，集合代码各部分指令讲解如下:
 
@@ -506,11 +442,13 @@ B灯   CSI_VSYNC    CSI_VSYNC  GPIO4_IO19
 
 ..
 
-   这部分是设置的时钟控制寄存器“CCM_CCGR1”，直接在《IMX6ULRM》搜索它可以找到如图 48‑14所示的表格。
+   这部分是设置的时钟控制寄存器“CCM_CCGR1”，直接在《IMX6ULRM》搜索它可以找到如下所示的表格。
 
-   |asembl015|
+.. image:: media/asembl015.png
+   :align: center
+   :alt: 找不到图片
 
-图 48‑14CCM_CCGR1时钟寄存器
+
 
    从图中可以看出CCM_CCGR1[26:27]用于使能GPIO1的时钟，这里不仅仅设置时钟的开或者关，还可以设置在芯片在不同工作模式下的时钟状态如表 48‑2所示。
 
@@ -527,17 +465,19 @@ CCM_CCGR1[26:27]的值 时钟状态描述
 
 ..
 
-   我们将CCM_CCGR1[26:27]设置为11（二进制）即可。仔细观察图 48‑14发现CCM_CCGR1寄存器默认全为1，即默认开启了时钟。为了程序规范我们再次使用代码开启时钟。将CCM_CCGR1寄存器设置全为1。
+   我们将CCM_CCGR1[26:27]设置为11（二进制）即可。仔细观察可以发现发现CCM_CCGR1寄存器默认全为1，即默认开启了时钟。为了程序规范我们再次使用代码开启时钟。将CCM_CCGR1寄存器设置全为1。
 
--  第八部分，设置引脚复用功能为GPIO。这里设置的是GPIO1_04的引脚复用寄存器，我们直接搜索“IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04”可以找到如图 48‑15所示的寄存器。
+-  第八部分，设置引脚复用功能为GPIO。这里设置的是GPIO1_04的引脚复用寄存器，我们直接搜索“IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04”可以找到如下所示的寄存器。
 
 ..
 
-   |asembl016|
+.. image:: media/asembl015.png
+   :align: center
+   :alt: 找不到图片
 
-图 48‑15GPIO1_IO04复用功能选择寄存器
 
-从图 48‑15可知IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04[MUX_MODE]=0101(B)时GPIO1_04复用功能是GPIO。所以在程序中我们将0x5写入该寄存即可。
+
+从上图可知IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04[MUX_MODE]=0101(B)时GPIO1_04复用功能是GPIO。所以在程序中我们将0x5写入该寄存即可。
 
 -  第九部分，设置引脚的PAD属性。同样的方法，在《IMX6ULRM》搜索寄存器定义，然后确定需要写入的值即可。这里设置的是引脚pad属性寄存器“IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04”
 
@@ -558,7 +498,11 @@ makefile 以及连接器脚本帮助我们完成这部分工作。
 
 编译命令：
 
-arm-none-eabi-gcc -g -c led.S -o led.o
+.. code-block:: asm
+   :caption: test
+   :linenos:
+
+   arm-none-eabi-gcc -g -c led.S -o led.o
 
 -  -g选项，加入GDB能够使用的调试信息,能够使用GDB调试。
 
@@ -576,15 +520,18 @@ arm-none-eabi-gcc -g -c led.S -o led.o
 
    arm-none-eabi-ld -Ttext 0x80000000 led.o -o led.elf
 
--  -Ttext 0x80000000选项，设置程序代码段的起始地址为0x80000000。0x80000000是外部内存的起始地址。这个地址是由芯片本身决定的，我们打开《IMX6ULRM》手册在Chapter 2 Memory Maps章节ARM平台内存映射表介绍了这部分内容，如图 48‑16所示。
+-  -Ttext 0x80000000选项，设置程序代码段的起始地址为0x80000000。0x80000000是外部内存的起始地址。这个地址是由芯片本身决定的，我们打开《IMX6ULRM》手册在Chapter 2 Memory Maps章节ARM平台内存映射表介绍了这部分内容，如下所示。
 
 ..
 
-   |asembl017|
+.. image:: media/asembl017.png
+   :align: center
+   :alt: 找不到图片
 
-图 48‑16内存映射表
 
-   从图中可以看出DDR（外部内存）映射在0X80000000起始地址处。
+
+
+   从上图中可以看出DDR（外部内存）映射在0X80000000起始地址处。
 
 -  -o选项，指定输出的文件名。
 
@@ -607,7 +554,7 @@ arm-none-eabi-gcc -g -c led.S -o led.o
 为二进制文件添加头并烧写到SD卡
 
 
-在46.2.5 烧写到SD卡章节我们详细讲解了如何将二进制文件烧写到SD卡（烧写工具自动实现为二进制文件添加头）。这里简单说明下载步骤。
+ 在上一章我们详细讲解了如何将二进制文件烧写到SD卡（烧写工具自动实现为二进制文件添加头）。这里简单说明下载步骤。
 
 -  将一张空SD卡（烧写一定会破坏SD卡中原有数据！！！烧写前请保存好SD卡中的数据），接入电脑后在虚拟机的右下角状态栏找到对应的SD卡。将其链接到虚拟机。
 
