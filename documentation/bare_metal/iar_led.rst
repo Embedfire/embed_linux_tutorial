@@ -29,27 +29,32 @@ Manual》第26章General Purpose Input/Output (GPIO)（P1133），和STM32以及
 GPIO框图剖析
 ~~~~~~~~
 
-|iarled002|
+.. image:: media/iarled002.png
+   :align: center
+   :alt: 未找到图片
 
-图 49‑1 GPIO结构框图
+
 
 通过GPIO硬件结构框图，就可以从整体上深入了解GPIO外设及它的各种应用模式。该图从最右端看起，①中的就表示i.MX 6U芯片引出的GPIO引脚，其余部件都位于芯片内部。
 
 基本结构分析
 ^^^^^^
 
-下面我们按图 49‑1中的编号对GPIO端口的结构部件进行说明。
+下面我们按上图的编号对GPIO端口的结构部件进行说明。
 
 PAD
 '''
 
 PAD代表了一个i.MX 6U的GPIO引脚。在它的左侧是一系列信号通道及控制线，如input_on控制输入开关，Dir控制引脚的输入输出方向，Data_out控制引脚输出高低电平，Data_in作为信号输入，这些信号都经过一个IOMUX的器件连接到左侧的寄存器。
 
-另外，对于每个引脚都有很多关于属性的配置，这些配置是由图 49‑2中的框架结构实现的。
+另外，对于每个引脚都有很多关于属性的配置，这些配置是由下图中的框架结构实现的。
 
-|iarled003|
 
-图 49‑2 PAD接口框架
+.. image:: media/iarled003.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 ①PAD引脚
 
@@ -85,15 +90,21 @@ DSE可以调整芯片内部与引脚串联电阻R0的大小，从而改变引脚
 
 -  HYS滞后使能
 
-i.MX 6U的输入检测可以使用普通的CMOS检测或施密特触发器模式（滞后模式）。施密特触发器具有滞后效应，对正向和负向变化的输入信号有不同的阈值电压，常被用于电子开关、波形变换等场合，其转换特性和对比见图 49‑3及图 49‑4，如检测按键时，使用施密特模式即可起到消抖的功能。
+i.MX 6U的输入检测可以使用普通的CMOS检测或施密特触发器模式（滞后模式）。施密特触发器具有滞后效应，对正向和负向变化的输入信号有不同的阈值电压，常被用于电子开关、波形变换等场合，其转换特性和对比如下图所示，检测按键时，使用施密特模式即可起到消抖的功能。
 
-   |iarled004|
 
-图 49‑3施密特触发器的转换特性
 
-|iarled005|
+.. image:: media/iarled004.png
+   :align: center
+   :alt: 未找到图片
 
-图 49‑4 在CMOS模式和滞后模式下的接收器输出
+
+
+.. image:: media/iarled005.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 ④Pull/Keeper上下拉、保持器
 
@@ -120,7 +131,7 @@ PUS可配置项可选为100K欧下拉以及22K欧、47K欧及100K欧上拉。
 IOMUX复用选择器
 ''''''''''
 
-继续分析图 49‑1，图中标注的第2部分IOMUX译为IO复用选择器。i.MX 6U的芯片每个GPIO都通过IOMUX支持多种功能，例如一个IO可用于网络外设ENET的数据接收引脚，也可以被配置成PWM外设的输出引脚，这样的设计大大增加了芯片的适用性，这样可选的功能就是由IOMUX实现的。IOMUX
+标注的第2部分IOMUX译为IO复用选择器。i.MX 6U的芯片每个GPIO都通过IOMUX支持多种功能，例如一个IO可用于网络外设ENET的数据接收引脚，也可以被配置成PWM外设的输出引脚，这样的设计大大增加了芯片的适用性，这样可选的功能就是由IOMUX实现的。IOMUX
 相当于增加了多根内部信号线与IO引脚相连，最多有8根，也就是说一个IO最多可支持8种可选的功能。
 
 IOMUX由其左侧的IOMUXC控制（C表示Controler），IOMUXC提供寄存器给用户进行配置，它又分成MUX Mode（IO模式控制）以及Pad Settings（Pad配置）两个部分：
@@ -133,9 +144,9 @@ MUX Mode就是用来配置引脚的复用功能，按上面的例子，即是具
 
 Pad Settings用于配置引脚的属性，例如驱动能力，是否使用上下拉电阻，是否使用保持器，是否使用开漏模式以及使用施密特模式还是CMOS模式等。关于属性的介绍会在后面给出，在学习各种外设时，也将会接触到这些属性在不同场合下的应用。
 
-在IOMUXC外设中关于MUX Mode和Pad Settings寄存器命名格式见表格 49‑1。
+在IOMUXC外设中关于MUX Mode和Pad Settings寄存器命名格式见下表。
 
-表格 49‑1 IOMUXC寄存器命名的方式
+表  IOMUXC寄存器命名的方式
 
 ============== ==========================
 IOMUXC控制类型 寄存器名称
@@ -150,11 +161,14 @@ GPIO1_IO04，以下简称MUX寄存器及PAD寄存器。根据寄存器说明即�
 IOMUXC_SW_MUX_CTL_PAD_XXXX引脚模式寄存器
 
 
-下面以GPIO1_IO04引脚为例对 MUX寄存器进行说明，该引脚相应的MUX寄存器在参考手册中的描述见图 49‑5。
+下面以GPIO1_IO04引脚为例对 MUX寄存器进行说明，该引脚相应的MUX寄存器在参考手册中的描述见下图。‘
 
-|iarled006|
 
-图 49‑5 参考手册中对GPIO1.4引脚MUX配置寄存器的说明
+.. image:: media/iarled006.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 可以看到，该寄存器主要有两个配置域，分别是SION和MUX_MODE，其中SION用于设置引脚在输出模式下同时开启输入通道。重点是MUX_MODE的配置，它使用4个寄存器位表示可选的ALT0~ALT7这8个模式，如ALT2模式就是用于usb外设的USB_OTG1_PWR信号；若配置为ALT5则引脚会
 用作普通的GPIO功能，用于输出高、低电平。 这也是本章所需要的。
@@ -162,11 +176,12 @@ IOMUXC_SW_MUX_CTL_PAD_XXXX引脚模式寄存器
 IOMUXC_SW\_ PAD_CTL_PAD_XXXX引脚属性寄存器
 
 
-类似地，以GPIO1_IO04引脚中PAD寄存器在参考手册中的描述见图 49‑6。
+类似地，以GPIO1_IO04引脚中PAD寄存器在参考手册中的描述见下图。
 
-|iarled007|
+.. image:: media/iarled007.png
+   :align: center
+   :alt: 未找到图片
 
-图 49‑6 参考手册中对GPIO1.4引脚PAD配置寄存器的说明（部分）
 
 相对来说PAD寄存器的配置项就更丰富了，而且图中仅是该寄存器的部分说明，仔细看这些配置项，它们就是前面图 49‑2介绍的各项属性，如HYS设置使用施密特模式的滞后功能，PUS配置上下拉电阻的阻值，其它的还包含PUE、PKE、ODE、SPEED、DSE及SRE的配置。
 
@@ -186,22 +201,27 @@ GPIO.GDIR方向寄存器
 
 控制一个GPIO引脚时，要先用GDIR方向寄存器配置该引脚用于输出电平信号还是用作输入检测。典型的例子是使用输出模式可以控制LED灯的亮灭，输入模式时可以用来检测按键是否按下。
 
-GDIR寄存器的每一个数据位代表一个引脚的方向，对应的位被设置为0时该引脚为输入模式，被设置为1时该引脚为输出模式，具体见图 49‑7。
+GDIR寄存器的每一个数据位代表一个引脚的方向，对应的位被设置为0时该引脚为输入模式，被设置为1时该引脚为输出模式，具体见下图。
 
-|iarled008|
 
-图 49‑7 参考手册中对GDIR的寄存器说明
+.. image:: media/iarled008.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 例如，对GPIO1的GDIR寄存器的bit3位被写入为1，那么GPIO1.3引脚的模式即为输出。
 
 GPIO.DR数据寄存器
 
 
-DR数据寄存器直接代表了引脚的电平状态，它也使用1个数据位表示1个引脚的电平，每位用1表示高电平，用0表示低电平。DR寄存器在参考手册中的说明见图 49‑8。
+DR数据寄存器直接代表了引脚的电平状态，它也使用1个数据位表示1个引脚的电平，每位用1表示高电平，用0表示低电平。DR寄存器在参考手册中的说明见下图。
 
-|iarled009|
+.. image:: media/iarled009.png
+   :align: center
+   :alt: 未找到图片
 
-图 49‑8 参考手册中对DR数据寄存器的说明
+
 
 当GDIR方向寄存器设置引脚为输出模式时，写入DR数据寄存器对应的位即可控制该引脚输出的电平状态，如这时GPIO1的DR寄存器的bit4被写入为1，则引脚为输出高电平。
 
@@ -222,20 +242,24 @@ GPIO功能框中的第5项表示另一个引脚PAD2，它与PAD1有一根信号�
 使用IAR点亮LED灯实验
 ~~~~~~~~~~~~~
 
-本教程假设你有一定的单片机基础，所以不再介绍IAR工程的建立。IAR工程名为“新建工程-固件库版本”，工程结构如所示图 49‑9所示。
+本教程假设你有一定的单片机基础，所以不再介绍IAR工程的建立。IAR工程名为“新建工程-固件库版本”，工程结构如下图所示。
 
-|iarled010|
+.. image:: media/iarled010.png
+   :align: center
+   :alt: 未找到图片
 
-图 49‑9工程结构
+
 
 查看底板原理图
 ^^^^^^^
 
-了解RGB灯的实物后，可打开相应的原理图文档来查看硬件连接，即《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》，具体见图 49‑10。
+了解RGB灯的实物后，可打开相应的原理图文档来查看硬件连接，即《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》，具体见下图。
 
-|iarled011|
+.. image:: media/iarled011.png
+   :align: center
+   :alt: 未找到图片
 
-图 49‑10 RGB灯电路连接图，摘自《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》
+
 
 这些LED灯的阴极都是连接到i.MX 6U的GPIO引脚，只要我们控制GPIO引脚的电平输出状态，即可控制LED灯的亮灭。若你使用的实验板LED灯的连接方式或引脚不一样，只需根据我们的工程修改引脚即可，程序的控制原理相同。
 
@@ -247,41 +271,51 @@ GPIO功能框中的第5项表示另一个引脚PAD2，它与PAD1有一根信号�
 查看核心板原理图
 ^^^^^^^^
 
-打开《野火_EBF6ULL S1 邮票孔核心板_V1.0_原理图》，在PDF阅读器的搜索框输入前面的GPIO_4、CSI_HSYNC、CSI_VSYNC标号，找到它们在i.MX 6U芯片中的标号说明，具体见图 49‑11。
+打开《野火_EBF6ULL S1 邮票孔核心板_V1.0_原理图》，在PDF阅读器的搜索框输入前面的GPIO_4、CSI_HSYNC、CSI_VSYNC标号，找到它们在i.MX 6U芯片中的标号说明，具体见下图。
 
-|iarled012|
 
-图 49‑11 核心板上i.MX 6U的信号连接，摘自《野火_EBF6ULL S1 邮票孔核心板_V1.0_原理图》
+.. image:: media/iarled012.png
+   :align: center
+   :alt: 未找到图片
 
-通过这样32 21 29 29 11的方式，我们查找到了GPIO_4信号的具体引脚名为GPIO1_IO04。但是当我们使用同样的方法查找时发现只能找到CSI_HSYNC、CSI_VSYNC，并没有我们熟悉的GPIOx_IOx标注的引脚名，如图 49‑12所示。
 
-|iarled013|
 
-图 49‑12RGB灯引脚
+通过这样32 21 29 29 11的方式，我们查找到了GPIO_4信号的具体引脚名为GPIO1_IO04。但是当我们使用同样的方法查找时发现只能找到CSI_HSYNC、CSI_VSYNC，并没有我们熟悉的GPIOx_IOx标注的引脚名，如下图所示。
+
+
+.. image:: media/iarled013.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 原因很简单，这两个引脚默认情况下不用作GPIO，而是用作摄像头的某一功能引脚，但是它可以复用为GPIO，我们怎么找到对应的GPIO呢？
 
-第一种，在《i.MX 6UltraLite Applications Processor Reference Manual》的第4章External Signals and Pin Multiplexing搜索引脚名，以CSI_HSYNC为例，如图 49‑13所示。
+第一种，在《i.MX 6UltraLite Applications Processor Reference Manual》的第4章External Signals and Pin Multiplexing搜索引脚名，以CSI_HSYNC为例，如下图所示。
 
-|iarled014|
 
-图 49‑13在参考手册根据引脚号查找其复用功能
+.. image:: media/iarled014.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 从中可以看出CSI_HSYNC对应的GPIO引脚为GPIO4_IO20。
 
-第二种，在官方写好的文件中查找，我们打开“fsl_iomuxc.h”文件（可以打开IAR工程找到该文件也可以在工程目录下直接搜索）。直接在“fsl_iomuxc.h”文件中搜索图 49‑12所搜得到的LED灯对应的引脚CSI_HSYNC（或CSI_VSYNC）得到如图
-49‑14所示的结果（以CSI_HSYNC为例）。
+第二种，在官方写好的文件中查找，我们打开“fsl_iomuxc.h”文件（可以打开IAR工程找到该文件也可以在工程目录下直接搜索）。直接在“fsl_iomuxc.h”文件中搜索图 49‑12所搜得到的LED灯对应的引脚CSI_HSYNC（或CSI_VSYNC）得到如下图所示的结果（以CSI_HSYNC为例）。
 
-|iarled015|
+.. image:: media/iarled015.png
+   :align: center
+   :alt: 未找到图片
 
-图 49‑14fsl_iomuxc.h文件
+
 
 从图中不难看出这就是我们要找的引脚，每个宏定义分“三段”，以宏IOMUXC_CSI_HSYNC_I2C2_SCL为例，IOMUXC代表这是一个引脚复用宏定义，CSI_HSYNC代表原理图上实际的芯片引脚名，I2C2_SCL代表引脚的复用功能。一个引脚有多个复用功能，本章要把CSI_HSYNC用作GP
 IO控制LED灯，所以本实验要选择IOMUXC_CSI_HSYNC_GPIO4_IO20宏定义引脚CSI_HSYNC复用为GPIO4_IO20，具体怎么使用程序中再详细介绍。
 
-经查阅，我们把以上连接LED灯的各个i.MX 6U芯片引脚总结出如表 49‑1所示，它展示了各个LED灯的连接信息及相应引脚的GPIO端口和引脚号。
+经查阅，我们把以上连接LED灯的各个i.MX 6U芯片引脚总结出如下表所示，它展示了各个LED灯的连接信息及相应引脚的GPIO端口和引脚号。
 
-表 49‑1与LED灯连接的各个引脚信息及GPIO复用编号
+表  与LED灯连接的各个引脚信息及GPIO复用编号
 
 ===== ============ ========== ==================
 LED灯 原理图的标号 具体引脚名 GPIO端口及引脚编号
@@ -318,202 +352,120 @@ LED灯引脚宏定义
 在编写应用程序的过程中，要考虑更改硬件环境的情况，例如LED灯的控制引脚与当前的不一样，我们希望程序只需要做最小的修改即可在新的环境正常运行。这个时候一般把硬件相关的部分使用宏来封装，若更改了硬件环境，只修改这些硬件相关的宏即可，这些定义一般存储在头文件，即本例子中的“bsp_led.h”文件中，具
 体见代码清单 49‑1。
 
-代码清单 49‑1 LED控制引脚相关的宏（bsp_led.h文件）
 
-1 #define RGB_RED_LED_GPIO GPIO1
+.. code-block:: c
+   :caption: LED控制引脚相关的宏（bsp_led.h文件）
+   :linenos:  
 
-2 #define RGB_RED_LED_GPIO_PIN (4U)
-
-3 #define RGB_RED_LED_IOMUXC IOMUXC_GPIO1_IO04_GPIO1_IO04
-
-4
-
-5 #define RGB_GREEN_LED_GPIO GPIO4
-
-6 #define RGB_GREEN_LED_GPIO_PIN (20U)
-
-7 #define RGB_GREEN_LED_IOMUXC IOMUXC_CSI_HSYNC_GPIO4_IO20
-
-8
-
-9 #define RGB_BLUE_LED_GPIO GPIO4
-
-10 #define RGB_BLUE_LED_GPIO_PIN (19U)
-
-11 #define RGB_BLUE_LED_IOMUXC IOMUXC_CSI_VSYNC_GPIO4_IO19
-
+   #define RGB_RED_LED_GPIO                 GPIO1
+    #define RGB_RED_LED_GPIO_PIN            (4U)
+    #define RGB_RED_LED_IOMUXC              IOMUXC_GPIO1_IO04_GPIO1_IO04
+   
+    #define RGB_GREEN_LED_GPIO              GPIO4
+    #define RGB_GREEN_LED_GPIO_PIN          (20U)
+    #define RGB_GREEN_LED_IOMUXC            IOMUXC_CSI_HSYNC_GPIO4_IO20
+   
+    #define RGB_BLUE_LED_GPIO               GPIO4
+    #define RGB_BLUE_LED_GPIO_PIN           (19U)
+    #define RGB_BLUE_LED_IOMUXC             IOMUXC_CSI_VSYNC_GPIO4_IO19
+   
+   
 以上代码分别把控制三盏LED灯的GPIO端口、GPIO引脚号以及IOMUXC的复用功能根据硬件连接使用宏定义封装起来了。在实际控制的时候我们就直接用这些宏，以达到应用代码跟硬件无关的效果。
 
 LED GPIO初始化驱动
 '''''''''''''
 
-利用上面的宏，我们在bsp_led.c文件中编写LED灯的初始化驱动，具体见代码清单 49‑2。
+利用上面的宏，我们在bsp_led.c文件中编写LED灯的初始化驱动，具体如下所示。
+
+
+.. code-block:: c
+   :caption: GPIO初始化驱动(bsp_led.c文件)
+   :linenos:  
+
+   /*************************第2部分**************************/
+    /* 所有引脚均使用同样的PAD配置 */
+    #define LED_PAD_CONFIG_DATA  (SRE_0_SLOW_SLEW_RATE| \
+                                  DSE_6_R0_6| \
+                                  SPEED_2_MEDIUM_100MHz| \
+                                  ODE_0_OPEN_DRAIN_DISABLED| \
+                                  PKE_0_PULL_KEEPER_DISABLED| \
+                                  PUE_0_KEEPER_SELECTED| \
+                                  PUS_0_100K_OHM_PULL_DOWN| \
+                                  HYS_0_HYSTERESIS_DISABLED)   
+        /* 配置说明 : */
+        /* 转换速率: 转换速率慢
+          驱动强度: R0/6 
+          带宽配置 : medium(100MHz)
+          开漏配置: 关闭 
+          拉/保持器配置: 关闭
+          拉/保持器选择: 保持器（上面已关闭，配置无效）
+          上拉/下拉选择: 100K欧姆下拉（上面已关闭，配置无效）
+          滞回器配置: 关闭 */     
+   
+    /************************************************
+     * 声明
+     *****************************************************/
+    static void LED_IOMUXC_MUX_Config(void);
+    static void LED_IOMUXC_PAD_Config(void);
+    static void LED_GPIO_Mode_Config(void);
+   
+    /*************************第3部分**************************/
+    /**
+    * @brief  初始化LED相关IOMUXC的MUX复用配置
+    */
+    static void LED_IOMUXC_MUX_Config(void)
+    {
+      /* RGB LED灯，使用同样的IOMUXC MUX配置 */  
+      IOMUXC_SetPinMux(RGB_RED_LED_IOMUXC, 0U); 
+      IOMUXC_SetPinMux(RGB_BLUE_LED_IOMUXC, 0U);  
+      IOMUXC_SetPinMux(RGB_GREEN_LED_IOMUXC, 0U);
+    }
+   
+    /**************第4部分*******************/
+    /**
+    * @brief  初始化LED相关IOMUXC的MUX复用配置
+    */
+    static void LED_IOMUXC_PAD_Config(void)
+    { 
+      /* RGB LED灯，使用同样的IOMUXC PAD配置 */ 
+      IOMUXC_SetPinConfig(RGB_RED_LED_IOMUXC, LED_PAD_CONFIG_DATA); 
+      IOMUXC_SetPinConfig(RGB_GREEN_LED_IOMUXC, LED_PAD_CONFIG_DATA); 
+      IOMUXC_SetPinConfig(RGB_BLUE_LED_IOMUXC, LED_PAD_CONFIG_DATA);  
+    }
+   
+    /*************************第5部分**************************/
+     /**
+      * @brief  初始化LED相关的GPIO模式
+      */
+    static void LED_GPIO_Mode_Config(void)
+    {     
+      /* 定义gpio初始化配置结构体 */
+      gpio_pin_config_t led_config;      
+      
+       /** 核心板的LED灯，GPIO配置 **/       
+      led_config.direction = kGPIO_DigitalOutput; //输出模式
+      led_config.outputLogic =  1;                //默认高电平    
+      led_config.interruptMode = kGPIO_NoIntmode; //不使用中断
+      
+      /* 使用同样的LED config配置RGB LED灯 */
+      GPIO_PinInit(RGB_RED_LED_GPIO,RGB_RED_LED_GPIO_PIN,&led_config);
+   GPIO_PinInit(RGB_GREEN_LED_GPIO,RGB_GREEN_LED_GPIO_PIN,&led_config);
+     GPIO_PinInit(RGB_BLUE_LED_GPIO,RGB_BLUE_LED_GPIO_PIN,&led_config);
+    }
+   
+    /*************************第6部分**************************/
+    /**
+      * @brief  初始化控制LED的IO
+      */
+    void LED_GPIO_Config(void)
+    {
+      /* 初始化GPIO复用、属性、模式 */
+        LED_IOMUXC_MUX_Config();
+        LED_IOMUXC_PAD_Config();
+    LED_GPIO_Mode_Config();
+    }
 
-代码清单 49‑2 LED GPIO初始化驱动(bsp_led.c文件)
 
-1 /第2部分/
-
-2 /\* 所有引脚均使用同样的PAD配置 \*/
-
-3 #define LED_PAD_CONFIG_DATA (SRE_0_SLOW_SLEW_RATE\| \\
-
-4 DSE_6_R0_6\| \\
-
-5 SPEED_2_MEDIUM_100MHz\| \\
-
-6 ODE_0_OPEN_DRAIN_DISABLED\| \\
-
-7 PKE_0_PULL_KEEPER_DISABLED\| \\
-
-8 PUE_0_KEEPER_SELECTED\| \\
-
-9 PUS_0_100K_OHM_PULL_DOWN\| \\
-
-10 HYS_0_HYSTERESIS_DISABLED)
-
-11 /\* 配置说明 : \*/
-
-12 /\* 转换速率: 转换速率慢
-
-13 驱动强度: R0/6
-
-14 带宽配置 : medium(100MHz)
-
-15 开漏配置: 关闭
-
-16 拉/保持器配置: 关闭
-
-17 拉/保持器选择: 保持器（上面已关闭，配置无效）
-
-18 上拉/下拉选择: 100K欧姆下拉（上面已关闭，配置无效）
-
-19 滞回器配置: 关闭 \*/
-
-20
-
-21 /\*
-
-22 \* 声明
-
-23 \/
-
-24 static void LED_IOMUXC_MUX_Config(void);
-
-25 static void LED_IOMUXC_PAD_Config(void);
-
-26 static void LED_GPIO_Mode_Config(void);
-
-27
-
-28 /第3部分/
-
-29 /*\*
-
-30 \* @brief 初始化LED相关IOMUXC的MUX复用配置
-
-31 \*/
-
-32 static void LED_IOMUXC_MUX_Config(void)
-
-33 {
-
-34 /\* RGB LED灯，使用同样的IOMUXC MUX配置 \*/
-
-35 IOMUXC_SetPinMux(RGB_RED_LED_IOMUXC, 0U);
-
-36 IOMUXC_SetPinMux(RGB_BLUE_LED_IOMUXC, 0U);
-
-37 IOMUXC_SetPinMux(RGB_GREEN_LED_IOMUXC, 0U);
-
-38 }
-
-39
-
-40 /第4部分/
-
-41 /*\*
-
-42 \* @brief 初始化LED相关IOMUXC的MUX复用配置
-
-43 \*/
-
-44 static void LED_IOMUXC_PAD_Config(void)
-
-45 {
-
-46 /\* RGB LED灯，使用同样的IOMUXC PAD配置 \*/
-
-47 IOMUXC_SetPinConfig(RGB_RED_LED_IOMUXC, LED_PAD_CONFIG_DATA);
-
-48 IOMUXC_SetPinConfig(RGB_GREEN_LED_IOMUXC, LED_PAD_CONFIG_DATA);
-
-49 IOMUXC_SetPinConfig(RGB_BLUE_LED_IOMUXC, LED_PAD_CONFIG_DATA);
-
-50 }
-
-51
-
-52 /第5部分/
-
-53 /*\*
-
-54 \* @brief 初始化LED相关的GPIO模式
-
-55 \*/
-
-56 static void LED_GPIO_Mode_Config(void)
-
-57 {
-
-58 /\* 定义gpio初始化配置结构体 \*/
-
-59 gpio_pin_config_t led_config;
-
-60
-
-61 /*\* 核心板的LED灯，GPIO配置 \**/
-
-62 led_config.direction = kGPIO_DigitalOutput; //输出模式
-
-63 led_config.outputLogic = 1; //默认高电平
-
-64 led_config.interruptMode = kGPIO_NoIntmode; //不使用中断
-
-65
-
-66 /\* 使用同样的LED config配置RGB LED灯 \*/
-
-67 GPIO_PinInit(RGB_RED_LED_GPIO,RGB_RED_LED_GPIO_PIN,&led_config);
-
-68GPIO_PinInit(RGB_GREEN_LED_GPIO,RGB_GREEN_LED_GPIO_PIN,&led_config);
-
-69 GPIO_PinInit(RGB_BLUE_LED_GPIO,RGB_BLUE_LED_GPIO_PIN,&led_config);
-
-70 }
-
-71
-
-72 /第6部分/
-
-73 /*\*
-
-74 \* @brief 初始化控制LED的IO
-
-75 \*/
-
-76 void LED_GPIO_Config(void)
-
-77 {
-
-78 /\* 初始化GPIO复用、属性、模式 \*/
-
-79 LED_IOMUXC_MUX_Config();
-
-80 LED_IOMUXC_PAD_Config();
-
-81 LED_GPIO_Mode_Config();
-
-82 }
 
 整个驱动文件主要是把初始化LED的内容分成了MUX配置函数、PAD属性函数以及GPIO模式配置函数几部分，最后再把它们封装进了一个函数方便调用，另外还增加了对底板RGB LED灯的初始化，该代码的各个部分说明如下：
 
@@ -524,101 +476,62 @@ LED GPIO初始化驱动
 
 其中的fsl_iomuxc.h和fsl_gpio.h是NXP固件库文件，它们分别包含了控制IOMUXC和GPIO外设的类型定义和函数声明，我们在第3、4部分的代码将会使用这些库文件提供的函数。
 
-而pad_config.h和bsp_led.h文件都是我们自己创建的，其中bsp_led.h文件中定义了各个LED控制引脚及操作宏，而pad_config.h文件主要包含使用IOMUXC外设配置PAD寄存器的引脚属性时使用的宏，具体见代码清单 49‑3。
+而pad_config.h和bsp_led.h文件都是我们自己创建的，其中bsp_led.h文件中定义了各个LED控制引脚及操作宏，而pad_config.h文件主要包含使用IOMUXC外设配置PAD寄存器的引脚属性时使用的宏，具体如下
 
-代码清单 49‑3 PAD寄存器的属性配置宏（pad_config.h文件）
 
-1 #include "fsl_common.h"
 
-2
+.. code-block:: c
+   :caption: LED控制引脚相关的宏（bsp_led.h文件）
+   :linenos:  
 
-3 /\* SRE 压摆率选择 \*/
+   #include "fsl_common.h"
+   
+    /* SRE 压摆率选择 */
+    #define SRE_0_SLOW_SLEW_RATE    IOMUXC_SW_PAD_CTL_PAD_SRE(0)
+    #define SRE_1_FAST_SLEW_RATE    IOMUXC_SW_PAD_CTL_PAD_SRE(1)
+   
+    /* 驱动能力配置，配置阻值的大小 */
+    #define DSE_0_OUTPUT_DRIVER_DISABLED  IOMUXC_SW_PAD_CTL_PAD_DSE(0)
+    /* R0 260 Ohm @ 3.3V, 150Ohm@1.8V, 240 Ohm for DDR */
+    #define DSE_1_R0_1               IOMUXC_SW_PAD_CTL_PAD_DSE(1) 
+    /* R0/2 */
+    #define DSE_2_R0_2               IOMUXC_SW_PAD_CTL_PAD_DSE(2)
+    /* R0/3 */
+    #define DSE_3_R0_3               IOMUXC_SW_PAD_CTL_PAD_DSE(3)
+    /* R0/4 */
+    #define DSE_4_R0_4               IOMUXC_SW_PAD_CTL_PAD_DSE(4)
+    /* R0/5 */
+    #define DSE_5_R0_5               IOMUXC_SW_PAD_CTL_PAD_DSE(5)
+    /* R0/6 */
+    #define DSE_6_R0_6               IOMUXC_SW_PAD_CTL_PAD_DSE(6)
+    /* R0/7 */
+    #define DSE_7_R0_7               IOMUXC_SW_PAD_CTL_PAD_DSE(7)
+   
+    /* SPEED 带宽配置 */
+    #define SPEED_0_LOW_50MHz            IOMUXC_SW_PAD_CTL_PAD_SPEED(0)
+    #define SPEED_1_MEDIUM_100MHz        IOMUXC_SW_PAD_CTL_PAD_SPEED(1)
+    #define SPEED_2_MEDIUM_100MHz        IOMUXC_SW_PAD_CTL_PAD_SPEED(2)
+    #define SPEED_3_MAX_200MHz           IOMUXC_SW_PAD_CTL_PAD_SPEED(3)
+   
+    /* ODE 是否使用开漏模式 */
+    #define ODE_0_OPEN_DRAIN_DISABLED  IOMUXC_SW_PAD_CTL_PAD_ODE(0)     
+    #define ODE_1_OPEN_DRAIN_ENABLED   IOMUXC_SW_PAD_CTL_PAD_ODE(1)     
+   
+    /* PKE 是否使能保持器或上下拉功能 */
+    #define PKE_0_PULL_KEEPER_DISABLED   IOMUXC_SW_PAD_CTL_PAD_PKE(0)      
+    #define PKE_1_PULL_KEEPER_ENABLED    IOMUXC_SW_PAD_CTL_PAD_PKE(1)      
+   
+    /* PUE 选择使用保持器还是上下拉 */
+    #define PUE_0_KEEPER_SELECTED        IOMUXC_SW_PAD_CTL_PAD_PUE(0)   
+    #define PUE_1_PULL_SELECTED          IOMUXC_SW_PAD_CTL_PAD_PUE(1)   
+   
+    /* PUS 上下拉配置 */
+    #define PUS_0_100K_OHM_PULL_DOWN     IOMUXC_SW_PAD_CTL_PAD_PUS(0)     
+    #define PUS_1_47K_OHM_PULL_UP        IOMUXC_SW_PAD_CTL_PAD_PUS(1)   
+    #define PUS_2_100K_OHM_PULL_UP       IOMUXC_SW_PAD_CTL_PAD_PUS(2)   
+    #define PUS_3_22K_OHM_PULL_UP        IOMUXC_SW_PAD_CTL_PAD_PUS(3)
 
-4 #define SRE_0_SLOW_SLEW_RATE IOMUXC_SW_PAD_CTL_PAD_SRE(0)
 
-5 #define SRE_1_FAST_SLEW_RATE IOMUXC_SW_PAD_CTL_PAD_SRE(1)
-
-6
-
-7 /\* 驱动能力配置，配置阻值的大小 \*/
-
-8 #define DSE_0_OUTPUT_DRIVER_DISABLED IOMUXC_SW_PAD_CTL_PAD_DSE(0)
-
-9 /\* R0 260 Ohm @ 3.3V, 150Ohm@1.8V, 240 Ohm for DDR \*/
-
-10 #define DSE_1_R0_1 IOMUXC_SW_PAD_CTL_PAD_DSE(1)
-
-11 /\* R0/2 \*/
-
-12 #define DSE_2_R0_2 IOMUXC_SW_PAD_CTL_PAD_DSE(2)
-
-13 /\* R0/3 \*/
-
-14 #define DSE_3_R0_3 IOMUXC_SW_PAD_CTL_PAD_DSE(3)
-
-15 /\* R0/4 \*/
-
-16 #define DSE_4_R0_4 IOMUXC_SW_PAD_CTL_PAD_DSE(4)
-
-17 /\* R0/5 \*/
-
-18 #define DSE_5_R0_5 IOMUXC_SW_PAD_CTL_PAD_DSE(5)
-
-19 /\* R0/6 \*/
-
-20 #define DSE_6_R0_6 IOMUXC_SW_PAD_CTL_PAD_DSE(6)
-
-21 /\* R0/7 \*/
-
-22 #define DSE_7_R0_7 IOMUXC_SW_PAD_CTL_PAD_DSE(7)
-
-23
-
-24 /\* SPEED 带宽配置 \*/
-
-25 #define SPEED_0_LOW_50MHz IOMUXC_SW_PAD_CTL_PAD_SPEED(0)
-
-26 #define SPEED_1_MEDIUM_100MHz IOMUXC_SW_PAD_CTL_PAD_SPEED(1)
-
-27 #define SPEED_2_MEDIUM_100MHz IOMUXC_SW_PAD_CTL_PAD_SPEED(2)
-
-28 #define SPEED_3_MAX_200MHz IOMUXC_SW_PAD_CTL_PAD_SPEED(3)
-
-29
-
-30 /\* ODE 是否使用开漏模式 \*/
-
-31 #define ODE_0_OPEN_DRAIN_DISABLED IOMUXC_SW_PAD_CTL_PAD_ODE(0)
-
-32 #define ODE_1_OPEN_DRAIN_ENABLED IOMUXC_SW_PAD_CTL_PAD_ODE(1)
-
-33
-
-34 /\* PKE 是否使能保持器或上下拉功能 \*/
-
-35 #define PKE_0_PULL_KEEPER_DISABLED IOMUXC_SW_PAD_CTL_PAD_PKE(0)
-
-36 #define PKE_1_PULL_KEEPER_ENABLED IOMUXC_SW_PAD_CTL_PAD_PKE(1)
-
-37
-
-38 /\* PUE 选择使用保持器还是上下拉 \*/
-
-39 #define PUE_0_KEEPER_SELECTED IOMUXC_SW_PAD_CTL_PAD_PUE(0)
-
-40 #define PUE_1_PULL_SELECTED IOMUXC_SW_PAD_CTL_PAD_PUE(1)
-
-41
-
-42 /\* PUS 上下拉配置 \*/
-
-43 #define PUS_0_100K_OHM_PULL_DOWN IOMUXC_SW_PAD_CTL_PAD_PUS(0)
-
-44 #define PUS_1_47K_OHM_PULL_UP IOMUXC_SW_PAD_CTL_PAD_PUS(1)
-
-45 #define PUS_2_100K_OHM_PULL_UP IOMUXC_SW_PAD_CTL_PAD_PUS(2)
-
-46 #define PUS_3_22K_OHM_PULL_UP IOMUXC_SW_PAD_CTL_PAD_PUS(3)
 
 NXP固件库本身并没有提供这些内容，因此我们为了方便使用而把它独立编写在这个自建的pad_config.h文件了，在以后对GPIO引脚属性配置时，可以用同样的方式使用这个文件。
 
@@ -648,61 +561,43 @@ NXP固件库本身并没有提供这些内容，因此我们为了方便使用�
 
 接着，对变量led_config进行赋值，本配置参数为输出模式、默认高电平以及不使用中断。赋值完成后使用同一个led_config变量调用库函数GPIO_PinInit对不同的GPIO端口及引脚进行初始化，即所有控制LED灯的引脚都采用同样的GPIO配置。
 
-特别地，在代码LED初始化函数中并没有设置GPIO的时钟，原因是因为在GPIO_PinInit函数加入GPIO时钟的开启控制操作具体见代码清单 49‑4。
+特别地，在代码LED初始化函数中并没有设置GPIO的时钟，原因是因为在GPIO_PinInit函数加入GPIO时钟的开启控制操作具体如下所示。
 
-代码清单 49‑4 NXP固件库中fls_gpio.c文件中的GPIO_PinInit函数
 
-1 void GPIO_PinInit(GPIO_Type \*base, uint32_t pin,
 
-2 const gpio_pin_config_t \*Config)
 
-3 {
+.. code-block:: c
+   :caption: NXP固件库中fls_gpio.c文件中的GPIO_PinInit函数
+   :linenos:  
 
-4 /第1部分/
+   void GPIO_PinInit(GPIO_Type *base, uint32_t pin,
+                     const gpio_pin_config_t *Config)
+   {
+       /************************第1部分****************************/
+   #if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) &&
+       FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
+       /* 使能GPIO时钟 */
+       CLOCK_EnableClock(s_gpioClock[GPIO_GetInstance(base)]);
+   #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
+       /************************第2部分****************************/
+       /* 对相应引脚IMR寄存器的控制位清零，先关闭中断 */
+       base->IMR &= ~(1U << pin);
+       /* 配置GPIO引脚的方向 */
+       if (Config->direction == kGPIO_DigitalInput) {
+       /* 输入模式 */
+       base->GDIR &= ~(1U << pin);
+       } else {
+           /* 输出模式 */
+           /* 先对DR寄存器赋值默认电平 */
+           GPIO_PinWrite(base, pin, Config->outputLogic);
+           /* 配置为输出模式 */
+           base->GDIR |= (1U << pin);
+       }
+       /* 配置GPIO引脚的中断模式 */
+       GPIO_SetPinInterruptConfig(base, pin, Config->interruptMode);
+   }
 
-5 #if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) &&
 
-6 FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
-
-7 /\* 使能GPIO时钟 \*/
-
-8 CLOCK_EnableClock(s_gpioClock[GPIO_GetInstance(base)]);
-
-9 #endif /\* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL \*/
-
-10 /第2部分/
-
-11 /\* 对相应引脚IMR寄存器的控制位清零，先关闭中断 \*/
-
-12 base->IMR &= ~(1U << pin);
-
-13 /\* 配置GPIO引脚的方向 \*/
-
-14 if (Config->direction == kGPIO_DigitalInput) {
-
-15 /\* 输入模式 \*/
-
-16 base->GDIR &= ~(1U << pin);
-
-17 } else {
-
-18 /\* 输出模式 \*/
-
-19 /\* 先对DR寄存器赋值默认电平 \*/
-
-20 GPIO_PinWrite(base, pin, Config->outputLogic);
-
-21 /\* 配置为输出模式 \*/
-
-22 base->GDIR \|= (1U << pin);
-
-23 }
-
-24 /\* 配置GPIO引脚的中断模式 \*/
-
-25 GPIO_SetPinInterruptConfig(base, pin, Config->interruptMode);
-
-26 }
 
 这段代码中的第1部分增加了对库函数CLOCK_EnableClock的调用，调用时根据函数输入参数base进行配置，而使用时，我们常常把base参数赋值为GPIO1、GPIO2等值，即CLOCK_EnableClock函数会根据实际的需要初始化GPIO1、GPIO2等端口的时时钟。代码的第2部分根据
 Config参数初始化GPIO的工作模式。
@@ -723,146 +618,82 @@ LDE GPIO初始化驱动总结
 main文件
 ''''''
 
-编写完LED灯的控制函数后，就可以在main函数中测试了，具体见代码清单 49‑5。
+编写完LED灯的控制函数后，就可以在main函数中测试了，具体如下。
+
+
+.. code-block:: c
+   :caption: 控制LED灯（main文件）
+   :linenos:  
+
+   /************************第1部分****************************/
+    #include "fsl_debug_console.h"
+   
+    #include "board.h"
+    #include "pin_mux.h"
+    #include "clock_config.h"
+    #include "./led/bsp_led.h"   
+   
+    /************************第2部分****************************/
+    /*简单延时函数*/
+    void delay(uint32_t count)
+    {
+        volatile uint32_t i = 0;
+        for (i = 0; i < count; ++i)
+        {
+            __asm("NOP"); /* 调用nop空指令 */
+        }
+    }
+   
+    /**
+      * @brief  主函数
+      * @param  无
+      * @retval 无
+      */
+    int main(void)
+    {
+    /************************第3部分****************************/
+        /* 初始化开发板引脚 */
+        BOARD_InitPins();
+        /* 初始化开发板时钟 */
+        BOARD_BootClockRUN();
+        /* 初始化调试串口 */
+        BOARD_InitDebugConsole();
+   
+    /************************第4部分****************************/
+        /* 打印系统时钟 */
+        PRINTF("\r\n");
+        PRINTF("*****欢迎使用野火EBF6UL/6ULL开发板*****\r\n");
+        PRINTF("CPU:         %d Hz\r\n", CLOCK_GetFreq(kCLOCK_CpuClk));
+        PRINTF("AHB:         %d Hz\r\n", CLOCK_GetFreq(kCLOCK_AhbClk));
+        PRINTF("MMDC:        %d Hz\r\n", CLOCK_GetFreq(kCLOCK_MmdcClk));
+        PRINTF("SYSPLL:      %d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllClk));
+      PRINTF("SYSPLLPFD0:%d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllPfd0Clk));
+        PRINTF("SYSPLLPFD1:  %d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllPfd1Clk));
+        PRINTF("SYSPLLPFD2:  %d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk));
+        PRINTF("SYSPLLPFD3:  %d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllPfd3Clk));  
+        /* 在这里添加你的代码^_^. */
+
+     /************************第5部分****************************/
+        /* 初始化LED引脚 */
+        LED_GPIO_Config();  
+    /************************第6部分****************************/  
+        while(1)
+        {
+          RGB_RED_LED_ON
+          delay(0xFFFFF);
+          RGB_RED_LED_OFF
+
+          RGB_GREEN_LED_ON
+          delay(0xFFFFF);
+          RGB_GREEN_LED_OFF
+
+          RGB_BLUE_LED_ON 
+          delay(0xFFFFF);
+          RGB_BLUE_LED_OFF
+        }     
+   
+    }
 
-代码清单 49‑5 控制LED灯（main文件）
-
-1 /第1部分/
-
-2 #include "fsl_debug_console.h"
-
-3
-
-4 #include "board.h"
-
-5 #include "pin_mux.h"
-
-6 #include "clock_config.h"
-
-7 #include "./led/bsp_led.h"
-
-8
-
-9 /第2部分/
-
-10 /*简单延时函数*/
-
-11 void delay(uint32_t count)
-
-12 {
-
-13 volatile uint32_t i = 0;
-
-14 for (i = 0; i < count; ++i)
-
-15 {
-
-16 \__asm("NOP"); /\* 调用nop空指令 \*/
-
-17 }
-
-18 }
-
-19
-
-20 /*\*
-
-21 \* @brief 主函数
-
-22 \* @param 无
-
-23 \* @retval 无
-
-24 \*/
-
-25 int main(void)
-
-26 {
-
-27 /第3部分/
-
-28 /\* 初始化开发板引脚 \*/
-
-29 BOARD_InitPins();
-
-30 /\* 初始化开发板时钟 \*/
-
-31 BOARD_BootClockRUN();
-
-32 /\* 初始化调试串口 \*/
-
-33 BOARD_InitDebugConsole();
-
-34
-
-35 /第4部分/
-
-36 /\* 打印系统时钟 \*/
-
-37 PRINTF("\r\n");
-
-38 PRINTF("欢迎使用野火EBF6UL/6ULL开发板\r\n");
-
-39 PRINTF("CPU: %d Hz\r\n", CLOCK_GetFreq(kCLOCK_CpuClk));
-
-40 PRINTF("AHB: %d Hz\r\n", CLOCK_GetFreq(kCLOCK_AhbClk));
-
-41 PRINTF("MMDC: %d Hz\r\n", CLOCK_GetFreq(kCLOCK_MmdcClk));
-
-42 PRINTF("SYSPLL: %d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllClk));
-
-43 PRINTF("SYSPLLPFD0:%d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllPfd0Clk));
-
-44 PRINTF("SYSPLLPFD1: %d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllPfd1Clk));
-
-45 PRINTF("SYSPLLPFD2: %d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk));
-
-46 PRINTF("SYSPLLPFD3: %d Hz\r\n", CLOCK_GetFreq(kCLOCK_SysPllPfd3Clk));
-
-47 /\* 在这里添加你的代码^_^.
-\*/
-
-48
-
-49 /第5部分/
-
-50 /\* 初始化LED引脚 \*/
-
-51 LED_GPIO_Config();
-
-52 /第6部分/
-
-53 while(1)
-
-54 {
-
-55 RGB_RED_LED_ON
-
-56 delay(0xFFFFF);
-
-57 RGB_RED_LED_OFF
-
-58
-
-59 RGB_GREEN_LED_ON
-
-60 delay(0xFFFFF);
-
-61 RGB_GREEN_LED_OFF
-
-62
-
-63 RGB_BLUE_LED_ON
-
-64 delay(0xFFFFF);
-
-65 RGB_BLUE_LED_OFF
-
-66 }
-
-67
-
-68 }
 
 .. _头文件-1:
 
@@ -933,17 +764,21 @@ IAR版本工程提供了两个版本(Debug和Release)，Release版本下载需�
 
 硬件需求：Jlink ,JTAG转接板（或用杜邦线链接）
 
-开发板Jtag接口如图 49‑15所示。
 
-|iarled016|
+开发板Jtag接口如下所示。
 
-图 49‑15板载JTAG接口
+.. image:: media/asembl016.png
+   :align: center
+   :alt: 未找到图片
 
-程序版本选择Debug版本如图 49‑16所示。
 
-|iarled017|
+程序版本选择Debug版本如下所示。
 
-图 49‑16版本选择
+
+.. image:: media/asembl017.png
+   :align: center
+   :alt: 未找到图片
+
 
 正确链接开发板、jlink、电脑之后，点击Debug and download 选项即可。正常情况下可以看到RGB灯交替闪烁。
 

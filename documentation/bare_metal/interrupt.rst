@@ -14,13 +14,15 @@
 GIC简介
 ~~~~~
 
-GIC是Generic Interrupt Controller的缩写，直译为通用中断控制器，它由ARM公司设计，目前共有4个版本V1~V4，i.MX 6U使用的是GIC V2。GIC V2的功能框图如图 54‑1所示。
+GIC是Generic Interrupt Controller的缩写，直译为通用中断控制器，它由ARM公司设计，目前共有4个版本V1~V4，i.MX 6U使用的是GIC V2。GIC V2的功能框图如下所示。
 
-|interr002|
+.. image:: media/interr002.png
+   :align: center
+   :alt: 未找到图片
 
-图 54‑1GIC功能框图
 
-图 54‑1从上往下看可知GIC最多支持8个处理器（processor0~ processor7）。不同处理器的GIC功能是相同的，我们只看其中一个即可。GIC主要分为分发器（Distributor）和CPU接口（CPU interface/Virtual CPU
+
+上图从上往下看可知GIC最多支持8个处理器（processor0~ processor7）。不同处理器的GIC功能是相同的，我们只看其中一个即可。GIC主要分为分发器（Distributor）和CPU接口（CPU interface/Virtual CPU
 interface）。下面重点讲解着两部分。
 
 分发器
@@ -31,12 +33,12 @@ interface）。下面重点讲解着两部分。
 
 分发器用于管理CPU所有中断源，确定每个中断的优先级，管理中断的屏蔽和中断抢占。最终将优先级最高的中断转发到一个或者多个CPU接口。CPU的中断源分为三类，讲解如下：
 
--  SPI(标号①)，SPI是共享中断，也就是我们在常用的串口中断、DMA中断等等。在图 54‑1中SPI中断编号为（32~1019），这是最大支持的中断数量，实际芯片支持的数量有芯片设计者决定，i.MX 6U支持128个SPI中断请求（中断编号为32~159），如图 54‑2所示（图片摘自《i.MX
+-  SPI(标号①)，SPI是共享中断，也就是我们在常用的串口中断、DMA中断等等。在图 54‑1中SPI中断编号为（32~1019），这是最大支持的中断数量，实际芯片支持的数量有芯片设计者决定，i.MX 6U支持128个SPI中断请求（中断编号为32~159），如下所示（图片摘自《i.MX
   6UltraLite Applications Processor Reference Manual》Chapter 3Interrupts and DMA Events）。
 
-|interr003|
-
-图 54‑2SPI中断
+.. image:: media/interr003.png
+   :align: center
+   :alt: 未找到图片
 
 -  SGI(标号②) 、PPI（标号③），SGI是软件中断，PPI是CPU私有中断。SGI中断共有16个中断，中断编号为0~15。PPI也有16个中断，中断编号为16~31，SGI与PPI中断都属于CPU私有中断，每个CPU都有各自的SGI和PPI，这些中断被存储在GIC分发器中。CPU之间通过中断号
   和CPU编号唯一确定一个SGI或PPI中断。SGI一般用于CPU之间通信，i.MX 6U是单核处理器，我们暂时不用过多关心SGI中断。
@@ -57,9 +59,9 @@ interface）。下面重点讲解着两部分。
 ''''''''''
 
 上一小节提到GIC分发器提供了一些编程接口，“编程接口”可以认为是寄存器，这里将简单介绍这些寄存器，因为我们程序中很少会去修改它。更详细的内容请参考《ARM® Generic Interrupt Controller》4.3 Distributor register descriptions
-。GIC分发器映射表如表 54‑1所示。
+。GIC分发器映射表如下所示。
 
-表 54‑1分发器编程接口
+表 分发器编程接口
 
 =========== ================ ==== ========== ========================
 偏移地址    寄存器名         类型 默认值     描述
@@ -83,19 +85,21 @@ interface）。下面重点讲解着两部分。
 0xF20-0xF2C GICD_SPENDSGIRn  RW   0x00000000 软件中断取消挂起寄存器。
 =========== ================ ==== ========== ========================
 
-首先我们简单介绍表 54‑1，在表中只给出了寄存器相对于GIC分发器基地址的偏移地址，GIC基地址保存在另外的寄存器中，使用到是我们将详细介绍。“默认值”选项中有“待定”手册原文是“IMPLEMENTATION DEFINED”,原因是这张表格摘自《ARM® Generic Interrupt
+首先我们简单介绍上表，在表中只给出了寄存器相对于GIC分发器基地址的偏移地址，GIC基地址保存在另外的寄存器中，使用到是我们将详细介绍。“默认值”选项中有“待定”手册原文是“IMPLEMENTATION DEFINED”,原因是这张表格摘自《ARM® Generic Interrupt
 Controller》，它不针对具体的芯片，这些寄存器的默认值由芯片厂商决定。表格项“地址偏移”部分值是一个范围比如“中断使能寄存器”地址偏移为“0x100-0x17C”，原因是“中断使能寄存器”有很多，地址偏移范围是“0x100-0x17C”。
 
-表 54‑1部分寄存器简单介绍如下：
+部分寄存器简单介绍如下：
 
 中断使能寄存器GICD_ISENABLERn
 
 
-中断使能寄存器与中断屏蔽寄存器（GICD_ICENABLERn）是一一对应的，GIC分发器将中断的使能与屏蔽分开设置。中断使能寄存器如图 54‑3所示。
+中断使能寄存器与中断屏蔽寄存器（GICD_ICENABLERn）是一一对应的，GIC分发器将中断的使能与屏蔽分开设置。中断使能寄存器如下所示。
 
-|interr004|
+.. image:: media/interr004.png
+   :align: center
+   :alt: 未找到图片
 
-图 54‑3中断使能寄存器
+
 
 仅从《ARM® Generic Interrupt Controller》可知共有1020个（0~1019）中断号即1020个中断，很显然要分别控制每一个中断，中断使能寄存器（GICD_ISENABLER）肯定不止一个。从表
 54‑1可知中断使能寄存器偏移地址为0x100-0x17C，中断使能寄存器从GICD_ISENABLER0到GICD_ISENABLERn依次排布在这段地址空间。
@@ -111,29 +115,38 @@ Controller》，它不针对具体的芯片，这些寄存器的默认值由芯�
 中断优先级设置寄存器GICD_IPRIORITYRn
 
 
-与中断使能寄存器一样GICD_IPRIORITYRn是一组寄存器，根据表 54‑1可知这组寄存器位于0x400-0x7F8偏移地址处。中断优先级设置寄存器如图 54‑4所示。
+与中断使能寄存器一样GICD_IPRIORITYRn是一组寄存器，根据表 54‑1可知这组寄存器位于0x400-0x7F8偏移地址处。中断优先级设置寄存器如下所示。
 
-|interr005|
 
-图 54‑4中断优先级设置寄存器
+.. image:: media/interr005.png
+   :align: center
+   :alt: 未找到图片
 
-从图 54‑4可以看出每个中断标号占用8位，数值越小中断优先级越高。下面介绍如何根据中断编号找到对应的中断优先级设置寄存器。假设中断编号为m，中断优先级寄存器为n，中断优先级设置位偏移为offset，则n = m /4。寄存器偏移地址为(0x400 + (4*n))。在寄存器中的偏移为 offset
+
+
+从上图可以看出每个中断标号占用8位，数值越小中断优先级越高。下面介绍如何根据中断编号找到对应的中断优先级设置寄存器。假设中断编号为m，中断优先级寄存器为n，中断优先级设置位偏移为offset，则n = m /4。寄存器偏移地址为(0x400 + (4*n))。在寄存器中的偏移为 offset
 = m%4。以 m = 65为例，n = 65/4 =16，所以中断优先级设置寄存器为GICD_IPRIORITYR16，offset(n) = 65%4 = 1，中断号65对应的寄存器为GICD_IPRIORITYR16[8~15].
 
 中断处理目标CPU寄存器GICD_ITARGETSRn
 
 
-根据之前讲解GIC支持多大8个CPU，在多核处理器中，中断可以通过该寄存器设置处理该中断的从CPU。例如中断A发生了，通过该寄存器可以将中断A发送到CPU0或发送到CPU1。中断处理目标寄存器如图 54‑5所示。
+根据之前讲解GIC支持多大8个CPU，在多核处理器中，中断可以通过该寄存器设置处理该中断的从CPU。例如中断A发生了，通过该寄存器可以将中断A发送到CPU0或发送到CPU1。中断处理目标寄存器如下图所示。
 
-|interr006|
 
-图 54‑5中断处理目标CPU寄存器
+.. image:: media/interr006.png
+   :align: center
+   :alt: 未找到图片
 
-每个中断对应8位，位0~7分别代表CPU0~CPU7如图 54‑6，一个中断也可以同时发送到多个CPU ，例如中断A对应的寄存器设置为0x03，则中断A发生后将会发送到CPU0和CPU1。
 
-|interr007|
+每个中断对应8位，位0~7分别代表CPU0~CPU7如下所示，一个中断也可以同时发送到多个CPU ，例如中断A对应的寄存器设置为0x03，则中断A发生后将会发送到CPU0和CPU1。
 
-图 54‑6CPU选择表
+
+
+.. image:: media/interr007.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 同样，断处理目标CPU寄存器GICD_ITARGETSRn是一组寄存器，知道中断号经过简单计算之后就可以找到对应的寄存器，这里设中断编号为m，中断处理目标CPU寄存器为n，中断处理目标CPU寄存器位偏移为offset，则n = m /4。在寄存器中的偏移为 offse t= m%4。以 m =
 65为例，n = 65/4 =16，所以中断处理目标CPU寄存器为GICD_ITARGETSR16，offset = 65%4 = 1，中断处理目标CPU寄存器为GICD_ITARGETSR16[8~15]。
@@ -163,9 +176,9 @@ CPU接口为链接到GIC的处理器提供接口，与分发器类似它也提�
 CPU接口寄存器介绍
 ''''''''''
 
-同GIC分发器，GIC的CPU接口模块同样提供了一些编程接口，“编程接口”在这里就是一些寄存器，GPU接口寄存器有很多，我们只介绍几个常用的寄存器，其他寄存使用到时再详细介绍，CPU接口寄存器列表如表 54‑2所示。
+同GIC分发器，GIC的CPU接口模块同样提供了一些编程接口，“编程接口”在这里就是一些寄存器，GPU接口寄存器有很多，我们只介绍几个常用的寄存器，其他寄存使用到时再详细介绍，CPU接口寄存器列表如下表所示。
 
-表 54‑2CPU接口寄存器
+表  CPU接口寄存器
 
 ============= ============ ==== ========== ========================
 地址偏移      寄存器名字   类型 复位值     寄存器描述
@@ -187,7 +200,7 @@ CPU接口寄存器介绍
 0x1000        GICC_DIR     WO   -          禁用中断寄存器
 ============= ============ ==== ========== ========================
 
-结合表 54‑2常用的CPU接口寄存器介绍如下：
+结合上表常用的CPU接口寄存器介绍如下：
 
 CPU接口控制寄存器GICC_CTLR
 
@@ -195,27 +208,32 @@ CPU接口控制寄存器GICC_CTLR
 中断优先掩码寄存器GICC_PMR
 
 
-在上一小节我们讲解了GIC分发器的中断优先级设置寄存器GICD_IPRIORITYRn，每个中断占8位。这里的中断优先级掩码寄存器GICC_PMR用8位代表一个中断阈值。高于这个优先级的中断才能被送到CPU。GICC_PMR寄存器如图 54‑7所示。
+在上一小节我们讲解了GIC分发器的中断优先级设置寄存器GICD_IPRIORITYRn，每个中断占8位。这里的中断优先级掩码寄存器GICC_PMR用8位代表一个中断阈值。高于这个优先级的中断才能被送到CPU。GICC_PMR寄存器如下所示。
+
+
+.. image:: media/interr008.png
+   :align: center
+   :alt: 未找到图片
 
 |interr008|
 
 图 54‑7中断优先掩码寄存器GICC_PMR
 
-从图
-54‑7可以看出GICC_PMR寄存器后8位（0~7）用于设置一个优先级，它的格式与GICD_IPRIORITYR寄存器相同。设置生效后高于此优先级的中断才能发送到CPU。需要注意的是8位寄存器只有高4位有效。与STM32一样，这四位还将分为“抢占优先级”和“子优先级”。讲解优先级分组时再详细介绍。
+从上图可以看出GICC_PMR寄存器后8位（0~7）用于设置一个优先级，它的格式与GICD_IPRIORITYR寄存器相同。设置生效后高于此优先级的中断才能发送到CPU。需要注意的是8位寄存器只有高4位有效。与STM32一样，这四位还将分为“抢占优先级”和“子优先级”。讲解优先级分组时再详细介绍。
 
 中断优先级分组寄存器GICC_BPR
 
 
-中断优先级分组寄存器用于将8位的优先级分成两部分，一部分表示抢占优先级另外一部分表示自优先级，这和STM32的中断优先级分组相同。GICC_BPR寄存器如所示。
+中断优先级分组寄存器用于将8位的优先级分成两部分，一部分表示抢占优先级另外一部分表示自优先级，这和STM32的中断优先级分组相同。GICC_BPR寄存器如下所示。
 
-|interr009|
 
-图 54‑8中断优先级分组寄存器GICC_BPR
+.. image:: media/interr009.png
+   :align: center
+   :alt: 未找到图片
 
-中断优先级分组寄存器的后三位用于设置中断优先级分组，如表 54‑3所示。
+中断优先级分组寄存器的后三位用于设置中断优先级分组，如下表所示。
 
-表 54‑3中断优先级分组
+表  中断优先级分组
 
 ============== ====================== ======== ========== ======== ========
 GICC_BPR [2:0] 中断优先级值PRI_N[7:4] 级数
@@ -235,11 +253,12 @@ GICC_BPR [2:0] 中断优先级值PRI_N[7:4] 级数
 中断确认寄存器GICC_IAR
 
 
-中断确认寄存器GICC_IAR保存当前挂起的最高优先级中断，寄存器描述如图 54‑9所示。
+中断确认寄存器GICC_IAR保存当前挂起的最高优先级中断，寄存器描述如下图所示。
 
-|interr010|
+.. image:: media/interr010.png
+   :align: center
+   :alt: 未找到图片
 
-图 54‑9中断确认寄存器GICC_IAR
 
 GICC_IAR寄存器共有两个字段，CPUID[10:12]保存请求中断的CPU ID。对于单核的
 
@@ -259,16 +278,19 @@ CP15协处理器
 CP15协处理器简介
 ''''''''''
 
-CP15寄存器是一组寄存器编号为C0~c15。每一个寄存器根据寄存器操作码（opc1和opc2）和CRm又可分为多个寄存器，以C0为例，如\ **错误!未找到引用源。**\ 所示。
+CP15寄存器是一组寄存器编号为C0~c15。每一个寄存器根据寄存器操作码（opc1和opc2）和CRm又可分为多个寄存器，以C0为例，如下图所示。
 
-|interr011|
 
-图 54‑10CP15-C0寄存器
+.. image:: media/interr011.png
+   :align: center
+   :alt: 未找到图片
 
-从\ **错误!未找到引用源。**\ 可以看出根据opc1、CRm、opc2不同CRn（c0）寄存器分为了多个寄存器，我们修改c0寄存器时将会用到opc1、CRm、opc2，它们的含义如\ **错误!未找到引用源。**\ 所示。（表格摘自Cortex-A7 Technical
+
+
+从上图可以看出根据opc1、CRm、opc2不同CRn（c0）寄存器分为了多个寄存器，我们修改c0寄存器时将会用到opc1、CRm、opc2，它们的含义如下表所示。（表格摘自Cortex-A7 Technical
 ReferenceManua，Table 4-1，更准确的解释请参考官方原文）。
 
-表 54‑4协处理器寄存器说明
+表 协处理器寄存器说明
 
 ==== ================== =============================================================
 选项 描述               原文
@@ -302,15 +324,15 @@ CP15寄存器读、写指令说明如下：
 
 -  cond：指令执行的条件码，忽略则表示无条件执行命令。
 
--  Opcode_1：寄存器操作码1 ，对应\ **错误!未找到引用源。** 的Op1选项。
+-  Opcode_1：寄存器操作码1 ，对应Op1选项。
 
 -  Rd：通用寄存器，当为mrc时，用于保存从CP15寄存器读取得到的数据。当为mcr时，用于保存将要写入CP15寄存器的数据。
 
--  CRn：要读、写的CP15寄存器（c0~c15），对应\ **错误!未找到引用源。**\ 中的CRn选项。
+-  CRn：要读、写的CP15寄存器（c0~c15），对应的CRn选项。
 
--  CRm：寄存器从编号，对应\ **错误!未找到引用源。**\ 中的CRm选项。
+-  CRm：寄存器从编号，对应CRm选项。
 
--  Opcode_2：寄存器操作码2，对应\ **错误!未找到引用源。**\ 中的Op2选项。
+-  Opcode_2：寄存器操作码2，对应的Op2选项。
 
 CP15读、写实例说明
 '''''''''''
@@ -321,332 +343,207 @@ CP15读、写实例说明
 
 ..
 
-   通常情况下系统刚刚启动时为防止cache、中断、mmu对初始化造成不必要的影响，需要在复位中断服务函数中暂时关闭这些功能，如\ **错误!未找到引用源。**\ 所示。
+   通常情况下系统刚刚启动时为防止cache、中断、mmu对初始化造成不必要的影响，需要在复位中断服务函数中暂时关闭这些功能，如下 所示。
 
-代码清单 54‑1官方裸机复位中断处理代码
 
-1 Reset_Handler:
 
-2 cpsid i /\* Mask interrupts \*/
+.. code-block:: asm
+   :caption: 官方裸机复位中断处理代码
+   :linenos:  
 
-3
+   Reset_Handler:
+       cpsid   i               /* Mask interrupts */
 
-4 /\* Reset SCTlr Settings \*/
+   /* Reset SCTlr Settings */
+   mrc  p15, 0, r0, c1, c0, 0     /* Read CP15 System Control register   */
+   bic  r0,  r0, #(0x1 << 12)     /* Clear I bit 12 to disable I Cache   */
+   bic  r0,  r0, #(0x1 <<  2)     /* Clear C bit  2 to disable D Cache    */
+   bic  r0,  r0, #0x2    /* Clear A bit  1 to disable strict alignment  */
+   bic  r0, r0, #(0x1 << 11) /*Clear Z bit 11 to disable branchprediction */
+   bic  r0,  r0, #0x1     /* Clear M bit  0 to disable MMU  */
+   mcr  p15, 0, r0,c1,c0,0 /* Write value back to CP15 System Controlregister */
 
-5 mrc p15, 0, r0, c1, c0, 0 /\* Read CP15 System Control register \*/
+   /****************以下代码省略***********************/
 
-6 bic r0, r0, #(0x1 << 12) /\* Clear I bit 12 to disable I Cache \*/
 
-7 bic r0, r0, #(0x1 << 2) /\* Clear C bit 2 to disable D Cache \*/
+结合以上代码，我们只看“mrc p15, 0, r0, c1, c0, 0”，不难看出，这里读取的CP15标号为c1的寄存器，该寄存器介绍如下图所示。
 
-8 bic r0, r0, #0x2 /\* Clear A bit 1 to disable strict alignment \*/
 
-9 bic r0, r0, #(0x1 << 11) /*Clear Z bit 11 to disable branchprediction \*/
 
-10 bic r0, r0, #0x1 /\* Clear M bit 0 to disable MMU \*/
+.. image:: media/interr012.png
+   :align: center
+   :alt: 未找到图片
 
-11 mcr p15, 0, r0,c1,c0,0 /\* Write value back to CP15 System Controlregister \*/
-
-12
-
-13 /以下代码省略/
-
-结合\ **错误!未找到引用源。**\ ，我们只看“mrc p15, 0, r0, c1, c0, 0”，不难看出，这里读取的CP15标号为c1的寄存器，该寄存器介绍如\ **错误!未找到引用源。**\ 所示。
-
-   |interr012|
-
-图 54‑11CP15-C1寄存器
 
 结合“mrc {cond} p15, <Opcode_1>, <Rd>, <CRn>, <CRm>, <Opcode_2> ”指令不难看出这里就是读取的SCTLR(系统控制寄存器)。
 
-**错误!未找到引用源。**\ 第11行“mcr p15, 0, r0,c1,c0,0”将修改过的r0寄存器值写入到系统控制寄存器。
+ 第11行“mcr p15, 0, r0,c1,c0,0”将修改过的r0寄存器值写入到系统控制寄存器。
 
 (2) 在IRQ中断服务函数中获取GIC控制器基地址。
 
 ..
 
-   GIC基地址获取相关代码如\ **错误!未找到引用源。**
+   GIC基地址获取相关代码如下所示
 
-代码清单 54‑2获取GIC基地址
 
-1 /第三部分/
+.. code-block:: asm
+   :caption: 获取GIC基地址
+   :linenos:  
 
-2 MRC P15, 4, r1, C15, C0, 0 /\* Get GIC base address \*/
+   /*******************第三部分******************************/
+    MRC     P15, 4, r1, C15, C0, 0   /* Get GIC base address  */
+    ADD     r1, r1, #0x2000          /* r1: GICC base address  */
+    LDR     r0, [r1, #0xC]           /* r0: IAR */
 
-3 ADD r1, r1, #0x2000 /\* r1: GICC base address \*/
 
-4 LDR r0, [r1, #0xC] /\* r0: IAR \*/
 
-对比“mrc {cond} p15, <Opcode_1>, <Rd>, <CRn>, <CRm>, <Opcode_2> ”指令格式可知 CRn、CRm、Opcode_1、Opcode_2分别为c15、c0、4、0。C15寄存器介绍如\ **错误!未找到引用源。**\ 所示。
+对比“mrc {cond} p15, <Opcode_1>, <Rd>, <CRn>, <CRm>, <Opcode_2> ”指令格式可知 CRn、CRm、Opcode_1、Opcode_2分别为c15、c0、4、0。C15寄存器介绍如下图所示。
 
-|interr013|
 
-图 54‑12CP15-C15寄存器
+.. image:: media/interr013.png
+   :align: center
+   :alt: 未找到图片
 
-结合\ **错误!未找到引用源。**\ 可知“MRC P15, 4, r1, C15, C0, 0”读取的是CBAR寄存器。GIC基地址保存在CBAR寄存器中。
+
+
+
+结合上图 可知“MRC P15, 4, r1, C15, C0, 0”读取的是CBAR寄存器。GIC基地址保存在CBAR寄存器中。
 
 i.MX 6U中断分类
 ~~~~~~~~~~~
 
-查找一个芯片有哪些类型的中断最简单的方法是查看官方启动文件，我们打开第五部分配套程序的IAR工程模板的“\section5\IAR_project\libraries\iar”目录，文件“startup_MCIMX6Y2.s”是i.MX 6U启动文件。启动代码的中断向量表部分代码如代码清单
-54‑3所示，其他部分省略。
+查找一个芯片有哪些类型的中断最简单的方法是查看官方启动文件，我们打开第五部分配套程序的IAR工程模板的“\section5\IAR_project\libraries\iar”目录，文件“startup_MCIMX6Y2.s”是i.MX 6U启动文件。启动代码的中断向量表部分代码如下所示，其他部分省略。
+
+.. code-block:: asm
+   :caption: 官方启动代码
+   :linenos:  
+
+   1 /**************************第一部分*********************/
+   __vector_table
+           ARM
+           LDR     PC, Reset_Word           ; Reset
+           LDR     PC, Undefined_Word       ; Undefined instructions
+           LDR     PC, SVC_Word             ; Supervisor Call
+           LDR     PC, PrefAbort_Word       ; Prefetch abort
+           LDR     PC, DataAbort_Word       ; Data abort
+           DCD     0                        ; RESERVED
+           LDR     PC, IRQ_Word             ; IRQ interrupt
+           LDR     PC, FIQ_Word             ; FIQ interrupt
+
+           DATA
+   /**************************第二部分*********************/
+   Reset_Word      DCD   __iar_program_start
+   Undefined_Word  DCD   Undefined_Handler
+   SVC_Word        DCD   SVC_Handler
+   PrefAbort_Word  DCD   PrefAbort_Handler
+   DataAbort_Word  DCD   DataAbort_Handler
+   IRQ_Word        DCD   IRQ_Handler
+   FIQ_Word        DCD   FIQ_Handler
+
+   /***********************以下代码省略*******************/
+
+
+   /**************************第三部分*********************/
+   __iar_program_start
+           CPSID   I                         ; Mask interrupts
+
+   ; Reset SCTLR Settings
+   MRC     P15, 0, R0, C1, C0, 0     ; Read CP15 System Control register
+   BIC     R0,  R0, #(0x1 << 12)     ; Clear I bit 12 to disable I Cache
+   BIC     R0,  R0, #(0x1 <<  2)     ; Clear C bit  2 to disable D Cache
+   BIC  R0,  R0, #0x2          ; Clear A bit  1 to disable strict alignment
+   BIC   R0, R0, #(0x1 << 11) ; Clear Z bit 11 to disable branch prediction
+   BIC     R0,  R0, #0x1             ; Clear M bit  0 to disable MMU
+    ; Write value back to CP15 System Control register
+    MCR     P15, 0, R0, C1, C0, 0     
+
+           ; Set up stack for IRQ, System/User and Supervisor Modes
+           ; Enter IRQ mode
+           CPS     #0x12
+           LDR     SP, =SFE(ISTACK)     ; Set up IRQ handler stack
+
+           ; Enter System mode
+           CPS     #0x1F
+           LDR     SP, =SFE(CSTACK)     ; Set up System/User Mode stack
+
+           ; Enter Supervisor mode
+           CPS     #0x13
+           LDR     SP, =SFE(CSTACK)     ; Set up Supervisor Mode stack
+
+           LDR     R0, =SystemInit
+           BLX     R0
+           CPSIE   I                    ; Unmask interrupts
+
+           ; Application runs in Supervisor mode
+           LDR     R0, =__cmain
+           BX      R0
+
+           PUBWEAK Undefined_Handler
+           PUBWEAK SVC_Handler
+           PUBWEAK PrefAbort_Handler
+           PUBWEAK DataAbort_Handler
+           PUBWEAK IRQ_Handler
+           PUBWEAK FIQ_Handler
+           SECTION .text:CODE:REORDER:NOROOT(2)
+
+           EXTERN  SystemIrqHandler
+
+           ARM
+
+   /**************************第四部分*********************/       
+   Undefined_Handler
+           B .     ; Undefined instruction at address LR-Off \
+                           (Off=4 in ARM mode and Off=2 in THUMB mode)
+
+   SVC_Handler
+           B .     ; Supervisor call from Address LR
+
+   PrefAbort_Handler
+           B .     ; Prefetch instruction abort at address LR-4
+
+   DataAbort_Handler
+           B .     ; Load data abort at instruction address LR-8
+
+
+   /**************************第五部分*********************/ 
+   IRQ_Handler
+           PUSH    {LR}             ; Save return address+4
+           PUSH    {R0-R3, R12}     ; Push caller save registers
+
+           MRS     R0, SPSR         ; Save SPRS to allow interrupt reentry
+           PUSH    {R0}
+
+           MRC     P15, 4, R1, C15, C0, 0  ; Get GIC base address
+           ADD     R1, R1, #0x2000         ; R1: GICC base address
+           LDR     R0, [R1, #0xC]          ; R0: IAR
+
+            PUSH    {R0, R1}
+   
+      CPS     #0x13   ; Change to Supervisor mode to allow interrupt reentry
+   
+            PUSH    {LR}              ; Save Supervisor LR
+            LDR     R2, =SystemIrqHandler
+            BLX     R2                ; Call SystemIrqHandler with param IAR
+            POP     {LR}
+   
+            CPS     #0x12             ; Back to IRQ mode
+   
+            POP     {R0, R1}
+   
+        STR     R0, [R1, #0x10]   ; Now IRQ handler finished: write to EOIR
+   
+            POP     {R0}
+            MSR     SPSR_CXSF, R0
+   
+            POP     {R0-R3, R12}
+            POP     {LR}
+            SUBS    PC, LR, #4
+    /********************第六部分*********************/
+    FIQ_Handler
+            B .     ; Unexpected FIQ
+   
+            END
 
-代码清单 54‑3i.MX 6U官方启动代码
-
-1 /第一部分/
-
-2 \__vector_table
-
-3 ARM
-
-4 LDR PC, Reset_Word ; Reset
-
-5 LDR PC, Undefined_Word ; Undefined instructions
-
-6 LDR PC, SVC_Word ; Supervisor Call
-
-7 LDR PC, PrefAbort_Word ; Prefetch abort
-
-8 LDR PC, DataAbort_Word ; Data abort
-
-9 DCD 0 ; RESERVED
-
-10 LDR PC, IRQ_Word ; IRQ interrupt
-
-11 LDR PC, FIQ_Word ; FIQ interrupt
-
-12
-
-13 DATA
-
-14 /第二部分/
-
-15 Reset_Word DCD \__iar_program_start
-
-16 Undefined_Word DCD Undefined_Handler
-
-17 SVC_Word DCD SVC_Handler
-
-18 PrefAbort_Word DCD PrefAbort_Handler
-
-19 DataAbort_Word DCD DataAbort_Handler
-
-20 IRQ_Word DCD IRQ_Handler
-
-21 FIQ_Word DCD FIQ_Handler
-
-22
-
-23 /以下代码省略/
-
-24
-
-25
-
-26 /第三部分/
-
-27 \__iar_program_start
-
-28 CPSID I ; Mask interrupts
-
-29
-
-30 ; Reset SCTLR Settings
-
-31 MRC P15, 0, R0, C1, C0, 0 ; Read CP15 System Control register
-
-32 BIC R0, R0, #(0x1 << 12) ; Clear I bit 12 to disable I Cache
-
-33 BIC R0, R0, #(0x1 << 2) ; Clear C bit 2 to disable D Cache
-
-34 BIC R0, R0, #0x2 ; Clear A bit 1 to disable strict alignment
-
-35 BIC R0, R0, #(0x1 << 11) ; Clear Z bit 11 to disable branch prediction
-
-36 BIC R0, R0, #0x1 ; Clear M bit 0 to disable MMU
-
-37 ; Write value back to CP15 System Control register
-
-38 MCR P15, 0, R0, C1, C0, 0
-
-39
-
-40 ; Set up stack for IRQ, System/User and Supervisor Modes
-
-41 ; Enter IRQ mode
-
-42 CPS #0x12
-
-43 LDR SP, =SFE(ISTACK) ; Set up IRQ handler stack
-
-44
-
-45 ; Enter System mode
-
-46 CPS #0x1F
-
-47 LDR SP, =SFE(CSTACK) ; Set up System/User Mode stack
-
-48
-
-49 ; Enter Supervisor mode
-
-50 CPS #0x13
-
-51 LDR SP, =SFE(CSTACK) ; Set up Supervisor Mode stack
-
-52
-
-53 LDR R0, =SystemInit
-
-54 BLX R0
-
-55 CPSIE I ; Unmask interrupts
-
-56
-
-57 ; Application runs in Supervisor mode
-
-58 LDR R0, =__cmain
-
-59 BX R0
-
-60
-
-61 PUBWEAK Undefined_Handler
-
-62 PUBWEAK SVC_Handler
-
-63 PUBWEAK PrefAbort_Handler
-
-64 PUBWEAK DataAbort_Handler
-
-65 PUBWEAK IRQ_Handler
-
-66 PUBWEAK FIQ_Handler
-
-67 SECTION .text:CODE:REORDER:NOROOT(2)
-
-68
-
-69 EXTERN SystemIrqHandler
-
-70
-
-71 ARM
-
-72
-
-73 /第四部分/
-
-74 Undefined_Handler
-
-75 B.
-; Undefined instruction at address LR-Off \\
-
-76 (Off=4 in ARM mode and Off=2 in THUMB mode)
-
-77
-
-78 SVC_Handler
-
-79 B.
-; Supervisor call from Address LR
-
-80
-
-81 PrefAbort_Handler
-
-82 B.
-; Prefetch instruction abort at address LR-4
-
-83
-
-84 DataAbort_Handler
-
-85 B.
-; Load data abort at instruction address LR-8
-
-86
-
-87
-
-88 /第五部分/
-
-89 IRQ_Handler
-
-90 PUSH {LR} ; Save return address+4
-
-91 PUSH {R0-R3, R12} ; Push caller save registers
-
-92
-
-93 MRS R0, SPSR ; Save SPRS to allow interrupt reentry
-
-94 PUSH {R0}
-
-95
-
-96 MRC P15, 4, R1, C15, C0, 0 ; Get GIC base address
-
-97 ADD R1, R1, #0x2000 ; R1: GICC base address
-
-98 LDR R0, [R1, #0xC] ; R0: IAR
-
-99
-
-100 PUSH {R0, R1}
-
-101
-
-102 CPS #0x13 ; Change to Supervisor mode to allow interrupt reentry
-
-103
-
-104 PUSH {LR} ; Save Supervisor LR
-
-105 LDR R2, =SystemIrqHandler
-
-106 BLX R2 ; Call SystemIrqHandler with param IAR
-
-107 POP {LR}
-
-108
-
-109 CPS #0x12 ; Back to IRQ mode
-
-110
-
-111 POP {R0, R1}
-
-112
-
-113 STR R0, [R1, #0x10] ; Now IRQ handler finished: write to EOIR
-
-114
-
-115 POP {R0}
-
-116 MSR SPSR_CXSF, R0
-
-117
-
-118 POP {R0-R3, R12}
-
-119 POP {LR}
-
-120 SUBS PC, LR, #4
-
-121 /第六部分/
-
-122 FIQ_Handler
-
-123 B.
-; Unexpected FIQ
-
-124
-
-125 END
 
 我们不具体讲解汇编启动文件实现，仅仅从中提取我们需要的信息。
 
@@ -683,111 +580,73 @@ i.MX 6U 共享中断实现
 在上一小节通过官方SDK启动文件介绍了i.MX 6U中断类型，我们可以发现虽然中断向量表中定义了7个中断，但是其中5个中断发生后直接进入死循环，仅剩下复位中断和IRQ中断。我们常用的外设中断如串口中断、DMA中断等等怎么实现呢？很容易猜到是通过IRQ，所有外设中断（共享中断）发生时都会进入IRQ中断
 ，在IRQ中断处理函数中进一步区分具体的外设中断。
 
-从官方裸机启动程序看是这样子的，我们可以从GIC功能框图中的到印证。如图 54‑13所示。
+从官方裸机启动程序看是这样子的，我们可以从GIC功能框图中的到印证。如下图所示。
 
-|interr014|
+.. image:: media/interr014.png
+   :align: center
+   :alt: 未找到图片
 
-图 54‑13GIC部分结构框图
 
-结合图 54‑13，无论是SPI中断、PPI中断、还是SGI中断，它们都链接到了CPU接口，而CPU接口接口输出到CPU的只有两个FIQ和IRQ(VFIQ和VIRQ这里没有用到，暂时忽略)。中断标号为0~1019的任意一个中断发生后CPU都会跳转到FIQ或IRQ中断服务函数去执行。在官方裸机代码中默
+
+结合上图介绍如下，无论是SPI中断、PPI中断、还是SGI中断，它们都链接到了CPU接口，而CPU接口接口输出到CPU的只有两个FIQ和IRQ(VFIQ和VIRQ这里没有用到，暂时忽略)。中断标号为0~1019的任意一个中断发生后CPU都会跳转到FIQ或IRQ中断服务函数去执行。在官方裸机代码中默
 认关闭了FIQ，只使用了IRQ。
 
 根据之前讲解，GIC控制器为我们提供了两个编程接口，分别为分发器寄存器和CPU接口寄存器。下面将结合NXP官方SDK中的裸机工程讲解i.MX 6U共享中断的实现。NXP官方裸机共享中断实现代码如所示，我们将参照官方代码讲解并最终将官方启动文件移植到我们自己的工程中。
 
-代码清单 54‑4IRQ共享中断实现
 
-1 IRQ_Handler:
 
-2
 
-3 /第一部分/
+.. code-block:: asm
+   :caption: IRQ共享中断实现
+   :linenos:  
 
-4 push {lr} /\* Save return address+4 \*/
+   IRQ_Handler:
 
-5 push {r0-r3, r12} /\* Push caller save registers \*/
+   /*******************第一部分******************************/
+       push    {lr}         /* Save return address+4     */
+       push    {r0-r3, r12} /* Push caller save registers           */
 
-6
+   /*******************第二部分******************************/
+       MRS     r0, spsr    /* Save SPRS to allow interrupt reentry  */
+       push    {r0}
 
-7 /第二部分/
+   /*******************第三部分******************************/
+       MRC     P15, 4, r1, C15, C0, 0   /* Get GIC base address  */
+       ADD     r1, r1, #0x2000          /* r1: GICC base address  */
+       LDR     r0, [r1, #0xC]           /* r0: IAR */
 
-8 MRS r0, spsr /\* Save SPRS to allow interrupt reentry \*/
+   /*******************第四部分******************************/
+       push    {r0, r1}
 
-9 push {r0}
+   /*******************第五部分******************************/
+      CPS  #0x13 /* Change to Supervisor mode to allow interrupt reentry */
 
-10
+   /*******************第六部分******************************/
+       push    {lr}            /* Save Supervisor lr  */
+       LDR     r2, =SystemIrqHandler
+       BLX     r2              /* Call SystemIrqHandler with param GCC */
+       POP     {lr}
 
-11 /第三部分/
+   /*******************第七部分******************************/
+       CPS     #0x12           /* Back to IRQ mode */
 
-12 MRC P15, 4, r1, C15, C0, 0 /\* Get GIC base address \*/
+       POP     {r0, r1}
 
-13 ADD r1, r1, #0x2000 /\* r1: GICC base address \*/
+       STR     r0, [r1, #0x10] /* Now IRQ handler finished: write to EOIR */
 
-14 LDR r0, [r1, #0xC] /\* r0: IAR \*/
+       POP     {r0}
+       MSR     spsr_cxsf, r0
 
-15
+       POP     {r0-r3, r12}
+       POP     {lr}
+       SUBS    pc, lr, #4
+       .size IRQ_Handler, . - IRQ_Handler
 
-16 /第四部分/
+       .align 2
+       .arm
+       .weak FIQ_Handler
+       .type FIQ_Handler, %function
 
-17 push {r0, r1}
-
-18
-
-19 /第五部分/
-
-20 CPS #0x13 /\* Change to Supervisor mode to allow interrupt reentry \*/
-
-21
-
-22 /第六部分/
-
-23 push {lr} /\* Save Supervisor lr \*/
-
-24 LDR r2, =SystemIrqHandler
-
-25 BLX r2 /\* Call SystemIrqHandler with param GCC \*/
-
-26 POP {lr}
-
-27
-
-28 /第七部分/
-
-29 CPS #0x12 /\* Back to IRQ mode \*/
-
-30
-
-31 POP {r0, r1}
-
-32
-
-33 STR r0, [r1, #0x10] /\* Now IRQ handler finished: write to EOIR \*/
-
-34
-
-35 POP {r0}
-
-36 MSR spsr_cxsf, r0
-
-37
-
-38 POP {r0-r3, r12}
-
-39 POP {lr}
-
-40 SUBS pc, lr, #4
-
-41 .size IRQ_Handler,.
-- IRQ_Handler
-
-42
-
-43 .align 2
-
-44 .arm
-
-45 .weak FIQ_Handler
-
-46 .type FIQ_Handler, %function
 
 结合代码讲解如下：
 
@@ -819,116 +678,96 @@ SPRS是特殊功能寄存器不能直接访问，指令“MRS r0, spsr”用于�
 指令“push {lr}”保存当前的链接寄存器，即保存程序的返回地址。指令“LDR r2, =SystemIrqHandler”用于将函数“SystemIrqHandler”地址保存到r2寄存器中。指令“BLX r2”是有返回的跳转，程序将会跳转到“SystemIrqHandler”函数执行。
 
 函数“SystemIrqHandler”保存在“~\base_code\section5\IAR_project\libraries\\ system_MCIMX6Y2.c”文件内。我们可以用VS code
-或者直接打开“~\base_code\section5\”目录下的IAR工程。去掉不必要的条件编译后如代码清单 54‑5所示。
+或者直接打开“~\base_code\section5\”目录下的IAR工程。去掉不必要的条件编译后如下所示。
 
-代码清单 54‑5SystemIrqHandler共享中断处理函数
 
-1 /第一部分/
 
-2 \__attribute__((weak)) void SystemIrqHandler(uint32_t giccIar)
 
-3 {
+.. code-block:: c
+   :caption: systemIrqHandler共享中断处理函数
+   :linenos:  
 
-4
+   /***********************第一部分********************/
+   __attribute__((weak)) void SystemIrqHandler(uint32_t giccIar)
+   {
 
-5 /第二部分/
+   /***********************第二部分********************/
+     uint32_t intNum = giccIar & 0x3FFUL;
 
-6 uint32_t intNum = giccIar & 0x3FFUL;
+     // rgb_led_init();
+     // blue_led_on;
+   /***********************第三部分********************/
+     /* Spurious interrupt ID or Wrong interrupt number */
+     if ((intNum == 1023) || (intNum >= NUMBER_OF_INT_VECTORS))
+     {
+       return;
+     }
 
-7
+     irqNesting++;
 
-8 // rgb_led_init();
+     // __enable_irq();      /* Support nesting interrupt */
 
-9 // blue_led_on;
+   /***********************第四部分********************/
+     /* Now call the real irq handler for intNum */
+     irqTable[intNum].irqHandler(giccIar, irqTable[intNum].userParam);
 
-10 /第三部分/
+     // __disable_irq();
+     irqNesting--;
+   }
 
-11 /\* Spurious interrupt ID or Wrong interrupt number \*/
 
-12 if ((intNum == 1023) \|\| (intNum >= NUMBER_OF_INT_VECTORS))
-
-13 {
-
-14 return;
-
-15 }
-
-16
-
-17 irqNesting++;
-
-18
-
-19 // \__enable_irq(); /\* Support nesting interrupt \*/
-
-20
-
-21 /第四部分/
-
-22 /\* Now call the real irq handler for intNum \*/
-
-23 irqTable[intNum].irqHandler(giccIar, irqTable[intNum].userParam);
-
-24
-
-25 // \__disable_irq();
-
-26 irqNesting--;
-
-27 }
 
 结合代码，各部分讲解如下:
 
 (1) 第一部分，SystemIrqHandler函数有一个入口参数“giccIar”，它是GICC_IAR寄存器的值。在代码清单 54‑4的第四部分代码中，我们将GICC_IAR寄存器的值保存到了R0寄存器，跳转到SystemIrqHandler函数之后R0寄存器的值作为函数参数。
 
-(2) 第二部分，获取中断的中断编号。中断编号保存在GICC_IAR寄存器的后10位（0~9）如图 54‑14所示。
+(2) 第二部分，获取中断的中断编号。中断编号保存在GICC_IAR寄存器的后10位（0~9）如下所示。
 
-|interr015|
+.. image:: media/interr015.png
+   :align: center
+   :alt: 未找到图片
 
-图 54‑14GICC_IAR寄存器
 
 (3) 第三部分，判断中断标号是否有效。根据之前讲解如果中断无效，则读取得到的中断号为1023。“NUMBER_OF_INT_VECTORS”是i.MX 6U支持的最大中断号加一，大于等于这个值的中断编号也被认为无效。
 
-(4) 如果中断编号有效，这部分根据中断编号在“irqTable”中找到对应的中断服务函数。我们简单了解一下这个表。表定义在system_MCIMX6Y2.h文件，如代码清单 54‑6所示。
+(4) 如果中断编号有效，这部分根据中断编号在“irqTable”中找到对应的中断服务函数。我们简单了解一下这个表。表定义在system_MCIMX6Y2.h文件，如下所示。
 
-代码清单 54‑6本地中断向量表定义
 
-1 /*中断数量 \*/
 
-2 #define NUMBER_OF_INT_VECTORS 160
+.. code-block:: c
+   :caption: 本地中断向量表定义
+   :linenos:  
 
-3 /\* 本地中断向量表 \*/
+   /*中断数量 */
+   2 #define NUMBER_OF_INT_VECTORS 160       
+   3 /* 本地中断向量表 */
+   4 static sys_irq_handle_t irqTable[NUMBER_OF_INT_VECTORS];
 
-4 static sys_irq_handle_t irqTable[NUMBER_OF_INT_VECTORS];
 
-这里把“irqTable”叫做“本地中断向量表”，我们所熟知的那个中断向量表在启动文件中实现，并且位于程序的开始处（0x80002000）。“本地中断向量表”的作用是当IRQ中断发生后找到对应的处理函数。从代码清单
-54‑6不难看出，本地中断向量表是一个“sys_irq_handle_t”结构体类型的数组。“sys_irq_handle_t”结构体如代码清单 54‑7所示。
 
-代码清单 54‑7sys_irq_handle_t结构体
+这里把“irqTable”叫做“本地中断向量表”，我们所熟知的那个中断向量表在启动文件中实现，并且位于程序的开始处（0x80002000）。“本地中断向量表”的作用是当IRQ中断发生后找到对应的处理函数。从上方代码不难看出，本地中断向量表是一个“sys_irq_handle_t”结构体类型的数组。“sys_irq_handle_t”结构体如下所示。
 
-1 typedef void (*system_irq_handler_t) (uint32_t giccIar, void \*param);
+.. code-block:: c
+   :caption: sys_irq_handle_t结构体
+   :linenos:  
 
-2 /*\*
+   typedef void (*system_irq_handler_t) (uint32_t giccIar, void *param);
+   /**
+    * @brief IRQ handle for specific IRQ
+    */
+   typedef struct _sys_irq_handle
+   {
+       system_irq_handler_t irqHandler; /**< IRQ handler for specific IRQ */
+      void *userParam;    /**< User param for handler callback */
+   } sys_irq_handle_t;
 
-3 \* @brief IRQ handle for specific IRQ
 
-4 \*/
 
-5 typedef struct \_sys_irq_handle
-
-6 {
-
-7 system_irq_handler_t irqHandler; /**< IRQ handler for specific IRQ \*/
-
-8 void \*userParam; /**< User param for handler callback \*/
-
-9 } sys_irq_handle_t;
-
-结合代码清单 54‑7可知，sys_irq_handle_t结构体中有一个函数指针和函数参数指针，函数指针用于指定中断的中断处理函数，函数参数指针用于指定中断处理程序的用户参数。
+结合以上代码可知，sys_irq_handle_t结构体中有一个函数指针和函数参数指针，函数指针用于指定中断的中断处理函数，函数参数指针用于指定中断处理程序的用户参数。
 
 初始化中断时我们会根据中断编号初始化对应的数组项（irqTable[]）。同样，中断发生后再SystemIrqHandler函数中根据中断标号找到对应的中断处理函数。
 
--  代码清单 54‑4第七部分，函数SystemIrqHandler执行完成后IRQ中断并没有结束，这部分代码用于标记中断处理完成并恢复中断前的状态。
+-  代码第七部分，函数SystemIrqHandler执行完成后IRQ中断并没有结束，这部分代码用于标记中断处理完成并恢复中断前的状态。
 
 按键中断实验
 ~~~~~~
@@ -938,23 +777,24 @@ SPRS是特殊功能寄存器不能直接访问，指令“MRS r0, spsr”用于�
 硬件设计
 ^^^^
 
-本实验会使用到Pro板的button2按键，和RGB灯。这些硬件电路在第52章 GPIO输入—按键查询检测以及\ **错误!未找到引用源。错误!未找到引用源。**\ 章节已经介绍，这里不再介绍。
+本实验会使用到Pro板的button2按键，和RGB灯。这些硬件电路在第52章 GPIO输入—按键查询检测已经介绍，这里不再介绍。
 
 软件设计
 ^^^^
 
 由于中断涉及的内容较多，添加的文件也较多，这里只介绍重点，完整的代码请参考本章配套程序。
 
-本章程序在\ **错误!未找到引用源。错误!未找到引用源。**\ 对应源码基础上修改得到，主要修改内容包括添加NXP官方SDK中断相关文件、修改启动文件，添加按键中断代码。
+本章程序在按键对应源码基础上修改得到，主要修改内容包括添加NXP官方SDK中断相关文件、修改启动文件，添加按键中断代码。
 
 添加SDK官方中断相关代码
 '''''''''''''
 
-如图 54‑15所示，在“/interrupt_init/include”目录下共添加了5个中断相关的头文件。
+如下图所示，在“/interrupt_init/include”目录下共添加了5个中断相关的头文件。
 
-|interr016|
+.. image:: media/interr016.png
+   :align: center
+   :alt: 未找到图片
 
-图 54‑15添加官方头文件
 
 标号①处是内核相关头文件以及符合CMSIS标准的头文件，没有对应的.c文件，这些头文件提供了系统控制函数以及特殊寄存器操作函数，我们直接添加到我们工程即可，几乎不用修改。
 
@@ -963,176 +803,98 @@ SPRS是特殊功能寄存器不能直接访问，指令“MRS r0, spsr”用于�
 修改启动文件
 ''''''
 
-启动文件参照官方GCC版本启动文件修改，官方文件位于“i.MX6ULL系列\1-野火开源图书合集\书籍配套代码\\ base_code_2019_11_09\section5\IAR_project\libraries\gcc”目录下，修改后的源码如代码清单 54‑8所示。
+启动文件参照官方GCC版本启动文件修改，官方文件位于“i.MX6ULL系列\1-野火开源图书合集\书籍配套代码\\ base_code_2019_11_09\section5\IAR_project\libraries\gcc”目录下，修改后的源码如下所示。
 
-代码清单 54‑8启动代码
 
-1 /第一部分/
 
-2
 
-3 /*DDR的前8K字节保留， [0x80000000-0x80001FFF] 保留为ROM区域 \*/
+.. code-block:: asm
+   :caption: 启动代码
+   :linenos:  
 
-4
+   /**********************第一部分*********************/
 
-5 /*定义内存起始地址和大小*/
+   /*DDR的前8K字节保留， [0x80000000-0x80001FFF] 保留为ROM区域 */
 
-6 #define m_DDR_start 0x80000000
+   /*定义内存起始地址和大小*/
+   #define m_DDR_start             0x80000000
+   #define m_DDR_size              0x20000000
 
-7 #define m_DDR_size 0x20000000
+   /*定义主代码区域，m_text_start将会作为中断向量表的起始地址，链接脚本中
+   *将该地址用作起始链接地址。
+   */
+   #define  m_text_start           0x80002000
 
-8
+   /*定义Supervisor工作模式的栈起始地址和大小
+   *野火开发板标配512M字节的DDR, Supervisor工作模式的栈和IRQ工作模式的栈
+   *位于DDR的后2M地址，大小均为1M。
+   */
+   #define   SUP_model_stack_start     0x9FE00000
+   #define   SUP_model_stack_size      0x00100000
 
-9 /*定义主代码区域，m_text_start将会作为中断向量表的起始地址，链接脚本中
 
-10 \*将该地址用作起始链接地址。
+   /*定义IRQ工作模式的栈起始地址和大小，大小为1M*/
+   #define   IRQ_model_stack_start     0x9FF00000
+   #define   IRQ_model_stack_size      0x00100000
 
-11 \*/
+   /**********************第二部分*********************/
+   .text
+   .align 2         //设置字节对齐
+   .global _start
+   _start:
 
-12 #define m_text_start 0x80002000
+       ldr     pc, =Reset_Handler           /* Reset                  */
+       ldr     pc, =Undefined_Handler       /* Undefined instructions */
+       ldr     pc, =SVC_Handler             /* Supervisor Call        */
+       ldr     pc, =PrefAbort_Handler       /* Prefetch abort         */
+       ldr     pc, =DataAbort_Handler       /* Data abort             */
+       .word   0                            /* RESERVED               */
+       ldr     pc, =IRQ_Handler             /* IRQ interrupt          */
+       ldr     pc, =FIQ_Handler             /* FIQ interrupt          */
 
-13
 
-14 /*定义Supervisor工作模式的栈起始地址和大小
 
-15 \*野火开发板标配512M字节的DDR, Supervisor工作模式的栈和IRQ工作模式的栈
+   /**********************第三部分*********************/
+   Reset_Handler:
+       cpsid   i                         /* 全局关闭中断 */
 
-16 \*位于DDR的后2M地址，大小均为1M。
 
-17 \*/
+       mrc     p15, 0, r0, c1, c0, 0     /*读取CP15系统控制寄存器   */
+       bic     r0,  r0, #(0x1 << 12)     /*  清除第12位（I位）禁用 I Cache  */
+       bic     r0,  r0, #(0x1 <<  2)     /*  清除第 2位（C位）禁用 D Cache  */
+       bic     r0,  r0, #0x2             /*  清除第 1位（A位）禁止严格对齐   */
+       bic     r0,  r0, #(0x1 << 11)     /*  清除第11位（Z位）分支预测   */
+       bic     r0,  r0, #0x1             /*  清除第 0位（M位）禁用 MMU   */
+       mcr     p15, 0, r0, c1, c0, 0     /*  将修改后的值写回CP15寄存器   */
 
-18 #define SUP_model_stack_start 0x9FE00000
+   /**********************第四部分*********************/
+       /* 定义IRQ工作模式的栈起始地址 */
+       cps     #0x12                
+       ldr     sp, =IRQ_model_stack_start    
 
-19 #define SUP_model_stack_size 0x00100000
+       /*定义User工作模式的栈起始地址，与Supervisor相同*/
+       cps     #0x1F               
+       ldr     sp, =SUP_model_stack_start    
 
-20
+       /*定义Supervisor工作模式的栈起始地址，与User相同 */
+       cps     #0x13                
+       ldr     sp, =SUP_model_stack_start   
 
-21
+   /**********************第五部分*******************/
+       /*跳转到系统初始化函数，初始化GIC、CACHE-L1、mmu等等*/
+       ldr     r2, =SystemInit      
+       blx     r2  
 
-22 /*定义IRQ工作模式的栈起始地址和大小，大小为1M*/
+    /*********************第六部分*******************/   
+       /*开启全局中断*/
+       cpsie   i                   
 
-23 #define IRQ_model_stack_start 0x9FF00000
+       /*跳转到到 main 函数执行，*/
+       b main                
+       b .        /*死循环*/
+       /*其他中断处理函数与官方相同这里省略，可直接打开源码查看*/
 
-24 #define IRQ_model_stack_size 0x00100000
 
-25
-
-26 /第二部分/
-
-27 .text
-
-28 .align 2 //设置字节对齐
-
-29 .global \_start
-
-30 \_start:
-
-31
-
-32 ldr pc, =Reset_Handler /\* Reset \*/
-
-33 ldr pc, =Undefined_Handler /\* Undefined instructions \*/
-
-34 ldr pc, =SVC_Handler /\* Supervisor Call \*/
-
-35 ldr pc, =PrefAbort_Handler /\* Prefetch abort \*/
-
-36 ldr pc, =DataAbort_Handler /\* Data abort \*/
-
-37 .word 0 /\* RESERVED \*/
-
-38 ldr pc, =IRQ_Handler /\* IRQ interrupt \*/
-
-39 ldr pc, =FIQ_Handler /\* FIQ interrupt \*/
-
-40
-
-41
-
-42
-
-43 /第三部分/
-
-44 Reset_Handler:
-
-45 cpsid i /\* 全局关闭中断 \*/
-
-46
-
-47
-
-48 mrc p15, 0, r0, c1, c0, 0 /*读取CP15系统控制寄存器 \*/
-
-49 bic r0, r0, #(0x1 << 12) /\* 清除第12位（I位）禁用 I Cache \*/
-
-50 bic r0, r0, #(0x1 << 2) /\* 清除第 2位（C位）禁用 D Cache \*/
-
-51 bic r0, r0, #0x2 /\* 清除第 1位（A位）禁止严格对齐 \*/
-
-52 bic r0, r0, #(0x1 << 11) /\* 清除第11位（Z位）分支预测 \*/
-
-53 bic r0, r0, #0x1 /\* 清除第 0位（M位）禁用 MMU \*/
-
-54 mcr p15, 0, r0, c1, c0, 0 /\* 将修改后的值写回CP15寄存器 \*/
-
-55
-
-56 /第四部分/
-
-57 /\* 定义IRQ工作模式的栈起始地址 \*/
-
-58 cps #0x12
-
-59 ldr sp, =IRQ_model_stack_start
-
-60
-
-61 /*定义User工作模式的栈起始地址，与Supervisor相同*/
-
-62 cps #0x1F
-
-63 ldr sp, =SUP_model_stack_start
-
-64
-
-65 /*定义Supervisor工作模式的栈起始地址，与User相同 \*/
-
-66 cps #0x13
-
-67 ldr sp, =SUP_model_stack_start
-
-68
-
-69 /第五部分/
-
-70 /*跳转到系统初始化函数，初始化GIC、CACHE-L1、mmu等等*/
-
-71 ldr r2, =SystemInit
-
-72 blx r2
-
-73
-
-74 /第六部分/
-
-75 /*开启全局中断*/
-
-76 cpsie i
-
-77
-
-78 /*跳转到到 main 函数执行，*/
-
-79 b main
-
-80 b.
-/*死循环*/
-
-81
-
-82
-
-83 /*其他中断处理函数与官方相同这里省略，可直接打开源码查看*/
 
 代码中一些内容在讲解官方启动文件时已经介绍，这里重点介绍修改的部分。结合代码各部分说明如下：
 
@@ -1145,79 +907,49 @@ SPRS是特殊功能寄存器不能直接访问，指令“MRS r0, spsr”用于�
 
 -  第四部分，设置栈地址。本程序将栈地址设置在DDR的末尾处。IRQ工作模式的栈位于0x9FF00000地址处（DDR最后1M地址空间）。User模式和Supervisor模式使用相同的栈空间，位于0x9FE00000起始地址处，大小为1M。
 
--  第五部分，调用“SystemInit”执行系统初始化。上一步设置了“栈”所以这里就可以直接调用C函数了。SystemInit函数如代码清单 54‑9所示。
+-  第五部分，调用“SystemInit”执行系统初始化。上一步设置了“栈”所以这里就可以直接调用C函数了。SystemInit函数如下所示。
 
-代码清单 54‑9SystemInit函数
 
-1 void SystemInit(void)
 
-2 {
+.. code-block:: c
+   :caption: SystemInit函数
+   :linenos:  
 
-3 uint32_t sctlr;
+   void SystemInit(void)
+   {
+     uint32_t sctlr;
+     uint32_t actlr;
+   /*FPU 相关代码省略*/
 
-4 uint32_t actlr;
+   /******************第一部分********************/
+     L1C_InvalidateInstructionCacheAll();
+     L1C_InvalidateDataCacheAll();
 
-5 /*FPU 相关代码省略*/
+   /******************第二部分********************/
+     actlr = __get_ACTLR();
+     actlr = (actlr | ACTLR_SMP_Msk); /* Change to SMP mode before enable DCache */
+     __set_ACTLR(actlr);
 
-6
+   /******************第三部分********************/
+     sctlr = __get_SCTLR();
+     sctlr = (sctlr & ~(SCTLR_V_Msk | /* Use low vector */
+                        SCTLR_A_Msk | /* Disable alignment fault checking */
+                        SCTLR_M_Msk)) /* Disable MMU */
+             | (SCTLR_I_Msk |         /* Enable ICache */
+                SCTLR_Z_Msk |         /* Enable Prediction */
+                SCTLR_CP15BEN_Msk |   /* Enable CP15 barrier operations */
+                SCTLR_C_Msk);         /* Enable DCache */
+     __set_SCTLR(sctlr);
 
-7 /第一部分/
+   /******************第四部分********************/
+     /* Set vector base address */
+     GIC_Init();
 
-8 L1C_InvalidateInstructionCacheAll();
+   /******************第五部分********************/
+     __set_VBAR((uint32_t)__VECTOR_TABLE);
 
-9 L1C_InvalidateDataCacheAll();
-
-10
-
-11 /第二部分/
-
-12 actlr = \__get_ACTLR();
-
-13 actlr = (actlr \| ACTLR_SMP_Msk); /\* Change to SMP mode before enable DCache \*/
-
-14 \__set_ACTLR(actlr);
-
-15
-
-16 /第三部分/
-
-17 sctlr = \__get_SCTLR();
-
-18 sctlr = (sctlr & ~(SCTLR_V_Msk \| /\* Use low vector \*/
-
-19 SCTLR_A_Msk \| /\* Disable alignment fault checking \*/
-
-20 SCTLR_M_Msk)) /\* Disable MMU \*/
-
-21 \| (SCTLR_I_Msk \| /\* Enable ICache \*/
-
-22 SCTLR_Z_Msk \| /\* Enable Prediction \*/
-
-23 SCTLR_CP15BEN_Msk \| /\* Enable CP15 barrier operations \*/
-
-24 SCTLR_C_Msk); /\* Enable DCache \*/
-
-25 \__set_SCTLR(sctlr);
-
-26
-
-27 /第四部分/
-
-28 /\* Set vector base address \*/
-
-29 GIC_Init();
-
-30
-
-31 /第五部分/
-
-32 \__set_VBAR((uint32_t)__VECTOR_TABLE);
-
-33
-
-34 /*FPU 相关代码省略*/
-
-35 }
+   /*FPU 相关代码省略*/
+   }
 
 SystemInit函数去除FPU相关代码（FPU暂时不使用），大致分为五部分，结合代码介绍如下。
 
@@ -1235,7 +967,7 @@ SystemInit函数执行完成后，系统已经可以接受中断了，我们回�
 
 -  第六部分，开启全局中断并跳转到main 函数开始执行。
 
-在启动文件中另外一个重要内容就是IRQ中断服务函数，根据之前讲解i.MX 6U共有160个中断（这里忽略了NotAvail中断），这么多中断共享IRQ中断，即在IRQ中断服务函数中根据中断号再次区分这160个中断。这部分内容与NXP官方启动文件相同，详细介绍请参考54.4 i.MX 6U
+在启动文件中另外一个重要内容就是IRQ中断服务函数，根据之前讲解i.MX 6U共有160个中断（这里忽略了NotAvail中断），这么多中断共享IRQ中断，即在IRQ中断服务函数中根据中断号再次区分这160个中断。这部分内容与NXP官方启动文件相同，详细介绍请参考i.MX 6U
 共享中断实现章节。这里不再赘述。
 
 添加按键中断初始化代码
@@ -1243,139 +975,90 @@ SystemInit函数执行完成后，系统已经可以接受中断了，我们回�
 
 与STM32中断初始化不同，我们将详细介绍这部分内容。此外，为了简化程序，我们并没有使用GIC接口寄存器配置每个中断的中断优先级、中断分组等等。中断优先级和中断优先级分组保持函数“SystemInit”设定的默认值。
 
-GPIO引脚中断初始化函数如代码清单 54‑10所示。
+GPIO引脚中断初始化函数如代码如下所示。
 
-代码清单 54‑10GPIO按键中断初始化
 
-1 /第一部分/
+.. code-block:: c
+   :caption: 按键中断初始化
+   :linenos:  
 
-2 /*按键2 GPIO端口、引脚号及IOMUXC复用宏定义*/
+   /******************第一部分********************/
+   /*按键2 GPIO端口、引脚号及IOMUXC复用宏定义*/
+   #define button2_GPIO               GPIO5
+   #define button2_GPIO_PIN           (1U)
+   /*按键初始化函数*/
+   void interrupt_button2_init(void)
+   {
+       volatile uint32_t *icr;  //用于保存 GPIO-ICR寄存器的地址,与 icrShift 变量配合使用
+       uint32_t icrShift;       //引脚号大于16时会用到,
+   
+       icrShift = button2_GPIO_PIN;  //保存button2引脚对应的 GPIO 号
+   
+   /******************第二部分********************/
+       /*添加中断服务函数到  "中断向量表"*/
+       SystemInstallIrqHandler(GPIO5_Combined_0_15_IRQn, \
+         (system_irq_handler_t)EXAMPLE_GPIO_IRQHandler, NULL);
+   
+   /******************第三部分********************/
+       GIC_EnableIRQ(GPIO5_Combined_0_15_IRQn);                 //开启中断
+   
+   /******************第四部分********************/
+       CCM_CCGR1_CG15(0x3);  //开启GPIO5的时钟
+   
+       /*设置 按键引脚的PAD属性*/
+       IOMUXC_SetPinMux(IOMUXC_SNVS_SNVS_TAMPER1_GPIO5_IO01,0);     
+       IOMUXC_SetPinConfig(IOMUXC_SNVS_SNVS_TAMPER1_GPIO5_IO01, button_PAD_CONFIG_DATA);
+   
+   /******************第五部分********************/
+       /*设置GPIO方向（输入或输出）*/
+       GPIO5->IMR &= ~(1 << button2_GPIO_PIN);  //寄存器重置为默认值
+       GPIO5->GDIR &= ~(1<<1);                  //设置GPIO5_01为输入模式
+   
+   /******************第六部分********************/
+       /*设置GPIO引脚中断类型*/
+       GPIO5->EDGE_SEL &= ~(1U << button2_GPIO_PIN);//寄存器重置为默认值
+   
+       if(button2_GPIO_PIN < 16)
+       {
+           icr = &(GPIO5->ICR1);
+       }
+       else
+       {
+           icr = &(GPIO5->ICR2);
+           icrShift -= 16;
+       }
+   
+       /*按键引脚默认低电平，设置为上升沿触发中断*/
+        *icr = (*icr & (~(3U << (2 * icrShift)))) | (2U << (2 * icrShift));
+   
+   /******************第七部分********************/
+        button2_GPIO->IMR |= (1 << button2_GPIO_PIN); //使能GPIO引脚中断
+   }
 
-3 #define button2_GPIO GPIO5
-
-4 #define button2_GPIO_PIN (1U)
-
-6
-
-7 /*按键初始化函数*/
-
-8 void interrupt_button2_init(void)
-
-9 {
-
-10 volatile uint32_t \*icr; //用于保存 GPIO-ICR寄存器的地址,与 icrShift 变量配合使用
-
-11 uint32_t icrShift; //引脚号大于16时会用到,
-
-12
-
-13 icrShift = button2_GPIO_PIN; //保存button2引脚对应的 GPIO 号
-
-14
-
-15 /第二部分/
-
-16 /*添加中断服务函数到 "中断向量表"*/
-
-17 SystemInstallIrqHandler(GPIO5_Combined_0_15_IRQn, \\
-
-18 (system_irq_handler_t)EXAMPLE_GPIO_IRQHandler, NULL);
-
-19
-
-20 /第三部分/
-
-21 GIC_EnableIRQ(GPIO5_Combined_0_15_IRQn); //开启中断
-
-22
-
-23 /第四部分/
-
-24 CCM_CCGR1_CG15(0x3); //开启GPIO5的时钟
-
-25
-
-26 /*设置 按键引脚的PAD属性*/
-
-27 IOMUXC_SetPinMux(IOMUXC_SNVS_SNVS_TAMPER1_GPIO5_IO01,0);
-
-28 IOMUXC_SetPinConfig(IOMUXC_SNVS_SNVS_TAMPER1_GPIO5_IO01, button_PAD_CONFIG_DATA);
-
-29
-
-30 /第五部分/
-
-31 /*设置GPIO方向（输入或输出）*/
-
-32 GPIO5->IMR &= ~(1 << button2_GPIO_PIN); //寄存器重置为默认值
-
-33 GPIO5->GDIR &= ~(1<<1); //设置GPIO5_01为输入模式
-
-34
-
-35 /第六部分/
-
-36 /*设置GPIO引脚中断类型*/
-
-37 GPIO5->EDGE_SEL &= ~(1U << button2_GPIO_PIN);//寄存器重置为默认值
-
-38
-
-39 if(button2_GPIO_PIN < 16)
-
-40 {
-
-41 icr = &(GPIO5->ICR1);
-
-42 }
-
-43 else
-
-44 {
-
-45 icr = &(GPIO5->ICR2);
-
-46 icrShift -= 16;
-
-47 }
-
-48
-
-49 /*按键引脚默认低电平，设置为上升沿触发中断*/
-
-50 \*icr = (*icr & (~(3U << (2 \* icrShift)))) \| (2U << (2 \* icrShift));
-
-51
-
-52 /第七部分/
-
-53 button2_GPIO->IMR \|= (1 << button2_GPIO_PIN); //使能GPIO引脚中断
-
-54 }
 
 结合代码，各部分说明如下：
 
 -  第一部分，这部分内容定义在button.h文件夹下，定义本次使用的GPIO引脚。
 
--  第二部分，添加中断服务函数到“本地中断向量表”，在STM32程序中，中断服务函数在启动文件中已经定义好了，我们只需要实现即可。但这里需要手动添加中断服务函数到“本地向量表中” SystemInstallIrqHandler函数原型如代码清单 54‑11所示。
+-  第二部分，添加中断服务函数到“本地中断向量表”，在STM32程序中，中断服务函数在启动文件中已经定义好了，我们只需要实现即可。但这里需要手动添加中断服务函数到“本地向量表中” SystemInstallIrqHandler函数原型如下所示。
 
-代码清单 54‑11SystemInstallIrqHandler函数
 
-1 void SystemInstallIrqHandler(IRQn_Type irq, \\
 
-2 system_irq_handler_t handler,\\
+.. code-block:: c
+   :caption: SystemInstallIrqHandler函数
+   :linenos:  
 
-3 void \*userParam)
+   void SystemInstallIrqHandler(IRQn_Type irq, \
+                 system_irq_handler_t handler,\
+                              void *userParam) 
+   {
+     irqTable[irq].irqHandler = handler;
+    irqTable[irq].userParam = userParam;
+   }
 
-4 {
 
-5 irqTable[irq].irqHandler = handler;
 
-6 irqTable[irq].userParam = userParam;
-
-7 }
-
-从代码清单 54‑11不难看出，该函数就是根据中断号填充全局结构体数组“irqTable”。SystemInstallIrqHandler函数共有三个参数，irq指定中断对应的中断号，handler指定中断服务函数，userParam指定中断服务函数的用户参数，如果不同设置为“NULL”即可。
+从以上代码不难看出，该函数就是根据中断号填充全局结构体数组“irqTable”。SystemInstallIrqHandler函数共有三个参数，irq指定中断对应的中断号，handler指定中断服务函数，userParam指定中断服务函数的用户参数，如果不同设置为“NULL”即可。
 
 -  第三部分，开启中断。GIC相关操作函数定义在core_ca.h文件。感兴趣可以使用这些函数实现更完善的中断。
 
@@ -1390,91 +1073,56 @@ GPIO引脚中断初始化函数如代码清单 54‑10所示。
 main函数实现和中断服务函数实现
 '''''''''''''''''
 
-GPIO引脚中断初始化完成后，验证代码就比较简单了。我们定义一个全局变量，在按键中断服务函数中循环切换0和1。在main函数循环检测全局变量的值，大于0则亮红灯，否则亮绿灯。如代码清单 54‑12所示。
+GPIO引脚中断初始化完成后，验证代码就比较简单了。我们定义一个全局变量，在按键中断服务函数中循环切换0和1。在main函数循环检测全局变量的值，大于0则亮红灯，否则亮绿灯。如下所示。
 
-代码清单 54‑12main函数和中断服务函数
 
-1 /*按键中断处理函数*/
+.. code-block:: c
+   :caption: main函数和中断服务函数
+   :linenos:  
 
-2 void EXAMPLE_GPIO_IRQHandler(void)
+   /*按键中断处理函数*/
+   void EXAMPLE_GPIO_IRQHandler(void)
+   {
+       /*按键引脚中断服务函数*/
+       button2_GPIO->ISR = 1U << button2_GPIO_PIN;  //清除GIIP中断标志位
+       if(button > 0)
+       {
+           button = 0;
+       }
+       else
+       {
+           button = 1;
+       }
+   }
 
-3 {
 
-4 /*按键引脚中断服务函数*/
+   int main()
+   {
+       int i = 0;
+       rgb_led_init();             //初始化 RGB 灯，初始化后 默认所有灯都不亮。
+       interrupt_button2_init();   //初始化引脚，和引脚的中断方式以及开启引脚中断。
 
-5 button2_GPIO->ISR = 1U << button2_GPIO_PIN; //清除GIIP中断标志位
+       while (1)
+       {
+           if(button > 0)
+           {
+               /*绿灯亮*/
+               red_led_off;
+               green_led_on;
+           }
+           else
+           {
+               /*红灯亮*/
+               green_led_off;
+               red_led_on;
+           }
 
-6 if(button > 0)
+       }
 
-7 {
+       return 0;
+   }
 
-8 button = 0;
 
-9 }
-
-10 else
-
-11 {
-
-12 button = 1;
-
-13 }
-
-14 }
-
-15
-
-16
-
-17 int main()
-
-18 {
-
-19 int i = 0;
-
-20 rgb_led_init(); //初始化 RGB 灯，初始化后 默认所有灯都不亮。
-
-21 interrupt_button2_init(); //初始化引脚，和引脚的中断方式以及开启引脚中断。
-
-22
-
-23 while (1)
-
-24 {
-
-25 if(button > 0)
-
-26 {
-
-27 /*绿灯亮*/
-
-28 red_led_off;
-
-29 green_led_on;
-
-30 }
-
-31 else
-
-32 {
-
-33 /*红灯亮*/
-
-34 green_led_off;
-
-35 red_led_on;
-
-36 }
-
-37
-
-38 }
-
-39
-
-40 return 0;
-
-41 }
 
 下载验证
 ''''

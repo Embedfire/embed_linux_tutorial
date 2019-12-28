@@ -18,13 +18,13 @@
 分类存储代码
 ~~~~~~
 
-本章程序基于按键检测程序。修改后的程序结构如图 53‑1所示。
+本章程序基于按键检测程序。修改后的程序结构如下图所示。
 
-|sortin002|
+.. image:: media/sortin002.png
+   :align: center
+   :alt: 未找到图片
 
-图 53‑1调整后的按键程序结构
-
-结合图 53‑1说明如下：
+结合上图说明如下：
 
 -  base.lds，将button.lds更改为base.lds。连接脚本与具体的外设无关，并且后面的程序我们几乎不会去修改链接脚本，这里把它修改为base.lds，你也可以根据自己喜好命令，只要和makefile中一致即可。
 
@@ -42,49 +42,34 @@
 编写子makefile
 ^^^^^^^^^^^
 
-子makefile用于将“device”文件夹下的驱动源文件编译为一个“.o”文件，完整内容如代码清单 53‑1所示。
+子makefile用于将“device”文件夹下的驱动源文件编译为一个“.o”文件，完整内容如下所示。
 
-代码清单 53‑1device文件夹下的子makefile
 
-1 /第一部分/
+.. code-block:: c
+   :caption: device文件夹下的子makefile
+   :linenos:  
 
-2 all : button.o led.o （1）
+    /***************第一部分************/
+    all : button.o  led.o （1）
+      arm-none-eabi-ld -r $^  -o device.o
 
-3 arm-none-eabi-ld -r $^ -o device.o
+    /***************第二部分************/
+    %.o : %.c
+      arm-none-eabi-gcc ${CFLAGS} -c $^
 
-4
+    /***************第三部分************/
+    %.o : %.S
+      arm-none-eabi-gcc ${CFLAGS} -c $^
 
-5 /第二部分/
+    .PHONY: clean
+    clean:
+      -rm -f *.o *.bak  
 
-6 %.o : %.c
+    /***************第四部分************/
+    #定义变量,用于保存编译选项和头文件保存路径
+    header_file := -fno-builtin -I$(shell pwd)/include
+    export header_file
 
-7 arm-none-eabi-gcc ${CFLAGS} -c $^
-
-8
-
-9 /第三部分/
-
-10 %.o : %.S
-
-11 arm-none-eabi-gcc ${CFLAGS} -c $^
-
-12
-
-13 .PHONY: clean
-
-14 clean:
-
-15 -rm -f \*.o \*.bak
-
-16
-
-17 /第四部分/
-
-18 #定义变量,用于保存编译选项和头文件保存路径
-
-19 header_file := -fno-builtin -I$(shell pwd)/include
-
-20 export header_file
 
 结合代码，各部分简单说明如下：
 
@@ -99,65 +84,42 @@
 修改主makefile
 ^^^^^^^^^^^
 
-主makefile的改动主要有亮点，第一，在编译命令中指明头文件位置，第二，使用命令调用子makefile，生成依赖文件。完整的代码如代码清单 53‑2所示。
+主makefile的改动主要有亮点，第一，在编译命令中指明头文件位置，第二，使用命令调用子makefile，生成依赖文件。完整的代码如下所示。
 
-代码清单 53‑2主makefile文件
+.. code-block:: c
+   :caption: 主makefile文件
+   :linenos:  
 
-1 /第一部分/
+    /*******************第一部分*********************/
+    #定义变量，用于保存编译选项和头文件保存路径
+    header_file := -fno-builtin -I$(shell pwd)/include
+    export header_file
 
-2 #定义变量，用于保存编译选项和头文件保存路径
+    /*******************第二部分*********************/
+    all : start.o main.o device/device.o 
+      arm-none-eabi-ld -Tbase.lds $^ -o base.elf 
+      arm-none-eabi-objcopy -O binary -S -g base.elf base.bin
 
-3 header_file := -fno-builtin -I$(shell pwd)/include
+    /*******************第三部分*********************/
+    %.o : %.S
+      arm-none-eabi-gcc -g -c $^ 
+    %.o : %.c
+      arm-none-eabi-gcc $( header_file) -c $^   
 
-4 export header_file
+    /*******************第四部分*********************/
+    #调用其他文件的makefile
+    device/device.o :
+      make -C device all
 
-5
 
-6 /第二部分/
+    /*******************第五部分*********************/
+    #定义清理伪目标
+    .PHONY: clean
+    clean:
+      make -C device clean
+      -rm -f *.o *.elf *.bin  
 
-7 all : start.o main.o device/device.o
 
-8 arm-none-eabi-ld -Tbase.lds $^ -o base.elf
-
-9 arm-none-eabi-objcopy -O binary -S -g base.elf base.bin
-
-10
-
-11 /第三部分/
-
-12 %.o : %.S
-
-13 arm-none-eabi-gcc -g -c $^
-
-14 %.o : %.c
-
-15 arm-none-eabi-gcc $( header_file) -c $^
-
-16
-
-17 /第四部分/
-
-18 #调用其他文件的makefile
-
-19 device/device.o :
-
-20 make -C device all
-
-21
-
-22
-
-23 /第五部分/
-
-24 #定义清理伪目标
-
-25 .PHONY: clean
-
-26 clean:
-
-27 make -C device clean
-
-28 -rm -f \*.o \*.elf \*.bin
 
 结合代码，各部分简单说明如下：
 
