@@ -339,15 +339,16 @@ i2cdump -f -y -r 0x3B-0x48 0 0x68
 ^^^^^^^^^^^^^^^^^^^^^
 
 实验说明
-**********************************
+"""""""""""""""""
 
 本教程将通过IIC接口读取板载陀螺仪(MPU6050)的原始数据(MINI开发板没有板载陀螺仪，想要完成本实验需要参照Pro开发板外接MPU6050传感器)。
 在测试程序中大约每一秒读取并显示一次MPU6050的原始数据。读取得到的原始数据并没有进行处理，所以不要误以为读取得到的是角度值。
 
+
 开始实验之前首先确定IIC 驱动已经存在并且已经加载，在开发板的控制端口输入如下命令：
 
 .. code-block:: c
-   :caption: 查看IIC 总线设备
+   :caption: 查看IIC 总线设备命令
    :linenos:  
 
    ls  /sys/bus/i2c/devices
@@ -367,45 +368,474 @@ i2cdump -f -y -r 0x3B-0x48 0 0x68
 
 
 陀螺仪传感器数据读取程序源码分析
-**************************************
+"""""""""""""""""""""""""""""""""""""""""
+
+
+.. code-block:: c
+   :caption: MPU6050初始化以及读、写函数实现
+   :linenos:  
+
+   /************************第一部分***********************/
+   //MPU6050初始化
+   static uint8 MPU6050_Init(void)
+   {
+       fd  = open("/dev/i2c-0", O_RDWR);               // open file and enable read     and  write
+   
+       if (fd < 0)
+       {
+           perror("Can't open /dev/MPU6050 \n");       // open i2c dev file fail
+           exit(1);
+       }
+   
+       printf("open /dev/i2c-0 success !\n");          // open i2c dev file succes
+   
+       if (ioctl(fd, I2C_SLAVE, Address) < 0)
+       { //set i2c address
+           printf("fail to set i2c device slave address!\n");
+           close(fd);
+           return - 1;
+       }
+   
+       printf("set slave address to 0x%x success!\n", Address);
+       i2c_write(fd, PWR_MGMT_1, 0X00);  //配置电源管理，0x00,正常启动
+       i2c_write(fd, SMPLRT_DIV, 0X07);   //设置MPU6050的输出分频既设置采样频率
+       i2c_write(fd, CONFIG, 0X06);  //配置数字低通滤波器和帧同步引脚采样
+       i2c_write(fd, ACCEL_CONFIG, 0X01);  //设置量程和 X、Y、Z 轴加速度自检，
+       return (1);
+   }
+   
+   /************************第二部分***********************/
+   //MPU6050 wirte byte
+   static uint8 i2c_write(int fd, uint8 reg, uint8 val)
+   {
+       int retries;
+       uint8 data[2];
+   
+       data[0] = reg;
+       data[1] = val;
+   
+       for (retries = 5; retries; retries--)
+       {
+           if (write(fd, data, 2) == 2)
+           {
+               return 0;
+   
+           }
+   
+           usleep(1000 * 10);
+       }
+   
+       return - 1;
+   }
+   
+   /************************第三部分***********************/
+   //MPU6050 read byte
+   static uint8 i2c_read(int fd, uint8 reg, uint8 * val)
+   {
+       int retries;
+   
+       for (retries = 5; retries; retries--)
+       {
+           if (write(fd, &reg, 1) == 1)
+           {
+               if (read(fd, val, 1) == 1)
+               {
+                   return 0;
+               }
+   
+           }
+   
+       }
+   
+       return - 1;
+   }
+   
+   /************************第四部分***********************/
+   //get data
+   short GetData(unsigned char REG_Address)
+   {
+       char H, L;
+   
+       i2c_read(fd, REG_Address, &H);
+       usleep(1000);
+       i2c_read(fd, REG_Address + 1, &L);
+       return (H << 8) +L;
+   }
+
+这部分代码由四个函数组成，它们都是由系统接口API（ioctl、read、write）函数实现的，结合代码简单说明如下：
+
+
+
+---------------------------------------------------------------------------------
+
+  1. 第一部分，MPU6050初始化函数。初始化的过程实际就是打开设备然后写入配置参数。代码第4行使用可读可写方式打开IIC 设备文件。
+  代码第14行，设置MPU6050的IIC 从地址。代码21到25行设置MPU6050采样精度和量程等等。
+
+  2. 第二部分，MPU6050写函数。写入成功，返回0，失败返回 -1。函数参数共有三个，fd,文件描述符。reg，要写入的MPU6050寄存器地址。
+  val, 要写入的值。在函数内部实际是使用 write 函数依次写入MPU6050寄存器地址和要写入的值。
+
+  3. 第三部分，MPU6050读函数。返回值与MPU6050写函数相同。在函数中使用 write 函数写入要读取的MPU6050寄存器地址，然后使用read 函数读取即可得到MPU6050寄存器值。
+
+  4. 第四部分，获取MPU6050数据函数。返回值为读取得到的MPU6050数据，函数实现很简单，使用 i2c_read 函数读取MPU6050数据寄存器即可。
+
+
+.. code-block:: c
+   :caption: 读取MPU6050原始数据
+   :linenos:  
+
+   /************************第一部分*********************/
+   #define ACCEL_XOUT_H                                0x3B
+   #define ACCEL_XOUT_L                                0x3C
+   #define ACCEL_YOUT_H                                0x3D
+   #define ACCEL_YOUT_L                                0x3E
+   #define ACCEL_ZOUT_H                                0x3F
+   #define ACCEL_ZOUT_L                                0x40
+   
+   
+   #define GYRO_XOUT_H                                 0x43
+   #define GYRO_XOUT_L                                 0x44
+   #define GYRO_YOUT_H                                 0x45
+   #define GYRO_YOUT_L                                 0x46
+   #define GYRO_ZOUT_H                                 0x47
+   #define GYRO_ZOUT_L                                 0x48
+   
+   /************************第二部分*********************/
+   // main
+   int main(int argc, char * argv[])
+   {
+       MPU6050_Init();
+       usleep(1000 * 100);
+   
+       while (1)
+       {
+           //printf("\033[2J");
+           usleep(1000 * 200);
+           printf("ACCE_X:%6d\n ", GetData(ACCEL_XOUT_H));
+           usleep(1000 * 200);
+           printf("ACCE_Y:%6d\n ", GetData(ACCEL_YOUT_H));
+           usleep(1000 * 200);
+           printf("ACCE_Z:%6d\n ", GetData(ACCEL_ZOUT_H));
+           usleep(1000 * 200);
+           printf("GYRO_X:%6d\n ", GetData(GYRO_XOUT_H));
+           usleep(1000 * 200);
+           printf("GYRO_Y:%6d\n ", GetData(GYRO_YOUT_H));
+           usleep(1000 * 200);
+           printf("GYRO_Z:%6d\n\n ", GetData(GYRO_ZOUT_H));
+           sleep(1);
+       }
+   
+       close(fd);
+   }
+
+代码实现非常简单，第一部分是MPU6050数据寄存器，我么就是通过读取这些寄存器来获得MPU6050的三轴加速度和三轴陀螺仪数据的。
+第二部分是在main函数中通过GetData函数读取数据并使用printf函数输出，读取间隔大约为1秒。
 
 
 
 
 
+  下载验证
+  """"""""""""""""""""""""""""""""""""""""""""""""""""
 
 
+以上程序的源码位于 base_code/section2/mpu6050 目录下
+，在该目录下执行 make ，编译完成后在 “~/mpu6050/bin”目录下生
+成可执行文件"mpu6050_demo"，将可执行文件复制到 NFS 共享目录，运行程序即可(如果无法运行请首先检查当前用户是否具有执行权限)，如下所示：
 
 
-与 uart_tty 类似，主要使用了  open()、write()、read()、close()、ioctl() 接口API函数
+.. code-block:: c
+   :caption: 实验现象
+   :linenos:  
 
+   root@npi:/home/nfs_share# ./mpu6050_demo 
+   open /dev/i2c-0 success !
+   set slave address to 0x68 success!
+   ACCE_X:   690
+    ACCE_Y:  -456
+    ACCE_Z: 15592
+    GYRO_X:  -755
+    GYRO_Y:   -97
+    GYRO_Z:   161
 
-
-
-   ls  /sys/bus/i2c/devices
-
-
-   root@npi:/home/nfs_share# ls  /sys/bus/i2c/devices
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-控制OLED显示
+OLED显示屏显示实验
 ^^^^^^^^^^^^^^^^^^^^^
 
+本实验使用OLED显示屏如下所示
+
+.. image:: media/i2c/i2cbus012.jpg
+   :align: center
+   :alt: 未找到图片
 
 
+本实验的配套程序适配 IIC 接口的 OLED 显示屏，分辨率128*64 。如果使用的是其他OLED显示屏必须保证支持IIC接口。
+
+
+**硬件连接**
+
+
+本实验和MPU6050使用相同的IIC总线，要讲OLED显示屏连接到 IIC_1 。 如果使用的是野火OLED 显示屏，OLED供
+电电压为3.3V（特别注意，OLED不兼容5V，接错电压可能烧坏OLED显示屏），OLED显示屏与Pro
+开发板连接如下所示：
+
+.. image:: media/i2c/i2cbus013.jpg
+   :align: center
+   :alt: 未找到图片
+
+
+**代码分析**
+
+oled 写函数 oled_i2c_write ，oled 写函数用于向oled发送命令（配置参数）和要显示的数据，函数原型如下所示：
+
+
+.. code-block:: c
+   :caption: oled 写函数 oled_i2c_write
+   :linenos:  
+
+   static uint8 oled_i2c_write(int fd, uint8 reg, uint8 val)
+   {   
+       /*******************第一部分************************/
+       int retries;
+       uint8 data[2];
+       int write_error = 0;
+   
+       data[0] = reg;
+       data[1] = val;
+       
+       ioctl(fd, I2C_SLAVE, OLED_ADDRESS);
+       /*******************第二部分************************/
+       for (retries = 5; retries; retries--)
+       {
+           if (write(fd, data, 2) == 2)
+           {
+               return 0;
+           }
+           usleep(1000);
+       }
+       return -1;
+   }
+
+函数oled_i2c_write共有三个参数。fd， 打开的设备文件描述符，成功打开IIC设备文件后得到。ueg，指定发送到的类型，这里分为命令和数据，在本程序中
+只有两个值可选，并且在程序中已经通过宏定义设置了，具体如下：
+
+
+.. code-block:: c
+   :caption: 写选项
+   :linenos: 
+
+   #define OLED_COMMEND_ADDR 0x00
+   #define OLED_DATA_ADDR 0x40
+ueg = 0x00， 表示发送的是命令，更准确的说是OLED配置参数、控制参数。ueg = 0x40, 表示发送的是数据。
+val , 指定要发送的内容。
+
+函数实现分为两部分。第一部分，将函数入口参数保存到局部变量 data[] 中，便于后面执行发送，调用ioctl 函数设置 IIC 从地址既oled 的地址，当oled检测到与自己对应的
+地址时就会响应，这时就可通信了。 oled 地址定义如下所示：
+
+.. code-block:: c
+   :caption: oled 设备地址定义
+   :linenos: 
+
+   #define OLED_ADDRESS 0x3C   //通过调整0R电阻,屏可以0x78和0x7A两个地址 -- 默认0x78 
+
+野火 oled 显示屏默认的IIC从地址为0X78,通过调整电阻可以设置为0X7A,需要注意的是，这里的地址是8位地址，最后一位表示的是读或者写。而我们这里要发送的是IIC设备的
+7位地址，如上代码所示，我们在宏定义中设置的IIC 地址是由0x78 左移一位得到的。
+第二部分，执行发送，如果一次发送不成功则循环发送5次，都失败的情况下返回-1，有一次成功则返回 0 。如果使用的是其他OLED显示屏必须保证支持IIC接口。
+
+
+oled 初始化函数OLED_Init。oled初始化函数实现很简单，只需要使用open 打开IIC 总线设备文件然后使用上面所讲的oled_i2c_write函数写入配置参数即可，部分代码如下所示
+完整代码请参考本实验源码。
+
+
+.. code-block:: c
+   :caption: oled 初始化函数
+   :linenos: 
+
+   void OLED_Init(void)
+   {
+     /*---------------------第一部分---------------------*/
+       fd = open("/dev/i2c-0", O_RDWR); // open file and enable read and  write
+   
+       if (fd < 0)
+       {
+           perror("Can't open /dev/i2c-0 \n"); // open i2c dev file fail
+           exit(1);
+       }
+       
+       /*发送 从设备地址， 这里就是 oled的地址*/
+       if (ioctl(fd, I2C_SLAVE, OLED_ADDRESS) < 0)
+       { //set i2c address
+           printf("fail to set i2c device slave address!\n");
+           close(fd);
+       }
+      
+     /*---------------------第一部分---------------------*/
+       oled_i2c_write(fd, OLED_COMMEND_ADDR, 0xAE); //display off
+       oled_i2c_write(fd, OLED_COMMEND_ADDR, 0x20); //
+       oled_i2c_write(fd, OLED_COMMEND_ADDR, 0x10); //00,Horizontal Addressing Mode;
+       oled_i2c_write(fd, OLED_COMMEND_ADDR, 0xb0); //Set Page Start Address for Page Addressing Mode,0-7
+       oled_i2c_write(fd, OLED_COMMEND_ADDR, 0xc8); //Set COM Output Scan Direction
+   }
+
+结合以上代码讲解如下，
+
+第一部分, 打开IIC 设备文件，使用ioctl函数发送 oled 设备地址。正常情况下 oled 设备会有响应。
+第二部分，使用oled_i2c_write向 oled 发送配置信息和控制信息，这部分内容完成了oled的初始化。配置参数非常多这里只列出了部分初始化代码，完整内容请
+参考源码。
+
+
+
+全屏填充函数OLED_Fill，全屏填充函数和清屏函数相似，全屏填充函数点亮每一个像素点而清屏函数熄灭每一个像素点，在程序中前者是写入0xff，后者写入0x00,
+函数实现如下所示：
+
+.. code-block:: c
+   :caption: 全屏填充函数OLED_Fill
+   :linenos: 
+
+   void OLED_Fill(unsigned char fill_Data) //全屏填充
+   {
+       unsigned char m, n;
+       /*---------------------第一部分---------------------*/
+       for (m = 0; m < 8; m++)
+       {
+           oled_i2c_write(fd, OLED_COMMEND_ADDR, 0xb0 + m); //page0-page1
+           oled_i2c_write(fd, OLED_COMMEND_ADDR, 0x00);     //low column start address
+           oled_i2c_write(fd, OLED_COMMEND_ADDR, 0x10);     //high column start address
+          /*---------------------第二部分---------------------*/
+           for (n = 0; n < 128; n++)
+           {
+               // WriteDat(fill_Data);
+               oled_i2c_write(fd, OLED_DATA_ADDR, fill_Data); //high column start address
+           }
+       }
+   }
+
+全屏填充函数由两个嵌套的for 循环组成，默认情况下没每8行像素组成"一行"，oled显示屏一列有64个
+像素点，所以外层循环可取0到7。内层循环用于设置“一行”，oled一行有
+128个像素点，内层循环要执行128次，oled_i2c_write函数每次写入一个8位的数据代表8个像素点的状
+态，准确的说，内层循环执行完成（循环128次）实际写入8行像素点。
+
+
+
+oled 字符串显示函数OLED_ShowStr，oled字符串显示函数只能显示F6x8和F8X16两种字体，F6x8既每个
+字符宽度为6个像素高度为8个像素，F6x8和F8X16都是通过字库生成软件手动生成
+的，字库工具位于“~\野火【OLED屏_I2C_0.96寸】模块资料\3-配套软件”目录，有兴趣可以自己制作
+其他字库并添加配套代码。字符串显示函数如下所示。
+
+.. code-block:: c
+   :caption: oled 字符串显示函数OLED_ShowStr
+   :linenos: 
+
+   void OLED_ShowStr(unsigned char x, unsigned char y, unsigned char ch[], unsigned char TextSize)
+   {
+   	unsigned char c = 0,i = 0,j = 0;
+   	switch(TextSize)
+   	{
+   
+       /*---------------------第一部分---------------------*/
+   		case 1:
+   		{
+   			while(ch[j] != '\0')
+   			{
+   				c = ch[j] - 32;
+   				if(x > 126)
+   				{
+   					x = 0;
+   					y++;
+   				}
+   				oled_set_Pos(x,y);
+   				for(i=0;i<6;i++)
+   					oled_i2c_write(fd, OLED_DATA_ADDR,F6x8[c][i]);
+   				x += 6;
+   				j++;
+   			}
+   		}break;
+       /*---------------------第二部分---------------------*/
+   		case 2:
+   		{
+   			while(ch[j] != '\0')
+   			{
+   				c = ch[j] - 32;
+   				if(x > 120)
+   				{
+   					x = 0;
+   					y++;
+   				}  
+   				oled_set_Pos(x,y);
+   				for(i=0;i<8;i++)
+   					oled_i2c_write(fd, OLED_DATA_ADDR,F8X16[c*16+i]);
+   				oled_set_Pos(x,y+1);
+   				for(i=0;i<8;i++)
+   					oled_i2c_write(fd, OLED_DATA_ADDR,F8X16[c*16+i+8]);
+   				x += 8;
+   				j++;
+   			}
+   		}break;
+   	}
+   }
+
+函数共有四个参数, x, y 用于设置字符显示的位置，因字符编码的不同，x和y的取值
+范围不是固定的，以F8X16为例，每写入一个字符 x需要自加8，根据oled分辨率可知
+x最大可取128-8-1（像素点从零开始），每写入一个字符 Y 需要自增 16个像素。我们知
+道8行像素组成“一行”，实际 y 可取 0到7,由于每写入一个字符 y 需要自增16个
+像素，所以y可取 0到6。ch[]，指定要写入的字符串。TextSize 指定字体大小，当前该函数只支持两
+种字体，TextSize = 1 使用F6x8字体格式，TextSize = 2使用F8X16字体格式。
+
+
+
+其他显示函数类似，这里不再一一介绍。
+
+
+
+
+.. code-block:: c
+   :caption: oled 测试实现
+   :linenos: 
+
+   int main(int argc, char *argv[])
+   {
+       int i = 0; //用于循环
+   
+       OLED_Init(); //初始化oled
+       usleep(1000 * 100);
+       OLED_Fill(0xff); //全屏填充
+   
+       while (1)
+       {
+           OLED_Fill(0xff); //全屏填充
+           sleep(1);
+   
+           OLED_CLS(); //清屏
+           sleep(1);
+   
+           OLED_ShowStr(0, 3, (unsigned char *)"Wildfire Tech", 1);  //测试6*8字符
+           OLED_ShowStr(0, 4, (unsigned char *)"Hello wildfire", 2); //测试8*16字符
+           sleep(1);
+           OLED_CLS(); //清屏
+   
+           for (i = 0; i < 4; i++)
+           {
+               OLED_ShowCN(22 + i * 16, 0, i); //测试显示中文
+           }
+           sleep(1);
+           OLED_CLS(); //清屏
+   
+           OLED_DrawBMP(0, 0, 128, 8, (unsigned char *)BMP1); //测试BMP位图显示
+           sleep(1);
+           OLED_CLS(); //清屏
+       }
+   
+       close(fd);
+   }
+
+主函数的实现比较简单，直接调用前面讲解的函数即可。在while(1)死循环中依次执行全屏填充、清屏、显示英文字符、显示汉字、显示图片测试函数
+原理很简单，这里不再赘述。
+
+
+**下载验证**
+
+
+以上程序的源码位于 base_code/section2/i2c/oled 目录下
+，在该目录下执行 make ，编译完成后在 “~/oled/bin”目录下生
+成可执行文件"oled_demo"，将可执行文件复制到 NFS 共享目录，运行程序即可(如果无法运行请首先检查当前用户是否具有执行权限)。
 
 
 
@@ -439,3 +869,7 @@ i2cdump -f -y -r 0x3B-0x48 0 0x68
 .. |i2cbus011| image:: media/i2c/i2cbus011.jpg
    :width: 5.78538in
    :height: 2.74747in
+.. |i2cbus012| image:: media/i2c/i2cbus012.jpg
+
+.. |i2cbus013| image:: media/i2c/i2cbus013.jpg
+
