@@ -84,13 +84,13 @@ make ARCH=arm mx6ull_14x14_evk_defconfig
 
 而如果想编译从emmc启动的uboot，则运行：
 
-命令（编译emmc卡版本uboot）
+命令（编译emmc版本uboot）
 
 make ARCH=arm mx6ull_14x14_evk\_ emmc \_defconfig
 
-想编译从emmc启动的uboot，则运行：
+想编译从nand启动的uboot，则运行：
 
-命令（编译nand卡版本uboot）
+命令（编译nand版本uboot）
 
 make ARCH=arm mx6ull_14x14_evk\_ nand \_defconfig
 
