@@ -177,71 +177,116 @@ I2C的数据和地址传输都带响应。响应包括“应答(ACK)”和“非
 传输时主机产生时钟，在第9个时钟时，数据发送端会释放SDA的控制权，由数据接收端控制SDA，若SDA为高电平，表示非应答信号(NACK)，低电平表示应答信号(ACK)。
 
 
-Linux的I2C及总线设备
+
+
+
+添加 IIC 设备驱动
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-由于一个I2C总线上可以挂载多个设备，
 
-
-/sys/bus/i2c
-
-::
-
-    #以下命令在开发板上的终端上运行
-    #查看系统存在的I2C总线
-    ls  /sys/bus/i2c/devices
-
-    #根据具体的输出查看存在的I2C设备和总线
-
-    #查看I2C总线的属性
-    ls /sys/bus/i2c/devices/i2c-0
-    #查看I2C总线的名字
-    cat /sys/bus/i2c/devices/i2c-0/name
-
-    #查看I2C设备的属性
-    ls /sys/bus/i2c/deivces/0-005d
-    #查看I2C设备的名字
-    cat /sys/bus/i2c/devices/0-005d/name
+使用IIC设备之前首先要使用“fire-config”工具将IIC驱动添加到系统（实际是讲IIC的设备树插件添加到系统）。添加完成重启系统即可。添加步骤介绍如下：
 
 
 
+**1.	执行 fire-config 进入配置界面**
 
-在用户态添加一个I2C设备
+.. code-block:: c
+   :caption:  进入 fire-config 进入配置界面命令
+   :linenos:  
 
-::
+   root@npi:/home# sudo fire-config
 
-  #未测试，参数为设备名及设备地址
-  echo eeprom 0x50 > /sys/bus/i2c/devices/i2c-3/new_device
+执行fire-config命令后弹出界面如下：
 
+.. image:: media/i2c/i2cbus014.png
+   :align: center
+   :alt: 未找到图片
 
-在用户态删除一个I2C设备
-
-::
-
-  #未测试,参数为要删除设备的设备地址
-  echo 0x50  > /sys/bus/i2c/devices/i2c-3/delete_device
-
-
-/dev/i2c-0
+通过键盘的 上、下 方向键选择要设置的设备，通过键盘的左、右方向键切换“Select”和“Finish”选项。
 
 
-
-i2c-detect工具
-^^^^^^^^^^^^^^^^^^^^^
-使用i2c-tools工具包提供了一些非常方便的工具来对系统的I2C总线进行调试。
-
-可以通过如下指令安装
-::
-
-  #以下命令在主机上运行
-  sudo apt install i2c-tools
-
-
-安装后可使用的命令有i2cdetect、i2cdump、i2cset以及i2cget,
-它们分别用于扫描I2C总线上的设备、读写指定设备的寄存器内容
+**2.	添加MPU6050设并重启**
 
 
 
-+ i2cdetect ：用于扫描I2C总线上的设备。它会打印一个表，其中包含了总线上检测到的设备。
+通过键盘的上、下方向键选中 “MPU6050”，MPU6050是本章需要的设备，它使用的是IIC 1。需要注意的是，MPU6050只是IIC 1总线上的一个设备，只要我们使用IIC 1就需要使用fire-config 添加MPU6050。通过键盘左、右 键选中 “select ”选项，然后按回车，如下所示：
+
+.. image:: media/i2c/i2cbus015.png
+   :align: center
+   :alt: 未找到图片
+
+同样，通过键盘的左、右方向键选中“Yes”,然后按回车，此时已经设置完成回到初始界面如下所示：
+
+
+.. image:: media/i2c/i2cbus016.png
+   :align: center
+   :alt: 未找到图片
+
+
+设置完成后选中“Finish”，按下回车，系统会提示是否现在重启，选择“Yes”重启之后MPU6050设备(严格来说是IIC 1 总线设备)就被加载进来了。后面就可以通过IIC 1 使用MPU6050了。
+
+
+
+**查看IIC 设备**
+
+Linux中一切皆文件，IIC设备在系统中对应一个设备文件，我们可以通过这个设备文件了解设备的一些基本信息，下面简单介绍几个查看命令。
+
+
+
+.. code-block:: c
+   :caption:  查看系统存在的I2C总线
+   :linenos:  
+
+   #查看系统存在的I2C总线
+   ls  /sys/bus/i2c/devices
+
+
+输出内容如下：
+
+
+.. code-block:: c
+   :caption:  输出内容
+   :linenos: 
+
+   root@npi:/home# ls /sys/bus/i2c/devices/
+   0-0068  i2c-0
+
+
+不同系统输出的内容可能有差别，i2c-0对应IIC 1（驱动是从0开始编号的）。MPU6050连接
+到了IIC 1 所以在应用程序是通过操作设备文件i2c-0实现对MPU6050的操作。不
+仅仅MPU6050是这样，只要连接到 IIC 1 上的设备（触摸、摄像头、oled）都是通过 i2c-0 设备文件实现具体的功能。
+
+
+
+IIC 第三方工具- i2c-detect
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+使用i2c-tools工具包提供了一些非常方便的工具来对系统的I2C总线进行调试。使用之前要使用apt 命令安装i2c-tools。下面介绍i2c-tools的安装步骤并使用i2c-tools提供的命令查看系统IIC 设备。
+
+
+**i2c-detect工具安装**
+
+
+在开发板的控制台执行命令：
+
+
+.. code-block:: c
+   :caption:  i2c-detect安装命令
+   :linenos: 
+
+   sudo apt install i2c-tools
+
+安装后可使用的命令有i2cdetect、i2cdump、i2cset以及i2cget,它们分别用于扫描I2C总线上的设备、读写指定设备的寄存器内容。命令介绍
+如下：
+
+
+
+
+
+**i2cdetect命令**
+
+
+i2cdetect ：用于扫描I2C总线上的设备。它会打印一个表，其中包含了总线上检测到的设备。
+
 
 相关命令语法：
 
@@ -262,12 +307,57 @@ i2c-detect工具
  - '**'：**表示以十六进制表示的设备地址编号，如 “2d”或“4e”。
 
 
+**i2cdetect 使用示例：**
+
+i2cdetect主要用于查看当前总线上的设备，我们这里查看IIC 1总线上的设备，重点关注MPU6050、显示屏触摸芯片、oled显示屏（需要使用杜邦线外接）
+
+
+首先不连接显示屏和oled 执行如下命令：
+
+.. code-block:: c
+   :caption:  查看设备命令
+   :linenos: 
+
+   root@npi:/home# i2cdetect -a 0
+
+参数 “-a” 扫描总线上的所有设备。 参数“0” 表示标号为0的IIC 总线，既 IIC 1 。
+
+输出内容如下所示：
+
+.. image:: media/i2c/i2cbus017.png
+   :align: center
+   :alt: 未找到图片
+
+
+上图中 “68” 是MPU6050的设备地址。
+
+连接显示屏（显示屏40pin 的排线中包含了触摸的IIC ，所以接上显示屏也就将触摸芯片接入 IIC 1 总线），再次执行查看设备命令，如下所示：
+
+.. code-block:: c
+   :caption:  查看设备命令
+   :linenos: 
+
+   root@npi:/home# i2cdetect -a 0
+
+输出内容如下所示：
+
+.. image:: media/i2c/i2cbus018.png
+   :align: center
+   :alt: 未找到图片
+
+对比上一次输出内容可以看出，这次增加了一个IIC 地址，它就是我们新接入的触摸芯片IIC 地址。
+
+
+**i2cdetect其他命令**
+~~~
  - i2cdetect -F i2cbus：查询i2c总线的功能，参数i2cbus表示i2c总 - 
  - i2cdetect -V：打印软件的 - 
  - i2cdetect -l：检测当前系统有几组i2c总线
 ~~~
 
-+ i2cget 
+
+**i2cget命令**
+
 ~~~
     相关命令语法：
         i2cget [-f] [-y] i2cbus chip-address [data-address [mode]]
@@ -280,8 +370,11 @@ i2c-detect工具
  - 参数mode：参考i2cdump命令。
 ~~~
 
+
+**i2cse命令**
+
 + i2cset 
-~~~~~~~~~~~~~~~
+~~~
     相关命令语法：
        i2cset  [-f]  [-y]  [-m  mask]  [-r]  i2cbus  chip-address data-address [value] ...  [mode]
        参数说明：
@@ -293,10 +386,16 @@ i2c-detect工具
  - 参数chip-address：i2c设备地址
  - 参数data-address：设备的寄存器的地址
  - 参数value：要写入寄存器的值
- - 参数mode：参考i2cdump命令。
+ - 参数mode：参考i2cdump命令
 ~~~
 
-+ i2cdump：读取I2C总线上某个设备的寄存器值。
+
+
+
+** i2cdump命令**
+
+i2cdump：读取I2C总线上某个设备的寄存器值。
+
 ~~~
     相关命令语法：
        i2cdump   [-f]   [-r first-last]  [-y]  i2cbus  address  [mode [bank [bankreg]]]
@@ -312,28 +411,6 @@ i2c-detect工具
 
 
 
-## MPU6050实验
-
-i2cset -f -y -r 0 0x68 0x6B 0
-
-i2cset -f -y -r 0 0x68 0x19 7
-
-i2cset -f -y -r 0 0x68 0x1A 6
-
-i2cset -f -y -r 0 0x68 0x1C 1
-
-i2cdump -f -y -r 0x3B-0x48 0 0x68
-
-
-读取陀螺仪的ID
-
-::
-
-  i2cget 0 0x68  0x75
-
-其中0x68是陀螺仪设备的7位I2C地址，0x75是陀螺仪的WHO_AM_I寄存器，
-
-数据地址支持的范围为0x00~0xFF,所以对于触摸屏使用16位表示寄存器地址的设备不适用。
 
 读取陀螺仪传感器数据实验
 ^^^^^^^^^^^^^^^^^^^^^
@@ -872,4 +949,8 @@ x最大可取128-8-1（像素点从零开始），每写入一个字符 Y 需要
 .. |i2cbus012| image:: media/i2c/i2cbus012.jpg
 
 .. |i2cbus013| image:: media/i2c/i2cbus013.jpg
+
+.. |i2cbus013| image:: media/i2c/i2cbus014.png
+.. |i2cbus013| image:: media/i2c/i2cbus015.png
+.. |i2cbus013| image:: media/i2c/i2cbus016.png
 
