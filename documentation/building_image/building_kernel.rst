@@ -221,7 +221,7 @@ imx_v7_ebf_defconfig命令生成的，这就直接可以看到我们在imx_v7_eb
 
 图 30‑5 make menuconfig界面
 
-比如我们选择配置我们开发板的触摸屏驱动：Goodix I2C touchscreen，如果读者炸不到这个配置选项在哪里，可以利用make menuconfig中的搜索功能，在英文输入法状态下按下“/”则可以进行搜索，输入“Goodix”找到改配置选项的位置，具体见图
+比如我们选择配置我们开发板的触摸屏驱动：Goodix I2C touchscreen，如果读者找不到这个配置选项在哪里，可以利用make menuconfig中的搜索功能，在英文输入法状态下按下“/”则可以进行搜索，输入“Goodix”找到改配置选项的位置，具体见图
 30‑6。从图中可以很明显看出Goodix I2C touchscreen配置选项位于-> Device Drivers选项下的-> Input device support下的-> Generic input layer (needed for keyboard, mouse, ...)
 (INPUT [=y])选项下的-> Touchscreens 选项中，其实也可以按下“1”直接可以定位到对应的选项，然后选中[*]Goodix touchpanel GT9xx series 、<*> Goodix GT9xx touch controller auto update
 support 、<*> Goodix GT9xx Tools for debuging 、<*>Goodix I2C touchscreen即可，具体见图 30‑7。
