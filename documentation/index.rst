@@ -125,6 +125,7 @@
    submission/rst-testfile
    submission/ubuntu16-rootfs
    submission/debian9-rootfs
+   submission/野火IMX6UL开发板SDK使用说明
 
 .. toctree::
    :maxdepth: 1
