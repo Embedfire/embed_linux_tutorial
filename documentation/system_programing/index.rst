@@ -11,4 +11,4 @@
 ..    process
 ..    signal
 ..    pipe
-
+..    semaphore

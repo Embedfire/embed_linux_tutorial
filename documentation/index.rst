@@ -79,6 +79,7 @@
    system_programing/process
    system_programing/pipe
    system_programing/signal
+   system_programing/semaphore
 
 
 .. toctree::
