@@ -81,7 +81,6 @@
    system_programing/signal
    system_programing/semaphore
 
-
 .. toctree::
    :maxdepth: 1
    :caption: i.MX6 裸机开发
@@ -101,7 +100,6 @@
    bare_metal/uart
    bare_metal/ddr
    bare_metal/elcdif
-
 
 .. toctree::
    :maxdepth: 1
