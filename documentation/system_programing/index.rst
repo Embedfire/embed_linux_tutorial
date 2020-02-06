@@ -11,4 +11,5 @@
 ..    process
 ..    signal
 ..    pipe
+..    msg_queuq
 ..    semaphore
