@@ -1,0 +1,6 @@
+# 配套书籍第五部分代码
+这部分主要是imx6祼机配套的代码
+
+sdk_nxp中包含了NXP SDK的生成工具
+IAR_project包含了IAR工程，需要在Windows下使用
+其它目录是在Linux下的代码

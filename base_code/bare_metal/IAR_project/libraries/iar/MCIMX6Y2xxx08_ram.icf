@@ -1,0 +1,117 @@
+/*
+** ###################################################################
+**     Processor:           MCIMX6Y2CVM08
+**     Compiler:            IAR ANSI C/C++ Compiler for ARM
+**     Reference manual:    IMX6ULLRM, Rev. 1, Feb. 2017
+**     Version:             rev. 2.0, 2017-03-09
+**     Build:               b170411
+**
+**     Abstract:
+**         Linker file for the IAR ANSI C/C++ Compiler for ARM
+**
+**     Copyright 2016 Freescale Semiconductor, Inc.
+**     Copyright 2016-2017 NXP
+**     Redistribution and use in source and binary forms, with or without modification,
+**     are permitted provided that the following conditions are met:
+**
+**     o Redistributions of source code must retain the above copyright notice, this list
+**       of conditions and the following disclaimer.
+**
+**     o Redistributions in binary form must reproduce the above copyright notice, this
+**       list of conditions and the following disclaimer in the documentation and/or
+**       other materials provided with the distribution.
+**
+**     o Neither the name of the copyright holder nor the names of its
+**       contributors may be used to endorse or promote products derived from this
+**       software without specific prior written permission.
+**
+**     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+**     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+**     WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+**     DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+**     ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+**     (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+**     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+**     ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+**     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+**     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+**     http:                 www.nxp.com
+**     mail:                 support@nxp.com
+**
+** ###################################################################
+*/
+
+/* Memory region from [0x80000000-0x80001FFF] is reserved for ROM code */
+
+define symbol m_ocram_start            = 0x00900000;
+define symbol m_ocram_end              = 0x0091FFFF;
+
+define symbol m_interrupts_start       = 0x80002000;
+define symbol m_interrupts_end         = 0x8000203F;
+
+define symbol m_text_start             = 0x80002040;
+define symbol m_text_end               = 0x803FFFFF;
+
+define symbol m_data_start             = 0x80400000;
+define symbol m_data_end               = 0x807FFFFF;
+
+/* Sizes */
+if (isdefinedsymbol(__resume_stack_size__)) {
+  define symbol __size_rstack__        = __resume_stack_size__;
+} else {
+  define symbol __size_rstack__        = 0x0100;
+}
+
+if (isdefinedsymbol(__stack_size__)) {
+  define symbol __size_cstack__        = __stack_size__;
+} else {
+  define symbol __size_cstack__        = 0x0400;
+}
+
+if (isdefinedsymbol(__irq_stack_size__)) {
+  define symbol __size_istack__        = __irq_stack_size__;
+} else {
+  define symbol __size_istack__        = 0x0400;
+}
+
+if (isdefinedsymbol(__heap_size__)) {
+  define symbol __size_heap__          = __heap_size__;
+} else {
+  define symbol __size_heap__          = 0x0400;
+}
+
+define exported symbol __VECTOR_TABLE  = m_interrupts_start;
+
+define memory mem with size = 4G;
+define region OCRAM_region = mem:[from m_ocram_start to m_ocram_end-__size_rstack__];
+define region RSTACK_region = mem:[from m_ocram_end-__size_rstack__+1 to m_ocram_end];
+define region TEXT_region = mem:[from m_interrupts_start to m_interrupts_end]
+                          | mem:[from m_text_start to m_text_end];
+define region DATA_region = mem:[from m_data_start to m_data_end-__size_cstack__-__size_istack__];
+define region CSTACK_region = mem:[from m_data_end-__size_cstack__-__size_istack__+1 to m_data_end-__size_istack__];
+define region ISTACK_region = mem:[from m_data_end-__size_istack__+1 to m_data_end];
+
+define block RSTACK        with alignment = 8, size = __size_rstack__   { };
+define block CSTACK        with alignment = 8, size = __size_cstack__   { };
+define block ISTACK        with alignment = 8, size = __size_istack__   { };
+define block HEAP          with alignment = 8, size = __size_heap__     { };
+define block NCACHE_VAR    with alignment = 1024*1024                   { section NonCacheable };
+define block RW            with alignment = 1024*1024                   { readwrite };
+define block ZI            { zi };
+
+initialize by copy { readwrite, section .textrw,
+                     section .text object clock_config_ocram.o, section .rodata object clock_config_ocram.o };
+do not initialize  { section .noinit };
+
+place at address mem: m_interrupts_start    { readonly section .intvec };
+place in OCRAM_region                       { first section OcramData };
+place in OCRAM_region                       { readwrite object clock_config_ocram.o };
+place in RSTACK_region                      { block RSTACK };
+place in TEXT_region                        { readonly };
+place in DATA_region                        { first block NCACHE_VAR };
+place in DATA_region                        { block RW };
+place in DATA_region                        { block ZI };
+place in DATA_region                        { last block HEAP };
+place in CSTACK_region                      { block CSTACK };
+place in ISTACK_region                      { block ISTACK };

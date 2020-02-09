@@ -1,0 +1,84 @@
+# Private settings
+private_settings.py
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+tmp/
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Python
+*.py[cod]
+
+# Eclipse Project Files
+.cproject
+.project
+.pydevproject
+
+# uVision generated files
+*.uvopt
+*.uvgui.*
+*.uvguix.*
+*.TMP
+*.scvd
+
+*.plg
+*.map
+*.lst
+*.lnp
+*.htm
+*.dep
+*.d
+*.crf
+*.bak
+
+*.axf
+*.S19
+*.bin
+*.hex
+*.dep
+*.FLM
+*.iex
+
+# JLink files
+JLink*.*
+
+# Output directories
+Output
+Lst
+Obj
+
+# cscope
+cscope.*
+
+# PyCharm project files
+.idea
+
+# ctags
+tags
+
+# Doxygen tags and html output
+*.tag
+html
+debug.txt
+/【固件库】STM32F10x_StdPeriph_Lib_V3.5.0
+keilkill.bat
+settings
+
+#IAR files
+
+*.out
+*.sim
+*.log
+*.ld
+
+/4-初识固件库/MIMXRT1052xxxxB_doc

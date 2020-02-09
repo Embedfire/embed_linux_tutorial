@@ -48,6 +48,74 @@
    linux_app/input_subsystem
    linux_app/uart_tty
    linux_app/i2c_bus
+   linux_app/spi_bus
+
+.. toctree::
+   :maxdepth: 1
+   :caption: 安装系统镜像
+   :numbered:
+
+   install_image/install_sd_image
+   install_image/sdcard_production
+   install_image/mfgtool_production
+
+.. toctree::
+   :maxdepth: 1
+   :caption: 制作系统镜像
+   :numbered:
+
+   building_image/image_composition
+   building_image/building_kernel
+   building_image/building_uboot
+   building_image/building_rootfs
+   building_image/using_buildroot
+   building_image/using_yocto
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Linux系统编程
+   :numbered:
+
+   system_programing/process
+   system_programing/pipe
+   system_programing/signal
+   system_programing/msg_queuq
+   system_programing/semaphore
+
+.. toctree::
+   :maxdepth: 1
+   :caption: i.MX6 裸机开发
+   :numbered:
+
+   bare_metal/sdk
+   bare_metal/building_sdk_demo
+   bare_metal/before_developing
+   bare_metal/asemble_led
+   bare_metal/iar_led
+   bare_metal/gcc_led
+   bare_metal/beautify_led
+   bare_metal/gpio_key
+   bare_metal/sorting_project
+   bare_metal/interrupt
+   bare_metal/ccm
+   bare_metal/uart
+   bare_metal/ddr
+   bare_metal/elcdif
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Linux驱动开发
+   :numbered:
+
+   linux_driver/character_device
+   linux_driver/module
+
+.. toctree::
+   :maxdepth: 1
+   :caption: 附录
+   :numbered:
+
+   appendix/install_sd_image
 
 .. toctree::
    :maxdepth: 1
@@ -56,6 +124,8 @@
 
    submission/rst-testfile
    submission/ubuntu16-rootfs
+   submission/debian9-rootfs
+   submission/野火IMX6UL开发板SDK使用说明
 
 .. toctree::
    :maxdepth: 1
