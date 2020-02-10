@@ -80,6 +80,7 @@
    system_programing/pipe
    system_programing/signal
    system_programing/msg_queuq
+   system_programing/systemV_sem
    system_programing/semaphore
 
 .. toctree::

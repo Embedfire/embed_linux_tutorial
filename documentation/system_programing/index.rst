@@ -12,4 +12,5 @@
 ..    signal
 ..    pipe
 ..    msg_queuq
+..    systemV_sem
 ..    semaphore
