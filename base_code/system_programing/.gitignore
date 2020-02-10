@@ -1,0 +1,6 @@
+/.vscode
+
+# all .o / .a / .d file 
+*.o
+*.a
+*.d
