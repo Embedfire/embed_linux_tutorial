@@ -299,7 +299,7 @@ raise()函数只是进程向自身发送信号的，而没有向其他进程发�
 
 raise()函数只有一个参数sig，它代表着发送的信号值，如果发送成功则返回0，发送失败则返回-1，发送失败的原因主要是信号无效，因为它只往自身发送信号，不存在权限问题，也不存在目标进程不存在的情况。
 
-我们来做个小实验，实验代码在野火提供资料的application/kill目录下，里面有一个kill.c源码文件，具体内容如代码清单38‑2所示。
+我们来做个小实验，实验代码在野火提供资料的system_programing/kill目录下，里面有一个kill.c源码文件，具体内容如代码清单38‑2所示。
 
 代码清单 38‑2 kill.c实验源码文件内容
 
@@ -374,7 +374,7 @@ SIGSTOP信号，使子进程暂停。
 代码清单 38‑2
 **(7)**\ ：使用waitpid()函数回收子进程资源，如果子进程未终止，父进程则会一直阻塞等待，直到子进程终止。
 
-进入\ ``application/kill``\ 目录下，该目录下有编译使用的Makefile文件，我们直接运行make命令即可编译生成“targets”可执行文件，然后运行该文件即可，可以看到终端输出了对应的代码，且子进程也被终止了，父进程才会退出，现象如图
+进入\ ``system_programing/kill``\ 目录下，该目录下有编译使用的Makefile文件，我们直接运行make命令即可编译生成“targets”可执行文件，然后运行该文件即可，可以看到终端输出了对应的代码，且子进程也被终止了，父进程才会退出，现象如图
 38‑3所示。
 
 .. figure:: media/signal004.png
@@ -565,7 +565,7 @@ c产生），当产生信号的时候就调用signal\_handler()函数去处理�
 代码清单38‑5
 **(4)**\ ：如果信号是SIGINT，则打印对应的信息，并且调用signal()函数将SIGINT信号的处理恢复默认的处理（SIG\_DFL），在下一次接收到SIGINT信号的时候就不会进入这个函数里了。
 
-我们进入\ ``application/signal``\ 目录下，该目录存在代码清单38‑5所示的实验代码，还有对应的Makefile文件，我们只需使用“make”命令编译生成“targets”可执行文件，并且运行即可，在运行过程中会不断打印出“waiting
+我们进入\ ``system_programing/signal``\ 目录下，该目录存在代码清单38‑5所示的实验代码，还有对应的Makefile文件，我们只需使用“make”命令编译生成“targets”可执行文件，并且运行即可，在运行过程中会不断打印出“waiting
 for the SIGINT signal , please enter "ctrl + c"...”，当我们按下“ctrl +
 c”时，进入signal\_handler()信号处理函数，打印对应的信息，并且将SIGINT信号的处理恢复默认，因此当下一次按下“ctrl
 + c”时进程将直接退出，该实验代码的现象具体见图 38‑6。
@@ -684,7 +684,7 @@ info指向siginfo\_t的指针，它是一个包含有关信号的更多信息的
 
 上面的成员变量绝大部分我们是几乎使用不到的，因为我们如果是对信号的简单处理，直接使用sa\_handler处理即可，根本无需配置siginfo\_t这些比较麻烦的信息。
 
-我们可以进入\ ``application/sigaction``\ 目录下，里面有一个sigaction.c文件与Makefile文件，sigaction.c就是我们的实验代码，具体见代码清单38‑6。
+我们可以进入\ ``system_programing/sigaction``\ 目录下，里面有一个sigaction.c文件与Makefile文件，sigaction.c就是我们的实验代码，具体见代码清单38‑6。
 
 代码清单 38‑6 sigaction.c文件内容
 
@@ -750,7 +750,7 @@ info指向siginfo\_t的指针，它是一个包含有关信号的更多信息的
 
 代码清单 38‑6 **(5)**\ ：调用sigaction()函数捕获SIGINT信号。
 
-进入application/sigaction目录下，直接使用make命令编译代码，然后运行生成的targets可执行文件，根据终端输出的提示按下两次“ctrl
+进入system_programing/sigaction目录下，直接使用make命令编译代码，然后运行生成的targets可执行文件，根据终端输出的提示按下两次“ctrl
 + c”，就可以看到如图 38‑7所示的实验现象。
 
 .. figure:: media/signal008.png

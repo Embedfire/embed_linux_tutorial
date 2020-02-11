@@ -1,14 +1,17 @@
+#include <sys/types.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+#include <sys/ipc.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/shm.h>
- #include <semaphore.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "shm_data.h"
-#include "../sem/sem.h"
+
+#include "sem.h"
+
 
 int main()
 {
@@ -20,7 +23,7 @@ int main()
 	int semid;;//信号量标识符
 
 	//创建共享内存
-	shmid = shmget((key_t)1234, sizeof(struct shared_use_st), 0644|IPC_CREAT);
+	shmid = shmget((key_t)1234, 4096, 0644 | IPC_CREAT);
 	if(shmid == -1)
 	{
 		fprintf(stderr, "shmget failed\n");
@@ -35,7 +38,8 @@ int main()
 	}
 	printf("Memory attached at %p\n", shm);
 
-    semid = semget((key_t)6666, 1, 0666|IPC_CREAT); /* 创建一个信号量*/
+	/** 打开信号量，不存在则创建 */
+    semid = semget((key_t)6666, 1, 0666|IPC_CREAT);
 
 	if(semid == -1)
 	{
@@ -43,24 +47,14 @@ int main()
 		exit(EXIT_FAILURE); 
 	}
 
-	//设置共享内存
-	shared = (struct shared_use_st*)shm;
+
 
 	while(running)//向共享内存中写数据
 	{
-		//数据还没有被读取，则等待数据被读取,不能向共享内存中写入文本
-		while(shared->written == 1)
-		{
-			sleep(1);
-			printf("Waiting...\n");
-		}
 		//向共享内存中写入数据
 		printf("Enter some text: ");
 		fgets(buffer, BUFSIZ, stdin);
-		strncpy(shared->text, buffer, TEXT_SIZE);
-
-		//写完数据，设置written使共享内存段可读
-		shared->written = 1;
+		strncpy(shm, buffer, 4096);
 
 		sem_v(semid);/* 释放信号量 */
 

@@ -243,7 +243,7 @@ system()
 ()函数是C标准库中提供的，它主要是提供了一种调用其它程序的简单方法。读者可以利用system()函数调用一些应用程序，它产生的结果与从
 shell中执行这个程序基本相似。事实上，system()启动了一个运行着/bin/sh的子进程，然后将命令交由它执行。
 
-我们举个例子，在野火提供的application/system目录下，找到system.c文件，它里面的应用例程就是使用system()函数启动一个新进程ls，具体的代码如代码清单37‑1所示：
+我们举个例子，在野火提供的system_programing/system目录下，找到system.c文件，它里面的应用例程就是使用system()函数启动一个新进程ls，具体的代码如代码清单37‑1所示：
 
 代码清单 37‑1 system.c文件源码
 
@@ -276,7 +276,7 @@ system()函数将返回-1，为了简单，作者在这个例子中并没有检�
 函数使用 shell 调用命令，它受到系统
 shell自身的功能特性和安全缺陷的限制，因此，作者并不推荐使用这种方法去启动一个进程。
 
-我们可以尝试编译它，在application/system目录下还会提供对应编译的Makefile文件，这是一个通用的Makefile文件，所有application的例程都使用这个Makefile文件编译，具体见代码清单
+我们可以尝试编译它，在system_programing/system目录下还会提供对应编译的Makefile文件，这是一个通用的Makefile文件，所有application的例程都使用这个Makefile文件编译，具体见代码清单
 37‑2。
 
 代码清单 37‑2 Makefile源码
@@ -338,7 +338,7 @@ shell自身的功能特性和安全缺陷的限制，因此，作者并不推荐
 -  第21 – 25行表示清除相关的依赖文件，目标文件等。
 -  ``.PHONY``\ 表示\ ``clean``\ 是个伪目标文件。
 
-进入\ ``application/system``\ 目录下，运行make命令将system.c编译，然后可以看到application/system目录下多了一个可执行文件——\ ``target``\ ，然后运行这个文件，可以看到调用system()函数启动一个进程输出的结果，它与我们在shell终端中执行\ ``ls –l``\ 命令产生的结果是一致的，具体见图
+进入\ ``system_programing/system``\ 目录下，运行make命令将system.c编译，然后可以看到system_programing/system目录下多了一个可执行文件——\ ``target``\ ，然后运行这个文件，可以看到调用system()函数启动一个进程输出的结果，它与我们在shell终端中执行\ ``ls –l``\ 命令产生的结果是一致的，具体见图
 37‑7。
 
 **命令:**
@@ -463,7 +463,7 @@ Write，简称COW），我们知道，linux系统中的进程都是使用虚拟�
 在fork()启动新的进程后，子进程与父进程开始并发执行，谁先执行由内核调度算法来决定。fork()函数如果成功启动了进程，会对父子进程各返回一次，其中对父进程返回子进程的
 PID，对子进程返回0；如果fork()函数启动子进程失败，它将返回-1。失败通常是因为父进程所拥有的子进程数目超过了规定的限制（CHILD\_MAX），此时errno将被设为EAGAIN。如果是因为进程表里没有足够的空间用于创建新的表单或虚拟内存不足，errno变量将被设为ENOMEM。
 
-在野火提供的application/fork目录下，找到fork.c文件，它里面的应用例程就是使用fork()函数启动一个新进程，并且在进程中打印相关的信息，如在父进程中打印出“In
+在野火提供的system_programing/fork目录下，找到fork.c文件，它里面的应用例程就是使用fork()函数启动一个新进程，并且在进程中打印相关的信息，如在父进程中打印出“In
 father process!!”等信息，例程源码具体见代码清单 37‑4。
 
 代码清单 37‑4 fork.c源码
@@ -511,7 +511,7 @@ father process!!”等信息，例程源码具体见代码清单 37‑4。
 -  如果返回的值大于0，则表示此时执行的代码是父进程，同样也打印出返回的结果、“In
    father process!!”与父进程的PID。
 
-在application/fork目录下也提供了对应的Makefile文件，可以直接运行make进行编译，然后执行编译后生成的可执行文件“targets”，现象具体见图37‑10。
+在system_programing/fork目录下也提供了对应的Makefile文件，可以直接运行make进行编译，然后执行编译后生成的可执行文件“targets”，现象具体见图37‑10。
 
 .. figure:: media/proces011.png
    :alt: proces011
@@ -734,7 +734,7 @@ execve()函数用于执行参数path字符串所代表的文件路径（必须�
         }
     }
 
-以上函数实例代码均在application/exce目录下，选择对应的代码进行编译即可，该目录也提供了对应的Makefile文件，可以直接运行make进行编译，然后执行编译后生成的可执行文件“targets”，具体现象如图
+以上函数实例代码均在system_programing/exce目录下，选择对应的代码进行编译即可，该目录也提供了对应的Makefile文件，可以直接运行make进行编译，然后执行编译后生成的可执行文件“targets”，具体现象如图
 37‑11所示。
 
 .. figure:: media/proces012.png
@@ -1035,7 +1035,7 @@ wait()函数使用实例如下：
 代码清单37‑12
 **(5)**\ ：若发现子进程退出（通过wait()函数返回的子进程pid判断），则打印出相应信息，如子进程的pid与status。
 
-以上函数实例代码在application/wait目录下，选择对应的代码进行编译即可，该目录也提供了对应的Makefile文件，可以直接运行make进行编译，然后执行编译后生成的可执行文件“targets”，执行结果如图
+以上函数实例代码在system_programing/wait目录下，选择对应的代码进行编译即可，该目录也提供了对应的Makefile文件，可以直接运行make进行编译，然后执行编译后生成的可执行文件“targets”，执行结果如图
 37‑14所示。
 
 .. figure:: media/proces015.png
