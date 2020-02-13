@@ -20,9 +20,14 @@ reescale的一些标签时不要奇怪。NXP承诺对这些产品供货周期持
 本书讲解主要采用的是i.MX6ULL系列处理器，它包含一个Cortex-A7内核，主频有528MHz、792MHz和900Mhz，具体芯片的特性可参考图
 2‑1的命名规则说明进行区分。如型号为MCIMX6Y2CVM08AB的芯片，它属于i.MX6ULL系列，是主频为792MHz、芯片封装为BGA，尺寸为14x14mm，焊盘间距为0.8pitch的工业级芯片。
 
-|imxser002|
+.. image:: media/imxser002.png
+   :align: center
+   :alt: 未找到图片
 
-图 2‑1 i.MX6 ULL芯片命名规则
+
+
+
+ULL芯片命名规则
 
 Cortex A7内核简介
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,13 +62,23 @@ NXP针对MCU（微控制器）的应用场景，推出了i.MX RT系列跨界处�
 
 对于学习Linux依然心怀忐忑，希望学习MCU过渡的读者，这些是非常适合的教材。具体资料下载地址请参见链接：\ https://github.com/Embdefire/products/wiki\ 。
 
-|imxser003|
 
-图 2‑2 我这有本秘笈（图片来源：周星驰 电影《功夫》）
+.. image:: media/imxser003.jpg
+   :align: center
+   :alt: 未找到图片
 
-|imxser004|
 
-图 2‑3 老乡别跑（图片来源：周星驰 电影《功夫》）
+（图片来源：周星驰 电影《功夫》）
+
+.. image:: media/imxser004.jpg
+   :align: center
+   :alt: 未找到图片
+
+
+（图片来源：周星驰 电影《功夫》）
+
+
+
 
 .. |imxser002| image:: media/imxser002.png
    :width: 5.23333in

@@ -18,9 +18,12 @@ Linux没有提供类似Windows的任务管理器，但是它将系统运行的�
 
 ls /proc
 
-|system002|
 
-图 12‑1 开发板上的/proc目录内容（内容可能会小有差异，影响不大）
+.. image:: media/system002.png
+   :align: center
+   :alt: 未找到图片02|
+
+
 
 该目录下各文件包含的信息如表 12‑1所示。
 
@@ -48,11 +51,14 @@ filesystems 记录内核支持的文件系统类型，通常mount一个设备时
 
 cat /proc/cpuinfo
 
-|system003|
+.. image:: media/system003.jpg
+   :align: center
+   :alt: 未找到图片03|
 
-图 12‑2 CPU信息
 
-从图 12‑2可以看到，我们使用的硬件平台是飞思卡尔i.MX6 Ultralite，是一款ARMv7架构的处理器（Cortex-A7内核是ARMv7架构的）。
+
+从上图可以看到，我们使用的硬件平台是飞思卡尔i.MX6 Ultralite，是一
+款ARMv7架构的处理器（Cortex-A7内核是ARMv7架构的）。
 
 查看内核版本
 ~~~~~~
@@ -61,19 +67,23 @@ cat /proc/cpuinfo
 
 cat /proc/version
 
-|system004|
+.. image:: media/system004.png
+   :align: center
+   :alt: 未找到图片04|
 
-图 12‑3 内核版本信息
 
-从图 12‑3中，我们可以看到当前使用的内核版本是4.1.15。
+
+从上图中我们可以看到当前使用的内核版本是4.1.15。
 
 也可以通过如下命令获取：
 
 uname –a
 
-|system005|
+.. image:: media/system005.png
+   :align: center
+   :alt: 未找到图片05|
 
-图 12‑4 uname –a命令获取的信息
+
 
 查看内存信息
 ~~~~~~
@@ -82,9 +92,10 @@ uname –a
 
 cat /proc/meminfo
 
-|system006|
+.. image:: media/system006.png
+   :align: center
+   :alt: 未找到图片06|
 
-图 12‑5 /proc/meminfo的内容
 
 在实际应用中，我们一般都不会直接去读取该文件的内容，而是使用下面的命令来获取内存的相关信息。
 
@@ -92,12 +103,17 @@ cat /proc/meminfo
 
 free
 
-如图 12‑6所示，输出信息共有三行，六列。其中第一行记录了我们的内存使用情况，可以看到我们内存容量为494M（506268/1024），当前已使用了93M，还剩下400M可用。shared表示表示的是多个进程共享的内存总量，这里只占有了580个字节；Buffers/cached表示当前磁盘缓存的大
+如下图所示，输出信息共有三行，六列。其中第一行记录了我们的内
+存使用情况，可以看到我们内存容量为494M（506268/1024），当前已
+使用了93M，还剩下400M可用。shared表示表示的是多个进程共享的内存总
+量，这里只占有了580个字节；Buffers/cached表示当前磁盘缓存的大
 小为31476个字节。
 
-|system007|
+.. image:: media/system007.jpg
+   :align: center
+   :alt: 未找到图片07|
 
-图 12‑6 内存使用情况
+
 
 查看FLASH存储器容量
 ~~~~~~~~~~~~
@@ -113,11 +129,13 @@ cat /proc/partitions
 Nand-Flash存储器
 ^^^^^^^^^^^^^
 
-图 12‑7是使用256MB Nand-FLASH开发板的命令输出信息。
+下图是使用256MB Nand-FLASH开发板的命令输出信息。
 
-|system008|
+.. image:: media/system008.png
+   :align: center
+   :alt: 未找到图片08|
 
-图 12‑7 256MB Nand-FLASH开发板的分区信息
+
 
 其中的mtdblock开头的都是属于Nand-FLASH存储器的数据块，把它们所有的blocks加起来就可以算出容量(每个block大小为1024Byte)：
 
@@ -132,11 +150,13 @@ Nand-Flash存储器
 eMMC存储器
 ^^^^^^^
 
-图 12‑8是使用8GB eMMC开发板的命令输出信息。
+下图是使用8GB eMMC开发板的命令输出信息。
 
-|system009|
+.. image:: media/system009.png
+   :align: center
+   :alt: 未找到图片09|
 
-图 12‑8 8GB eMMC开发板的分区信息
+
 
 其中的mmcblk开头的都是属于eMMC存储器的数据块，把它们所有的blocks加起来就可以算出容量（每个block大小为512Byte）：
 
@@ -156,41 +176,58 @@ eMMC存储器
 在/proc文件夹下，有很多以数字命名的文件夹，这些文件夹是用来记录当前正在运行的进程状态，文件名则是他们的pid号，每一个进程都对应一个pid号，用于辨识。这些进程文件夹中包含的内容，基本上是大同小异的。使用ls命令，来查看pid为1的文件夹内容，如图
 12‑9所示。其中，fd记录里当前进程使用的文件描述，mountinfo记录了挂载信息，mem则记录了该进程的内存使用情况等。
 
-|system010|
+.. image:: media/system010.jpg
+   :align: center
+   :alt: 未找到图片10|
 
-图 12‑9 文件夹1的内容
 
-除了上面使用的这种方式，常用的还有top命令。该命令的功能类似于windows的任务管理器，执行效果如图 12‑10所示，该命令可以会实时地更新每个进程的使用情况，按下“q”键或“Ctrl + C”，就可以退出该命令。
+
+除了上面使用的这种方式，常用的还有top命令。该命令的功能类似于windows的任务管理器，执行效果
+如上图所示，该命令可以会实时地更新每个进程的使用情况，按下“q”键或“Ctrl + C”，就可以退出该命令。
 
 top
 
-|system011|
+.. image:: media/system011.jpg
+   :align: center
+   :alt: 未找到图片11|
 
-图 12‑10 top命令
+
 
 查看支持的文件系统
 ~~~~~~~~~
 
 cat /proc/filesystems
 
-/proc/filesystems可以用来查看内核支持的文件系统类型，如图 12‑10所示。图中有部分文件系统前带有“nodev”标志，表示这些文件系统不需要挂载块设备，如网络文件系统nfs/nfs4，伪文件系统sysfs等。
+/proc/filesystems可以用来查看内核支持的文件系
+统类型，如上图所示。图中有部分文件系统前带有“nodev”标志，表示
+这些文件系统不需要挂载块设备，如网络文件系统nfs/nfs4，伪文件系统sysfs等。
 
-|system012|
+.. image:: media/system012.jpg
+   :align: center
+   :alt: 未找到图片12|
 
-图 12‑11 内核支持的文件系统
+
 
 查看CPU当前主频
 ~~~~~~~~~
 
-除了/proc目录外，在/sys目录也可以查看一些系统相关的信息，如文件/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq包含了CPU当前的主频信息，若系统存在该文件，可以把它的内容输出来查看：
+除了/proc目录外，在/sys目录也可以查看一些系统相关的信
+息，如文件/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq包含了CPU当
+前的主频信息，若系统存在该文件，可以把它的内容输出来查看：
 
 cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq
 
-|system013|
+.. image:: media/system013.png
+   :align: center
+   :alt: 未找到图片13|
 
-图 12‑12 当前CPU主频
 
-如图 12‑12中的输出，表示当前CPU主频为792MHz。
+
+如上图中的输出，表示当前CPU主频为792MHz。
+
+
+
+
 
 .. |system002| image:: media/system002.png
    :width: 5.82381in

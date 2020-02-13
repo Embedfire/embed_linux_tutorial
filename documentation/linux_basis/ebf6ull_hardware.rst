@@ -8,34 +8,46 @@
 EBF6ULL Mini及Pro开发板
 ~~~~~~~~~~~~~~~~~~~
 
-EBF6ULL 系列开发板是野火电子基于NXP i.MX 6ULL系列处理器设计的一款低功耗单板电脑，工业级主频最高可达 792MHz，按底板功能主要分为Mini和Pro两个版本，具体见图 10‑1及图 10‑2。
+EBF6ULL 系列开发板是野火电子基于NXP i.MX 6ULL系列处理器设计的一款低功耗单板电
+脑，工业级主频最高可达 792MHz，按底板功能主要分为Mini和Pro两个版本，具体见下图。
 
-|ebf6ul002|
 
-图 10‑1 EBF6ULL S1 Mini开发板
 
-|ebf6ul003|
 
-图 10‑2 EBF6ULL S1 Pro开发板
+.. image:: media/ebf6ul002.jpeg
+   :align: center
+   :alt: 未找到图片2|
+
+
+
+.. image:: media/ebf6ul003.jpeg
+   :align: center
+   :alt: 未找到图片3|
+
+
 
 EBF6ULL开发板提供完整的SDK驱动开发包、核心板封装库，底板应用参考设计原理图，可帮助客户大大缩减产品的开发时间，加快产品上市。目前提供Linux 4.1.15版本的内核，配套的系统自带python、Qt等组件。
 
-开发板整板由EBF6ULL S1核心板模组和底板组成，具体见图 10‑3，元件采用工业级选料，其中核心板板载主控芯片512MB DDR3L内存，256/512MB Nand-FLASH（或8GB eMMC）。
+开发板整板由EBF6ULL S1核心板模组和底板组成，具体见下图，元件采用工业级选料，其中核心板板载主控芯片512MB DDR3L内存，256/512MB Nand-FLASH（或8GB eMMC）。
 
-|ebf6ul004|
+.. image:: media/ebf6ul004.jpeg
+   :align: center
+   :alt: 未找到图片4|
 
-图 10‑3核心板外观
+
 
 核心板PCB采用8层黑色沉金设计，单面放元件，整体尺寸39x39mm，共140个引脚，引脚间距1.0mm，除了SEMC总线引脚外，芯片其余IO均引出。该核心板适用于工业控制、手持扫码、喷墨打印机、轨道交通、无人机控制和音频输出等领域。
 
 EBF6ULL核心板硬件资源
 ~~~~~~~~~~~~~~
 
-野火EBF6ULL核心板包含多种配置版本，它按照核心板上FLASH存储器类型进行区分，具体见图 10‑4。
+野火EBF6ULL核心板包含多种配置版本，它按照核心板上FLASH存储器类型进行区分，具体见下图。
 
-|ebf6ul005|
+.. image:: media/ebf6ul005.jpeg
+   :align: center
+   :alt: 未找到图片5|
 
-图 10‑4 EBF6ULL S1邮票孔核心板内部
+
 
    EBF6ULL S1核心板模组参数如下：
 
@@ -60,15 +72,19 @@ EBF6ULL核心板硬件资源
 EBF6ULL Mini底板硬件资源
 ~~~~~~~~~~~~~~~~~~
 
-EBF6ULL Mini底板硬件资源见图 10‑5。
+EBF6ULL Mini底板硬件资源见下图。
 
-|ebf6ul006|
+.. image:: media/ebf6ul006.jpg
+   :align: center
+   :alt: 未找到图片6|
 
-图 10‑5 EBF6ULL S1 Mini开发板硬件资源图（正面）
 
-|ebf6ul007|
 
-图 10‑6 EBF6ULL S1 Mini开发板硬件资源图（背面）
+.. image:: media/ebf6ul007.jpeg
+   :align: center
+   :alt: 未找到图片7|
+
+
 
    EBF6ULL S1 Mini底板参数如下：
 
@@ -107,11 +123,13 @@ EBF6ULL Mini底板硬件资源见图 10‑5。
 EBF6ULL Pro底板硬件资源
 ~~~~~~~~~~~~~~~~~
 
-野火EBF6ULL Pro底板硬件资源见图 10‑5。
+野火EBF6ULL Pro底板硬件资源见下图。
 
-|ebf6ul008|
+.. image:: media/ebf6ul008.jpeg
+   :align: center
+   :alt: 未找到图片8|
 
-图 10‑7 EBF6ULL S1 Pro开发板硬件资源图
+
 
 表 10‑1 EBF6ULL S1 Pro底板硬件资源表
 
@@ -152,6 +170,9 @@ LVDS接口     板载RGB转LVDS芯片，LVDS接口通过2x15P 2.0间距排针引
 LCD接口      FPC接口，RGB888及I2C触摸信号，支持直接连接野火的5寸/7寸/4.3寸屏
 GPIO         通过两排2*40P的2.54间距排针引出，可自主连接各种外部设备
 ============ ============================================================================================
+
+
+
 
 .. |ebf6ul002| image:: media/ebf6ul002.jpeg
    :width: 5.76806in
