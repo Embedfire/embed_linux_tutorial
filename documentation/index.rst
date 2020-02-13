@@ -81,6 +81,8 @@
    system_programing/signal
    system_programing/msg_queuq
    system_programing/systemV_sem
+   system_programing/shm
+   system_programing/thread
    system_programing/semaphore
 
 .. toctree::

@@ -13,4 +13,6 @@
 ..    pipe
 ..    msg_queuq
 ..    systemV_sem
+..    shm
+..    thread
 ..    semaphore
