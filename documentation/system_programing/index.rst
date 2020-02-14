@@ -15,4 +15,4 @@
 ..    systemV_sem
 ..    shm
 ..    thread
-..    semaphore
+..    posix_sem

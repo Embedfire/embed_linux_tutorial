@@ -83,7 +83,7 @@
    system_programing/systemV_sem
    system_programing/shm
    system_programing/thread
-   system_programing/semaphore
+   system_programing/posix_sem
 
 .. toctree::
    :maxdepth: 1
