@@ -79,7 +79,11 @@
    system_programing/process
    system_programing/pipe
    system_programing/signal
-
+   system_programing/msg_queuq
+   system_programing/systemV_sem
+   system_programing/shm
+   system_programing/thread
+   system_programing/semaphore
 
 .. toctree::
    :maxdepth: 1
@@ -100,7 +104,6 @@
    bare_metal/uart
    bare_metal/ddr
    bare_metal/elcdif
-
 
 .. toctree::
    :maxdepth: 1
