@@ -200,7 +200,8 @@ update_emmc_boot.scr
 配置SD卡烧录信息
 ~~~~~~~~~
 
-如果需要从SD卡烧录到NAND Flash，则将mfg-images-nand改名为mfg-images；如果需要从SD卡烧录到emmc，则将mfg-images-emmc改名为mfg-images；并且将update_nand_boot.scr改名为boot.scr，mfg-
+如果需要从SD卡烧录到NAND Flash，则将mfg-images-nand改名为mfg-images；如果
+需要从SD卡烧录到emmc，则将mfg-images-emmc改名为mfg-images；并且将update_nand_boot.scr改名为boot.scr，mfg-
 images文件夹中的文件相应的替换，并在Manifest中填写欲烧写文件的文件名即可。然后将sd卡插入开发板，将开发板的WiFi的跳帽取下，同时将boot的拨码开关 2/5/8 拨到 ON档，表示从SD卡启动，在SD卡烧写的时候红灯闪烁，烧写完毕，红灯常亮，烧写失败，红灯熄灭。
 
 修改文件名字可以使用mv命令，具体如下：
@@ -217,13 +218,17 @@ sudo mv mfg-images-nand/ mfg-images/
 
 sudo mv update_nand_boot.scr boot.scr
 
-在烧录工程可以打开串口终端，查看开发板输出的信息，具体见图 29‑1。
+在烧录工程可以打开串口终端，查看开发板输出的信息，具体见下图。
 
-|sdcard002|
+.. image:: media/sdcard002.png
+   :align: center
+   :alt: 未找到图片
 
-图 29‑1 从SD卡烧录
+
 
 在烧录完成后，将boot的拨码开关 2/3/6 拨到 ON档，就可以从NAND Flash启动了。
+
+
 
 .. |sdcard002| image:: media/sdcard002.png
    :width: 5.12508in

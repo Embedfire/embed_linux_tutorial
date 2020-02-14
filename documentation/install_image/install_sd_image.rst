@@ -23,38 +23,58 @@ Etcher 是一个快速将镜像文件烧录到 USB 设备或 SD 卡中的工具�
 下载Etcher
 ~~~~~~~~
 
-首先打开官网：\ https://www.balena.io/etcher/\ ，在首页就可以看到Etcher工具的下载位置，如图 26‑1所示，下载完毕直接安装即可。
+首先打开官网：\ https://www.balena.io/etcher/\ ，在首页就可以看到Etcher工具的下载位置，如下图所示，下载完毕直接安装即可。
 
-|instal002|
 
-图 26‑1下载Etcher
+
+
+.. image:: media/instal002.png
+   :align: center
+   :alt: 未找到图片2|
+
+
 
 使用Etcher工具烧录
 ~~~~~~~~~~~~
 
-首先打开已经安装完成的Etcher，启动界面如图 26‑2所示。
+首先打开已经安装完成的Etcher，启动界面如下图所示。
 
-|instal003|
+.. image:: media/instal003.png
+   :align: center
+   :alt: 未找到图片3|
 
-图 26‑2 Etcher启动界面
 
-然后选择要烧录的SD卡镜像，野火提供的SD卡镜像是.sdcard格式的，如图 26‑3所示，可以直接烧录到SD卡中，我们可以选择core-image-sato-imx6ull14x14evk.sdcard镜像烧录即可。
 
-|instal004|
+然后选择要烧录的SD卡镜像，野火提供的SD卡镜像是.sdcard格式的，如
+下图所示，可以直接烧录到SD卡中，我们可以选择core-image-sato-imx6ull14x14evk.sdcard镜像烧录即可。
 
-图 26‑3 SD卡镜像
+.. image:: media/instal004.png
+   :align: center
+   :alt: 未找到图片4|
 
-接着选择要烧录的SD卡，如果你的电脑只是插入一个SD卡，那么Etcher会自动识别你的SD卡，在烧录的过程中，SD卡会被分区并且格式化，选择完毕后直接点击“Flash”进行烧录操作，具体见图 26‑4与图 26‑5。
 
-|instal005|
 
-图 26‑4 选择SD卡与烧录
+接着选择要烧录的SD卡，如果你的电脑只是插入一个SD卡，那么Etcher会自动识
+别你的SD卡，在烧录的过程中，SD卡会被分区并且格式化，选择完毕后直
+接点击“Flash”进行烧录操作，具体见下图。
 
-|instal006|
+.. image:: media/instal005.png
+   :align: center
+   :alt: 未找到图片5|
 
-图 26‑5 烧录界面
 
-当制作成功后，将SD卡插入开发板中，并且将拨码开关的2/5/8打到ON档（SD启动方式），然后给开发板上电就可以看到开发板正常启动。
+
+.. image:: media/instal006.png
+   :align: center
+   :alt: 未找到图片6|
+
+
+
+当制作成功后，将SD卡插入开发板中，并且将拨码开关
+的2/5/8打到ON档（SD启动方式），然后给开发板上电就可以看到开发板正常启动。
+
+
+
 
 .. |instal002| image:: media/instal002.png
    :width: 5.31343in

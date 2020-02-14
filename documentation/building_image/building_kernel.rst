@@ -11,31 +11,47 @@
 ~~~~~~~~~~~~~~
 
 在编译内核前我们首先要下载到官方提供的内核镜像，打开\ http://git.freescale.com/git/\
-网页，可以看到很多nxp官方提供的内核镜像，这个网站是飞思卡尔（freescale）公司的，在2015年的是nxp巨资收购了飞思卡尔，所以可以直接从飞思卡尔的网站下载nxp官方提供的内核镜像。
+网页，可以看到很多nxp官方提供的内
+核镜像，这个网站是飞思卡尔（freescale）公司的，在2015年的是nxp巨
+资收购了飞思卡尔，所以可以直接从飞思卡尔的网站下载nxp官方提供的内核镜像。
 
-打开网页后可以看到nxp官方有非常多的镜像在这里，我们需要选择要下载的内核镜像linux-imx，然后页面会跳转到linux-imx内核镜像的详细说明页面，该页面有很多分支、标签等信息，具体见图 30‑1、图 30‑2。
+打开网页后可以看到nxp官方有非常多的镜像在这里，我们需要
+选择要下载的内核镜像linux-imx，然后页面会跳转到linux-imx内核镜像的
+详细说明页面，该页面有很多分支、标签等信息，具体见下图。
 
-|buildi010|
 
-图 30‑1 选择linux-imx镜像
 
-|buildi003|
 
-图 30‑2 linux-imx信息说明
+.. image:: media/building_kernel010.png
+   :align: center
+   :alt: 未找到图片10|
 
-我们注意图 30‑2最下面的两句话，它就是告诉我们克隆（即下载）镜像的路径：
+
+
+.. image:: media/building_kernel003.png
+   :align: center
+   :alt: 未找到图片03|
+
+
+
+我们注意上图中最下面的两句话，它就是告诉我们克隆（即下载）镜像的路径：
 
 Clonegit://git.freescale.com/imx/linux-imx.git http://git.freescale.com/git/cgit.cgi/imx/linux-imx.git
 
-在克隆内核镜像的时候最好是在虚拟机中（或linux环境），而不是在Windows环境下载，然后下载的环境必须支持git，因为我们将使用git
-clone命令去克隆nxp官方提供的内核镜像，这样子就能保留镜像中的所有git信息与标签，在开发过程中能方便切换到合适的分支进行开发，因为不同的分支内核镜像的源代码是不一样的，可能会发生未知的问题，我们目前就使用\ `imx_4.1.15_2.0.0_ga
-<http://git.freescale.com/git/cgit.cgi/imx/linux-imx.git/log/?h=imx_4.1.15_2.0.0_ga>`__\ 分支进行开发。
+在克隆内核镜像的时候最好是在虚拟机中（或linux环境），而不是在Windows环
+境下载，然后下载的环境必须支持git，因为我们将使用git
+clone命令去克隆nxp官方提供的内核镜像，这样子就能保留镜像中的所有git信息与
+标签，在开发过程中能方便切换到合适的分支进行开发，因为不同的分支内核镜像的源代码是不一样的，可
+能会发生未知的问题，我们目前就使用\ `imx_4.1.15_2.0.0_ga
+<http://git.freescale.com/git/cgit.cgi/imx/linux-imx.git/log/?h=imx_4.1.15_2.0.0_ga>`__\ 分支
+进行开发。
 
 使用git clone命令克隆内核镜像，然后等待克隆完成即可：
 
 git clone git://git.freescale.com/imx/linux-imx.git
 
-由于网站是国外的，可能会非常慢，甚至出现下载失败现象，建议使用野火资料包中的源码进行开发，我们已经将源码提交到腾讯云开发者平台，直接使用git clone命令克隆内核镜像即可：
+由于网站是国外的，可能会非常慢，甚至出现下载失败现象，建议使用野火资料包中的
+源码进行开发，我们已经将源码提交到腾讯云开发者平台，直接使用git clone命令克隆内核镜像即可：
 
 注意：我们修改的镜像名字是imx-linux，与官方命名刚好相反以便于区分。
 
@@ -50,8 +66,11 @@ embedfire@embedfire_dev:~$ git clone https://git.dev.tencent.com/flyleaf91/imx-l
 (delta 6957086), reused 8201579 (delta 6933694) Receiving objects: 100% (8225151/8225151), 1.37 GiB \| 4.79 MiB/s, done.Resolving deltas: 100%
 (6957086/6957086), done.warning: remote HEAD refers to nonexistent ref, unable to checkout.
 
-我们可以看到输出的信息，虽然是提示克隆完成，但是没法切换到（checkout）合适的分支，此时就需要进行手动切换分支。首先进入imx-linux目录下，可以看到imx-linux目录下是没有文件的，这是因为没有切换到正确的分支，我们可以使用git branch
-–a命令查看当前下载的源码包的分支情况，可以看到存在两个分支，分别是remotes/origin/imx_4.1.15_2.0.0_ga与remotes/origin/show，我们可以使用git
+我们可以看到输出的信息，虽然是提示克隆完成，但是没法切换到（checkout）合
+适的分支，此时就需要进行手动切换分支。首先进入imx-linux目录下，可以看到imx-linux目
+录下是没有文件的，这是因为没有切换到正确的分支，我们可以使用git branch
+–a命令查看当前下载的源码包的分支情况，可以看到存在两个分
+支，分别是remotes/origin/imx_4.1.15_2.0.0_ga与remotes/origin/show，我们可以使用git
 checkout命令手动切换到imx_4.1.15_2.0.0_ga分支，然后就可以看到当前目录下多了很多文件夹，具体见：
 
 进入imx-linux目录
@@ -87,18 +106,28 @@ Kbuild kernel MAINTAINERS mm README samples security tools virt
 内核源码目录
 ~~~~~~
 
-在克隆完内核镜像之后，我们会发现克隆的目录下多出了一个文件夹imx-linux，它就是我们克隆的内核镜像，里面是官方提供的内核源码，我们可以进入imx-linux目录下中查看主要有哪些文件夹组成，具体见图 30‑3。
+在克隆完内核镜像之后，我们会发现克隆的目录下多出了一个文件
+夹imx-linux，它就是我们克隆的内核镜像，里面是官方提供的内核源码，我们可
+以进入imx-linux目录下中查看主要有哪些文件夹组成，具体见下图。
 
-|buildi004|
+.. image:: media/building_kernel004.png
+   :align: center
+   :alt: 未找到图片04|
 
-图 30‑3内核源码目录
 
-从图中我们可以看到Linux内核源码目录下是有非常多的文件夹，且文件夹下也有非常多的文件，下面我们简单分析一下这些文件夹的主要作用。
 
--  arch：主要包含和硬件体系结构相关的代码，如arm、x86、MIPS，PPC，每种CPU平台占一个相应的目录，例如我们使用的imx系列CPU就在arch/arm/mach-
-  imx目录下，Linux内核目前已经支持30种左右的CPU体系结构。arch中的目录下存放的是各个平台以及各个平台的芯片对Linux内核进程调度、 内存管理、 中断等的支持，以及每个具体的SoC和电路板的板级支持代码。
+从图中我们可以看到Linux内核源码目录下是有非常多的文件夹，且文件夹下也
+有非常多的文件，下面我们简单分析一下这些文件夹的主要作用。
 
--  block：在Linux中block表示块设备（以块（多个字节组成的整体，类似于扇区）为单位来整体访问），譬如说SD卡、Nand、硬盘等都是块设备，block目录下放的是一些Linux存储体系中关于块设备管理的代码。
+-  arch：主要包含和硬件体系结构相关的代码，如arm、x86、MIPS，PPC，每
+种CPU平台占一个相应的目录，例如我们使用的imx系列CPU就在arch/arm/mach-
+  imx目录下，Linux内核目前已经支持30种左右的CPU体系结构。arch中的目录下
+  存放的是各个平台以及各个平台的芯片对Linux内核进程调度、 内存管理、 中断等
+  的支持，以及每个具体的SoC和电路板的板级支持代码。
+
+-  block：在Linux中block表示块设备（以块（多个字节组成的整体，类似于扇区）为单
+位来整体访问），譬如说SD卡、Nand、硬盘等都是块设备，block目录下放的是一些Linux存储
+体系中关于块设备管理的代码。
 
 -  crypto：这个文件夹下存放的是常用加密和散列算法（如md5、AES、 SHA等） ，还有一些压缩和CRC校验算法。
 
@@ -137,19 +166,27 @@ Kbuild kernel MAINTAINERS mm README samples security tools virt
 编译内核
 ~~~~
 
-简单了解内核源码的目录结构后，我们可以开始尝试编译内核，本小节主要是以编译我们配套的开发板源代码为主，在后续也会提到编译官方开发板源代码的方法（官方的比较简单）。
+简单了解内核源码的目录结构后，我们可以开始尝试编译内核，本小节主要是以编译
+我们配套的开发板源代码为主，在后续也会提到编译官方开发板源代码的方法（官方的比较简单）。
 
-我们提供的源码包是经过修改的，首先进入imx-linux/arch/arm/configs目录下，可以看到很多默认的deconfig文件，这些是linux源码中的配置文件，其中我们主要关注imx_v6_v7_defconfig、imx_v7_defconfig
-、imx_v7_ebf_defconfig 、imx_v7_mfg_defconfig这4个文件即可，如图 30‑4所示。
+我们提供的源码包是经过修改的，首先进入imx-linux/arch/arm/configs目录下，可以看
+到很多默认的deconfig文件，这些是linux源码中的配置文件，其中我们主
+要关注imx_v6_v7_defconfig、imx_v7_defconfig
+、imx_v7_ebf_defconfig 、imx_v7_mfg_defconfig这4个文件即可，如下图所示。
 
-|buildi005|
+.. image:: media/building_kernel005.png
+   :align: center
+   :alt: 未找到图片05|
 
-图 30‑4 默认配置文件
 
-imx_v6_v7_defconfig、imx_v7_defconfig这两个文件是nxp官方提供的默认配置文件，而imx_v7_ebf_defconfig
-、imx_v7_mfg_defconfig这两个文件则是我们野火提供的配置文件，这些文件是与边缘内核息息相关的，而不同的开发板这些配置是不一样的，前面两个是用于编译官方的imx6ull开发板，而后面两个则是根据我们的imx6ull开发板硬件而定制的配置。
+imx_v6_v7_defconfig、imx_v7_defconfig这两个文件是nxp官方提供的默认
+配置文件，而imx_v7_ebf_defconfig
+、imx_v7_mfg_defconfig这两个文件则是我们野火提供的配置文件，这些文件是
+与边缘内核息息相关的，而不同的开发板这些配置是不一样的，前面两个是用于编
+译官方的imx6ull开发板，而后面两个则是根据我们的imx6ull开发板硬件而定制的配置。
 
-由于整个内核镜像都已经打上我们的补丁，那么也无需再做过多的修改即可直接编译，我们可以通过git log命令查看补丁信息：
+由于整个内核镜像都已经打上我们的补丁，那么也无需再做过多的修改即可直
+接编译，我们可以通过git log命令查看补丁信息：
 
 命令
 
@@ -193,7 +230,9 @@ mode=thumb --disable-werror --enable-multilib --enable-checking=release --build=
 
 export PATH=/opt/arm-gcc/bin:$PATHexport ARCH=arm export CROSS_COMPILE=arm-linux-gnueabihf-
 
-首先进入imx-linux目录下，然后开始编译内核，运行make ARCH=arm imx_v7_ebf_defconfig命令将imx_v7_ebf_defconfig配置文件的信息写入当前路径下的 .config文件中，在linux中与“.”开头的文件都是隐藏文件，我们可以使用ls
+首先进入imx-linux目录下，然后开始编译内核，运行make ARCH=arm imx_v7_ebf_defconfig命
+令将imx_v7_ebf_defconfig配置文件的信息写入当前路径下的 .config文件中，在linux中与“.”开头的
+文件都是隐藏文件，我们可以使用ls
 –la命令查看这些文件。
 
 命令
@@ -207,42 +246,71 @@ scripts/kconfig/zconf.hash.c HOSTCC scripts/kconfig/zconf.tab.o HOSTLD scripts/k
 
 Linux内核的配置系统由三个部分组成，分别是：
 
-1. Makefile：分布在 Linux 内核源代码根目录及各层目录中，定义 Linux 内核的编译规则；
+1. Makefile：分布在 Linux 内核源代码根目录及各层目
+   录中，定义 Linux 内核的编译规则；
 
-2. 配置文件：给用户提供配置选择的功能，如Kconfig文件定义了配置项，.config文件对配置项进行赋值；
+2. 配置文件：给用户提供配置选择的功能，如Kconfig文件定义
+   了配置项，.config文件对配置项进行赋值；
 
-3. 配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配置用户界面（linux提供基于字符界面、基于 Ncurses 图形界面以及基于 Xwindows 图形界面的用户配置界面，各自对应于 make config、make menuconfig 和 make xconfig）。
+3. 配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配
+   置用户界面（linux提供基于字符界面、基于 Ncurses 图形界面以及基于 Xwindows 图形
+   界面的用户配置界面，各自对应于 make config、make menuconfig 和 make xconfig）。
 
-读者如果想看我们提供的配置文件imx_v7_ebf_defconfig中修改了什么地方，可以通过make menuconfig命令来查看我们的配置，make menuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下导入
-.config文件的配置（如果没有找到 .config文件则会生成默认配置的 .config文件），而这个配置则是我们运行make ARCH=arm
-imx_v7_ebf_defconfig命令生成的，这就直接可以看到我们在imx_v7_ebf_defconfig的配置选择，可以通过键盘的“上”、“下”、“左”、“右”、“回车”、“空格”、“?”、“ESC”等按键进行选择配置，具体见图 30‑5。
+读者如果想看我们提供的配置文件imx_v7_ebf_defconfig中修改了什么地方，可以通
+过make menuconfig命令来查看我们的配置，make menuconfig是一个基于文本选择
+的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下导入
+.config文件的配置（如果没有找到 .config文件则会生成默认配置的 .config文件），而这
+个配置则是我们运行make ARCH=arm
+imx_v7_ebf_defconfig命令生成的，这就直接可以看到我们在imx_v7_ebf_defconfig的配
+置选择，可以通过键盘的“上”、“下”、“左”、“右”、“回车”、“空格”、“?”、“ESC”等按键进行选
+择配置，具体见下图。
 
-|buildi006|
+.. image:: media/building_kernel006.png
+   :align: center
+   :alt: 未找到图片06|
 
-图 30‑5 make menuconfig界面
 
-比如我们选择配置我们开发板的触摸屏驱动：Goodix I2C touchscreen，如果读者找不到这个配置选项在哪里，可以利用make menuconfig中的搜索功能，在英文输入法状态下按下“/”则可以进行搜索，输入“Goodix”找到改配置选项的位置，具体见图
-30‑6。从图中可以很明显看出Goodix I2C touchscreen配置选项位于-> Device Drivers选项下的-> Input device support下的-> Generic input layer (needed for keyboard, mouse, ...)
-(INPUT [=y])选项下的-> Touchscreens 选项中，其实也可以按下“1”直接可以定位到对应的选项，然后选中[*]Goodix touchpanel GT9xx series 、<*> Goodix GT9xx touch controller auto update
-support 、<*> Goodix GT9xx Tools for debuging 、<*>Goodix I2C touchscreen即可，具体见图 30‑7。
 
-|buildi007|
+比如我们选择配置我们开发板的触摸屏驱动：Goodix I2C touchscreen，如果读者找不到
+这个配置选项在哪里，可以利用make menuconfig中的搜索功能，在英文输入法状态
+下按下“/”则可以进行搜索，输入“Goodix”找到改配置选项的位置，具体见图
+30‑6。从图中可以很明显看出Goodix I2C touchscreen配置选项位于-> Device Drivers选
+项下的-> Input device support下的-> Generic input layer (needed for keyboard, mouse, ...)
+(INPUT [=y])选项下的-> Touchscreens 选项中，其实也可以按下“1”直
+接可以定位到对应的选项，然后选
+中[*]Goodix touchpanel GT9xx series 、<*> Goodix GT9xx touch controller auto update
+support 、<*> Goodix GT9xx Tools for debuging 、<*>Goodix I2C touchscreen即可，具
+见下图。
 
-图 30‑6 搜索功能
+.. image:: media/building_kernel007.png
+   :align: center
+   :alt: 未找到图片07|
 
-|buildi008|
 
-图 30‑7 使能触摸屏配置
+.. image:: media/building_kernel008.png
+   :align: center
+   :alt: 未找到图片08|
 
-再举个例子，如果想要在我们的开发板上使用DHT11测量温湿度（单总线协议），那么需要在内核中配置支持单总线协议：Dallas's 1-wire support，我们也照葫芦画瓢，先搜索到这个配置在哪个位置（时候搜索不到就直接找即可），它位于->Device Drivers 选项下的<*>
-Dallas's 1-wire suppor选项中，然后进入它的选项下进行选择即可，当配置完成后保存退出，就可以进行编译了，具体见图 30‑8。
 
-|buildi009|
 
-图 30‑8 选择单总线驱动
+再举个例子，如果想要在我们的开发板上使用DHT11测量温湿度（单总线协议），那么
+需要在内核中配置支持单总线协议：Dallas's 1-wire support，我们也照葫芦画瓢，先
+搜索到这个配置在哪个位置（时候搜索不到就直接找即可），它位于->Device Drivers 选项下的<*>
+Dallas's 1-wire suppor选项中，然后进入它的选项下进行选择即可，当配置完成
+后保存退出，就可以进行编译了，具体见下图。
 
-如果不需要修改配置，则可以直接编译，运行make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf- 命令直接编译，-j4是代表使用4个CPU进行编译，如果不选则默认使用一个CPU编译，而CPU的多少决定了编译的时间，根据自身情况决定即可，在运行这个命令后
-，可以看到中断输出一系列编译信息，而在编译的最后会告诉我们编译成功，镜像存在arch/arm/boot/目录下，具体见：（已删减绝大部分编译输出的信息）。
+.. image:: media/building_kernel009.png
+   :align: center
+   :alt: 未找到图片09|
+
+
+
+如果不需要修改配置，则可以直接编译，运
+行make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf- 命令直接编译，-j4
+是代表使用4个CPU进行编译，如果不选则默认使用一个CPU编译，而CPU的多少决定
+了编译的时间，根据自身情况决定即可，在运行这个命令后
+，可以看到中断输出一系列编译信息，而在编译的最后会告诉我们编译
+成功，镜像存在arch/arm/boot/目录下，具体见：（已删减绝大部分编译输出的信息）。
 
 命令
 
@@ -256,7 +324,9 @@ OBJCOPY arch/arm/boot/zImage Kernel: arch/arm/boot/zImage is ready
 
 ···
 
-这个命令编译的不仅仅是内核，还会编译设备树，设备树编译后产生的.dtb文件存在arch/arm/boot/dts/目录下，我们可以通过ls arch/arm/boot/dts/ \| grep .dtb命令查看该目录下的所有设备树：（已删减，仅显示imx6ull相关的设备树）。
+这个命令编译的不仅仅是内核，还会编译设备树，设备树编译后产生的.dtb文
+件存在arch/arm/boot/dts/目录下，我们可以通过ls arch/arm/boot/dts/ \| grep .dtb命令
+查看该目录下的所有设备树：（已删减，仅显示imx6ull相关的设备树）。
 
 命令
 
@@ -276,11 +346,15 @@ weim-50-70-dht11-update.dtbimx6ull-14x14-evk-gpmi-weim-50-70.dtbimx6ull-14x14-ev
 烧录自己编译的内核到开发板
 ~~~~~~~~~~~~~
 
-那么经过编译得到的zImage与设备树都可以烧录到我们的开发板中，比如我们选择zImage与imx6ull-14x14-evk-gpmi-weim-50-70-dht11-leds.dtb文件替换掉28.3 小节中的烧录镜像与设备树，完成烧录后即可看到内核启动完成，具体见图 30‑9。
+那么经过编译得到的zImage与设备树都可以烧录到我们的开发板中，比如我们
+选择zImage与imx6ull-14x14-evk-gpmi-weim-50-70-dht11-leds.dtb文件替
+换掉28.3 小节中的烧录镜像与设备树，完成烧录后即可看到内核启动完成，具体见下图。
 
-|buildi010|
+.. image:: media/building_kernel010.png
+   :align: center
+   :alt: 未找到图片10|
 
-图 30‑9 替换镜像与设备树
+
 
 当内核启动后，我们登陆root用户，就可以通过cat /proc/version命令查看内核版本：
 
@@ -288,6 +362,9 @@ imx6ull14x14evk login: rootroot@imx6ull14x14evk:~# cat /proc/versionLinux versio
 (gcc version 7.4.0 (Ubuntu/Linaro 7.4.0-1ubuntu1~18.04.1) ) #2 SMP PREEMPT Tue Aug 27 07:46:06 UTC 2019
 
 可能会增加个编译官方内核的
+
+
+
 
 .. |buildi010| image:: media/building_kernel002.png
    :width: 5.76806in
