@@ -16,3 +16,4 @@
 ..    shm
 ..    thread
 ..    posix_sem
+..    posix_mutex

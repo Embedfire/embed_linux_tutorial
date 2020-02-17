@@ -84,6 +84,7 @@
    system_programing/shm
    system_programing/thread
    system_programing/posix_sem
+   system_programing/posix_mutex
 
 .. toctree::
    :maxdepth: 1
