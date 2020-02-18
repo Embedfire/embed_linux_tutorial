@@ -85,6 +85,7 @@
    system_programing/thread
    system_programing/posix_sem
    system_programing/posix_mutex
+   system_programing/tcp_ip
 
 .. toctree::
    :maxdepth: 1

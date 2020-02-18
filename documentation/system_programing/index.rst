@@ -17,3 +17,4 @@
 ..    thread
 ..    posix_sem
 ..    posix_mutex
+..    tcp_ip
