@@ -16,10 +16,11 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: 搭建并熟悉开发环境
+   :caption: 熟悉linux操作系统
    :numbered:
 
    linux_basis/why_learning_linux
+   linux_basis/how_to_learn_linux
    linux_basis/i_mx_series
    linux_basis/linux_brief
    linux_basis/installing_linux
@@ -28,7 +29,16 @@
    linux_basis/command_line
    linux_basis/software_package
    linux_basis/editor
+   
+
+.. toctree::
+   :maxdepth: 1
+   :caption: 熟悉EBF_6ULL开发板
+   :numbered:
+
    linux_basis/ebf6ull_hardware
+   linux_basis/fire-config_brief
+   linux_basis/fire-config_flash
    linux_basis/board_startup
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
@@ -57,6 +67,7 @@
    :numbered:
 
    install_image/install_sd_image
+   install_image/install_debian_to_sd
    install_image/sdcard_production
    install_image/mfgtool_production
 
@@ -71,6 +82,7 @@
    building_image/building_rootfs
    building_image/using_buildroot
    building_image/using_yocto
+   building_image/building_debian
 
 .. toctree::
    :maxdepth: 1
