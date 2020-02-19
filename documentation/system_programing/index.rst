@@ -15,4 +15,6 @@
 ..    systemV_sem
 ..    shm
 ..    thread
-..    semaphore
+..    posix_sem
+..    posix_mutex
+..    tcp_ip

@@ -84,7 +84,9 @@
    system_programing/systemV_sem
    system_programing/shm
    system_programing/thread
-   system_programing/semaphore
+   system_programing/posix_sem
+   system_programing/posix_mutex
+   system_programing/tcp_ip
 
 .. toctree::
    :maxdepth: 1
@@ -130,6 +132,10 @@
    submission/ubuntu16-rootfs
    submission/debian9-rootfs
    submission/野火IMX6UL开发板SDK使用说明
+   submission/buildroot2017-1
+   submission/buildroot2017-2
+   submission/buildroot2017-3
+
 
 .. toctree::
    :maxdepth: 1

@@ -35,12 +35,13 @@
 # .PHONY:clean
 
 # CC = arm-linux-gnueabihf-gcc
-CC=gcc
+# CC=gcc
+CC = gcc
 SRC = $(wildcard *.c */*.c)
 OBJS = $(patsubst %.c, %.o, $(SRC))
 DEP_FILES := $(patsubst %, .%.d,$(OBJS))
 DEP_FILES := $(wildcard $(DEP_FILES))
-FLAG = -g -Werror -I. -Iinclude -lpthread
+FLAG = -g -Werror -I. -Iinclude -lpthread 
 TARGET = targets
 
 $(TARGET):$(OBJS)

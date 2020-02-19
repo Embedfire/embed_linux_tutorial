@@ -40,14 +40,14 @@
 #include <pthread.h>
 
 #define THREAD_NUMBER 3 /* 线程数 */
-#define REPEAT_NUMBER 3 /* 每个线程的小任务数 */
-#define DELAY_TIME_LEVELS 10.0 /*小任务之间的最大时间间隔*/
+#define sleep_TIME_LEVELS 4.0 /*小任务之间的最大时间间隔*/
 
 pthread_mutex_t mutex;
+
 void *thrd_func(void *arg)
 {
     int num = (unsigned long long)arg; /** sizeof(void*) == 8 and sizeof(int) == 4 (64 bits) */
-    int delay_time = 0, count = 0;
+    int sleep_time = 0;
     int res;
 
     /* 互斥锁上锁 */
@@ -55,17 +55,24 @@ void *thrd_func(void *arg)
     if (res)
     {
         printf("Thread %d lock failed\n", num);
+
+        /* 互斥锁解锁 */
+        pthread_mutex_unlock(&mutex);
+
         pthread_exit(NULL);
     }
 
-    printf("Thread %d is starting\n", num);
-    for (count = 0; count < REPEAT_NUMBER; count++)
-    {
-        delay_time = (int)(rand() * DELAY_TIME_LEVELS/(RAND_MAX)) + 1;
-        sleep(delay_time);
-        printf("\tThread %d: job %d delay = %d\n",num, count, delay_time);
-    }
-    printf("Thread %d finished\n", num);
+    printf("Thread %d is hold mutex\n", num);
+
+    sleep_time = (int)(rand() * sleep_TIME_LEVELS/(RAND_MAX)) + 1;
+    printf("\tThread %d: sleep %d S\n",num, sleep_time);
+    sleep(sleep_time);
+
+    printf("Thread %d freed mutex\n\n", num);
+
+    /* 互斥锁解锁 */
+    pthread_mutex_unlock(&mutex);
+
     pthread_exit(NULL);
 }
 
@@ -73,38 +80,26 @@ void *thrd_func(void *arg)
 int main(void)
 {
     pthread_t thread[THREAD_NUMBER];
-    int no = 0, res;
-    void * thrd_ret;
+    int num = 0, res;
 
     srand(time(NULL));
 
     /* 互斥锁初始化 */
     pthread_mutex_init(&mutex, NULL);
-    for (no = 0; no < THREAD_NUMBER; no++)
+    for (num = 0; num < THREAD_NUMBER; num++)
     {
-        res = pthread_create(&thread[no], NULL, thrd_func, (void*)(unsigned long long)no);
+        res = pthread_create(&thread[num], NULL, thrd_func, (void*)(unsigned long long)num);
         if (res != 0)
         {
-            printf("Create thread %d failed\n", no);
+            printf("Create thread %d failed\n", num);
             exit(res);
         }
     }
 
-    printf("Create treads success\n Waiting for threads to finish...\n");
-    for (no = 0; no < THREAD_NUMBER; no++)
-    {
-        res = pthread_join(thread[no], &thrd_ret);
-        if (!res)
-        {
-            printf("Thread %d joined\n", no);
-        }
-        else
-        {
-            printf("Thread %d join failed\n", no);
-        }
 
-        /* 互斥锁解锁 */
-        pthread_mutex_unlock(&mutex);
+    for (num = 0; num < THREAD_NUMBER; num++)
+    {
+        pthread_join(thread[num], NULL);
     }
 
     pthread_mutex_destroy(&mutex);
