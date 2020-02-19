@@ -42,6 +42,7 @@
 
    linux_app/mount_nfs
    linux_app/gcc_hello_world
+   linux_app/makefile
    linux_app/filesystem_system_call
    linux_app/led_subsystem
    linux_app/gpio_subsystem
