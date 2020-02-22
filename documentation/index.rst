@@ -38,7 +38,6 @@
 
    linux_basis/ebf6ull_hardware
    linux_basis/fire-config_brief
-   linux_basis/fire-config_flash
    linux_basis/board_startup
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
