@@ -403,7 +403,7 @@ fire-config连接wifi
 ~~~~~~~~~~~~~~
 
 wifi配置前提
-------------------
+^^^^^^^^^^^^^
 
 - wifi与sd卡共用同一个sdio接口，进行配置wifi之前，要先通过fire-config工具来刷机。
   确认开发板可以正常从nandflash或者eMMC启动后，才能进行wifi的配置连接。
@@ -414,6 +414,8 @@ wifi配置前提
    :align: center
    :alt: fire-config刷机
 
+wifi连接步骤
+^^^^^^^^^^^^^
 
 1、在终端执行sudo fire-config命令，选择"wifi"项。
 如下图:
