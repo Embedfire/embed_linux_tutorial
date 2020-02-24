@@ -42,7 +42,7 @@
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
-
+   linux_basis/ec20_4g_module
 
 .. toctree::
    :maxdepth: 1
