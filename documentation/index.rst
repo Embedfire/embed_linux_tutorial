@@ -29,7 +29,7 @@
    linux_basis/command_line
    linux_basis/software_package
    linux_basis/editor
-   linux_basus/git_tutorial
+   linux_basis/git_tutorial
    
 
 .. toctree::
