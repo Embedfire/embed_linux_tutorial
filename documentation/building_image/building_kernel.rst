@@ -54,7 +54,7 @@ clone命令去克隆nxp官方提供的内核镜像，这样子就能保留镜像
    git clone git://git.freescale.com/imx/linux-imx.git
 
 由于网站是国外的，可能会非常慢，甚至出现下载失败现象，建议使用野火资料包中的
-源码进行开发，我们已经将源码提交到腾讯云开发者平台，直接使用git clone命令克隆内核镜像即可：
+源码进行开发，我们已经将源码提交到gitee平台，直接使用git clone命令克隆内核镜像即可：
 
 注意：我们修改的镜像名字是imx-linux，与官方命名刚好相反以便于区分。
 
@@ -62,8 +62,11 @@ clone命令去克隆nxp官方提供的内核镜像，这样子就能保留镜像
 
 .. code-block:: sh
    :linenos:
-
-   git clone https://git.dev.tencent.com/flyleaf91/imx-linux.git
+   #github地址
+   git clone https://github.com/Embedfire/ebf_6ull_linux.git
+   
+   #若github太慢，可使用gitee地址
+   git clone https://gitee.com/wildfireteam/ebf_6ull_linux.git
 
 运行结果
 
