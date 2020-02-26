@@ -37,9 +37,11 @@ gedit 要打开或新建的文件名
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-gedit /etc/apt/sources.list #以普通用户身份打开配置文件
+.. code-block:: sh
+   :linenos:
 
-sudo gedit /etc/apt/sources.list #使用sudo增加权限打开配置文件
+   gedit /etc/apt/sources.list #以普通用户身份打开配置文件
+   sudo gedit /etc/apt/sources.list #使用sudo增加权限打开配置文件
 
 .. image:: media/editor003.png
    :align: center
@@ -61,13 +63,13 @@ Linux新手在配置开发环境时，对Linux本来就不熟悉，刚学习配�
 
 例如：
 
-#使用sudo权限通过vim打开文件
+.. code-block:: sh
+   :linenos:
 
-sudo vim /etc/apt/sources.list
-
-#使用sudo权限通过gedit打开文件
-
-sudo gedit /etc/apt/sources.list
+   #使用sudo权限通过vim打开文件
+   sudo vim /etc/apt/sources.list
+   #使用sudo权限通过gedit打开文件
+   sudo gedit /etc/apt/sources.list
 
 以上命令区别仅为“vim”和“gedit”，即使是Vim编辑器同样也是需要sudo权限才能对文件进行编辑的，如果不使用sudo，以普通用户的身份使用Vim编辑器打开配置文件，同样也是只有“只读”权限。所以，千万不要把Vi/Vim编辑器神圣化了。
 
@@ -119,7 +121,10 @@ VS Code 的安装步骤如下：
 
 (3) 如果想体验命令行安装deb包，可以使用以下命令：
 
-sudo dpkg -i 安装包的名字
+.. code-block:: sh
+   :linenos:
+
+   sudo dpkg -i 安装包的名字
 
 使用命令行安装过程如下图所示。
 
@@ -131,7 +136,6 @@ sudo dpkg -i 安装包的名字
 
 (4) 安装完成后，可以通过“显示应用程序“中打开，如下图所示。
 
-..
 
 .. image:: media/editor010.png
    :align: center
@@ -152,7 +156,10 @@ code
 
 (5) 类似地，如果希望用VS Code修改配置文件，使用sudo命令增加权限即可：
 
-sudo code 文件名 --user-data-dir
+.. code-block:: sh
+   :linenos:
+
+   sudo code 文件名 --user-data-dir
 
 其中的“--user-data-dir”参数是VS Code提示要输入的，如下图所示。
 
@@ -214,22 +221,29 @@ Vim使用演示
 
 在Ubuntu下，使用apt可安装Vim编辑器，执行如下命令安装：
 
-sudo apt install vim
+.. code-block:: sh
+   :linenos:
+
+   sudo apt install vim
 
 打开Vi/Vim
 ''''''''''''''''''''''''''''''''
 
 安装后使用vi或vim命令都可以打开，它们的基础使用方法是一样的：
 
-vi #若系统安装了vim，该命令会自动打开vim软件
+.. code-block:: sh
+   :linenos:
 
-vim #打开vim软件
+   vi #若系统安装了vim，该命令会自动打开vim软件
+   vim #打开vim软件
 
 也可以使用如下命令创建或打开文件：
 
-vi 文件名 #若文件存在则打开，文件不存在则创建
+.. code-block:: sh
+   :linenos:
 
-vim 文件名
+   vi 文件名 #若文件存在则打开，文件不存在则创建
+   vim 文件名
 
 退出Vim
 '''''''''''''''''''''''''
@@ -394,11 +408,19 @@ set hlsearch 搜索结果高亮显示
 
 在终端中执行行下列命令：
 
-vim hello_world.sh
+.. code-block:: sh
+   :linenos:
 
-然后进入插入模式（在一般模式下按“i”键），输入下列代码后，保存文件并退出（退出插入模式，进入命令行模式后，输入wq并回车），注意以下内容全为英文符号。
+   vim hello_world.sh
 
-echo "helloworld,this is a script test!"
+然后进入插入模式（在一般模式下按“i”键），输入下列代码后，保存文
+件并退出（退出插入模式，进入命令行模式后，输入wq并回车），注意以下内
+容全为英文符号。
+
+.. code-block:: sh
+   :linenos:
+
+   echo "helloworld,this is a script test!"
 
 此脚本文件中的echo命令的作用是将其后面的文本内容直接输出到终端上。
 
@@ -410,7 +432,10 @@ echo "helloworld,this is a script test!"
 
 Vim退出后回到终端，通过source命令运行刚刚编写的脚本文件：
 
-source hello_world.sh
+.. code-block:: sh
+   :linenos:
+
+   source hello_world.sh
 
 可以看到终端会输出“helloworld,this is a script test!”字样。
 

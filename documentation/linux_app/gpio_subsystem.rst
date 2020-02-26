@@ -26,31 +26,22 @@ GPIO驱动子系统导出到用户空间的目录是“/sys/class/gpio”。
 
 可使用如下命令查看：
 
-#在主机或开发板的终端使用以下命令查看
+.. code-block:: sh
+   :linenos:
 
-ls -lh /sys/class/gpio
-
-#以下命令不支持在Ubuntu主机上运行
-
-#请在开发板的终端上执行如下命令：
-
-#请在开发板的终端上执行如下命令：
-
-#导出GPIO到用户空间
-
-echo 19 > /sys/class/gpio/export
-
-#查看目录的变化，增加了gpio19目录
-
-ls /sys/class/gpio/
-
-#把gpio19从用户空间中取消导出
-
-echo 19 > /sys/class/gpio/unexport
-
-#查看目录变化，gpio19目录消失了
-
-ls /sys/class/gpio/
+   #在主机或开发板的终端使用以下命令查看
+   ls -lh /sys/class/gpio
+   #以下命令不支持在Ubuntu主机上运行
+   #请在开发板的终端上执行如下命令：
+   #请在开发板的终端上执行如下命令：
+   #导出GPIO到用户空间
+   echo 19 > /sys/class/gpio/export
+   #查看目录的变化，增加了gpio19目录
+   ls /sys/class/gpio/
+   #把gpio19从用户空间中取消导出
+   echo 19 > /sys/class/gpio/unexport
+   #查看目录变化，gpio19目录消失了
+   ls /sys/class/gpio/
 
 .. image:: media/gpiosu002.png
    :align: center
@@ -84,15 +75,14 @@ GPIO设备属性
 
 gpioN目录下相关的设备文件，可以使用以下命令查看：
 
-#在开发板的终端使用以下命令
+.. code-block:: sh
+   :linenos:
 
-#导出编号为19的GPIO
-
-echo 19 > /sys/class/gpio/export
-
-#查看gpio19目录下的内容
-
-ls -lh /sys/class/gpio/gpio19
+   #在开发板的终端使用以下命令
+   #导出编号为19的GPIO
+   echo 19 > /sys/class/gpio/export
+   #查看gpio19目录下的内容
+   ls -lh /sys/class/gpio/gpio19
 
 .. image:: media/gpiosu002.png
    :align: center
@@ -173,27 +163,20 @@ index = GPIOn_IOx = (n-1)*32 + x
 
 由于在Ubuntu主机通常无法导出GPIO，请在开发板上执行以下命令测试：
 
-#以下命令在开发板上执行
+.. code-block:: sh
+   :linenos:
 
-#导出蜂鸣器使用的GPIO到用户空间
-
-echo 19 > /sys/class/gpio/export
-
-#确认出现了gpio19设备目录
-
-ls /sys/class/gpio/
-
-#控制gpio19方向为输出
-
-echo out > /sys/class/gpio/gpio19/direction
-
-#控制gpio19输出高电平
-
-echo 1 > /sys/class/gpio/gpio19/value
-
-#控制gpio19输出低电平
-
-echo 0 > /sys/class/gpio/gpio19/value
+   #以下命令在开发板上执行
+   #导出蜂鸣器使用的GPIO到用户空间
+   echo 19 > /sys/class/gpio/export
+   #确认出现了gpio19设备目录
+   ls /sys/class/gpio/
+   #控制gpio19方向为输出
+   echo out > /sys/class/gpio/gpio19/direction
+   #控制gpio19输出高电平
+   echo 1 > /sys/class/gpio/gpio19/value
+   #控制gpio19输出低电平
+   echo 0 > /sys/class/gpio/gpio19/value
 
 .. image:: media/gpiosu002.png
    :align: center
@@ -386,11 +369,12 @@ echo 0 > /sys/class/gpio/gpio19/value
 
 对于ARM架构的程序，可使用如下步骤进行编译：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#编译arm平台的程序
-
-make ARCH=arm
+   #在主机的实验代码Makefile目录下编译
+   #编译arm平台的程序
+   make ARCH=arm
 
 编译后生成的ARM平台程序为build_arm/beep_demo，使用网络文件系统共
 享至开发板，在开发板的终端上运行该程序测试即可。

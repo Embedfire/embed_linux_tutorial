@@ -10,13 +10,18 @@
 SD卡创建分区
 ~~~~~~~
 
-和前面的原理类似，即先将一个媒介镜像烧写到SD卡上，系统在SD卡启动后，再将保存在SD卡的系统烧写到NAND Flash或emmc中，然后再将系统配置为从NAND启动，从而更新系统。
+和前面的原理类似，即先将一个媒介镜像烧写到SD卡上，系统在SD卡启动后，再将保
+存在SD卡的系统烧写到NAND Flash或emmc中，然后再将系统配置为从NAND启动，从
+而更新系统。
 
 提示：整个实验使用野火提供的资料源码与镜像即可。
 
-首先需要准备一张SD卡与一个读卡器，开发环境为ubuntu14.04虚拟机，使用读卡器将SD卡连接到电脑USB中，然后在虚拟机中将SD卡格式化，再将系统文件拷贝到SD卡中，具体操作如下。
+首先需要准备一张SD卡与一个读卡器，开发环境为ubuntu14.04虚拟机，使用读
+卡器将SD卡连接到电脑USB中，然后在虚拟机中将SD卡格式化，再将系统文件拷贝
+到SD卡中，具体操作如下。
 
-首先通过sudo fdisk /dev/sdb命令对SD卡进行分区，然后通过对应的命令对SD卡进行操作，如p：打印分区表，d：删除分区，n：添加新分区等等，具体命令如下：
+首先通过sudo fdisk /dev/sdb命令对SD卡进行分区，然后通过对应的命令对SD卡
+进行操作，如p：打印分区表，d：删除分区，n：添加新分区等等，具体命令如下：
 
 提示：fdisk命令产生的更改将停留在内存中，直到您决定将更改写入磁盘。
 
@@ -139,7 +144,12 @@ w 将分区表写入磁盘并退出
 
 uuu uboot.imx
 
-命令：ls /dev/ \| grep sdb
+命令：
+
+.. code-block:: sh
+   :linenos:
+
+   ls /dev/ \| grep sdb
 
 输出：
 
@@ -150,14 +160,21 @@ sdbsdb1sdb2
 
 首先将野火提供的SD卡启动的资料包放入虚拟机，放入的目录可以随意选择，如我是直接放到家目录下，u-boot/sd_update/root存在以下内容：
 
-embedfire@ embedfire:~/u-boot/sd_update/root$ lsmfg-images-emmc update_nand_boot.scrmfg-images-nand zImagerelease.txt zImage-imx6ull-14x14-evk-emmc-
-update.dtbrootfs.cpio.gz zImage-imx6ull-14x14-evk-gpmi-weim-update.dtbu-boot-sd-2016.03-r0.imx update_emmc_boot.scr
+.. code-block:: sh
+   :linenos:
+
+
+   embedfire@ embedfire:~/u-boot/sd_update/root$ lsmfg-images-emmc update_nand_boot.scrmfg-images-nand zImagerelease.txt zImage-imx6ull-14x14-evk-emmc-
+   update.dtbrootfs.cpio.gz zImage-imx6ull-14x14-evk-gpmi-weim-update.dtbu-boot-sd-2016.03-r0.imx update_emmc_boot.scr
 
 u-boot-sd-2016.03-r0.imx是我们需要烧写到SD卡的Uboot，我们可以使用以下命令将进行烧录：
 
 输入命令：
 
-sudo dd if=~/u-boot/sd_update/root/u-boot-sd-2016.03-r0.imx of=/dev/sdb bs=512 seek=2 conv=fsync
+.. code-block:: sh
+   :linenos:
+
+   sudo dd if=~/u-boot/sd_update/root/u-boot-sd-2016.03-r0.imx of=/dev/sdb bs=512 seek=2 conv=fsync
 
 输出：
 
@@ -170,25 +187,52 @@ sudo dd if=~/u-boot/sd_update/root/u-boot-sd-2016.03-r0.imx of=/dev/sdb bs=512 s
 
 因为是从SD卡烧录到NAND Flash或者emmc，因此SD卡要保存烧录到NAND Flash或者emmc的文件，首先要将SD卡的分区进行格式化，用于保存这些文件，具体操作过程如下：
 
-输入命令：sudo mkfs.vfat /dev/sdb1
+输入命令：
+
+.. code-block:: sh
+   :linenos:
+
+   sudo mkfs.vfat /dev/sdb1
+
 
 输出：
 
-~$ mkfs.fat 4.1 (2017-01-24)mkfs.vfat: /dev/sdb1 contains a mounted filesystem.
+.. code-block:: sh
+   :linenos:
 
-输入命令：sudo mkfs.ext4 /dev/sdb2
+   ~$ mkfs.fat 4.1 (2017-01-24)mkfs.vfat: /dev/sdb1 contains a mounted filesystem.
 
-输出：mke2fs 1.44.1 (24-Mar-2018)
+输入命令：
 
-首先挂载SD卡，本次试验创建一个挂载目录mountpoint，将SD卡挂载到该目录下，然后将野火提供的SD卡启动的资料包中root目录下所有文件拷贝到fat格式分区（即sdb1）目录下，具体操作如下：
+.. code-block:: sh
+   :linenos:
+
+   sudo mkfs.ext4 /dev/sdb2
+
+输出：
+
+.. code-block:: sh
+   :linenos:
+
+   mke2fs 1.44.1 (24-Mar-2018)
+
+首先挂载SD卡，本次试验创建一个挂载目录mountpoint，将SD卡挂
+载到该目录下，然后将野火提供的SD卡启动的资料包中root目录下所
+有文件拷贝到fat格式分区（即sdb1）目录下，具体操作如下：
 
 挂载SD卡：
 
-mkdir mountpointsudo mount /dev/sdb1 mountpoint/
+.. code-block:: sh
+   :linenos:
+
+   mkdir mountpointsudo mount /dev/sdb1 mountpoint/
 
 拷贝root目录下所有文件到SD卡：
 
-sudo cp -r ~/u-boot/sd_update/root/\* ~/mountpoint/
+.. code-block:: sh
+   :linenos:
+
+   sudo cp -r ~/u-boot/sd_update/root/\* ~/mountpoint/
 
 查看拷贝后的内容：ls
 
@@ -202,21 +246,33 @@ update_emmc_boot.scr
 
 如果需要从SD卡烧录到NAND Flash，则将mfg-images-nand改名为mfg-images；如果
 需要从SD卡烧录到emmc，则将mfg-images-emmc改名为mfg-images；并且将update_nand_boot.scr改名为boot.scr，mfg-
-images文件夹中的文件相应的替换，并在Manifest中填写欲烧写文件的文件名即可。然后将sd卡插入开发板，将开发板的WiFi的跳帽取下，同时将boot的拨码开关 2/5/8 拨到 ON档，表示从SD卡启动，在SD卡烧写的时候红灯闪烁，烧写完毕，红灯常亮，烧写失败，红灯熄灭。
+images文件夹中的文件相应的替换，并在Manifest中填写欲烧写文件的文
+件名即可。然后将sd卡插入开发板，将开发板的WiFi的跳帽取下，同时
+将boot的拨码开关 2/5/8 拨到 ON档，表示从SD卡启动，在SD卡烧写的时
+候红灯闪烁，烧写完毕，红灯常亮，烧写失败，红灯熄灭。
 
 修改文件名字可以使用mv命令，具体如下：
 
 进入mountpoint目录：
 
-cd mountpoint/
+.. code-block:: sh
+   :linenos:
+
+   cd mountpoint/
 
 修改mfg-images-nand文件名字为mfg-images：
 
-sudo mv mfg-images-nand/ mfg-images/
+.. code-block:: sh
+   :linenos:
+
+   sudo mv mfg-images-nand/ mfg-images/
 
 修改update_nand_boot.scr文件为boot.scr：
 
-sudo mv update_nand_boot.scr boot.scr
+.. code-block:: sh
+   :linenos:
+
+   sudo mv update_nand_boot.scr boot.scr
 
 在烧录工程可以打开串口终端，查看开发板输出的信息，具体见下图。
 

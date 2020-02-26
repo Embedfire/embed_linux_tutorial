@@ -16,7 +16,10 @@ Linux没有提供类似Windows的任务管理器，但是它将系统运行的�
 
 #在开发板的终端执行以下命令
 
-ls /proc
+.. code-block:: sh
+   :linenos:
+
+   ls /proc
 
 
 .. image:: media/system002.png
@@ -25,9 +28,9 @@ ls /proc
 
 
 
-该目录下各文件包含的信息如表 12‑1所示。
+该目录下各文件包含的信息如下表所示。
 
-表 12‑1 /proc文件结构
+表   /proc文件结构
 
 =========== ================================================================================================================================================================================
 文件名      作用
@@ -49,7 +52,10 @@ filesystems 记录内核支持的文件系统类型，通常mount一个设备时
 
 /proc/cpuinfo文件存储了CPU的信息，可通过如下命令查看：
 
-cat /proc/cpuinfo
+.. code-block:: sh
+   :linenos:
+
+   cat /proc/cpuinfo
 
 .. image:: media/system003.jpg
    :align: center
@@ -65,7 +71,10 @@ cat /proc/cpuinfo
 
 /proc/version文件保存了内核的版本信息，我们可以通过如下命令来获取。
 
-cat /proc/version
+.. code-block:: sh
+   :linenos:
+
+   cat /proc/version
 
 .. image:: media/system004.png
    :align: center
@@ -77,7 +86,10 @@ cat /proc/version
 
 也可以通过如下命令获取：
 
-uname –a
+.. code-block:: sh
+   :linenos:
+
+   uname –a
 
 .. image:: media/system005.png
    :align: center
@@ -90,7 +102,10 @@ uname –a
 
 内核将内存的使用情况记录在/proc/meminfo文件中，我们可以通过读取该文件的内容，来了解我们内存的使用情况：
 
-cat /proc/meminfo
+.. code-block:: sh
+   :linenos:
+
+   cat /proc/meminfo
 
 .. image:: media/system006.png
    :align: center
@@ -101,7 +116,10 @@ cat /proc/meminfo
 
 通过free命令查看系统的内存大小：
 
-free
+.. code-block:: sh
+   :linenos:
+
+   free
 
 如下图所示，输出信息共有三行，六列。其中第一行记录了我们的内
 存使用情况，可以看到我们内存容量为494M（506268/1024），当前已
@@ -122,7 +140,10 @@ free
 
 可使用如下命令查看：
 
-cat /proc/partitions
+.. code-block:: sh
+   :linenos:
+
+   cat /proc/partitions
 
 其单位为blocks的数量，对于本示例的开发板，Nand-FLASH的每个Block大小为1024Byte，eMMC则为512Byte。
 
@@ -137,7 +158,9 @@ Nand-Flash存储器
 
 
 
-其中的mtdblock开头的都是属于Nand-FLASH存储器的数据块，把它们所有的blocks加起来就可以算出容量(每个block大小为1024Byte)：
+其中的mtdblock开头的都是属于Nand-FLASH存储器的数
+据块，把它们所有的blocks加起来就可以
+算出容量(每个block大小为1024Byte)：
 
 65536+16384+16384+163840 （Block）
 
@@ -158,7 +181,9 @@ eMMC存储器
 
 
 
-其中的mmcblk开头的都是属于eMMC存储器的数据块，把它们所有的blocks加起来就可以算出容量（每个block大小为512Byte）：
+其中的mmcblk开头的都是属于eMMC存储器的数
+据块，把它们所有的blocks加起来就可以算出
+容量（每个block大小为512Byte）：
 
 7634944+512000+7020544+512+4096+4096 （Block）
 
@@ -168,13 +193,18 @@ eMMC存储器
 
 =7.2 GByte
 
-算出的最终结果比8G小一点，这跟SD卡标称值比实际值小的原因一样，不要纠结。
+算出的最终结果比8G小一点，这跟SD卡标称值
+比实际值小的原因一样，不要纠结。
 
 查看任务进程
 ~~~~~~
 
-在/proc文件夹下，有很多以数字命名的文件夹，这些文件夹是用来记录当前正在运行的进程状态，文件名则是他们的pid号，每一个进程都对应一个pid号，用于辨识。这些进程文件夹中包含的内容，基本上是大同小异的。使用ls命令，来查看pid为1的文件夹内容，如图
-12‑9所示。其中，fd记录里当前进程使用的文件描述，mountinfo记录了挂载信息，mem则记录了该进程的内存使用情况等。
+在/proc文件夹下，有很多以数字命名的文件夹，这些文件
+夹是用来记录当前正在运行的进程状态，文件名则是他们
+的pid号，每一个进程都对应一个pid号，用于辨识。这些
+进程文件夹中包含的内容，基本上是大同小异的。使
+用ls命令，来查看pid为1的文件夹内容，如下图所示。其中，fd记
+录里当前进程使用的文件描述，mountinfo记录了挂载信息，mem则记录了该进程的内存使用情况等。
 
 .. image:: media/system010.jpg
    :align: center
@@ -182,10 +212,15 @@ eMMC存储器
 
 
 
-除了上面使用的这种方式，常用的还有top命令。该命令的功能类似于windows的任务管理器，执行效果
-如上图所示，该命令可以会实时地更新每个进程的使用情况，按下“q”键或“Ctrl + C”，就可以退出该命令。
+除了上面使用的这种方式，常用的还有top命令。该命令的功
+能类似于windows的任务管理器，执行效果
+如上图所示，该命令可以会实时地更新每个进程的使用
+情况，按下“q”键或“Ctrl + C”，就可以退出该命令。
 
-top
+.. code-block:: sh
+   :linenos:
+
+   top
 
 .. image:: media/system011.jpg
    :align: center
@@ -199,8 +234,10 @@ top
 cat /proc/filesystems
 
 /proc/filesystems可以用来查看内核支持的文件系
-统类型，如上图所示。图中有部分文件系统前带有“nodev”标志，表示
-这些文件系统不需要挂载块设备，如网络文件系统nfs/nfs4，伪文件系统sysfs等。
+统类型，如上图所示。图中有部分文件系统前
+带有“nodev”标志，表示
+这些文件系统不需要挂载块设备，如网络文
+件系统nfs/nfs4，伪文件系统sysfs等。
 
 .. image:: media/system012.jpg
    :align: center
@@ -215,7 +252,10 @@ cat /proc/filesystems
 息，如文件/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq包含了CPU当
 前的主频信息，若系统存在该文件，可以把它的内容输出来查看：
 
-cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq
+.. code-block:: sh
+   :linenos:
+
+   cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq
 
 .. image:: media/system013.png
    :align: center

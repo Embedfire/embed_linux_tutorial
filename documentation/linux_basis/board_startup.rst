@@ -165,7 +165,10 @@ i.MX系列芯片支持多种启动方式，在我们配套的开发板上主要�
 
 #在开发板的终端执行以下命令
 
-ping www.firebbs.cn
+.. code-block:: sh
+   :linenos:
+
+   ping www.firebbs.cn
 
 
 .. image:: media/boards008.png
@@ -183,7 +186,10 @@ ping路由测试
 若连接的路由不支持连接到公网，可以直接ping路由的IP地址，如本例子中的路由IP地址为192.168.0.1。请把以
 下命令中的IP地址换成自己实验环境的路由IP：
 
-ping 192.168.0.1
+.. code-block:: sh
+   :linenos:
+
+   ping 192.168.0.1
 
 查看开发板的IP地址
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -200,7 +206,10 @@ ping 192.168.0.1
 在上图中开发板使用ifconfig命令可查看到开发板eth0网口的IP地址，为192.168.0.177。若
 使用ifconfig命令查看不到IP地址，请检查网络连接，或尝试使用以下命令申请IP：
 
-udhcpc  -b  -i  eth0
+.. code-block:: sh
+   :linenos:
+
+   udhcpc  -b  -i  eth0
 
 若命令执行正常，会出现图 11‑9中的输出，并且再次输入ifconfig命令会查看到eth0具有正常的IP地址。
 

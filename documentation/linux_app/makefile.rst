@@ -80,33 +80,49 @@ test.txt”等命令前要使用Tab键，不能使用空格代替。
 
 #查看当前目录的内容
 
-ls
+.. code-block:: sh
+   :linenos:
+
+   ls
 
 #执行make命令，make会在当前目录下搜索“Makefile”或“makefile”，并执行
 
-make
+.. code-block:: sh
+   :linenos:
+
+   make
 
 #可看到make命令后的输出，它执行了Makefile中编写的命令
 
 #查看执行make命令后的目录内容，多了test.txt文件
 
-ls
+.. code-block:: sh
+   :linenos:
+
+   ls
 
 #执行Makefile的targetd目标，并查看，少了test.txt文件
 
-make targetd
+.. code-block:: sh
+   :linenos:
 
-ls
+   make targetd
+   ls
 
 #执行Makefile的targetb目标，并查看，又生成了test.txt文件
 
-make targetb
+.. code-block:: sh
+   :linenos:
 
-ls
+   make targetb
+   ls
 
 #执行Makefile的targetc目标
 
-make targetc
+.. code-block:: sh
+   :linenos:
+
+   make targetc
 
 .. image:: media/makefi002.jpg
    :align: center
@@ -191,11 +207,17 @@ make targetd 、make targetb、make targetc命令：
 
 #注意最后的“-I .”包含名点“.”
 
-gcc -o hello_main hello_main.c hello_func.c -I .
+.. code-block:: sh
+   :linenos:
+
+   gcc -o hello_main hello_main.c hello_func.c -I .
 
 #运行生成的hello_main程序
 
-./hello_main
+.. code-block:: sh
+   :linenos:
+
+   ./hello_main
 
 .. image:: media/makefi003.png
    :align: center
@@ -250,33 +272,48 @@ hello_main”设置成一致了，也就是说，此处的目标hello_main在Mak
 
 #若之前有编译生成hello_main程序，先删除
 
-rm hello_main
+.. code-block:: sh
+   :linenos:
 
-ls
+   rm hello_main
+   ls
 
 #使用make根据Makefile编译程序
 
-make
+.. code-block:: sh
+   :linenos:
 
-ls
+   make
+   ls
 
 #执行生成的hello_main程序
 
-./hello_main
+.. code-block:: sh
+   :linenos:
+
+   ./hello_main
 
 #再次make，会提示hello_main文件已是最新
 
-make
+.. code-block:: sh
+   :linenos:
+
+   make
 
 #使用touch命令更新一下hello_func.c的时间
 
-touch hello_func.c
+.. code-block:: sh
+   :linenos:
+
+   touch hello_func.c
 
 #再次make，由于hello_func.c比hello_main新，所以会再编译
 
-make
+.. code-block:: sh
+   :linenos:
 
-ls
+   make
+   ls
 
 .. image:: media/makefi004.png
    :align: center
@@ -284,9 +321,11 @@ ls
 
 
 
-如上图所示，有了Makefile后，我们实际上只需要执行一下make命令就可以完成整个编译流程。
+如上图所示，有了Makefile后，我们实际上只需要执行一下make命令就可以完成
+整个编译流程。
 
-图中还演示了make会对目标文件和依赖进行更新检查，当依赖文件有改动时，才会再
+图中还演示了make会对目标文件和依赖进行更新检查，当依赖文件
+有改动时，才会再
 次执行命令更新目标文件。
 
 目标与依赖
@@ -470,7 +509,10 @@ o文件时，会查找目录下的同名xxx.c文件进行编译。根据这样
 
 当我们想使用变量时，其语法如下：
 
-$(变量名)
+.. code-block:: sh
+   :linenos:
+
+   $(变量名)
 
 下面通过一个实验来讲解这四种定义方式，对于后两种赋值方式
 比较简单，主要思考延时赋值和直接赋值的差异，实验代码如下所示。
@@ -547,11 +589,12 @@ FILEB。
 
 #当“%”匹配的字符为“hello_func”的话：
 
-$(CC) -c -o $@ $< $(CFLAGS)
+.. code-block:: sh
+   :linenos:
 
-#等价于：
-
-gcc -c -o hello_func.o func_func.c -I .
+   $(CC) -c -o $@ $< $(CFLAGS)
+   #等价于：
+   gcc -c -o hello_func.o func_func.c -I .
 
 也就是说以上代码利用变量及自动化变量，重写了o文件的默认生成
 规则，并且增加了头文件的依赖。
@@ -622,15 +665,14 @@ $?   所有比目标要新的依赖目标
 为方便直接切换GCC编译器，我们还可以使用条件分支增加切换编译器
 的功能。在Makefile中的条件分支语法如下：
 
-ifeq(arg1, arg2)
+.. code-block:: sh
+   :linenos:
 
-分支1
-
-else
-
-分支2
-
-endif
+   ifeq(arg1, arg2)
+   分支1
+   else
+   分支2
+   endif
 
 分支会比较括号内的参数“arg1”和“arg2”的值是否相
 同，如果相同，则为真，执行分支1的内容，否则的话，执行分支2 的内容，参
@@ -679,21 +721,17 @@ Makefile主要是增加了ARCH变量用于选择目标平台，第4行代
 
 在执行make命令的时候，通过给ARCH赋予不同的变量值切换不同的编译器平台：
 
-#清除编译输出，确保不受之前的编译输出影响
+.. code-block:: sh
+   :linenos:
 
-make clean
-
-#使用ARM平台
-
-make ARCH=arm
-
-#清除编译输出
-
-make clean
-
-#默认是x86平台
-
-make
+   #清除编译输出，确保不受之前的编译输出影响
+   make clean
+   #使用ARM平台
+   make ARCH=arm
+   #清除编译输出
+   make clean
+   #默认是x86平台
+   make
 
 .. image:: media/makefi008.png
    :align: center
@@ -723,11 +761,12 @@ make
 在Makefile中调用函数的方法跟变量的使用
 类似，以“$()”或“${}”符号包含函数名和参数，具体语法如下：
 
-$(函数名 参数)
+.. code-block:: sh
+   :linenos:
 
-#或者使用花括号
-
-${函数名 参数}
+   $(函数名 参数)
+   #或者使用花括号
+   ${函数名 参数}
 
 下面以常用的notdir、patsubst、wildcard函数为例
 进行讲解，并且示例中都是我们后面Makefile中使用到的内容。
@@ -737,18 +776,22 @@ notdir函数
 
 notdir函数用于取输入参数中的文件名。它的格式如下：
 
-$(notdir 文件名)
+.. code-block:: sh
+   :linenos:
+
+   $(notdir 文件名)
 
 例如输入参数“./sources/hello_func.c”，函数执行后
 的输出为“hell_func.c”，也就是说它会把输入中的“./sources/”路径部分去掉，保留
 文件名。使用范例如下：
 
-#以下是范例
+.. code-block:: sh
+   :linenos:
 
-$(notdir ./sources/hello_func.c)
+   #以下是范例
+   $(notdir ./sources/hello_func.c)
 
 #上面的函数执行后会把路径中的“./sources/”部分去掉，输出为：
-
 hello_func.c
 
 wildcard函数
@@ -761,37 +804,50 @@ $(wildcard 匹配规则)
 例如函数调用“$(wildcard \*.c)”，函数执行后会把当前目录的所
 有c文件列出。假设我们在上图中的Makefile目录下执行该函数，使用范例如下：
 
-#在sources目录下有hello_func.c、hello_main.c、test.c文件
+.. code-block:: sh
+   :linenos:
 
-#执行如下函数
+   #在sources目录下有hello_func.c、hello_main.c、test.c文件
+   #执行如下函数
+   $(wildcard sources/*.c)
+   #函数的输出为：
+   sources/hello_func.c sources/hello_main.c sources/test.c
 
-$(wildcard sources/*.c)
 
-#函数的输出为：
-
-sources/hello_func.c sources/hello_main.c sources/test.c
 
 patsubst函数
 ''''''''''''''''''''''''''''''
 
 patsubst函数功能为模式字符串替换。它的格式如下：
 
-$(patsubst 匹配规则, 替换规则, 输入的字符串)
+.. code-block:: sh
+   :linenos:
+
+   $(patsubst 匹配规则, 替换规则, 输入的字符串)
 
 当输入的字符串符合匹配规则，那么使用替换规则来替换字符串，当匹配规则中有“%”号时，替换规
 则也可以例程“%”号来提取“%”匹配的内容加入到最后替换的字符串中。有点抽象，请直接阅读以下示例：
 
 #执行如下函数
 
-$(patsubst %.c, build_dir/%.o, hello_main.c )
+.. code-block:: sh
+   :linenos:
+
+   $(patsubst %.c, build_dir/%.o, hello_main.c )
 
 #函数的输出为：
 
-build_dir/hello_main.o
+.. code-block:: sh
+   :linenos:
+
+   build_dir/hello_main.o
 
 #执行如下函数
 
-$(patsubst %.c, build_dir/%.o, hello_main.xxx )
+.. code-block:: sh
+   :linenos:
+
+   $(patsubst %.c, build_dir/%.o, hello_main.xxx )
 
 #由于hello_main.xxx不符合匹配规则“%.c”，所以函数没有输出
 
@@ -898,11 +954,17 @@ r/hello_main.o”。
 
 #若提示找不到命令，使用 sudo apt install tree安装
 
-tree
+.. code-block:: sh
+   :linenos:
+
+   tree
 
 #编译
 
-make
+.. code-block:: sh
+   :linenos:  
+
+   make
 
 .. image:: media/makefi010.png
    :align: center
@@ -910,7 +972,8 @@ make
 
 
 
-本示例中的Makefile目前只支持使用一个源文件目录，如果有多个源文件目录还需要改进，关于这些，我们在以后的学习中继续积累。
+本示例中的Makefile目前只支持使用一个源文件目录，如果有多个源文
+件目录还需要改进，关于这些，我们在以后的学习中继续积累。
 
 
 

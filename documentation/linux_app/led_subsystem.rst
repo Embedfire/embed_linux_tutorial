@@ -21,17 +21,26 @@ LED设备目录
 
 #在主机或ARM板的终端上执行如下命令：
 
-ls /sys/class/leds/
+.. code-block:: sh
+   :linenos:
+
+   ls /sys/class/leds/
 
 #根据具体的目录内容继续查看：
 
 #在主机上有input2::capslock目录，可在主机执行如下命令查看
 
-ls /sys/class/leds/input2::capslock
+.. code-block:: sh
+   :linenos:
+
+   ls /sys/class/leds/input2::capslock
 
 #在开发板上有cpu目录，可在开发板上执行如下命令查看
 
-ls /sys/class/leds/cpu
+.. code-block:: sh
+   :linenos:
+
+   ls /sys/class/leds/cpu
 
 .. image:: media/ledsub002.png
    :align: center
@@ -46,8 +55,8 @@ ls /sys/class/leds/cpu
 
 
 上图可看到，示例中的Ubuntu主机和开发板/sys/class/leds下包含了以LED设备名
-字命名的目录，如“input2::capslock”、“input2::numlock”和“blue”、“cpu”等LED灯，这些目
-录对应的具体LED灯如下表所示。
+字命名的目录，如“input2::capslock”、“input2::numlock”和“blue”、“cpu”等LED灯，这
+些目录对应的具体LED灯如下表所示。
 
 表  /sys/class/leds下目录对应的设备
 
@@ -77,9 +86,10 @@ LED设备属性
    表示LED为点亮状态，0值表示灭状态。
 
 -  trigger文件：则指示了LED灯的触发方式，查看该文件的内容时，该文件会
-   列出它的所有可用触方式，而当前使用的触发方式会以“[]”符号括起。常见的触发方式如表 20‑2。
+   列出它的所有可用触方式，而当前使用的触发方式会以“[]”符号括起。常见的触
+   发方式如下表所示。
 
-表 20‑2 trigger常见的触发方式
+表 trigger常见的触发方式
 
 ============= ==============
 触发方式      说明
@@ -97,27 +107,22 @@ heartbeat     系统心跳
 
 下面通过命令行控制LED来讲解LED设备属性文件的应用。
 
-首先以主机Ubuntu上的“input2::capslock”大写锁定指示灯的文件状态为例，按以下流程进行操作：
+首先以主机Ubuntu上的“input2::capslock”大写锁定指示灯的文件
+状态为例，按以下流程进行操作：
 
-#以下命令在主机上执行
+.. code-block:: sh
+   :linenos:
 
-#请把“input2::capslock”替换为自己主机上的大写锁定指示灯的设备名字
-
-#查看max_brightness文件内容
-
-cat /sys/class/leds/input2\:\:capslock/max_brightness
-
-#查看trigger文件内容
-
-cat /sys/class/leds/input2\:\:capslock/trigger
-
-#查看brightness文件内容
-
-cat /sys/class/leds/input2\:\:capslock/brightness
-
-#按下键盘的CapsLock大写锁定键（Shift键的上面），再次查看brightness文件的内容
-
-cat /sys/class/leds/input2\:\:capslock/brightness
+   #以下命令在主机上执行
+   #请把“input2::capslock”替换为自己主机上的大写锁定指示灯的设备名字
+   #查看max_brightness文件内容
+   cat /sys/class/leds/input2\:\:capslock/max_brightness
+   #查看trigger文件内容
+   cat /sys/class/leds/input2\:\:capslock/trigger
+   #查看brightness文件内容
+   cat /sys/class/leds/input2\:\:capslock/brightness
+   #按下键盘的CapsLock大写锁定键（Shift键的上面），再次查看brightness文件的内容
+   cat /sys/class/leds/input2\:\:capslock/brightness
 
 .. image:: media/ledsub004.jpg
    :align: center
@@ -132,21 +137,20 @@ cat /sys/class/leds/input2\:\:capslock/brightness
 htness文件的内容，可发现它的内容已变为“1”，也就是说它与键盘上大写锁定指
 示灯的状态是一致的。 “NumLock”或“ScrollLock”指示灯也是类似的。
 
-特别地，brightness和trigger文件都是可写的，当trigger文件的内容为none时，直接修改brightness的内容即可控制LED设备的亮度。
+特别地，brightness和trigger文件都是可写的，当trigger文件的内容为none时，直接修
+改brightness的内容即可控制LED设备的亮度。
 
 在主机上执行以下命令：
 
-#在主机执行以下命令：
+.. code-block:: sh
+   :linenos:
 
-#请把“input2::capslock”替换为自己主机上的大写锁定指示灯的设备名字
-
-#点亮大写锁定指示灯
-
-sudo sh -c 'echo 1 > /sys/class/leds/input2\:\:capslock/brightness'
-
-#关闭大写锁定指示灯
-
-sudo sh -c 'echo 0 > /sys/class/leds/input2\:\:capslock/brightness'
+   #在主机执行以下命令：
+   #请把“input2::capslock”替换为自己主机上的大写锁定指示灯的设备名字
+   #点亮大写锁定指示灯
+   sudo sh -c 'echo 1 > /sys/class/leds/input2\:\:capslock/brightness'
+   #关闭大写锁定指示灯
+   sudo sh -c 'echo 0 > /sys/class/leds/input2\:\:capslock/brightness'
 
 .. image:: media/ledsub005.png
    :align: center
@@ -160,33 +164,23 @@ sudo sh -c 'echo 0 > /sys/class/leds/input2\:\:capslock/brightness'
 
 类似地，我们也可以使用同样的方式控制开发板的LED设备：
 
-#以下命令在开发板的终端上执行
+.. code-block:: sh
+   :linenos:
 
-#查看red灯的最大亮度值
-
-cat /sys/class/leds/red/max_brightness
-
-#查看red灯的触发方式
-
-cat /sys/class/leds/red/trigger
-
-#查看red灯当前的亮度值
-
-cat /sys/class/leds/red/brightness
-
-#开发板上LED灯默认可能处于亮的状态，我们先把它们全部关闭再一点亮
-
-echo 0 > /sys/class/leds/red/brightness #关闭red灯
-
-echo 0 > /sys/class/leds/blue/brightness #关闭blue灯
-
-echo 0 > /sys/class/leds/green/brightness #关闭green灯
-
-echo 255 > /sys/class/leds/red/brightness #设置red灯亮度值255
-
-echo 127 > /sys/class/leds/red/brightness #设置red灯亮度值127
-
-echo 10 > /sys/class/leds/red/brightness #设置red灯亮度值10
+   #以下命令在开发板的终端上执行
+   #查看red灯的最大亮度值
+   cat /sys/class/leds/red/max_brightness
+   #查看red灯的触发方式
+   cat /sys/class/leds/red/trigger
+   #查看red灯当前的亮度值
+   cat /sys/class/leds/red/brightness
+   #开发板上LED灯默认可能处于亮的状态，我们先把它们全部关闭再一点亮
+   echo 0 > /sys/class/leds/red/brightness #关闭red灯
+   echo 0 > /sys/class/leds/blue/brightness #关闭blue灯
+   echo 0 > /sys/class/leds/green/brightness #关闭green灯
+   echo 255 > /sys/class/leds/red/brightness #设置red灯亮度值255
+   echo 127 > /sys/class/leds/red/brightness #设置red灯亮度值127
+   echo 10 > /sys/class/leds/red/brightness #设置red灯亮度值10
 
 .. image:: media/ledsub006.png
    :align: center
@@ -204,19 +198,16 @@ echo 10 > /sys/class/leds/red/brightness #设置red灯亮度值10
 
 通过如下命令可查看及修改触发方式：
 
-#以下命令在开发板上的终端上执行
+.. code-block:: sh
+   :linenos:
 
-#查看触发方式
-
-cat /sys/class/leds/cpu/trigger
-
-#修改触发方式为none
-
-echo none > /sys/class/leds/cpu/trigger
-
-#修改触发方式为heartbeat
-
-echo heartbeat > /sys/class/leds/cpu/trigger
+   #以下命令在开发板上的终端上执行
+   #查看触发方式
+   cat /sys/class/leds/cpu/trigger
+   #修改触发方式为none
+   echo none > /sys/class/leds/cpu/trigger
+   #修改触发方式为heartbeat
+   echo heartbeat > /sys/class/leds/cpu/trigger
 
 .. image:: media/ledsub007.png
    :align: center
@@ -237,8 +228,6 @@ echo heartbeat > /sys/class/leds/cpu/trigger
 本小节的示例代码目录为：led/sys_class_leds/c_stdio。
 
 本小节先演示使用C库函数控制LED，具体如下所示。
-
-
 
 .. code-block:: c
    :caption: 通过C库函数控制LED（led/sys_class_leds/c_stdio/sources/main.c文件）
@@ -358,27 +347,23 @@ echo heartbeat > /sys/class/leds/cpu/trigger
 x86架构
 '''''''''''''''
 
-本工程的main.c实验代码使用的设备文件默认是开发板上的RGB灯，在Ubuntu主机上并没有
-这样的设备，如果想尝试在主机上使用，可以根据自己Ubuntu主机上存在的LED设备修改代码中的LED路
-径，然后使用make直接编译测试。
+本工程的main.c实验代码使用的设备文件默认是开发板
+上的RGB灯，在Ubuntu主机上并没有
+这样的设备，如果想尝试在主机上使用，可以根据自己Ubuntu主机上存
+在的LED设备修改代码中的LED路径，然后使用make直接编译测试。
 
-#在主机测试请先修改main.c代码中的LED灯路径
+.. code-block:: sh
+   :linenos:
 
-#在主机测试请先修改main.c代码中的LED灯路径
-
-#在主机的实验代码Makefile目录下编译
-
-#默认编译x86平台的程序
-
-make
-
-#运行需要root权限，要使用sudo运行
-
-#运行需要root权限，要使用sudo运行
-
-sudo ./build_x86/led_demo
-
-#程序运行后终端会输出提示，相应的LED灯设备状态会改变
+   #在主机测试请先修改main.c代码中的LED灯路径
+   #在主机测试请先修改main.c代码中的LED灯路径
+   #在主机的实验代码Makefile目录下编译
+   #默认编译x86平台的程序
+   make
+   #运行需要root权限，要使用sudo运行
+   #运行需要root权限，要使用sudo运行
+   sudo ./build_x86/led_demo
+   #程序运行后终端会输出提示，相应的LED灯设备状态会改变
 
 .. image:: media/ledsub008.png
    :align: center
@@ -391,11 +376,12 @@ ARM架构
 
 对于ARM架构的程序，可使用如下步骤进行编译：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#编译arm平台的程序
-
-make ARCH=arm
+   #在主机的实验代码Makefile目录下编译
+   #编译arm平台的程序
+   make ARCH=arm
 
 编译后生成的ARM平台程序为build_arm/led_demo，使用网络文件系统共享至开
 发板，在开发板的终端上测试即可。
@@ -512,11 +498,12 @@ make ARCH=arm
 
 对于ARM架构的程序，可使用如下步骤进行编译：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#编译arm平台的程序
-
-make ARCH=arm
+   #在主机的实验代码Makefile目录下编译
+   #编译arm平台的程序
+   make ARCH=arm
 
 编译后生成的ARM平台程序为build_arm/led_demo，使用网络文件系统共享至开发
 板，在开发板的终端上测试即可。

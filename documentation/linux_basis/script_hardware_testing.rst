@@ -16,7 +16,10 @@
 测试脚本都被存放在开发板的“/home/root/peripheral”目录，为方便讲解，本章
 后面默认是在该目录下进行，先使用如下命令切换至该目录：
 
-cd ~/peripheral
+.. code-block:: sh
+   :linenos:
+
+   cd ~/peripheral
 
 
 
@@ -39,7 +42,10 @@ led.sh脚本可以控制开发板上的LED灯，对于EBF6ULL Pro开发板的RGB
 
 #在脚本目录下运行
 
-./led.sh
+.. code-block:: sh
+   :linenos:
+
+   ./led.sh
 
 对脚本内容感兴趣的用户可以使用cat命令来查看脚本的内容，如下图所示。
 
@@ -60,7 +66,10 @@ input.sh脚本可用于对输入设备进行测试，包括按键、触摸屏、
 
 #在脚本目录下运行
 
-./input.sh
+.. code-block:: sh
+   :linenos:
+
+   ./input.sh
 
 .. image:: media/script004.png
    :align: center
@@ -87,7 +96,10 @@ EBF6ULL Pro开发板带有蜂鸣器，可进行蜂鸣器测试。
 
 #在脚本目录下运行
 
-./beep.sh
+.. code-block:: sh
+   :linenos:
+
+   ./beep.sh
 
 执行脚本后，按提示输入1，蜂鸣器则会发出响声，输入0，则会关闭蜂鸣器。
 
@@ -108,7 +120,10 @@ EBF6ULL Pro开发板带有电位器，可进行ADC电压采集测试。
 
 #在脚本目录下运行
 
-./adc.sh
+.. code-block:: sh
+   :linenos:
+
+   ./adc.sh
 
 .. image:: media/script006.jpg
    :align: center
@@ -125,7 +140,10 @@ EBF6ULL Pro开发板带有陀螺仪，可进行陀螺仪测试。
 
 #在脚本目录下运行
 
-./mpu_demo
+.. code-block:: sh
+   :linenos:
+
+   ./mpu_demo
 
 .. image:: media/script007.png
    :align: center
@@ -146,7 +164,10 @@ EBF6ULL Pro开发板带有耳机接口，可进行音乐播放测试。
 
 #在脚本目录下运行
 
-./music_player.sh
+.. code-block:: sh
+   :linenos:
+
+   ./music_player.sh
 
 .. image:: media/script008.png
    :align: center
@@ -167,7 +188,10 @@ EBF6ULL Pro开发板带有耳机及液晶接口，可进行视频播放测试。
 
 #在脚本目录下运行
 
-./video_player.sh
+.. code-block:: sh
+   :linenos:
+
+   ./video_player.sh
 
 .. image:: media/script009.png
    :align: center

@@ -26,7 +26,8 @@
 
 
 
-对于没有COM口的电脑，可以使用类似下图的USB转串口线，把USB端接入电脑并安装对应的驱动程序即可。
+对于没有COM口的电脑，可以使用类似下图的USB转串口线，把USB端接
+入电脑并安装对应的驱动程序即可。
 
 .. image:: media/uarttt003.png
    :align: center
@@ -34,7 +35,8 @@
 
 
 
-Windows上有很多串口通讯工具，如野火串口调试助手，终端工具putty、xShell等，如下图所示。
+Windows上有很多串口通讯工具，如野火串口调试助手，终端
+工具putty、xShell等，如下图所示。
 
 .. image:: media/uarttt004.jpg
    :align: center
@@ -94,9 +96,12 @@ Teletype是最早出现的一种终端设备，类似于电传打字机，tty是
 
 在Linux下终端的设备文件都位于/dev/目录下，以tty*开头的字符命名，可使用如下命令查看：
 
-#查看/dev目录下的“tty”名字开头的设备，“*”表示匹配任意字符
 
-ls /dev/tty\*
+.. code-block:: sh
+   :linenos:
+
+   #查看/dev目录下的“tty”名字开头的设备，“*”表示匹配任意字符
+   ls /dev/tty\*
 
 .. image:: media/uarttt006.png
    :align: center
@@ -123,19 +128,16 @@ Linux下有一个专门的stty命令可以查看或设置终端的参数。
 
 在开发板的终端执行如下命令：
 
-#在开发板的终端执行如下命令
+.. code-block:: sh
+   :linenos:
 
-#它会输出当前终端的参数
-
-stty
-
-#查看ttymxc0设备参数
-
-stty -F /dev/ttymxc0
-
-#查看ttymxc2设备参数
-
-stty -F /dev/ttymxc2
+   #在开发板的终端执行如下命令
+   #它会输出当前终端的参数
+   stty
+   #查看ttymxc0设备参数
+   stty -F /dev/ttymxc0
+   #查看ttymxc2设备参数
+   stty -F /dev/ttymxc2
 
 .. image:: media/uarttt008.png
    :align: center
@@ -144,21 +146,19 @@ stty -F /dev/ttymxc2
 
 
 从上图中命令的执行结果可看到，ttymxc0的通讯速率“speed”为115200，ttymxc2的通讯
-速率为9600，这就是串口通讯的波特率，这些是在驱动中设置的默认值。若用户想修改tty设备的配置，可以使用如下命令：
+速率为9600，这就是串口通讯的波特率，这些是在驱动中设置的默认值。若用
+户想修改tty设备的配置，可以使用如下命令：
 
-#在开发板的终端执行如下命令
+.. code-block:: sh
+   :linenos:
 
-#查看设备参数
-
-stty -F /dev/ttymxc2
-
-#设置通讯速率，其中ispeed为输入速率，ospeed为输出速率
-
-stty -F /dev/ttymxc2 ispeed 115200 ospeed 115200
-
-#查看设备参数
-
-stty -F /dev/ttymxc2
+   #在开发板的终端执行如下命令
+   #查看设备参数
+   stty -F /dev/ttymxc2
+   #设置通讯速率，其中ispeed为输入速率，ospeed为输出速率
+   stty -F /dev/ttymxc2 ispeed 115200 ospeed 115200
+   #查看设备参数
+   stty -F /dev/ttymxc2
 
 .. image:: media/uarttt009.png
    :align: center
@@ -220,17 +220,15 @@ stty -F /dev/ttymxc2
 
 配置好串口调试助手后，尝试使用如下命令测试发送数据：
 
-#在开发板上的终端执行如下指令
+.. code-block:: sh
+   :linenos:
 
-#查看设备参数，确认波特率与串口调试助手的一致
-
-stty -F /dev/ttymxc2
-
-#使用echo命令向终端设备文件写入字符串“board”
-
-echo board > /dev/ttymxc2
-
-#Windows上的串口调试助手会接收到内容
+   #在开发板上的终端执行如下指令
+   #查看设备参数，确认波特率与串口调试助手的一致
+   stty -F /dev/ttymxc2
+   #使用echo命令向终端设备文件写入字符串“board”
+   echo board > /dev/ttymxc2
+   #Windows上的串口调试助手会接收到内容
 
 .. image:: media/uarttt013.jpg
    :align: center
@@ -242,19 +240,16 @@ echo board > /dev/ttymxc2
 
 而读取设备文件则可接收Winodws主机发往开发板的内容，可以使用cat命令来读取：
 
-#在开发板上的终端执行如下指令
+.. code-block:: sh
+   :linenos:
 
-#使用cat命令读取终端设备文件
-
-cat /dev/ttymxc2
-
-#cat命令会等待
-
-#使用串口调试助手发送字符串
-
-#字符串最后必须加回车！
-
-#开发板的终端会输出接收到的内容
+   #在开发板上的终端执行如下指令
+   #使用cat命令读取终端设备文件
+   cat /dev/ttymxc2
+   #cat命令会等待
+   #使用串口调试助手发送字符串
+   #字符串最后必须加回车！
+   #开发板的终端会输出接收到的内容
 
 .. image:: media/uarttt014.jpg
    :align: center
@@ -296,15 +291,14 @@ Linux下也有类似Windows的图形界面串口调试助手，不过此处想�
 
 在Ubuntu主机上可以直接用以下命令安装和配置minicom：
 
-#以下命令在主机上执行
+.. code-block:: sh
+   :linenos:
 
-sudo apt install minicom
-
-#安装成功后使用如下命令运行配置
-
-#需要使用sudo权限运行
-
-sudo minicom -s
+   #以下命令在主机上执行
+   sudo apt install minicom
+   #安装成功后使用如下命令运行配置
+   #需要使用sudo权限运行
+   sudo minicom -s
 
 .. image:: media/uarttt017.png
    :align: center
@@ -339,7 +333,10 @@ sudo minicom -s
 
 #以下命令在Ubuntu主机上执行
 
-minicom
+.. code-block:: sh
+   :linenos:
+
+   minicom
 
 下图是minicom打开的终端界面，默认包含了当前打开的串口
 设备信息，当该设备接收到内容时，会在终端上显示出来，而在终端输入的内容则会通过串口发送出去。
@@ -359,21 +356,21 @@ minicom
 ''''''''''''''''''
 
 配置好minicom后，就可以使用它与开发板进行串口通讯
-实验了，操作方式与Windows下是类似的，在开发板使用echo和cat命令对终端设备文件进行读写，实现串口通讯。
+实验了，操作方式与Windows下是类似的，在开发板使用echo和cat命令
+对终端设备文件进行读写，实现串口通讯。
 
 使用如下命令测试收发数据：
 
-#在开发板上的终端执行如下指令
+.. code-block:: sh
+   :linenos:
 
-#查看设备参数，确认波特率与串口调试助手的一致
-
-stty -F /dev/ttymxc2
-
-#使用echo命令向终端设备文件写入字符串“board”
-
-echo board > /dev/ttymxc2
-
-#Ubuntu主机上的minicom会显示接收到内容
+   #在开发板上的终端执行如下指令
+   #查看设备参数，确认波特率与串口调试助手的一致
+   stty -F /dev/ttymxc2
+   #使用echo命令向终端设备文件写入字符串“board”
+   echo board > /dev/ttymxc2
+   
+Ubuntu主机上的minicom会显示接收到内容
 
 .. image:: media/uarttt021.jpg
    :align: center
@@ -383,19 +380,16 @@ echo board > /dev/ttymxc2
 
 开发板接收串口内容的实验步骤如下：
 
-#在开发板上的终端执行如下指令
+.. code-block:: sh
+   :linenos:
 
-#使用cat命令读取终端设备文件
-
-cat /dev/ttymxc2
-
-#cat命令会等待
-
-#在Ubuntu主机的minicom界面输入内容
-
-#字符串最后必须加回车！
-
-#开发板的终端会输出接收到的内容
+   #在开发板上的终端执行如下指令
+   #使用cat命令读取终端设备文件
+   cat /dev/ttymxc2
+   #cat命令会等待
+   #在Ubuntu主机的minicom界面输入内容
+   #字符串最后必须加回车！
+   #开发板的终端会输出接收到的内容
 
 .. image:: media/uarttt022.jpg
    :align: center
@@ -670,13 +664,16 @@ VTIM         设置非标准模式读取时的延时值，单位为十分之一�
 
 其中tcgetattr和tcsetattr函数分别用于读取和设置串口的参数，原型如下：
 
-#include <termios.h>
+.. code-block:: sh
+   :linenos:
 
-#include <unistd.h>
-
-int tcgetattr(int fd, struct termios \*termios_p);
-
-int tcsetattr(int fd, int optional_actions, const struct termios \*termios_p);
+   #include <termios.h>
+   
+   #include <unistd.h>
+   
+   int tcgetattr(int fd, struct termios \*termios_p);
+   
+   int tcsetattr(int fd, int optional_actions, const struct termios \*termios_p);
 
 -  形参fd：指定串口设备文件的文件描述符。
 
@@ -694,13 +691,17 @@ int tcsetattr(int fd, int optional_actions, const struct termios \*termios_p);
 跟示例代码中的一样，通常都使用选项TCSANOW，让写入的参数配置立马生效。
 
 代码中的cfsetispeed和cfsetospeed函数分别用于设置termios结构体的输入和输出波
-特率，另外还有cfsetspeed函数可以同时设置输入和输出波特率参数为相同的值，原型如下：
+特率，另外还有cfsetspeed函数可以同时设置输入和输出波特率参数为相
+同的值，原型如下：
 
-int cfsetispeed(struct termios \*termios_p, speed_t speed);
+.. code-block:: sh
+   :linenos:
 
-int cfsetospeed(struct termios \*termios_p, speed_t speed);
-
-int cfsetspeed(struct termios \*termios_p, speed_t speed);
+   int cfsetispeed(struct termios \*termios_p, speed_t speed);
+   
+   int cfsetospeed(struct termios \*termios_p, speed_t speed);
+   
+   int cfsetspeed(struct termios \*termios_p, speed_t speed);
 
 使用这些函数要注意两点：
 
@@ -880,41 +881,26 @@ x86架构
 
 在x86平台的编译测试过程如下：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#默认编译x86平台的程序
-
-make
-
-#查看可用的tty设备文件
-
-ls /dev/tty\*
-
-#请根据自己主机上的输出修改设备文件参数
-
-#程序需要使用sudo运行
-
-sudo ./build_x86/tty_demo /dev/ttyUSB0
-
-----------------------------------------------------------------------
-
-#在另一个设备通过串口发送内容至Ubuntu主机
-
-#本示例中是开发板与电脑连接，此处在开发板中使用echo命令发送内容至串口3
-
-#以下命令在开发板的终端执行
-
-#以下命令在开发板的终端执行
-
-#确认串口波特率
-
-stty -F /dev/ttymxc2
-
-#发送数据
-
-echo board > /dev/ttymxc2
-
-#Ubuntu主机端会收到数据并显示
+   #在主机的实验代码Makefile目录下编译
+   #默认编译x86平台的程序
+   make
+   #查看可用的tty设备文件
+   ls /dev/tty\*
+   #请根据自己主机上的输出修改设备文件参数
+   #程序需要使用sudo运行
+   sudo ./build_x86/tty_demo /dev/ttyUSB0
+   #在另一个设备通过串口发送内容至Ubuntu主机
+   #本示例中是开发板与电脑连接，此处在开发板中使用echo命令发送内容至串口3
+   #以下命令在开发板的终端执行
+   #以下命令在开发板的终端执行
+   #确认串口波特率
+   stty -F /dev/ttymxc2
+   #发送数据
+   echo board > /dev/ttymxc2
+   #Ubuntu主机端会收到数据并显示
 
 .. image:: media/uarttt023.jpg
    :align: center
@@ -926,42 +912,32 @@ ARM架构
 
 对于ARM架构的程序，可使用如下步骤进行编译：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#编译arm平台的程序
-
-make ARCH=arm
-
-编译后生成的ARM平台程序为build_arm/tty_demo，使用网络文件系统
-共享至开发板，程序默认使用ttymxc2通讯，也可以自行指定输入设备路径。
-
-#以下命令在Ubuntu主机执行
-
-#以下命令在Ubuntu主机执行
-
-#根据自己主机的设备配置minicom，注意波特率要匹配
-
-#关于minicom的配置请参考前面小节的内容
-
-sudo minicom /dev/ttyUSB0
-
-#配置完毕打开minicom终端
+   #在主机的实验代码Makefile目录下编译
+   #编译arm平台的程序
+   make ARCH=arm
+   编译后生成的ARM平台程序为build_arm/tty_demo，使用网络文件系统
+   共享至开发板，程序默认使用ttymxc2通讯，也可以自行指定输入设备路径。
+   #以下命令在Ubuntu主机执行
+   #以下命令在Ubuntu主机执行
+   #根据自己主机的设备配置minicom，注意波特率要匹配
+   #关于minicom的配置请参考前面小节的内容
+   sudo minicom /dev/ttyUSB0
+   #配置完毕打开minicom终端
 
 ----------------------------------------------------------------------
 
-#以下命令在开发板上的终端执行
+.. code-block:: sh
+   :linenos:
 
-#以下命令在开发板上的终端执行
-
-#在NFS共享的工程目录路径执行
-
-#使用默认的ttymxc2设备通讯
-
-./build_arm/tty_demo
-
-#程序会通过串口发送内容至主机
-
-#主机使用minicom可发送内容至开发板
+   #以下命令在开发板上的终端执行
+   #在NFS共享的工程目录路径执行
+   #使用默认的ttymxc2设备通讯
+   ./build_arm/tty_demo
+   #程序会通过串口发送内容至主机
+   #主机使用minicom可发送内容至开发板
 
 .. image:: media/uarttt024.jpg
    :align: center
@@ -1002,9 +978,11 @@ ioctl原型
 
 ioctl系统调用的功能是向设备文件发送命令，控制一些特殊操作，它的函数原型如下：
 
-#include <sys/ioctl.h>
+.. code-block:: sh
+   :linenos:
 
-int ioctl(int fd, unsigned long request, ...);
+   #include <sys/ioctl.h>
+   int ioctl(int fd, unsigned long request, ...);
 
 -  参数fd：与write、read类似，fd文件句柄指定要操作哪个文件。
 
@@ -1149,7 +1127,10 @@ int ioctl(int fd, unsigned long request, ...);
 
 关于ioctl的TCGETS和TCSETS参数，可以在man手册中查看，使用如下命令：
 
-man ioctl_tty
+.. code-block:: sh
+   :linenos:
+
+   man ioctl_tty
 
 .. image:: media/uarttt025.png
    :align: center
@@ -1158,7 +1139,8 @@ man ioctl_tty
 
 
 ioctl系统调用应用非常广泛，因为并不是所有设备都仅有读写操作，例如控制CD-ROM的
-弹出和收回，特殊设备的机械操作，又或者我们自己编写LED驱动程序也可以对上层提供指令
+弹出和收回，特殊设备的机械操作，又或者我们自己编写LED驱动程序也可以对
+上层提供指令
 实现花式点灯，在以后编写驱动程序时，我们再来学习与ioctl系统调用相关的接口。
 
 .. _编译及测试-1:
@@ -1178,27 +1160,20 @@ x86架构
 
 在x86平台的编译测试过程如下：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#默认编译x86平台的程序
-
-make
-
-#查看可用的tty设备文件
-
-ls /dev/tty\*
-
-#请根据自己主机上的输出修改设备文件参数
-
-#可以使用stty命令查看当前设备参数
-
-sudo stty -F /dev/ttyUSB0
-
-#程序需要使用sudo运行
-
-sudo ./build_x86/tty_demo /dev/ttyUSB0
-
-#程序运行时会输出获取到的波特率及c_cflag配置，并把波特率设置为B9600或B115200
+   #在主机的实验代码Makefile目录下编译
+   #默认编译x86平台的程序
+   make
+   #查看可用的tty设备文件
+   ls /dev/tty\*
+   #请根据自己主机上的输出修改设备文件参数
+   #可以使用stty命令查看当前设备参数
+   sudo stty -F /dev/ttyUSB0
+   #程序需要使用sudo运行
+   sudo ./build_x86/tty_demo /dev/ttyUSB0
+   #程序运行时会输出获取到的波特率及c_cflag配置，并把波特率设置为B9600或B115200
 
 .. image:: media/uarttt026.jpg
    :align: center
@@ -1212,30 +1187,34 @@ ARM架构
 
 对于ARM架构的程序，可使用如下步骤进行编译：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#编译arm平台的程序
-
-make ARCH=arm
+   #在主机的实验代码Makefile目录下编译
+   #编译arm平台的程序
+   make ARCH=arm
 
 编译后生成的ARM平台程序为build_arm/tty_demo，使用网络文件系
 统共享至开发板，程序默认使用ttymxc2设备，也可以自行指定输入设备路径。
 
-#以下命令在开发板上的终端执行
+.. code-block:: sh
+   :linenos:
 
-#以下命令在开发板上的终端执行
+   #以下命令在开发板上的终端执行
+   #以下命令在开发板上的终端执行
+   
+   #请根据自己主机上的输出修改设备文件参数
+   
+   #可以使用stty命令查看当前设备参数
+   
+   stty -F /dev/ ttymxc2
+   
+   #程序需要使用sudo运行
+   
+   ./build_arm/tty_demo /dev/ttymxc2
+   
+   #程序运行时会输出获取到的波特率及c_cflag配置，并把波特率设置为B9600或B115200
 
-#请根据自己主机上的输出修改设备文件参数
-
-#可以使用stty命令查看当前设备参数
-
-stty -F /dev/ ttymxc2
-
-#程序需要使用sudo运行
-
-./build_arm/tty_demo /dev/ttymxc2
-
-#程序运行时会输出获取到的波特率及c_cflag配置，并把波特率设置为B9600或B115200
 
 .. image:: media/uarttt027.png
    :align: center
@@ -1261,7 +1240,8 @@ stty -F /dev/ ttymxc2
 
 
 这两个函数的定义位于glibc源码的如下目录： glibc/sysdeps/unix/sysv/linux/，该
-目录中的tcgetattr.c和tcsetattr.c文件分别定义了这两个函数。这两个文件我们也拷贝了一份到工程的如下目录，方便查看：
+目录中的tcgetattr.c和tcsetattr.c文件分别定义了这两个函数。这两个文件
+我们也拷贝了一份到工程的如下目录，方便查看：
 base_code/section2/tty/c_ioctl/glibc_file。
 
 tcgetattr.c文件的内容如下。

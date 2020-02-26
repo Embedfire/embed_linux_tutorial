@@ -33,7 +33,10 @@ Linux操作系统，同样也是多用户操作系统，其中具有管理
 
 我们可以通过id命令来查看当前用户的UID值（关于如何使用命令在下一章介绍，此处先了解）：
 
-id
+.. code-block:: sh
+   :linenos:
+
+   id
 
 .. image:: media/usergr003.jpg
    :align: center

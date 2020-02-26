@@ -12,12 +12,17 @@ MFGtool工具
 MFGtool工具的作用
 ~~~~~~~~~~~~
 
-MFGTool工具是freescale官方推荐的一个使用OTG来升级镜像的软件工具，它是freescale针对i.MX系列处理器专门使用的烧录工具，可以用来升级linux，单独烧录某一系统分区，独立地烧录spi flash、 nor flash、sd card、nand
-flash，emmc等，只需简单的配置，就可以使用该工具将编译好的文件系统和镜像文件烧录到开发板上，使用起来非常方便。而且MFGtool工具作为一个可量产性的工具，它支持多通道的烧录，在实际量产中，可以直接使用MFGtool工具同时将文件系统与镜像文件烧录到多个开发板上。
+MFGTool工具是freescale官方推荐的一个使用OTG来升级镜像的软
+件工具，它是freescale针对i.MX系列处理器专门使用的烧
+录工具，可以用来升级linux，单独烧录某一系统分区，独立
+地烧录spi flash、 nor flash、sd card、nand
+flash，emmc等，只需简单的配置，就可以使用该工具将编译好
+的文件系统和镜像文件烧录到开发板上，使用起来非常方便。而
+且MFGtool工具作为一个可量产性的工具，它支持多通道的烧录，在实
+际量产中，可以直接使用MFGtool工具同时将文件系统与镜像文件烧录
+到多个开发板上。
 
 MFGtool工具目录主要有以下内容，具体见下图。
-
-
 
 .. image:: media/mfgtoo002.png
    :align: center
@@ -32,7 +37,8 @@ flash的镜像文件。之所以存在这两种镜像，是因为MFGTools的烧�
 原理是先烧录媒介镜像到ram里面，然后启动，再通过这个启动了的媒介镜像
 把目标镜像烧录到emmc、sdcard或者nand flash里面。
 
-除此之外还有配置文件也是非常重要的，如cfg.ini、UICfg.ini以及ucl2.xml（该文
+除此之外还有配置文件也是非常重要的，如cfg.ini、UICfg.ini以
+及ucl2.xml（该文
 件位于Profiles\Linux\OS Firmware目录下，此处就不再截图说明）。
 
 MfgTool2.exe则是MFGtool工具的可执行程序文件，在Windows系统下可
@@ -83,128 +89,126 @@ cfg.ini文件主要是用来配置目标芯片类型和板子信息及存储器�
 profiles
 ''''''''
 
-[profiles]
+.. code-block:: sh
+   :linenos:
 
-chip = Linux
+   [profiles]
+   chip = Linux
 
 表示要使用Profiles目录下哪个文件夹的内容进行烧录。
 
-如以上配置使用“/profiles/Linux/OS Firmware/ucl2.xml”目录下的ucl2.xml配置烧录。
+如以上配置使用“/profiles/Linux/OS Firmware/ucl2.xml”目录
+下的ucl2.xml配置烧录。
 
 platform
 ''''''''
 
-[platform]
+.. code-block:: sh
+   :linenos:
 
-board = embedfire_board
+   [platform]
+   board = embedfire_board
 
 开发板名字，目前没有作用，可以忽略
 
 list
 ''''
 
-[list]
+.. code-block:: sh
+   :linenos:
 
-name = NAND Flash
+   [list]
+   name = NAND Flash
 
-表示使用“/profiles/CHIP_PROFILE/OS Firmware/ucl2.xml”文件中的哪个list配置进行烧录，如将name 设置为 NAND Flash，则使用 ucl2.xml文件中NAND
-Flash一栏的配置进行烧录（ucl2.xml文件内容在后续讲解，此处只简单列出部分配置）。
+表示使用“/profiles/CHIP_PROFILE/OS Firmware/ucl2.xml”文件中
+的哪个list配置进行烧录，如将name 设置为 NAND Flash，则使用 ucl2.xml文
+件中NAND
+Flash一栏的配置进行烧录（ucl2.xml文件内容在后续讲解，此处只
+简单列出部分配置）。
 
-<LIST name="SDCard"
+.. code-block:: sh
+   :linenos:
 
-….
-
-<LIST name="eMMC"
-
-….
-
-<LIST name="NAND Flash"
-
-….
+   <LIST name="SDCard"
+   ….
+   <LIST name="eMMC"
+   ….
+   <LIST name="NAND Flash"
+   ….
 
 variable
 ''''''''
 
-variable中是一些环境变量，在list列表配置中会引用的环境变量，如initramfs=fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot，在“/profiles/CHIP_PROFILE/OS
+variable中是一些环境变量，在list列表配置中会引用的环境
+变量，如initramfs=fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot，在“/profiles/CHIP_PROFILE/OS
 Firmware/ucl2.xml”文件中会被<CMD state="BootStrap" type="load" file="firmware/%initramfs%"
-address="0x83800000"…引用，其引用的方式为“%...%”，在两个百分号（%）之间，通过变量initramfs进行传递。
+address="0x83800000"…引用，其引用的方式为“%...%”，在两
+个百分号（%）之间，通过变量initramfs进行传递。
 
-[variable]
+.. code-block:: sh
+   :linenos:
 
-board = sabresd
-
-mmc = 1
-
-sxuboot=sabresd
-
-sxdtb=sdb
-
-7duboot=sabresd
-
-7ddtb=sdb
-
-6uluboot=14x14evk
-
-6uldtb=14x14-evk
-
-ldo=
-
-plus=
-
-lite=l
-
-initramfs=fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot
-
-nand=nand
-
-nanddtb=gpmi-weim
-
-part_uboot=0
-
-part_kernel=1
-
-part_dtb=2
-
-part_rootfs=3
+   [variable]
+   board = sabresd
+   mmc = 1
+   sxuboot=sabresd
+   sxdtb=sdb
+   7duboot=sabresd
+   7ddtb=sdb
+   6uluboot=14x14evk
+   6uldtb=14x14-evk
+   ldo=
+   plus=
+   lite=l
+   initramfs=fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot
+   nand=nand
+   nanddtb=gpmi-weim
+   part_uboot=0
+   part_kernel=1
+   part_dtb=2
+   part_rootfs=3
 
 ucl2.xml文件
 ^^^^^^^^^^
 
 首先我们看一下ucl2.xml文件中的文件内容（已删减）：
 
-<UCL>
+.. code-block:: sh
+   :linenos:
 
-<CFG>
-
-<STATE name="BootStrap" dev="MX6ULL" vid="15A2" pid="0080"/>
-
-<STATE name="Updater" dev="MSC" vid="066F" pid="37FF"/>
-
-</CFG>
-
-<LIST name="NAND Flash" desc="Choose NAND as media">
-
-<CMD state="BootStrap" type="load" file="firmware/%initramfs%" address="0x83800000"loadSection="OTH" setSection="OTH" asFlashHeader="FALSE"
-ifdev="MX6SL MX6SX MX7D MX6UL MX6ULL">Loading Initramfs.</CMD>
-
-<CMD state="BootStrap" type="jump" > Jumping to OS image.
-</CMD>
-
-<CMD state="Updater" type="push" body="send" file="files1/zImage"> Sending kernel zImage</CMD>
-
-<CMD state="Updater" type="push" body="$ ubiformat /dev/mtd%part_rootfs%"/>
-
-<CMD state="Updater" type="push" body="$ ubimkvol /dev/ubi0 -Nrootfs -m"/>
-
-<CMD state="Updater" type="push" body="$ mkdir -p /mnt/mtd%part_rootfs%"/>
-
-<CMD state="Updater" type="push" body="frf">Finishing rootfs write</CMD>
-
-<CMD state="Updater" type="push" body="$ echo Update Complete!">Done</CMD>
-
-</LIST>
-
-</UCL>
+   <UCL>
+   
+   <CFG>
+   
+   <STATE name="BootStrap" dev="MX6ULL" vid="15A2" pid="0080"/>
+   
+   <STATE name="Updater" dev="MSC" vid="066F" pid="37FF"/>
+   
+   </CFG>
+   
+   <LIST name="NAND Flash" desc="Choose NAND as media">
+   
+   <CMD state="BootStrap" type="load" file="firmware/%initramfs%" address="0x83800000"loadSection="OTH" setSection="OTH" asFlashHeader="FALSE"
+   ifdev="MX6SL MX6SX MX7D MX6UL MX6ULL">Loading Initramfs.</CMD>
+   
+   <CMD state="BootStrap" type="jump" > Jumping to OS image.
+   </CMD>
+   
+   <CMD state="Updater" type="push" body="send" file="files1/zImage"> Sending kernel zImage</CMD>
+   
+   <CMD state="Updater" type="push" body="$ ubiformat /dev/mtd%part_rootfs%"/>
+   
+   <CMD state="Updater" type="push" body="$ ubimkvol /dev/ubi0 -Nrootfs -m"/>
+   
+   <CMD state="Updater" type="push" body="$ mkdir -p /mnt/mtd%part_rootfs%"/>
+   
+   <CMD state="Updater" type="push" body="frf">Finishing rootfs write</CMD>
+   
+   <CMD state="Updater" type="push" body="$ echo Update Complete!">Done</CMD>
+   
+   </LIST>
+   
+   </UCL>
 
 整个文件由三部分组成，首先看最外层标签<UCL> <UCL/>，它表示更新
 命令列表（Update Command List，UCL），会被MFGtool工具中的脚本解析，所有的配置都包含在该标签之下。
@@ -295,23 +299,23 @@ Card或者emmc，然后完成烧录。
 
 野火开发板第1阶段烧录的文件（以烧录到nand为例）：
 
-Uboot：u-boot-imx6ull14x14evk_nand.imx
+.. code-block:: sh
+   :linenos:
 
-Kernel：zImage
-
-device tree：zImage-imx6ull-14x14-evk-gpmi-weim.dtb
-
-Initramfs：fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot
+   Uboot：u-boot-imx6ull14x14evk_nand.imx
+   Kernel：zImage
+   device tree：zImage-imx6ull-14x14-evk-gpmi-weim.dtb
+   Initramfs：fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot
 
 野火开发板第2阶段烧录的文件以烧录到nand为例）：
 
-Uboot：u-boot-emmc-2016.03-r0.imx
+.. code-block:: sh
+   :linenos:
 
-Kernel：zImage
-
-device tree：zImage-imx6ull-14x14-evk-emmc-50-70-dht11-leds.dtb
-
-rootfs：my_qt_core_fs.tar.bz2
+   Uboot：u-boot-emmc-2016.03-r0.imx
+   Kernel：zImage
+   device tree：zImage-imx6ull-14x14-evk-emmc-50-70-dht11-leds.dtb
+   rootfs：my_qt_core_fs.tar.bz2
 
 烧录测试
 ^^^^

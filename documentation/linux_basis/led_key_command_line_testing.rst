@@ -19,16 +19,12 @@ wm等。
 
 #在开发板上的终端执行以下命令查看
 
-.. code-block:: c
-   :caption: 命令
+.. code-block:: sh
    :linenos:
 
    ls /sys
-   
    ls /sys/class
-   
    ls /sys/class/leds
-   
    ls /sys/class/leds/cpu
 
 
@@ -77,20 +73,14 @@ brightness文件
 
 #LED灯默认可能处于亮的状态，我们先把它们全部关闭再一盏盏点亮
 
-.. code-block:: c
-   :caption: 命令
+.. code-block:: sh
    :linenos:
 
    echo 0 > /sys/class/leds/red/brightness #关闭red灯
-   
    echo 0 > /sys/class/leds/blue/brightness #关闭blue灯
-   
    echo 0 > /sys/class/leds/green/brightness #关闭green灯
-   
    echo 255 > /sys/class/leds/red/brightness #点亮red灯
-   
    echo 255 > /sys/class/leds/blue/brightness #点亮blue灯
-   
    echo 255 > /sys/class/leds/green/brightness #点亮green灯
 
 .. image:: media/ledkey003.png
@@ -117,11 +107,10 @@ trigger文件
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-.. code-block:: c
-   :caption: 命令
+.. code-block:: sh
    :linenos:
+
    cat /sys/class/leds/red/trigger #查看red灯的trigger文件内容
-   
    cat /sys/class/leds/cpu/trigger #查看cpu灯的trigger文件内容
 
 .. image:: media/ledkey004.png
@@ -142,16 +131,13 @@ eat”，表示系统心跳指示触发，这时用户不能再直接修改brigh
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-.. code-block:: c
-   :caption: 命令
+
+.. code-block:: sh
    :linenos:
 
    echo none > /sys/class/leds/cpu/trigger #修改cpu灯触发条件为none
-   
    cat /sys/class/leds/cpu/trigger #查看cpu灯的trigger文件内容
-   
    echo 1 > /sys/class/leds/cpu/brightness # 点亮cpu灯
-   
    echo 0 > /sys/class/leds/cpu/brightness #关闭cpu灯
 
 .. image:: media/ledkey005.png
@@ -163,8 +149,7 @@ eat”，表示系统心跳指示触发，这时用户不能再直接修改brigh
 类似地，我们可以把red灯的触发条件改为heartbeat，此时red灯就会以心跳指示的方式进行闪烁：
 
 
-.. code-block:: c
-   :caption: 命令
+.. code-block:: sh
    :linenos:
 
    echo heartbeat > /sys/class/leds/red/trigger
@@ -210,7 +195,10 @@ eat”，表示系统心跳指示触发，这时用户不能再直接修改brigh
 
 在开发板的终端执行以下命令：
 
-cat /proc/bus/input/devices
+.. code-block:: sh
+   :linenos:
+
+   cat /proc/bus/input/devices
 
 .. image:: media/ledkey008.png
    :align: center
@@ -237,7 +225,10 @@ cat /proc/bus/input/devices
 
 在开发板的终端上输入如下命令：
 
-evtest
+.. code-block:: sh
+   :linenos:
+
+   evtest
 
 .. image:: media/ledkey009.png
    :align: center

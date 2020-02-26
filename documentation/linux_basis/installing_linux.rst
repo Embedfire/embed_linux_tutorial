@@ -206,11 +206,10 @@
 (8) 选择语言，处可以选择英文，中文等语言，这里我们选择 “简体中文”，然后点击处
     的“install Ubuntu”按钮，进入下一步。
 
-..
-
-   .. image:: media/instal024.jpg
+.. image:: media/instal024.jpg
    :align: center
    :alt: 未找到图片24|
+
 
 (9) 选择键盘布局，如下图所示，点击“继续”。
 
@@ -247,9 +246,8 @@
 (13) 选择时区，在下图的提示界面区域点击我国东侧位置，其下的文本会出现“Shanghai”字
      样，选择后系统使用的就是北京时间。
 
-..
 
-   .. image:: media/instal029.jpg
+.. image:: media/instal029.jpg
    :align: center
    :alt: 未找到图片29|
 
@@ -349,12 +347,11 @@
     件夹”窗口，我们可以看到处有一个下拉箭头，我们选中处，来选择
     我们刚刚新建的文件夹。到这里之后，我们就完成了文件夹路径的
     设置。我们仍然需要让虚拟机启动的时候，自动挂载共享文件夹，见下
-    图。选中“自动挂载”选项，在处填入共享文件夹的挂载点，这里我们建议初学者使用我们提供的路径：
+    图。选中“自动挂载”选项，在处填入共享文件夹的挂载点，这里我
+    们建议初学者使用我们提供的路径：**/home/用户名/ebf_dir**  
 
-/home/用户名/ebf_dir
-
-   用户名需要根据用户安装系统时，输入的用户名。本书使用的embedfire，因此，我们
-   输入的路径为“/home/embedfire/ebf_dir”，最后点击“OK”按钮即可完成设置，见下图。
+    用户名需要根据用户安装系统时，输入的用户名。本书使用的embedfire，因此，我们
+    输入的路径为“/home/embedfire/ebf_dir”，最后点击“OK”按钮即可完成设置，见下图。
 
 .. image:: media/instal038.jpg
    :align: center
@@ -375,11 +372,12 @@
 
 (4) 启动虚拟机，我们就可以看到我们的共享文件夹了，见下图。
 
-..
 
-   .. image:: media/instal041.jpg
+.. image:: media/instal041.jpg
    :align: center
    :alt: 未找到图片41|
+
+
 
 
 (5) 单击鼠标右键，左键点击“打开终端”，见下图。
@@ -392,7 +390,13 @@
 
 出现如下图所示的窗口，输入命令：
 
-sudo usermod -a -G vboxsf 用户名
+.. code-block:: sh
+   :emphasize-lines: 1
+   :linenos:
+
+   sudo usermod -a -G vboxsf 用户名
+
+
 
 本机的用户名是embedfire，因此，输入命令“sudo usermod –a –G vboxsf embedfire”，见下图。
 
@@ -411,11 +415,12 @@ sudo usermod -a -G vboxsf 用户名
 (6) 打开之后，这里为了更好地说明，因此在Windows下新建一个普通的txt文档，我们可
     以看到Linux也可以对该文档进行操作。
 
-..
 
-   .. image:: media/instal045.jpg
+.. image:: media/instal045.jpg
    :align: center
    :alt: 未找到图片45|
+
+
 
 
 

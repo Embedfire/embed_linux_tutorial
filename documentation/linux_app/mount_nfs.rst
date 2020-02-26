@@ -120,7 +120,10 @@ ping [目标主机名或目标ip地址]
 
 #以下命令在主机上运行
 
-sudo apt-get install net-tools
+.. code-block:: sh
+   :linenos:
+
+   sudo apt-get install net-tools
 
 在上图中开发板使用ifconfig命令可查看到开发板有两个网卡，分别是其两
 个网络接口的信息，其中eth0没有接网线，所以不能正常使用，而eth1可看到其IP地
@@ -141,7 +144,10 @@ Ubuntu系统默认没有安装NFS服务，需要使用如下命令安装NFS服�
 
 #以下命令在主机上运行
 
-sudo apt-get install nfs-kernel-server
+.. code-block:: sh
+   :linenos:
+
+   sudo apt-get install nfs-kernel-server
 
 查看用户id
 ''''''''''''''''''
@@ -150,7 +156,10 @@ sudo apt-get install nfs-kernel-server
 
 #以下命令在主机上运行
 
-id
+.. code-block:: sh
+   :linenos:
+
+   id
 
 具体见下图。
 
@@ -195,7 +204,10 @@ id
 
 #以下命令在主机上运行，可用gedit替换vim
 
-sudo vim /etc/exports
+.. code-block:: sh
+   :linenos:
+
+   sudo vim /etc/exports
 
 在/etc/exports文件末尾添加如下语句并保存，注意如下语句写到/etc/exports文件是在同一行，此处由于排版问题分行了。
 
@@ -203,7 +215,10 @@ sudo vim /etc/exports
 
 #以下内容的IP地址和uid，gid需要根据自己的环境进行修改
 
-/home/embedfire/workdir 192.168.0.0/24(rw,sync,all_squash,anonuid=998,anongid=998,no_subtree_check)
+.. code-block:: sh
+   :linenos:
+
+   /home/embedfire/workdir 192.168.0.0/24(rw,sync,all_squash,anonuid=998,anongid=998,no_subtree_check)
 
 注意具体的配置需要根据自己的实验环境进行配置，请理解如下说明根据自己的实验环境进行修改：
 
@@ -249,7 +264,10 @@ dfire创建的；在开发主机上仅embedfire能读写的文件，在开发板
 
 #以下命令在主机上运行
 
-mkdir /home/embedfire/workdir
+.. code-block:: sh
+   :linenos:
+
+   mkdir /home/embedfire/workdir
 
 更新exports配置
 '''''''''''''''''''''''''''''''''
@@ -258,7 +276,10 @@ mkdir /home/embedfire/workdir
 
 #以下命令在主机上运行
 
-sudo exportfs -arv
+.. code-block:: sh
+   :linenos:
+
+   sudo exportfs -arv
 
 该命令的参数说明如下：
 
@@ -287,7 +308,10 @@ sudo exportfs -arv
 
 #以下命令在主机上运行
 
-showmount -e
+.. code-block:: sh
+   :linenos:
+
+   showmount -e
 
 .. image:: media/mountn010.jpg
    :align: center
@@ -311,7 +335,10 @@ showmount -e
 
 #以下命令在开发板上运行
 
-mkdir /home/root/mountnfs
+.. code-block:: sh
+   :linenos:
+
+   mkdir /home/root/mountnfs
 
 临时挂载NFS文件系统
 '''''''''''''''''''''''''''''''''
@@ -322,7 +349,10 @@ mkdir /home/root/mountnfs
 
 #需要把下面的dev设置为前面自己的主机名
 
-mount -o vers=4 dev:/home/embedfire/workdir /home/root/mountnfs
+.. code-block:: sh
+   :linenos:
+
+   mount -o vers=4 dev:/home/embedfire/workdir /home/root/mountnfs
 
 以上命令使用的各个参数如下：
 
@@ -353,7 +383,10 @@ mount -o vers=4 dev:/home/embedfire/workdir /home/root/mountnfs
 
 #以下命令在开发板上运行
 
-umount /home/root/mountnfs
+.. code-block:: sh
+   :linenos:
+
+   umount /home/root/mountnfs
 
 使用该命令时以要取消挂载的目录作为参数即可，没有输出表示执行正常。如果
 在当前挂载的目录进行umount操作，会提示“device is busy”。建议取消挂

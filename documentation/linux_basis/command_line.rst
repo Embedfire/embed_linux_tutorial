@@ -118,19 +118,17 @@ embedfire@dev:~$
 
 # 在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-# 从下面开始是你要在终端中输入的命令（不包括#号后的内容）：
+从下面开始是你要在终端中输入的命令（不包括#号后的内容）：
 
-cd /home # 切换到/home目录
+.. code-block:: sh
+   :linenos:
 
-pwd # 显示当前目录
-
-cd ~ # 切换至~目录
-
-pwd # 显示当前目录
-
-ls # l是字母L的小写，不要把l输入成数字1或字母i的大写
-
-ls -l # 同上，两个l都是字母L的小写
+   cd /home # 切换到/home目录
+   pwd # 显示当前目录
+   cd ~ # 切换至~目录
+   pwd # 显示当前目录
+   ls # l是字母L的小写，不要把l输入成数字1或字母i的大写
+   ls -l # 同上，两个l都是字母L的小写
 
 每行命令输入后按回车，Shell就会对输入的命令进行解释，执行后输出，运行结果如下所示。
 
@@ -143,12 +141,7 @@ ls -l # 同上，两个l都是字母L的小写
    以上各行命令的意义如下：
 
 -  cd /home ：执行 “cd”命令，并以“/home”作为参数，表示切换至/home目录，命令执行后，我们
-   可以看到命令提示符已变为 ：
-
-从 embedfire@dev:~$
-
-变为 embedfire@dev:/home$
-
+   可以看到命令提示符已从 **embedfire@dev:~$变为embedfire@dev:/home$**
    即其中的波浪符号“~”已变成“/home”。
 
 -  pwd：执行“pwd”命令，表示输出当前所在目录，可看到它的输出为“/home”，与命令提示符中的是一致的。
@@ -181,14 +174,21 @@ ls -l # 同上，两个l都是字母L的小写
 
 通过以上的一些命令示例，我们大致可以归纳一下命令的格式：
 
-command [-options] [argument]
+.. code-block:: sh
+   :linenos:
+
+   command [-options] [argument]
 
 命令的组成一般分三部分，每部分之间使用空格隔开，说明如下：
 
 -  command：命令名，如前面的cd命令，pwd命令，ls命令。
 
--  -options：命令的选项，使用“-”开头的或“--”开头，如前面示例“ls -l”中的-l选项，命令会根据具体的选项执行不同的操作。使用“-”时一般是选项的简写，一些选项可以同时使用，“ls -la”等价于“ls -l
-  -a”，即同时使用“l”和“a”选项。而“--”一般后面带选项的全名，如“ls -a”等价于“ls --all”。
+-  -options：命令的选项，使用“-”开头的或“--”开头，如前
+   面示例“ls -l”中的-l选项，命令会根据具体的选项执行不同的
+   操作。使用“-”时一般是选项的简写，一些选项可以同时使
+   用，“ls -la”等价于“ls -l -a”，即同时
+   使用“l”和“a”选项。而“--”一般后面带选项的全
+   名，如“ls -a”等价于“ls --all”。
 
 -  argument：命令参数，如前面cd命令中以“/home”可“~”参数作为路径名。
 
@@ -205,7 +205,10 @@ Linux下系统本身就支持数不清的命令，不同的命令又带不同的
 每个命令都会带有一个“-h” 或者“--help”的参数，可以用来打印一些帮
 助说明。比如，现在不知道ls的选项a有什么用法，那么就可以执行下面的命令：
 
-ls --help
+.. code-block:: sh
+   :linenos:
+
+   ls --help
 
 .. image:: media/comman010.png
    :align: center
@@ -215,7 +218,10 @@ ls --help
 
 从上图中圈出来的地方，可以知道参数a可以只列出隐藏的内容。现在执行命令：
 
-ls –a
+.. code-block:: sh
+   :linenos:
+
+   ls –a
 
 
 .. image:: media/comman011.png
@@ -292,13 +298,14 @@ ls –a
 
 如在终端输入：
 
-# 在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
+**# 在后面的说明中，#号表示注释，它后面的内容不要输入到终端中**
 
-# 在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
+.. code-block:: sh
+   :linenos:
 
-ping 127.0.0.1 #尝试ping测试自己的网络地址127.0.0.1
+   ping 127.0.0.1 #尝试ping测试自己的网络地址127.0.0.1
 
-#以上ping命令会持续输出，按下“Ctrl”+“c”组合键来结束
+**以上ping命令会持续输出，按下“Ctrl”+“c”组合键来结束**
 
 
 .. image:: media/comman016.jpg
@@ -313,11 +320,12 @@ ping 127.0.0.1 #尝试ping测试自己的网络地址127.0.0.1
 
 # 在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-# 在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
+.. code-block:: sh
+   :linenos:
 
-ls adfadfadsfadsfa
+   ls adfadfadsfadsfa
 
-#输入后不想运行以上命令，按下“Ctrl”+“c”组合键来结束
+输入以上命令后不想运行以上命令，按下“Ctrl”+“c”组合键来结束
 
 .. image:: media/comman017.jpg
    :align: center
@@ -343,11 +351,13 @@ ls adfadfadsfadsfa
 
 # 在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-which ls # 查看使用的是哪个ls命令
 
-which pwd # 查看使用的是哪个pwd命令
+.. code-block:: sh
+   :linenos:
 
-which cd # 查看使用的是哪个cd命令
+   which ls # 查看使用的是哪个ls命令
+   which pwd # 查看使用的是哪个pwd命令
+   which cd # 查看使用的是哪个cd命令
 
 .. image:: media/comman019.png
    :align: center
@@ -362,7 +372,6 @@ which cd # 查看使用的是哪个cd命令
 的目录下查找有没有该程序，如果有就使用命令选项及参数调用该程序执行，并把程序
 的输出再呈现出来。而这个预定的目录我们可以通过如下命令来查看：
 
-# 在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
 echo $PATH # echo是输出命令，而“$PATH”是一个变量，表示输出变量内容
 
@@ -386,7 +395,10 @@ cd命令
 
 cd命令是change dir的简写，它可以把终端当前所在的路径切换至目标路径。该命令的格式如下：
 
-cd [目录名]
+.. code-block:: sh
+   :linenos:
+
+   cd [目录名]
 
 格式说明中 “目录名”就是要切换至的路径，若目录名称省略，则切换至当前用户的 home 目录 。
 
@@ -396,11 +408,14 @@ cd [目录名]
 
 # 在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-# 假如当前目录为/home/embedfire
+假如当前目录为/home/embedfire
 
-cd test
 
-cd /home/embedfire/test
+.. code-block:: sh
+   :linenos:
+
+   cd test
+   cd /home/embedfire/test
 
 它们都表示切换至“/home/embedfire/test”目录，这其中的“test”就是相对路径，而“/home/embedfire/test”是绝对路径。
 
@@ -420,21 +435,19 @@ cd /home/embedfire/test
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-cd / # 切换至根目录
+.. code-block:: sh
+   :linenos:
 
-ls # 列出当前目录的内容（根目录）
-
-cd - # 返回至上一次的目录（家目录）
-
-cd ..
-# 切换至上一级目录
-
-ls # 列出当前目录的内容（home目录）
-
-cd embedfire # 切换至embedfire目录（请把embedfire换成自己的用户名）
+   cd / # 切换至根目录
+   ls  # 列出当前目录的内容（根目录）
+   cd - # 返回至上一次的目录（家目录）
+   cd .. # 切换至上一级目录
+   ls # 列出当前目录的内容（home目录）
+   cd embedfire # 切换至embedfire目录（请把embedfire换成自己的用户名）
 
 注意以上命令中，命令名cd与路径名之间是有空格的，实际上包括以后使
-用的所有命令中，命令名，命令选项以及命令参数之间都是要有空格分隔开的。
+用的所有命令中，命令名，命令选项以及命令参数之间都是要有空
+格分隔开的。
 
 .. image:: media/comman021.png
    :align: center
@@ -451,7 +464,10 @@ mkdir命令
 
 mkdir命令是make directory的简写，它可以在文件系统中创建一个新的目录。其命令格式如下：
 
-mkdir [-p] 目录名
+.. code-block:: sh
+   :linenos:
+
+   mkdir [-p] 目录名
 
 命令格式中的“目录名”就是要创建的目录路径，“-p”选项可以不输入，若使用了“-p”选项，当创建
 的目录名包含的上级目录不存在时，它会自动创建所有不存在的目录。
@@ -460,19 +476,16 @@ mkdir [-p] 目录名
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-ls # 列出当前目录的内容，此时没有testdir目录
+.. code-block:: sh
+   :linenos:
 
-mkdir testdir # 创建目录testdir
-
-ls # 列出当前目录的内容，发现多了testdir
-
-mkdir other/test # 创建目录other/test，因为other不存在，报错
-
-mkdir -p other/test # 使用 -p 选项创建目录other/test
-
-ls # 列出当前目录的内容，发现other目录
-
-ls other # 列出other目录的内容，发现test目录
+   ls # 列出当前目录的内容，此时没有testdir目录
+   mkdir testdir # 创建目录testdir
+   ls # 列出当前目录的内容，发现多了testdir
+   mkdir other/test # 创建目录other/test，因为other不存在，报错
+   mkdir -p other/test # 使用 -p 选项创建目录other/test
+   ls # 列出当前目录的内容，发现other目录
+   ls other # 列出other目录的内容，发现test目录
 
 .. image:: media/comman022.png
    :align: center
@@ -487,15 +500,20 @@ touch命令可以创建不存在的文件，或者touch通过参数修改目录�
 
 它的命令格式如下：
 
-touch 文件名
+.. code-block:: sh
+   :linenos:
+
+   touch 文件名
 
 尝试执行如下命令：
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-touch helloworld # 在当前目录下创建一个名为helloworld的文件
+.. code-block:: sh
+   :linenos:
 
-ls # 显示当前目录下的内容
+   touch helloworld # 在当前目录下创建一个名为helloworld的文件
+   ls # 显示当前目录下的内容
 
 使用touch命令，新建一个helloworld的文件，然后使用ls命令来查看文件是否被创建，执行结果如下图所示。
 
@@ -513,7 +531,10 @@ ls命令是list的简写，在前面我们已经频繁使用，它是Linux下最
 
 ls命令格式如下：
 
-ls [选项] [目录]
+.. code-block:: sh
+   :linenos:
+
+   ls [选项] [目录]
 
 当“目录”参数省略时，它会列出当前目录的内容。
 
@@ -533,11 +554,12 @@ ls [选项] [目录]
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-ls # 列出当前目录的内容
+.. code-block:: sh
+   :linenos:
 
-ls -a # 显示当前目录下的所有内容
-
-ls -A # 显示当前目录下除“.” 及 “..”外的所有内容
+   ls # 列出当前目录的内容
+   ls -a # 显示当前目录下的所有内容
+   ls -A # 显示当前目录下除“.” 及 “..”外的所有内容
 
 .. image:: media/comman024.jpg
    :align: center
@@ -550,17 +572,20 @@ ls -A # 显示当前目录下除“.” 及 “..”外的所有内容
 
 除此之外，在终端上罗列出来的文件是白色的字体，而文件夹是淡蓝色的字体，以此来区分文件和文件夹。
 
-特别地，有时我们需要查看文件的详细信息，可以使用“-l”参数，我们尝试执行以下命令：
+特别地，有时我们需要查看文件的详细信息，可以使用“-l”参数，我们尝
+试执行以下命令：
 
-ls -l
+.. code-block:: sh
+   :linenos:
 
-可以看到如下图的结果 参数l的执行结果的结果，得到当前目录下所有文件所占用的空间总和以及一个7个字段的列表。
+   ls -l
+
+可以看到如下图的结果 参数l的执行结果的结果，得到当前目
+录下所有文件所占用的空间总和以及一个7个字段的列表。
 
 .. image:: media/comman025.jpg
    :align: center
    :alt: 未找到图片
-
-
 
 
 各个字段的说明如下：
@@ -627,11 +652,18 @@ cat命令是concatenate的简写，译为串联，即它可以把两个内容串
 
 命令格式为：
 
-cat 文件名
+.. code-block:: sh
+   :linenos:
 
-前面我们使用gedit编辑器保存了一些内容到test123.txt文件上，此处可以使用如下命令把它的内容输出到终端：
+   cat 文件名
 
-cat test123.txt
+前面我们使用gedit编辑器保存了一些内容到test123.txt文件上，此处
+可以使用如下命令把它的内容输出到终端：
+
+.. code-block:: sh
+   :linenos:
+
+   cat test123.txt
 
 
 .. image:: media/comman028.png
@@ -639,35 +671,35 @@ cat test123.txt
    :alt: 未找到图片
 
 
-
-
-
 echo命令
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-echo命令的功能是在终端上打印一段文字，也可以把终端的变量内容打印出来。
+echo命令的功能是在终端上打印一段文字，也可以把终端
+的变量内容打印出来。
 
 其命令格式如下：
 
-echo “字符串”
+.. code-block:: sh
+   :linenos:
 
-echo 字符串
+   echo “字符串”
+   echo 字符串
+   echo $变量名
 
-echo $变量名
-
-使用echo命令时，带双引号和不带双引号的效果是一样的，使用引号时，要注意用英文符号。
+使用echo命令时，带双引号和不带双引号的效果是一样
+的，使用引号时，要注意用英文符号。
 
 我们尝试执行如下命令：
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-echo “test” # 打印字符串test
+.. code-block:: sh
+   :linenos:
 
-echo test # 打印字符串test
-
-echo $PATH # 打印环境变量PATH
-
-echo “$PATH” # 打印环境变量PATH
+   echo “test” # 打印字符串test
+   echo test # 打印字符串test
+   echo $PATH # 打印环境变量PATH
+   echo “$PATH” # 打印环境变量PATH
 
 
 .. image:: media/comman029.png
@@ -687,9 +719,11 @@ echo “$PATH” # 打印环境变量PATH
 
 使用格式如下：
 
-命令 > 文件名
+.. code-block:: sh
+   :linenos:
 
-命令 >> 文件名
+   命令 > 文件名
+   命令 >> 文件名
 
 重定向时文件不存在会自动创建。
 
@@ -697,21 +731,17 @@ echo “$PATH” # 打印环境变量PATH
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-echo test > file.txt # 把echo test的输出重定向至file.txt文件
+.. code-block:: sh
+   :linenos:
 
-cat file.txt # 查看file.txt文件的内容
-
-echo abc > file.txt # 把echo abc 的输出重定向至file.txt文件
-
-cat file.txt # 查看file.txt文件的内容
-
-echo 123456 >> file.txt # 把echo 123456的输出重定向追加至file.txt文件
-
-cat file.txt # 查看file.txt文件的内容
-
-ls > file.txt # 把ls命令的输出重定向至file.txt文件
-
-cat file.txt # 查看file.txt文件的内容
+   echo test > file.txt # 把echo test的输出重定向至file.txt文件
+   cat file.txt # 查看file.txt文件的内容
+   echo abc > file.txt # 把echo abc 的输出重定向至file.txt文件
+   cat file.txt # 查看file.txt文件的内容
+   echo 123456 >> file.txt # 把echo 123456的输出重定向追加至file.txt文件
+   cat file.txt # 查看file.txt文件的内容
+   ls > file.txt # 把ls命令的输出重定向至file.txt文件
+   cat file.txt # 查看file.txt文件的内容
 
 
 .. image:: media/comman030.png
@@ -721,7 +751,8 @@ cat file.txt # 查看file.txt文件的内容
 
 
 
-上图演示了echo命令和ls命令的输出重定向至文件file.txt中，重定向执行命令后输出不会显示在终端上。
+上图演示了echo命令和ls命令的输出重定向至
+文件file.txt中，重定向执行命令后输出不会显示在终端上。
 
 rmdir命令
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -730,20 +761,28 @@ rmdir命令是remove directory的简写，它的功能是删除空的目录。
 
 命令格式如下：
 
-rmdir [-p] 目录名
+.. code-block:: sh
+   :linenos:
 
-与mkdir的选项类似，-p可以用来递归删除目录，如果子目录删除后其父目录为空时，也一同被删除。
+   rmdir [-p] 目录名
 
-特别地，rmdir命令只能够用来删除空目录，当删除一个非空目录时，会提示“删除“某某某”目录失
+与mkdir的选项类似，-p可以用来递归删除目录，如果子目
+录删除后其父目录为空时，也一同被删除。
+
+特别地，rmdir命令只能够用来删除空目录，当删除一个非空
+目录时，会提示“删除“某某某”目录失
 败：目录非空”，所以实际上这个命令用得并不多。
 
-下面我们执行以下命令，来删除我们上面创建testdir目录和其other/test及其子目录。
+下面我们执行以下命令，来删除我们上面创建testdir目录
+和其other/test及其子目录。
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-rmdir testdir # 删除testdir目录
+.. code-block:: sh
+   :linenos:
 
-rmdir -p other/test # 删除other/test目录，若删除后other为空，把other目录也删除掉
+   rmdir testdir # 删除testdir目录
+   rmdir -p other/test # 删除other/test目录，若删除后other为空，把other目录也删除掉
 
 .. image:: media/comman031.png
    :align: center
@@ -763,11 +802,17 @@ rm命令是remove的简写，它的功能是删除一个或多个文件或目录
 
 其命令格式如下：
 
-rm [选项] 一个或多个文件/文件夹名
+.. code-block:: sh
+   :linenos:
 
-使用rm命令删除内容时，文件是会被直接永久删除的，它并不会放到回收站
-中再确认。所以在使用rm命令前，一定要考虑清楚。特别时如果你使用的是系
-统管理员账户或者通过后面介绍的sudo命令获取了系统权限，那么只需要一句命令就可以实现删库跑路，酿成大祸！
+   rm [选项] 一个或多个文件/文件夹名
+
+使用rm命令删除内容时，文件是会被直接永久删除的，它并
+不会放到回收站
+中再确认。所以在使用rm命令前，一定要考虑清楚。特别
+时如果你使用的是系
+统管理员账户或者通过后面介绍的sudo命令获取了系统
+权限，那么只需要一句命令就可以实现删库跑路，酿成大祸！
 
 它支持的选项如下：
 
@@ -785,16 +830,22 @@ rm [选项] 一个或多个文件/文件夹名
 
 #先创建一些试验文件给后面删除
 
-mkdir -p ABC/test #创建ABC/test目录
+.. code-block:: sh
+   :linenos:
 
-ls #列出内容
+   mkdir -p ABC/test #创建ABC/test目录
+   ls #列出内容
 
-touch a.txt b.txt c.txt d.txt #创建 几个测试文件
+.. code-block:: sh
+   :linenos:
 
-ls #列出内容
+   touch a.txt b.txt c.txt d.txt #创建 几个测试文件
+   ls #列出内容
 
-先结合前面学习的mkdir和touch命令，在当前目录创建一个ABC目录，里面包含了一
-个子目录test还有a.txt，b.txt， c.txt，d.txt，执行结果如下图所示。
+先结合前面学习的mkdir和touch命令，在当前目录创建
+一个ABC目录，里面包含了一
+个子目录test还有a.txt，b.txt， c.txt，d.txt，执行结果
+如下图所示。
 
 
 .. image:: media/comman032.png
@@ -809,13 +860,17 @@ ls #列出内容
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-rm a.txt b.txt #直接删除a.txt b.txt
+.. code-block:: sh
+   :linenos:
 
-rm –i c.txt d.txt #询问式删除c.txt d.txt
+   rm a.txt b.txt #直接删除a.txt b.txt
+   rm –i c.txt d.txt #询问式删除c.txt d.txt
 
 执行上面两条命令的其中一条都可以完成删除任务。当带有参
-数i时，则会有询问是否删除文件，如果是，输入y；反之，则输入n。如下图所示，直接
-删除了a.txt，b.txt。使用询问式删除时，删除了c.txt，保留了d.txt文件。
+数i时，则会有询问是否删除文件，如果是，输入y；反之，则输
+入n。如下图所示，直接
+删除了a.txt，b.txt。使用询问式删除时，删除了c.txt，保留
+了d.txt文件。
 
 
 .. image:: media/comman033.png
@@ -828,9 +883,13 @@ rm –i c.txt d.txt #询问式删除c.txt d.txt
 删除非空目录
 ''''''''''''''''''''''''''''''''''''
 
-前面提到rmdir命令不能删除非空的目录，我们可以使用rm命令配合“-r”选项来完成：
+前面提到rmdir命令不能删除非空的目录，我们可以使用rm命令
+配合“-r”选项来完成：
 
-rm –r ABC/
+.. code-block:: sh
+   :linenos:
+
+   rm –r ABC/
 
 .. image:: media/comman034.png
    :align: center
@@ -839,7 +898,8 @@ rm –r ABC/
 
 
 
-执行以上命令之后，就会把目录ABC以及子目录test，即ABC下的内容统统都删除掉。因此，为了防止误
+执行以上命令之后，就会把目录ABC以及
+子目录test，即ABC下的内容统统都删除掉。因此，为了防止误
 删文件，使用rm命令时尽可能加上参数i。
 
 选项-f的作用
@@ -847,16 +907,15 @@ rm –r ABC/
 
 执行以下两条命令，比较执行结果的差异：
 
-rm a.txt
+.. code-block:: sh
+   :linenos:
 
-rm –f a.txt
+   rm a.txt
+   rm –f a.txt
 
 .. image:: media/comman035.png
    :align: center
    :alt: 未找到图片
-
-
-
 
 
 当使用第一条命令时，会提示“删除失败，找不到该文件”，但是当我们
@@ -868,9 +927,12 @@ sudo命令
 
 sudo命令是switch user do的简写，意思是切换用户去做某件事情。
 
-在Linux中，有一个名为root的超级用户。它可以做任何事情，权力越大，责任越大
-因此在日常工作中，若一时没注意输入了错误的命令，可能会导致系统崩溃，所以在Ubuntu下默认是
-不能用root用户登录的。但是在很多情况下我们又需要用到root的权限，如安装某个软件，若使用
+在Linux中，有一个名为root的超级用户。它可以做任何事情，权力越
+大，责任越大
+因此在日常工作中，若一时没注意输入了错误的命令，可能会
+导致系统崩溃，所以在Ubuntu下默认是
+不能用root用户登录的。但是在很多情况下我们又需要用到root的
+权限，如安装某个软件，若使用
 普通的用户会提示“权限不够”。
 这时候我们可以在需要root权限的命令前添加sudo命令，从而使当前用户获得root权限，并执
 行其后的命令。所以Ubuntu需要用sudo实际上是提醒我们接下来执行的命令有可能会影响
@@ -878,7 +940,10 @@ sudo命令是switch user do的简写，意思是切换用户去做某件事情�
 
 sudo命令格式如下：
 
-sudo 命令
+.. code-block:: sh
+   :linenos:
+
+   sudo 命令
 
 使用sudo命令时会提示输入你当前的用户密码，而不是root用户的密码。请注意，你输入的密码不会显示在终端上，而且终端也不会随着你的输入而显示星号（*）！自信地在键盘上敲入密码，然后按回车即可。
 
@@ -886,21 +951,18 @@ sudo 命令
 
 #在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
 
-cd /home # 切换至/home目录
+.. code-block:: sh
+   :linenos:
 
-touch test.txt # 尝试在当前目录创建test.txt文件
+   cd /home # 切换至/home目录
+   touch test.txt # 尝试在当前目录创建test.txt文件
+   sudo touch test.txt # 使用sudo增加权限，创建test.txt文件
 
-sudo touch test.txt # 使用sudo增加权限，创建test.txt文件
-
-# 输入密码时终端也不会随着输入而显示星号（*），输入完回车即可！
-
-# 输入密码时终端也不会随着输入而显示星号（*），输入完回车即可！
-
-# 输入密码时终端也不会随着输入而显示星号（*），输入完回车即可！
-
-rm test.txt # 尝试删除test.txt文件
-
-sudo rm test.txt # 使用sudo增加权限，删除test.txt文件
+   # 输入密码时终端也不会随着输入而显示星号（*），输入完回车即可！
+   # 输入密码时终端也不会随着输入而显示星号（*），输入完回车即可！
+   # 输入密码时终端也不会随着输入而显示星号（*），输入完回车即可！
+   rm test.txt # 尝试删除test.txt文件
+   sudo rm test.txt # 使用sudo增加权限，删除test.txt文件
 
 .. image:: media/comman036.jpg
    :align: center
@@ -925,16 +987,21 @@ clear命令
 
 终端执行各种命令后会保留之前的内容在屏幕上，如果觉得碍眼，可以直接运行clear命令清除：
 
-clear
+.. code-block:: sh
+   :linenos:
+
+   clear
 
 reboot/poweroff命令
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 在终端上，reboot/poweroff命令来控制系统的重启与关机。直接使用如下命令即可：
 
-reboot
+.. code-block:: sh
+   :linenos:
 
-poweroff
+   reboot
+   poweroff
 
 man命令
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -949,11 +1016,19 @@ man基本用法
 
 man命令格式：
 
-man [要查询的内容]
+.. code-block:: sh
+   :linenos:
 
-使用起来非常简单，如我们想查看ls命令的说明，直接输入如下命令即可：
+   man [要查询的内容]
 
-man ls
+使用起来非常简单，如我们想查看ls命令的说明，直接输
+入如下命令即可：
+
+
+.. code-block:: sh
+   :linenos:
+
+   man ls
 
 .. image:: media/comman037.png
    :align: center
@@ -971,7 +1046,10 @@ man手册的章节
 
 关于man手册本身的使用，可以使用如下命令查看：
 
-man man
+.. code-block:: sh
+   :linenos:
+
+   man man
 
 .. image:: media/comman038.png
    :align: center
@@ -979,15 +1057,15 @@ man man
 
 
 
-
-
 从上图可了解到，除了Shell命令外，还可以看到man手册支持共9种类型
 的内容，如第一章是关于Shell命令，第二章是系统调用（内核提供的函数）、第三章
 是库调用（程序库中的函数），如我们可以查看内核函数fork及C标准库函数printf的说明：
 
-man fork
+.. code-block:: sh
+   :linenos:
 
-man printf
+   man fork
+   man printf
 
 .. image:: media/comman039.png
    :align: center
@@ -1001,19 +1079,28 @@ man printf
 
 
 
-说明页开头的 “FORK(2)”、 “PRINTF(1)”括号内的数字表明了它在man手册中的章节号。即此处的FORK页的说明是
-第二章的内容，正是我们要查询的内核函数说明（系统调用）。而此处PRINTF页面实际是第一章的内容，man手册的第
+说明页开头的 “FORK(2)”、 “PRINTF(1)”括号内的数字表明了它
+在man手册中的章节号。即此处的FORK页的说明是
+第二章的内容，正是我们要查询的内核函数说明（系统调用）。而
+此处PRINTF页面实际是第一章的内容，man手册的第
 一章是关于Shell命令的，在Shell中刚好有一个命令也是
-名为“printf”，所以它出现了这样的搜索结果，该页的说明不是我们想要的C库函数内容，C库函数的说明应位于man手册的第三章。
+名为“printf”，所以它出现了这样的搜索结果，该页的说明不是我
+们想要的C库函数内容，C库函数的说明应位于man手册的第三章。
 
 查询指定章节的内容
 '''''''''''''''''''''''''''''''''''''''''
 
-man是按默认顺序来查找的，有时我们要查阅的内容可能在前面的手册出现，而它不是我们需要的内容，例如前面的C库函数printf ，或者查阅open系统调用函数时，出现的却是Shell的printf和openvt程序说明：
+man是按默认顺序来查找的，有时我们要查阅的内容可能在前面的手
+册出现，而它不是我们需要的内容，例如前面的C库函数printf ，或者
+查阅open系统调用函数时，出现的却是Shell的printf和openvt程序说明：
 
-#直接man open，它会按默认顺序搜索，结果搜索出了openvt的Shell命令说明
+#直接man open，它会按默认顺序搜索，结果搜索出了openvt的Shell命
+令说明
 
-man open
+.. code-block:: sh
+   :linenos:
+
+   man open
 
 .. image:: media/comman041.png
    :align: center
@@ -1028,23 +1115,35 @@ man open
 面的man命令输出中可看到“库调用”属于第3章，而“系统调用”是属
 于第2章，所以使用man命令时，我们通过“-s”选项指定它搜索的章节号：
 
-#通过-s指定搜索章节的内容
+通过-s指定搜索章节的内容
 
-#man手册的章节3是“库调用”相关的函数说明
+man手册的章节3是“库调用”相关的函数说明
 
-man -s 3 printf
+.. code-block:: sh
+   :linenos:
 
-#可以省略-s，使用以下命令是等价的
+   man -s 3 printf
 
-man 3 printf
+可以省略-s，使用以下命令是等价的
 
-#man手册的章节2是“系统调用”相关的函数说明
+.. code-block:: sh
+   :linenos:
 
-man -s 2 open
+   man 3 printf
 
-#可以省略-s，使用以下命令是等价的
+man手册的章节2是“系统调用”相关的函数说明
 
-man 2 open
+.. code-block:: sh
+   :linenos:
+
+   man -s 2 open
+
+可以省略-s，使用以下命令是等价的
+
+.. code-block:: sh
+   :linenos:
+
+   man 2 open
 
 .. image:: media/comman042.png
    :align: center

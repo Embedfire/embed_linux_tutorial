@@ -21,9 +21,6 @@ deb包、dpkg及apt
 
 
 
-
-
-
 .. image:: media/softwa002.jpg
    :align: center
    :alt: 未找到图片02|
@@ -32,7 +29,10 @@ deb包、dpkg及apt
 
 若下载了deb软件包，可使用如下命令进行安装，其中xxxx.deb为要安装的软件包的名字：
 
-sudo dpkg -i xxxx.deb
+.. code-block:: sh
+   :linenos:
+
+   sudo dpkg -i xxxx.deb
 
 命令中的dpkg（Debian Packager）是Debian专门开发的包管理工具，它可以用
 来安装、更新和移除软件，安装时它需要使用deb软件包。
@@ -44,7 +44,10 @@ dpkg是一个底层的包管理工具，主要用于对已下载到本地和已�
 
 如果是使用apt工具安装某个软件，直接使用如下命令即可，它会自动下载并安装软件：
 
-sudo apt-get install 软件名
+.. code-block:: sh
+   :linenos:
+
+   sudo apt-get install 软件名
 
 概括起来可以这么理解，deb是软件包，dpkg是手动安装工具，apt是自动安装工具。
 
@@ -62,7 +65,10 @@ rpm包、rpm及yum
 
 若下载了rpm软件包，可使用如下命令进行安装，其中xxxx.rpm为要安装的软件包的名字：
 
-rpm -ivh xxxx.rpm
+.. code-block:: sh
+   :linenos:
+
+   rpm -ivh xxxx.rpm
 
 命令中的rpm与dpkg的功能类似，同样是主要用于对已下载到本地和已经安装
 的软件包进行管理。在它之上yum（Yellow dog Updater, Modified）包管理
@@ -70,11 +76,14 @@ rpm -ivh xxxx.rpm
 
 使用yum安装软件的命令如下，同样地，它会自动下载并完成安装：
 
-yum install 软件名
+.. code-block:: sh
+   :linenos:
 
-关于这些软件包和工具，总结如表 8‑1：
+   yum install 软件名
 
-表 8‑1 软件包和工具
+关于这些软件包和工具，总结如下表：
+
+表  软件包和工具
 
 ============== ================ ================
 \              Debian派系发行版 Redhat派系发行版
@@ -89,17 +98,24 @@ apt工具使用
 
 本书使用的Linux发行版是Ubuntu，对应的包管理工具就是apt工具，apt包管
 理工具包含了apt-get工具，主要负责软件包的的安装、卸载以及更新等事务，除
-此之外，还有apt-cache，用于查询软件包的相关信息，apt-config，用于配置所有apt工具。
+此之外，还有apt-cache，用于查询软件包的相关信息，apt-config，用于配
+置所有apt工具。
 
 安装与删除软件包
 ^^^^^^^^
 
-apt-get install
+.. code-block:: sh
+   :linenos:
+
+   apt-get install
 '''''''''''''''
 
 使用apt-get工具安装程序的时候，需要你知道应用程序的名字。具体的命令语法：
 
-sudo apt-get install 软件包名
+.. code-block:: sh
+   :linenos:
+
+   sudo apt-get install 软件包名
 
 apt-get install会扫描本地存放的软件包更新列表/var/lib/apt/lists/，找
 到最新版本的软件包，然后检查软件包依赖关系，找到支持该软件正常运行的
@@ -131,7 +147,8 @@ apt-get install会扫描本地存放的软件包更新列表/var/lib/apt/lists/�
 
 
 
-上图则是apt-get install从镜像源http://cn.archive.ubuntu.com/ubuntu中下载所需要的软件，并且
+上图则是apt-get install从镜
+像源http://cn.archive.ubuntu.com/ubuntu中下载所需要的软件，并且
 自动解压，完成安装的整个过程。
 
 运行刚刚安装的软件，在终端输入命令：sl，就可以看到下图的画面。
@@ -147,7 +164,10 @@ apt-get remove
 
 讲了如何安装软件，自然也要知道如何卸载一个软件，具体的命令语法如下：
 
-sudo apt-get remove 软件包名
+.. code-block:: sh
+   :linenos:
+
+   sudo apt-get remove 软件包名
 
 .. image:: media/softwa008.jpg
    :align: center
@@ -176,7 +196,8 @@ sudo apt-get remove 软件包名
 这些镜像站通常包含非常丰富的软件，以清华大学镜像源的网站为例，见下图，在其镜
 像列表中可以找到ubuntu的软件源，点击ubuntu右侧的“？”，还可以查看到如下的帮助说明。
 
-   .. image:: media/softwa009.png
+
+.. image:: media/softwa009.png
    :align: center
    :alt: 未找到图片09|
 
@@ -267,9 +288,13 @@ sudo apt-get remove 软件包名
 下修改配置文件的过程吧。修改配置文件的步骤为：熟悉配置文件的格式->修改配置文件->更新配置。
 
 我们先来了解软件源配置文件的格式，在Ubunut下，软件源的配置是记录
-在文件/etc/apt/sources.list中的，我们可以通过cat命令输出该文件的内容，查看自己电脑上的源配置：
+在文件/etc/apt/sources.list中的，我们可以通过cat命令输出该文件的内容，查
+看自己电脑上的源配置：
 
-cat /etc/apt/sources.list
+.. code-block:: sh
+   :linenos:
+
+   at /etc/apt/sources.list
 
 .. image:: media/softwa018.png
    :align: center
@@ -315,7 +340,8 @@ deb/deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic               ma
    了包管理工具中的软件都是经过Linux开发者在特定的硬件平台上编译成功
    之后，发布出来的。因此，同一个软件，在不同的平台上不一定适用，因此，在
    下载的时候，千万不能搞错版本，张冠李戴。Ubuntu中的每个版本都是由一个形容词和一个动物名称组
-   成，并且形容词和名词的首字母都是一致的。如果当前版本的首字母是 D ，下个版本就要以 E 来起头。
+   成，并且形容词和名词的首字母都是一致的。如果当前版本的首字母是 D ，下个
+   版本就要以 E 来起头。
 
 表  Ubuntu发行版版本代号
 
@@ -343,18 +369,27 @@ deb/deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic               ma
 
 建议在修改软件源前，使用如下复制命令对原文件进行备份：
 
-cp /etc/apt/sources.list /etc/apt/sources_bk.list
+.. code-block:: sh
+   :linenos:
+
+   cp /etc/apt/sources.list /etc/apt/sources_bk.list
 
 若修改后使用有问题，使用备份的/etc/apt/sources_bk.list覆盖原文件后更新即可。
 
 由于修改/etc/apt/sources.list配置文件通常需要管理员权限，
 普通用户在图形界面直接双击打开该文件时，Ubuntu系统自带的编辑器gedit只有只读权限，无法修改。可以在终端中使用sudo以管理员的身份运行gedit，并打开/etc/apt/sources.list文件进行修改，命令如下：
 
-sudo gedit /etc/apt/sources.list
+.. code-block:: sh
+   :linenos:
 
-在后面的系统应用中，我们常常需要修改某些系统配置文件，都可以通过这种方式使用gedit进行修改，把命令中的文件名改成目标文件即可。
+   sudo gedit /etc/apt/sources.list
 
-如果系统没有gedit或者没有图形界面，一般直接在终端下使用Vi/Vim编辑器进行修改，不会使用Vi/Vim的话，请在学习《使用Vim编辑器》的章节后再进行修改。
+在后面的系统应用中，我们常常需要修改某些系统配置文件，都可以通过这
+种方式使用gedit进行修改，把命令中的文件名改成目标文件即可。
+
+如果系统没有gedit或者没有图形界面，一般直接在终端下使
+用Vi/Vim编辑器进行修改，不会使用Vi/Vim的话，请在学习《使用Vim编辑器》的章
+节后再进行修改。
 
 把前面镜像源使用帮助的sources.list文件内容复制替换文件/etc/apt/sources.list的原内容，保存后退出即可。
 
@@ -369,7 +404,10 @@ sudo gedit /etc/apt/sources.list
 
 用户一旦修改了软件源配置文件/etc/apt/sources.list，需要运行apt-get update命令来更新软件源中的所有软件列表。
 
-sudo apt-get update
+.. code-block:: sh
+   :linenos:
+
+   sudo apt-get update
 
 .. image:: media/softwa020.png
    :align: center
@@ -392,7 +430,8 @@ update的过程中，也只会去获取main类型的软件包。此外，图中
 
 
 
-本书的虚拟机使用的64位机器，我们打开上图选中的文件，该文件主要记录了所有适用于am64架构处理器的软件包。
+本书的虚拟机使用的64位机器，我们打开上图选中的文件，该文件主要
+记录了所有适用于am64架构处理器的软件包。
 
 .. image:: media/softwa022.jpeg
    :align: center
@@ -416,9 +455,9 @@ update的过程中，也只会去获取main类型的软件包。此外，图中
       rubric:: apt-cache工具 :name: apt-cache工具
 
 apt-cache是Ubuntu的另一个APT软件包管理工具。通过apt-cache工具
-配合对应的子命令，可以实现查找，显示软件包信息及包依赖关系等功能，见表格 8‑3。
+配合对应的子命令，可以实现查找，显示软件包信息及包依赖关系等功能，见下表。
 
-表格 8‑3 apt-cache工具
+表  apt-cache工具
 
 ========================== ============================================
 命令                       作用
@@ -434,7 +473,10 @@ apt-cache policy 软件包名  显示软件包的安装状态
 
 例如，可通过如下命令搜索支持ifconfig命令的软件包：
 
-apt-cache search ifconfig
+.. code-block:: sh
+   :linenos:
+
+   apt-cache search ifconfig
 
 .. image:: media/softwa023.png
    :align: center
@@ -454,7 +496,10 @@ apt与apt-get
 前面介绍命令“apt-get install”时，已经为大家演示了如何安装软件。下面的实验
 是大多数初学者经常会遇到的情况。现在我们执行下面的命令：
 
-vim
+.. code-block:: sh
+   :linenos:
+
+   vim
 
 终端会告诉你，找不到这个vim命令，并告诉你可以用下面提供命令来安
 装软件，如下图所示。Linux的终端往往会输出一些有利于我们
@@ -497,7 +542,10 @@ apt list             根据名称列出所有的软件包
 
 我们输入命令：
 
-sudo apt install vim
+.. code-block:: sh
+   :linenos:
+
+   sudo apt install vim
 
 之后，会提示你输入密码，接着便开始下载，安装软件
 了。软件安装完成之后，再执行命令vim，终端就不会再报

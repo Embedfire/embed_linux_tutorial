@@ -48,7 +48,10 @@ clone命令去克隆nxp官方提供的内核镜像，这样子就能保留镜像
 
 使用git clone命令克隆内核镜像，然后等待克隆完成即可：
 
-git clone git://git.freescale.com/imx/linux-imx.git
+.. code-block:: sh
+   :linenos:
+
+   git clone git://git.freescale.com/imx/linux-imx.git
 
 由于网站是国外的，可能会非常慢，甚至出现下载失败现象，建议使用野火资料包中的
 源码进行开发，我们已经将源码提交到腾讯云开发者平台，直接使用git clone命令克隆内核镜像即可：
@@ -57,7 +60,10 @@ git clone git://git.freescale.com/imx/linux-imx.git
 
 命令
 
-git clone https://git.dev.tencent.com/flyleaf91/imx-linux.git
+.. code-block:: sh
+   :linenos:
+
+   git clone https://git.dev.tencent.com/flyleaf91/imx-linux.git
 
 运行结果
 
@@ -75,33 +81,54 @@ checkout命令手动切换到imx_4.1.15_2.0.0_ga分支，然后就可以看到�
 
 进入imx-linux目录
 
-embedfire @embedfire_dev:~$ cd imx-linux/embedfire @embedfire_dev:~/imx-linux$ ls
+.. code-block:: sh
+   :linenos:
+
+   embedfire @embedfire_dev:~$ cd imx-linux/embedfire @embedfire_dev:~/imx-linux$ ls
 
 命令
 
-embedfire @embedfire_dev:~/imx-linux$ git branch –a
+.. code-block:: sh
+   :linenos:
+
+   embedfire @embedfire_dev:~/imx-linux$ git branch –a
 
 输出
 
-remotes/origin/imx_4.1.15_2.0.0_ga remotes/origin/show
+.. code-block:: sh
+   :linenos:
+
+   remotes/origin/imx_4.1.15_2.0.0_ga remotes/origin/show
 
 手动切换分支
 
-embedfire @embedfire_dev:~/imx-linux$ git checkout imx_4.1.15_2.0.0_ga
+.. code-block:: sh
+   :linenos:
+
+   embedfire @embedfire_dev:~/imx-linux$ git checkout imx_4.1.15_2.0.0_ga
 
 输出
 
-Checking out files: 100% (50159/50159), done.Branch 'imx_4.1.15_2.0.0_ga' set up to track remote branch 'imx_4.1.15_2.0.0_ga' from 'origin'.Switched
-to a new branch 'imx_4.1.15_2.0.0_ga'
+.. code-block:: sh
+   :linenos:
+
+   Checking out files: 100% (50159/50159), done.Branch 'imx_4.1.15_2.0.0_ga' set up to track remote branch 'imx_4.1.15_2.0.0_ga' from 'origin'.Switched
+   to a new branch 'imx_4.1.15_2.0.0_ga'
 
 命令
 
-embedfire @embedfire_dev:~/imx-linux$ ls
+.. code-block:: sh
+   :linenos:
+
+   embedfire @embedfire_dev:~/imx-linux$ ls
 
 输出
 
-arch COPYING CREDITS Documentation firmware include ipc Kconfig lib Makefile net REPORTING-BUGS scripts sound usrblock copy.sh crypto drivers fs init
-Kbuild kernel MAINTAINERS mm README samples security tools virt
+.. code-block:: sh
+   :linenos:
+
+   arch COPYING CREDITS Documentation firmware include ipc Kconfig lib Makefile net REPORTING-BUGS scripts sound usrblock copy.sh crypto drivers fs init
+   Kbuild kernel MAINTAINERS mm README samples security tools virt
 
 内核源码目录
 ~~~~~~
@@ -190,9 +217,14 @@ imx_v6_v7_defconfig、imx_v7_defconfig这两个文件是nxp官方提供的默认
 
 命令
 
-embedfire @embedfire_dev:~/imx-linux$ git log
+.. code-block:: sh
+   :linenos:
+
+   embedfire @embedfire_dev:~/imx-linux$ git log
 
 输出
+
+
 
 commit 00ce0881a15f0a140f6a684cafea06e114e0c6c7 (HEAD -> imx_4.1.15_2.0.0_ga, origin/imx_4.1.15_2.0.0_ga)Author: flyleaf91 <flyleaf91@163.com>Date:
 Tue Aug 27 02:31:51 2019 +0000 添加ebf config文件commit 2d1ca998ace53ee6f9f053b99296166e80321b6aAuthor: pengjie <jiejie.128@163.com>Date: Mon Aug 26
@@ -204,15 +236,22 @@ pengjie <jiejie.128@163.com>Date: Mon Aug 5 21:25:11 2019 +0800 适配4.3寸，5
 30278abfe0977b1d2f065271ce1ea23c0e2d1b6e (tag: rel_imx_4.1.15_2.1.0_ga)Author: Robby Cai <robby.cai@nxp.com>Date: Thu May 4 14:52:24 2017 +0800
 MLK-14762 ARM: dts: imx6sll-evk: correct gpio pin for lcd power control
 
-在编译内核前需要安装编译内核的工具链：arm-linux-gnueabihf-gcc，我们使用的是v7.4.0版本，大家可以通过命令安装：
+在编译内核前需要安装编译内核的工具链：arm-linux-gnueabihf-gcc，我们使用的是v7.4.0版本，大家可以
+通过命令安装：
 
-sudo apt-get install gcc-arm-linux-gnueabihf
+.. code-block:: sh
+   :linenos:
+
+   sudo apt-get install gcc-arm-linux-gnueabihf
 
 然后可以通过arm-linux-gnueabihf-gcc –v命令查看交叉编译器的版本号（我的虚拟机上是7.4.0版本，即使是不一样的版本有也是没有问题的，都是可以编译通过的）：
 
 命令
 
-embedfire @embedfire_dev:~/imx-linux$ arm-linux-gnueabihf-gcc -v
+.. code-block:: sh
+   :linenos:
+
+   embedfire @embedfire_dev:~/imx-linux$ arm-linux-gnueabihf-gcc -v
 
 输出
 
@@ -237,7 +276,10 @@ export PATH=/opt/arm-gcc/bin:$PATHexport ARCH=arm export CROSS_COMPILE=arm-linux
 
 命令
 
-embedfire @embedfire_dev:~/imx-linux$ make ARCH=arm imx_v7_ebf_defconfig
+.. code-block:: sh
+   :linenos:
+
+   embedfire @embedfire_dev:~/imx-linux$ make ARCH=arm imx_v7_ebf_defconfig
 
 输出
 
@@ -314,15 +356,21 @@ Dallas's 1-wire suppor选项中，然后进入它的选项下进行选择即可�
 
 命令
 
-embedfire @embedfire_dev:~/imx-linux$ make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf-
+.. code-block:: sh
+   :linenos:
+
+   embedfire @embedfire_dev:~/imx-linux$ make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf-
 
 输出
 
-···
+.. code-block:: sh
+   :linenos:
 
-OBJCOPY arch/arm/boot/zImage Kernel: arch/arm/boot/zImage is ready
-
-···
+   ···
+   
+   OBJCOPY arch/arm/boot/zImage Kernel: arch/arm/boot/zImage is ready
+   
+   ···
 
 这个命令编译的不仅仅是内核，还会编译设备树，设备树编译后产生的.dtb文
 件存在arch/arm/boot/dts/目录下，我们可以通过ls arch/arm/boot/dts/ \| grep .dtb命令
@@ -330,7 +378,10 @@ OBJCOPY arch/arm/boot/zImage Kernel: arch/arm/boot/zImage is ready
 
 命令
 
-embedfire @embedfire_dev:~/imx-linux$ ls arch/arm/boot/dts/ \| grep .dtb
+.. code-block:: sh
+   :linenos:
+
+   embedfire @embedfire_dev:~/imx-linux$ ls arch/arm/boot/dts/ \| grep .dtb
 
 输出
 
@@ -358,8 +409,11 @@ weim-50-70-dht11-update.dtbimx6ull-14x14-evk-gpmi-weim-50-70.dtbimx6ull-14x14-ev
 
 当内核启动后，我们登陆root用户，就可以通过cat /proc/version命令查看内核版本：
 
-imx6ull14x14evk login: rootroot@imx6ull14x14evk:~# cat /proc/versionLinux version 4.1.15-2.1.0-00162-gd815328d0504-dirty (embedfire @embedfire_dev)
-(gcc version 7.4.0 (Ubuntu/Linaro 7.4.0-1ubuntu1~18.04.1) ) #2 SMP PREEMPT Tue Aug 27 07:46:06 UTC 2019
+.. code-block:: sh
+   :linenos:
+
+   imx6ull14x14evk login: rootroot@imx6ull14x14evk:~# cat /proc/versionLinux version 4.1.15-2.1.0-00162-gd815328d0504-dirty (embedfire @embedfire_dev)
+   (gcc version 7.4.0 (Ubuntu/Linaro 7.4.0-1ubuntu1~18.04.1) ) #2 SMP PREEMPT Tue Aug 27 07:46:06 UTC 2019
 
 可能会增加个编译官方内核的
 

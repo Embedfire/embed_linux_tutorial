@@ -69,7 +69,10 @@ buntu发行版安装了相应的支持。目前微软已公开exFAT文件系统�
 
 #在主机或开发板上执行如下命令
 
-df -T
+.. code-block:: sh
+   :linenos:
+
+   df -T
 
 
 
@@ -106,13 +109,13 @@ procfs是“process filesystem”的缩写，所以它
 
 #在主机或开发板上执行如下命令
 
-#查看CPU信息
+.. code-block:: sh
+   :linenos:
 
-cat /proc/cpuinfo
-
-#查看proc目录
-
-ls /proc
+   #查看CPU信息
+   cat /proc/cpuinfo
+   #查看proc目录
+   ls /proc
 
 .. image:: media/filesy003.png
    :align: center
@@ -151,7 +154,10 @@ filesystems 记录内核支持的文件系统类型，通常mount一个设备时
 
 #在主机上执行如下命令
 
-ps
+.. code-block:: sh
+   :linenos:
+
+   ps
 
 每个人的计算机运行运行状况不一样，所以得到的进程号也是不一样，如下图所示，当前得
 到bash进程的pid是3042。
@@ -165,11 +171,12 @@ ps
 
 执行如下命令：
 
-#在主机上执行如下命令
+.. code-block:: sh
+   :linenos:
 
-#把目录中的数字改成自己bash进程的pid号
-
-ls /proc/3042
+   #在主机上执行如下命令
+   #把目录中的数字改成自己bash进程的pid号
+   ls /proc/3042
 
 .. image:: media/filesy006.png
    :align: center
@@ -206,7 +213,10 @@ wchan     记录当前进程处于睡眠状态，内核调用的相关函数
 
 #把目录中的数字改成自己bash进程的pid号
 
-cat /proc/3042/comm
+.. code-block:: sh
+   :linenos:
+
+   cat /proc/3042/comm
 
 .. image:: media/filesy007.png
    :align: center
@@ -366,9 +376,11 @@ fopen函数
 
 fopen库函数用于打开或创建文件，返回相应的文件流。它的函数原型如下：
 
-#include <stdio.h>
+.. code-block:: sh
+   :linenos:
 
-FILE \*fopen(const char \*pathname, const char \*mode);
+   #include <stdio.h>
+   FILE \*fopen(const char \*pathname, const char \*mode);
 
 -  pathname参数用于指定要打开或创建的文件名。
 
@@ -393,9 +405,11 @@ fread函数
 
 fread库函数用于从文件流中读取数据。它的函数原型如下：
 
-#include <stdio.h>
+.. code-block:: sh
+   :linenos:
 
-size_t fread(void \*ptr, size_t size, size_t nmemb, FILE \*stream);
+   #include <stdio.h>
+   size_t fread(void \*ptr, size_t size, size_t nmemb, FILE \*stream);
 
 stream是使用fopen打开的文件流，fread通过它指定要访问的文件，它从该文件中读取nmemb项
 数据，每项的大小为size，读取到的数据会被存储在ptr指向的数组中。fread的返回值为成功读取的项数（项的单位为size）。
@@ -405,9 +419,11 @@ fwrite函数
 
 fwrite库函数用于把数据写入到文件流。它的函数原型如下：
 
-#include <stdio.h>
+.. code-block:: sh
+   :linenos:
 
-size_t fwrite(void \*ptr, size_t size, size_t nmemb, FILE \*stream);
+   #include <stdio.h>
+   size_t fwrite(void \*ptr, size_t size, size_t nmemb, FILE \*stream);
 
 它的操作与fread相反，把ptr数组中的内容写入到stream文件流，写入的项数为nmemb，每项
 大小为size，返回值为成功写入的项数（项的单位为size）。
@@ -418,9 +434,11 @@ fclose函数
 fclose库函数用于关闭指定的文件流，关闭时它会把尚未写到文件的内容都写出。因为标准
 库会对数据进行缓冲，所以需要使用fclose来确保数据被写出。它的函数原型如下：
 
-#include <unistd.h>
+.. code-block:: sh
+   :linenos:
 
-int close(int fd);
+   #include <unistd.h>
+   int close(int fd);
 
 fflush函数
 ''''''''''''''''''''''''
@@ -428,18 +446,22 @@ fflush函数
 fflush函数用于把尚未写到文件的内容立即写出。常用于确保前面操作的数据被写
 入到磁盘上。fclose函数本身也包含了fflush的操作。fflush的函数原型如下：
 
-#include <stdio.h>
+.. code-block:: sh
+   :linenos:
 
-int fflush(FILE \*stream);
+   #include <stdio.h>
+   int fflush(FILE \*stream);
 
 fseek函数
 ''''''''''''''''''''''''''''
 
 fseek函数用于设置下一次读写函数操作的位置。它的函数原型如下：
 
-#include <stdio.h>
+.. code-block:: sh
+   :linenos:
 
-int fseek(FILE \*stream, long offset, int whence);
+   #include <stdio.h>
+   int fseek(FILE \*stream, long offset, int whence);
 
 其中的offset参数用于指定位置，whence参数则定义了offset的意义，whence的可取值如下：
 
@@ -612,25 +634,19 @@ x86架构
 
 本实验支持x86和ARM架构，在x86上的编译及测试命令如下：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#默认编译x86平台的程序
-
-make
-
-tree
-
-#运行
-
-./build_x86/file_demo
-
-#程序运行后本身有输出，并且创建了一个文件
-
-ls
-
-#查看文件的内容
-
-cat filesystem_test.txt
+   #在主机的实验代码Makefile目录下编译
+   #默认编译x86平台的程序
+   make
+   tree
+   #运行
+   ./build_x86/file_demo
+   #程序运行后本身有输出，并且创建了一个文件
+   ls
+   #查看文件的内容
+   cat filesystem_test.txt
 
 .. image:: media/filesy011.png
    :align: center
@@ -643,11 +659,12 @@ ARM架构
 
 对于ARM架构的程序，可使用如下步骤进行编译：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#编译arm平台的程序
-
-make ARCH=arm
+   #在主机的实验代码Makefile目录下编译
+   #编译arm平台的程序
+   make ARCH=arm
 
 编译后生成的ARM平台程序为build_arm/file_demo，使用网络文件系统共
 享至开发板，在开发板的终端上运行即可，如下图所示。
@@ -666,23 +683,22 @@ Linux提供的文件操作系统调用常用的有open、write、read、lseek、
 open函数
 ''''''''''''''''''''''''
 
-#include <sys/types.h>
+.. code-block:: sh
+   :linenos:
 
-#include <sys/stat.h>
-
-#include <fcntl.h>
-
-int open(const char \*pathname, int flags);
-
-int open(const char \*pathname, int flags, mode_t mode);
+   #include <sys/types.h>
+   #include <sys/stat.h>
+   #include <fcntl.h>
+   int open(const char \*pathname, int flags);
+   int open(const char \*pathname, int flags, mode_t mode);
 
 Linux使用open函数来打开文件，并返回该文件对应的文件描述符。函数参数的具体说明如下：
 
 -  pathname：要打开或创建的文件名；
 
--  flag：指定文件的打开方式，具体有以下参数，见表 19‑3 flag参数值。
+-  flag：指定文件的打开方式，具体有以下参数，见下表 flag参数值。
 
-表 19‑3 flag参数值
+表   flag参数值
 
 ======== ========================================================
 标志位   含义
@@ -695,9 +711,9 @@ O_APPEND 将数据写入到当前文件的结尾处
 O_TRUNC  如果pathname文件存在，则清除文件内容
 ======== ========================================================
 
-C库函数fopen的mode参数与系统调用open的flags参数有如表 19‑4中的等价关系。
+C库函数fopen的mode参数与系统调用open的flags参数有如下表中的等价关系。
 
-表 19‑4 fopen的mode与open的flags参数关系
+表   fopen的mode与open的flags参数关系
 
 =============== ===============================
 fopen的mode参数 open的flags参数
@@ -711,7 +727,8 @@ a+              O_RDWR \| O_CREAT \| O_APPEND
 =============== ===============================
 
 -  mode：当open函数的flag值设置为O_CREAT时，必须使用mode参数来设置文件
-   与用户相关的权限。mode可用的权限如下表所示，表中各个参数可使用“\| ”来组合。
+   与用户相关的权限。mode可用的权限如下表所示，表中各个参数可使用“\| ”来组
+   合。
 
 表  文件权限
 
@@ -734,11 +751,14 @@ S_IWOTH 其他用户拥有写权限 \        S_IXOTH 其他用户拥有执行权
 read函数
 ''''''''''''''''''''''''
 
-#include <unistd.h>
+.. code-block:: sh
+   :linenos:
 
-ssize_t read(int fd, void \*buf, size_t count);
+   #include <unistd.h>
+   ssize_t read(int fd, void \*buf, size_t count);
 
-read函数用于从文件中读取若干个字节的数据，保存到数据缓冲区buf中，并返回实际读取的字节数，具体函数参数如下：
+read函数用于从文件中读取若干个字节的数据，保存到数据缓冲区buf中，并返
+回实际读取的字节数，具体函数参数如下：
 
 -  fd：文件对应的文件描述符，可以通过fopen函数获得。另外，当一个程序
    运行时，Linux默认有0、1、2这三个已经打开的文件描述符，分别对应了标准输入、标准输出、标准错误输出，即可以直接访问这三种文件描述符；
@@ -750,9 +770,11 @@ read函数用于从文件中读取若干个字节的数据，保存到数据缓�
 write函数
 '''''''''''''''''''''
 
-#include <unistd.h>
+.. code-block:: sh
+   :linenos:
 
-ssize_t write(int fd, const void \*buf, size_t count);
+   #include <unistd.h>
+   ssize_t write(int fd, const void \*buf, size_t count);
 
 write函数用于往文件写入内容，并返回实际写入的字节长度，具体函数参数如下：
 
@@ -765,16 +787,23 @@ write函数用于往文件写入内容，并返回实际写入的字节长度，
 close函数
 '''''''''''''''''''''
 
-int close(int fd);
+.. code-block:: sh
+   :linenos:
+
+   int close(int fd);
 
 当我们完成对文件的操作之后，想要关闭该文件，可以调用close函数，来关闭该fd文件描述符对应的文件。
 
 lseek函数
 ''''''''''''''''''''''''''''
 
-lseek函数可以用与设置文件指针的位置，并返回文件指针相对于文件头的位置。其函数原型如下：
+lseek函数可以用与设置文件指针的位置，并返回文件指针相对于文件头
+的位置。其函数原型如下：
 
-off_t lseek(int fd, off_t offset, int whence);
+.. code-block:: sh
+   :linenos:
+
+   off_t lseek(int fd, off_t offset, int whence);
 
 它的用法与flseek一样，其中的offset参数用于指定位置，whence参数则定义了offset的意义，whence的可取值如下：
 
@@ -877,7 +906,10 @@ world的程序会因为找不到stdio.h文件而报错。
 
 #在Ubuntu主机下执行如下命令：
 
-locate sys/stat.h
+.. code-block:: sh
+   :linenos:
+
+   locate sys/stat.h
 
 .. image:: media/filesy014.png
    :align: center
@@ -921,29 +953,21 @@ x86架构
 
 本实验支持x86和ARM架构，在x86上的编译及测试命令如下：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#默认编译x86平台的程序
-
-make
-
-tree
-
-#运行
-
-./build_x86/file_demo
-
-#程序运行后本身有输出，并且创建了一个文件
-
-ls
-
-#查看文件的内容
-
-cat testsript.sh
-
-#执行生成的testscript.sh文件
-
-./testscript.sh
+   #在主机的实验代码Makefile目录下编译
+   #默认编译x86平台的程序
+   make
+   tree
+   #运行
+   ./build_x86/file_demo
+   #程序运行后本身有输出，并且创建了一个文件
+   ls
+   #查看文件的内容
+   cat testsript.sh
+   #执行生成的testscript.sh文件
+   ./testscript.sh
 
 .. image:: media/filesy015.png
    :align: center
@@ -962,11 +986,12 @@ ARM架构
 
 对于ARM架构的程序，可使用如下步骤进行编译：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#编译arm平台的程序
-
-make ARCH=arm
+   #在主机的实验代码Makefile目录下编译
+   #编译arm平台的程序
+   make ARCH=arm
 
 编译后生成的ARM平台程序为build_arm/file_demo，使用网络文件系统共享
 至开发板，在开发板的终端上测试即可。

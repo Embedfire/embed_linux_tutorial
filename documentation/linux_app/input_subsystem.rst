@@ -28,19 +28,16 @@ input事件目录
 
 在Ubuntu主机下使用如下命令测试：
 
-#在主机下执行如下命令
+.. code-block:: sh
+   :linenos:
 
-#安装evtest工具
-
-sudo apt install evtest
-
-#使用sudo权限运行evtest工具
-
-sudo evtest
-
-#根据自己主机的输出来选择某个设备测试，下图选择的是“6”，鼠标
-
-#根据选择的设备测试，如选择的键盘就按键盘，选择鼠标就移植鼠标
+   #在主机下执行如下命令
+   #安装evtest工具
+   sudo apt install evtest
+   #使用sudo权限运行evtest工具
+   sudo evtest
+   #根据自己主机的输出来选择某个设备测试，下图选择的是“6”，鼠标
+   #根据选择的设备测试，如选择的键盘就按键盘，选择鼠标就移植鼠标
 
 .. image:: media/inputs002.png
    :align: center
@@ -117,13 +114,13 @@ evtest工具的原理并不神秘，学习本章节后也可以尝试自己
 
 可使用以下方式可进行测试：
 
-#根据自己主机上的事件号修改要查看的具体事件文件
+.. code-block:: sh
+   :linenos:
 
-#此处使用的event6是本主机的鼠标设备，注意要使用sudo权限
-
-sudo cat /dev/input/event6
-
-#输入命令后移动鼠标，会看到字符
+   #根据自己主机上的事件号修改要查看的具体事件文件
+   #此处使用的event6是本主机的鼠标设备，注意要使用sudo权限
+   sudo cat /dev/input/event6
+   #输入命令后移动鼠标，会看到字符
 
 .. image:: media/inputs004.jpg
    :align: center
@@ -139,7 +136,8 @@ input事件设备名
 
 “/dev/input/event*”的事件编号与设备的联系不是固定的，它通常按系统检测
 到设备的先号顺序安排event文件的编号，这对编写应用程序控制不太方便，我们
-可以通过“/dev/input/by-id”或“/dev/input/by-path”目录查看具体的硬件设备，如下图所示。
+可以通过“/dev/input/by-id”或“/dev/input/by-path”目录查看具体的硬件设备，如
+下图所示。
 
 .. image:: media/inputs005.png
    :align: center
@@ -152,7 +150,8 @@ input事件设备名
 mouse”文件就是event6的快捷方式，它就是本主机中使用的鼠标，也就是说访问该
 文件就是访问该鼠标的事件设备，而且该文件名与硬件的关系是固定的，后面我们的实验就是采用这样的方式。
 
-由于/dev下的设备都是通过/sys导出的，所以也可以通过“/sys/class/input”目录查看，如下图所示。
+由于/dev下的设备都是通过/sys导出的，所以也可以通过“/sys/class/input”目
+录查看，如下图所示。
 
 .. image:: media/inputs006.png
    :align: center
@@ -172,19 +171,16 @@ integration”，evtest工具列出的事件与设备名的关系，就是从这
 
 下面以简单的操作对开发板上的设备进行说明：
 
-#在开发板的终端执行如下命令：
+.. code-block:: sh
+   :linenos:
 
-#查看存在的输入设备，截图中是板子接了屏幕和鼠标的情况
-
-evtest
-
-#查看按键在by-path目录下的文件
-
-ls -lh /dev/input/by-path
-
-#查看按键在/sys文件系统中的名字,以下命令中的“event3”根据自己的实验环境修改
-
-cat /sys/class/input/event3/device/name
+   #在开发板的终端执行如下命令：
+   #查看存在的输入设备，截图中是板子接了屏幕和鼠标的情况
+   evtest
+   #查看按键在by-path目录下的文件
+   ls -lh /dev/input/by-path
+   #查看按键在/sys文件系统中的名字,以下命令中的“event3”根据自己的实验环境修改
+   cat /sys/class/input/event3/device/name
 
 .. image:: media/inputs007.png
    :align: center
@@ -314,27 +310,20 @@ x86架构
 并没有这样的设备，如果想尝试在主机上使用，可以根据自己Ubuntu主机上存在的事件作为
 程序的输入参数输入运行，在x86平台的编译测试过程如下：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#默认编译x86平台的程序
-
-make
-
-#运行需要root权限，要使用sudo运行
-
-#运行需要root权限，要使用sudo运行
-
-#使用evtest查看可用的设备文件
-
-sudo evtest
-
-#请根据自己主机上的输出修改设备文件参数
-
-#程序需要使用sudo运行
-
-sudo ./build_x86/input_demo /dev/input/event6
-
-#使用对应的设备输入，终端会打印出事件的信息
+   #在主机的实验代码Makefile目录下编译
+   #默认编译x86平台的程序
+   make
+   #运行需要root权限，要使用sudo运行
+   #运行需要root权限，要使用sudo运行
+   #使用evtest查看可用的设备文件
+   sudo evtest
+   #请根据自己主机上的输出修改设备文件参数
+   #程序需要使用sudo运
+   sudo ./build_x86/input_demo /dev/input/event6
+   #使用对应的设备输入，终端会打印出事件的信息
 
 .. image:: media/inputs008.jpg
    :align: center
@@ -347,28 +336,26 @@ ARM架构
 
 对于ARM架构的程序，可使用如下步骤进行编译：
 
-#在主机的实验代码Makefile目录下编译
+.. code-block:: sh
+   :linenos:
 
-#编译arm平台的程序
-
-make ARCH=arm
+   #在主机的实验代码Makefile目录下编译
+   #编译arm平台的程序
+   make ARCH=arm
 
 编译后生成的ARM平台程序为build_arm/input_demo，使用网络文
 件系统共享至开发板，程序默认使用KEY按键检测，也可以自行指定输入设备路径。
 
-#以下命令在开发板上的终端执行
+.. code-block:: sh
+   :linenos:
 
-#在NFS共享的工程目录路径执行
-
-#使用默认的KEY按键运行
-
-./build_arm/input_demo
-
-#按下开发板的KEY按键会有输出
-
-#也可以指定要测试的事件文件路径
-
-./build_arm/input_demp [事件文件路径]
+   #以下命令在开发板上的终端执行
+   #在NFS共享的工程目录路径执行
+   #使用默认的KEY按键运行
+   ./build_arm/input_demo
+   #按下开发板的KEY按键会有输出
+   #也可以指定要测试的事件文件路径
+   ./build_arm/input_demp [事件文件路径]
 
 .. image:: media/inputs009.jpg
    :align: center
