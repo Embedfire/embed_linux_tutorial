@@ -49,34 +49,49 @@ log查看仓库的日志信息，看看更改了什么地方。在\ ``ebf_6ull_l
    :alt: building\_kernel001
 
    building\_kernel001
+
+
 从图中我们可以看到Linux内核源码目录下是有非常多的文件夹，且文件夹下也有非常多的文件，下面我们简单分析一下这些文件夹的主要作用。
--
-arch：主要包含和硬件体系结构相关的代码，如arm、x86、MIPS，PPC，每种CPU平台占一个相应的目录，例如我们使用的imx系列CPU就在\ ``arch/arm/mach-imx``\ 目录下，Linux内核目前已经支持30种左右的CPU体系结构。arch中的目录下存放的是各个平台以及各个平台的芯片对Linux内核进程调度、
-内存管理、 中断等的支持，以及每个具体的SoC和电路板的板级支持代码。 -
-block：在Linux中block表示块设备（以块（多个字节组成的整体，类似于扇区）为单位来整体访问），譬如说SD卡、Nand、硬盘等都是块设备，block目录下放的是一些Linux存储体系中关于块设备管理的代码。
-- crypto：这个文件夹下存放的是常用加密和散列算法（如md5、AES、 SHA等）
-，还有一些压缩和CRC校验算法。 - Documentation：内核各部分的文档描述。 -
-drivers：
-设备驱动程序，里面列出了linux内核支持的所有硬件设备的驱动源代码，每个不同的驱动占用一个子目录，如char、
-block、 net、 mtd、 i2c等。 - fs：fs就是file
-system，里面包含Linux所支持的各种文件系统，如EXT、 FAT、 NTFS、
-JFFS2等。 -
-include：目录包括编译核心所需要的大部分头文件，例如与平台无关的头文件在\ ``include/linux``\ 子目录下，与cpu架构相关的头文件在include目录下对应的子目录中。
-- init：
-内核初始化代码，这个目录下的代码就是linux内核启动时初始化内核的代码。 -
-ipc：
-ipc就是\ ``inter process commuication``\ ，进程间通信，该文件夹下都是linux进程间通信的代码。
-- kernel：
-kernel就是Linux内核，是Linux中最核心的部分，包括进程调度、定时器等，而和平台相关的一部分代码放在arch/\*/kernel目录下。
--
-lib：lib是库的意思，lib目录下存放的都是一些公用的有用的库函数，注意这里的库函数和C语言的库函数不一样的，因为在内核编程中是不能用C语言标准库函数的，所以需要使用lib中的库函数，除此之外与处理器结构相关的库函数代码被放在\ ``arch/*/lib/``\ 目录下。
-- mm： 目录包含了所有独立于 cpu
-体系结构的内存管理代码，如页式存储管理内存的分配和释放等，而与具体硬件体系结构相关的内存管理代码位于\ ``arch/*/mm``\ 目录下，例如\ ``arch/arm/mm/fault.c``\ 。
-- net： 网络协议栈相关代码，net目录下实现各种常见的网络协议。 -
-scripts：这个目录下全部是脚本文件，这些脚本文件不是linux内核工作时使用的，而是用了配置编译linux内核的。
-- security：内核安全模型相关的代码，例如最有名的SELINUX。 - sound：
-ALSA、 OSS音频设备的驱动核心代码和常用设备驱动。 - usr：
-实现用于打包和压缩的cpio等。
+
+-  arch：主要包含和硬件体系结构相关的代码，如arm、x86、MIPS，PPC，每种CPU平台占一个相应的目录，例如我们使用的imx系列CPU就在\ ``arch/arm/mach-imx``\ 目录下，Linux内核目前已经支持30种左右的CPU体系结构。arch中的目录下存放的是各个平台以及各个平台的芯片对Linux内核进程调度、
+   内存管理、 中断等的支持，以及每个具体的SoC和电路板的板级支持代码。
+
+-  block：在Linux中block表示块设备（以块（多个字节组成的整体，类似于扇区）为单位来整体访问），譬如说SD卡、Nand、硬盘等都是块设备，block目录下放的是一些Linux存储体系中关于块设备管理的代码。
+
+-  crypto：这个文件夹下存放的是常用加密和散列算法（如md5、AES、 SHA等）
+   ，还有一些压缩和CRC校验算法。
+
+-  Documentation：内核各部分的文档描述。
+
+-  drivers：设备驱动程序，里面列出了linux内核支持的所有硬件设备的驱动源代码，每个不同的驱动占用一个子目录，如char、
+   block、 net、 mtd、 i2c等。
+
+-  fs：fs就是file system，里面包含Linux所支持的各种文件系统，如EXT、
+   FAT、 NTFS、 JFFS2等。
+
+-  include：目录包括编译核心所需要的大部分头文件，例如与平台无关的头文件在\ ``include/linux``\ 子目录下，与cpu架构相关的头文件在include目录下对应的子目录中。
+
+-  init：内核初始化代码，这个目录下的代码就是linux内核启动时初始化内核的代码。
+
+-  ipc：ipc就是\ ``inter process commuication``\ ，进程间通信，该文件夹下都是linux进程间通信的代码。
+
+-  kernel：kernel就是Linux内核，是Linux中最核心的部分，包括进程调度、定时器等，而和平台相关的一部分代码放在arch/\*/kernel目录下。
+
+-  lib：lib是库的意思，lib目录下存放的都是一些公用的有用的库函数，注意这里的库函数和C语言的库函数不一样的，因为在内核编程中是不能用C语言标准库函数的，所以需要使用lib中的库函数，除此之外与处理器结构相关的库函数代码被放在\ ``arch/*/lib/``\ 目录下。
+
+-  mm： 目录包含了所有独立于 cpu
+   体系结构的内存管理代码，如页式存储管理内存的分配和释放等，而与具体硬件体系结构相关的内存管理代码位于\ ``arch/*/mm``\ 目录下，例如\ ``arch/arm/mm/fault.c``\ 。
+
+-  net： 网络协议栈相关代码，net目录下实现各种常见的网络协议。
+
+-  scripts：这个目录下全部是脚本文件，这些脚本文件不是linux内核工作时使用的，而是用了配置编译linux内核的。
+
+-  security：内核安全模型相关的代码，例如最有名的SELINUX。
+
+-  sound： ALSA、 OSS音频设备的驱动核心代码和常用设备驱动。
+
+-  usr： 实现用于打包和压缩的cpio等。
+
 提示：对于其他的未列出来的目录，暂时不用去理会。
 
 编译内核
@@ -150,10 +165,7 @@ arm-linux-gnueabihf-gcc：\ ``v7.4.0``
 
 链接：\ https://github.com/Embedfire/products/wiki
 
-在 **Linux系列产品**
-中找到的网盘链接，在\ ``i.MX6ULL系列\5-编译工具链\arm-gcc`` 目录下找到
-``arm-gcc.tar.gz``
-压缩包并且下载，然后解压到\ ``/opt/arm-gcc/``\ 目录下，如果没有创建即可，解压后就可以在\ ``/opt/arm-gcc/bin/``\ 目录下找到我们的编译器\ ``arm-linux-gnueabihf-gcc``\ ，它的版本是\ ``gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11)``\ ，然后可以将编译器所在的路径添加到环境变量中，只修改当前用户的配置文件，通常是\ ``“~/.bashrc”``\ 或者\ ``“~/.bash_profile”``\ ，直接
+在 **Linux系列产品**中找到的网盘链接，在\ ``i.MX6ULL系列\5-编译工具链\arm-gcc`` 目录下找到``arm-gcc.tar.gz``压缩包并且下载，然后解压到\ ``/opt/arm-gcc/``\ 目录下，如果没有创建即可，解压后就可以在\ ``/opt/arm-gcc/bin/``\ 目录下找到我们的编译器\ ``arm-linux-gnueabihf-gcc``\ ，它的版本是\ ``gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11)``\ ，然后可以将编译器所在的路径添加到环境变量中，只修改当前用户的配置文件，通常是\ ``“~/.bashrc”``\ 或者\ ``“~/.bash_profile”``\ ，直接
 vi 打开即可，在文件末尾增加编译器所在的路径：
 
 .. code:: bash
@@ -232,20 +244,18 @@ vi 打开即可，在文件末尾增加编译器所在的路径：
       # configuration written to .config 
       #
 
-Linux内核的配置系统由三个部分组成，分别是： 1. Makefile：分布在 Linux
-内核源代码根目录及各层目录中，定义 Linux 内核的编译规则； 2.
-配置文件：给用户提供配置选择的功能，如Kconfig文件定义了配置项，.config文件对配置项进行赋值；
-3.
-配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配置用户界面（linux提供基于字符界面、基于
-Ncurses 图形界面以及基于 Xwindows 图形界面的用户配置界面，各自对应于
-make config、make menuconfig 和 make xconfig）。
-读者如果想看我们提供的配置文件imx6\_v7\_ebf\_defconfig中修改了什么地方，可以通过make
-menuconfig命令来查看我们的配置，make
-menuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make
-menuconfig运行的时候会从当前目录下导入 .config文件的配置（如果没有找到
-.config文件则会生成默认配置的 .config文件），而这个配置则是我们运行make
-ARCH=arm
-imx6\_v7\_ebf\_defconfig命令生成的，这就直接可以看到我们在imx6\_v7\_ebf\_defconfig的配置选择，可以通过键盘的“上”、“下”、“左”、“右”、“回车”、“空格”、“?”、“ESC”等按键进行选择配置，具体见：
+Linux内核的配置系统由三个部分组成，分别是： 
+-  Makefile：分布在 Linux内核源代码根目录及各层目录中，定义 Linux 内核的编译规则； 
+
+-  配置文件：给用户提供配置选择的功能，如Kconfig文件定义了配置项，.config文件对配置项进行赋值；
+
+-  配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配置用户界面（linux提供基于字符界面、
+基于Ncurses 图形界面以及基于 Xwindows 图形界面的用户配置界面，各自对应于make config、make menuconfig 和 make xconfig）。
+读者如果想看我们提供的配置文件imx6\_v7\_ebf\_defconfig中修改了什么地方，可以通过makemenuconfig命令来查看我们的配置，
+makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下
+导入 .config文件的配置（如果没有找到.config文件则会生成默认配置的 .config文件），
+而这个配置则是我们运行make ARCH=arm imx6\_v7\_ebf\_defconfig命令生成的，这就直接可以看到我们在imx6\_v7\_ebf\_defconfig的配置选择，
+可以通过键盘的“上”、“下”、“左”、“右”、“回车”、“空格”、“?”、“ESC”等按键进行选择配置，具体见：
 
 .. figure:: media/building_kernel002.png
    :alt: building\_kernel002
