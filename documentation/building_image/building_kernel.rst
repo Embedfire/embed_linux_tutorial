@@ -1,452 +1,492 @@
-.. vim: syntax=rst
-
 编译内核
-----
+========
 
-本章节内容处于开发笔记状态，还待整理至最终版的教程。
+下载野火官方提供的内核镜像
+--------------------------
 
-本章节内容处于开发笔记状态，还待整理至最终版的教程。
+在编译内核前我们首先要下载到官方提供的内核镜像，目前野火官方镜像已经托管在github上，可以随时去下载，打开\ https://github.com/Embedfire/ebf_6ull_linux\ 网页，可以看到野火官方提供的内核镜像，并且携带了很详细的操作说明文档，这个仓库是来源于NXP官方提供的内核镜像\ http://git.freescale.com/git/cgit.cgi/imx/linux-imx.git/\ ，由\ ``imx_4.1.15_2.0.0_ga``\ 分支开发而来，主要是满足野火开发板的需求。
 
-下载nxp官方提供的内核镜像
-~~~~~~~~~~~~~~
+我们只需要野火官方提供的内核镜像即可，首先我们克隆一下这个内核镜像仓库，在克隆内核镜像的时候最好是在虚拟机中（或linux环境），而不是在Windows环境下，我们将使用\ ``git clone``\ 命令去克隆官方提供的内核镜像，这样子就能保留镜像中的所有git信息与标签，在开发过程中能方便切换到合适的分支进行开发，因为不同的分支内核镜像的源代码修改的地方是不一样的，可能会发生未知的问题，我们目前就使用\ ``master``\ 分支进行开发。
 
-在编译内核前我们首先要下载到官方提供的内核镜像，打开\ http://git.freescale.com/git/\
-网页，可以看到很多nxp官方提供的内
-核镜像，这个网站是飞思卡尔（freescale）公司的，在2015年的是nxp巨
-资收购了飞思卡尔，所以可以直接从飞思卡尔的网站下载nxp官方提供的内核镜像。
+使用\ ``git clone``\ 命令克隆内核镜像，然后等待克隆完成即可：
 
-打开网页后可以看到nxp官方有非常多的镜像在这里，我们需要
-选择要下载的内核镜像linux-imx，然后页面会跳转到linux-imx内核镜像的
-详细说明页面，该页面有很多分支、标签等信息，具体见下图。
+.. code:: bash
 
+    git clone https://github.com/Embedfire/ebf_6ull_linux.git
 
+由于github网站是国外的，可能会非常慢，甚至出现下载失败现象，建议使用gitee中的仓库，我们已经将源码提交到gitee平台，直接使用\ ``git clone``\ 命令克隆内核镜像即可：
 
+.. code:: bash
 
-.. image:: media/building_kernel010.png
-   :align: center
-   :alt: 未找到图片10|
+    git clone https://gitee.com/wildfireteam/ebf_6ull_linux.git
 
-
-
-.. image:: media/building_kernel003.png
-   :align: center
-   :alt: 未找到图片03|
-
-
-
-我们注意上图中最下面的两句话，它就是告诉我们克隆（即下载）镜像的路径：
-
-Clonegit://git.freescale.com/imx/linux-imx.git http://git.freescale.com/git/cgit.cgi/imx/linux-imx.git
-
-在克隆内核镜像的时候最好是在虚拟机中（或linux环境），而不是在Windows环
-境下载，然后下载的环境必须支持git，因为我们将使用git
-clone命令去克隆nxp官方提供的内核镜像，这样子就能保留镜像中的所有git信息与
-标签，在开发过程中能方便切换到合适的分支进行开发，因为不同的分支内核镜像的源代码是不一样的，可
-能会发生未知的问题，我们目前就使用\ `imx_4.1.15_2.0.0_ga
-<http://git.freescale.com/git/cgit.cgi/imx/linux-imx.git/log/?h=imx_4.1.15_2.0.0_ga>`__\ 分支
-进行开发。
-
-使用git clone命令克隆内核镜像，然后等待克隆完成即可：
-
-.. code-block:: sh
-   :linenos:
-
-   git clone git://git.freescale.com/imx/linux-imx.git
-
-由于网站是国外的，可能会非常慢，甚至出现下载失败现象，建议使用野火资料包中的
-源码进行开发，我们已经将源码提交到gitee平台，直接使用git clone命令克隆内核镜像即可：
-
-注意：我们修改的镜像名字是imx-linux，与官方命名刚好相反以便于区分。
-
-命令
-
-.. code-block:: sh
-   :linenos:
-   #github地址
-   git clone https://github.com/Embedfire/ebf_6ull_linux.git
-   
-   #若github太慢，可使用gitee地址
-   git clone https://gitee.com/wildfireteam/ebf_6ull_linux.git
-
-运行结果
-
-embedfire@embedfire_dev:~$ git clone https://git.dev.tencent.com/flyleaf91/imx-linux.gitCloning into 'imx-linux'...remote: Enumerating objects:
-8225151, done.remote: Counting objects: 100% (8225151/8225151), done.remote: Compressing objects: 100% (1240846/1240846), done.remote: Total 8225151
-(delta 6957086), reused 8201579 (delta 6933694) Receiving objects: 100% (8225151/8225151), 1.37 GiB \| 4.79 MiB/s, done.Resolving deltas: 100%
-(6957086/6957086), done.warning: remote HEAD refers to nonexistent ref, unable to checkout.
-
-我们可以看到输出的信息，虽然是提示克隆完成，但是没法切换到（checkout）合
-适的分支，此时就需要进行手动切换分支。首先进入imx-linux目录下，可以看到imx-linux目
-录下是没有文件的，这是因为没有切换到正确的分支，我们可以使用git branch
-–a命令查看当前下载的源码包的分支情况，可以看到存在两个分
-支，分别是remotes/origin/imx_4.1.15_2.0.0_ga与remotes/origin/show，我们可以使用git
-checkout命令手动切换到imx_4.1.15_2.0.0_ga分支，然后就可以看到当前目录下多了很多文件夹，具体见：
-
-进入imx-linux目录
-
-.. code-block:: sh
-   :linenos:
-
-   embedfire @embedfire_dev:~$ cd imx-linux/embedfire @embedfire_dev:~/imx-linux$ ls
-
-命令
-
-.. code-block:: sh
-   :linenos:
-
-   embedfire @embedfire_dev:~/imx-linux$ git branch –a
-
-输出
-
-.. code-block:: sh
-   :linenos:
-
-   remotes/origin/imx_4.1.15_2.0.0_ga remotes/origin/show
-
-手动切换分支
-
-.. code-block:: sh
-   :linenos:
-
-   embedfire @embedfire_dev:~/imx-linux$ git checkout imx_4.1.15_2.0.0_ga
-
-输出
-
-.. code-block:: sh
-   :linenos:
-
-   Checking out files: 100% (50159/50159), done.Branch 'imx_4.1.15_2.0.0_ga' set up to track remote branch 'imx_4.1.15_2.0.0_ga' from 'origin'.Switched
-   to a new branch 'imx_4.1.15_2.0.0_ga'
-
-命令
-
-.. code-block:: sh
-   :linenos:
-
-   embedfire @embedfire_dev:~/imx-linux$ ls
-
-输出
-
-.. code-block:: sh
-   :linenos:
-
-   arch COPYING CREDITS Documentation firmware include ipc Kconfig lib Makefile net REPORTING-BUGS scripts sound usrblock copy.sh crypto drivers fs init
-   Kbuild kernel MAINTAINERS mm README samples security tools virt
+    Cloning into 'ebf_6ull_linux'...
+    remote: Enumerating objects: 54412, done.
+    remote: Counting objects: 100% (54412/54412), done.
+    remote: Compressing objects: 100% (47905/47905), done.
+    remote: Total 54412 (delta 5331), reused 54348 (delta 5281)
+    Receiving objects: 100% (54412/54412), 148.94 MiB | 3.49 MiB/s, done.
+    Resolving deltas: 100% (5331/5331), done.
+    Checking out files: 100% (51413/51413), done.
 
 内核源码目录
-~~~~~~
+------------
 
-在克隆完内核镜像之后，我们会发现克隆的目录下多出了一个文件
-夹imx-linux，它就是我们克隆的内核镜像，里面是官方提供的内核源码，我们可
-以进入imx-linux目录下中查看主要有哪些文件夹组成，具体见下图。
+在运行\ ``git clone``\ 命令命令后，大约等待一分钟，我们可以看到输出的信息，已然提示克隆完成，我们会发现克隆的目录下多出了一个文件夹\ ``ebf_6ull_linux``\ ，我们可以进入到\ ``ebf_6ull_linux``\ 目录下，可以使用git
+log查看仓库的日志信息，看看更改了什么地方。在\ ``ebf_6ull_linux``\ 目录下看到当前目录下多了很多文件夹，它就是我们克隆的内核镜像，里面是官方提供的内核源码，我们可以进入imx-linux目录下中查看主要有哪些文件夹组成，具体见：
 
-.. image:: media/building_kernel004.png
-   :align: center
-   :alt: 未找到图片04|
+.. code:: bash
 
+    ➜  ebf_6ull_linux git:(master) ls
 
+    arch      CREDITS        fs       Kconfig      mm               REPORTING-BUGS  tools
+    block     crypto         include  kernel       Module.symvers   samples         usr
+    build.sh  Documentation  init     lib          net              scripts         virt
+    COPYING   drivers        ipc      MAINTAINERS  OFFICIAL-README  security
+    copy.sh   firmware       Kbuild   Makefile     README.md        sound
 
-从图中我们可以看到Linux内核源码目录下是有非常多的文件夹，且文件夹下也
-有非常多的文件，下面我们简单分析一下这些文件夹的主要作用。
+.. figure:: media/building_kernel001.png
+   :alt: building\_kernel001
 
--  arch：主要包含和硬件体系结构相关的代码，如arm、x86、MIPS，PPC，每
-种CPU平台占一个相应的目录，例如我们使用的imx系列CPU就在arch/arm/mach-
-  imx目录下，Linux内核目前已经支持30种左右的CPU体系结构。arch中的目录下
-  存放的是各个平台以及各个平台的芯片对Linux内核进程调度、 内存管理、 中断等
-  的支持，以及每个具体的SoC和电路板的板级支持代码。
-
--  block：在Linux中block表示块设备（以块（多个字节组成的整体，类似于扇区）为单
-位来整体访问），譬如说SD卡、Nand、硬盘等都是块设备，block目录下放的是一些Linux存储
-体系中关于块设备管理的代码。
-
--  crypto：这个文件夹下存放的是常用加密和散列算法（如md5、AES、 SHA等） ，还有一些压缩和CRC校验算法。
-
--  Documentation：内核各部分的文档描述。
-
--  drivers： 设备驱动程序，里面列出了linux内核支持的所有硬件设备的驱动源代码，每个不同的驱动占用一个子目录，如char、 block、 net、 mtd、 i2c等。
-
--  fs：fs就是file system，里面包含Linux所支持的各种文件系统，如EXT、 FAT、 NTFS、 JFFS2等。
-
--  include：目录包括编译核心所需要的大部分头文件，例如与平台无关的头文件在include/linux子目录下，与cpu架构相关的头文件在include目录下对应的子目录中。
-
--  init： 内核初始化代码，这个目录下的代码就是linux内核启动时初始化内核的代码。
-
--  ipc： ipc就是inter process commuication，进程间通信，该文件夹下都是linux进程间通信的代码。
-
--  kernel： kernel就是Linux内核，是Linux中最核心的部分，包括进程调度、定时器等，而和平台相关的一部分代码放在arch/*/kernel目录下。
-
--  lib：lib是库的意思，lib目录下存放的都是一些公用的有用的库函数，注意这里的库函数和C语言的库函数不一样的，因为在内核编程中是不能用C语言标准库函数的，所以需要使用lib中的库函数，除此之外与处理器结构相关的库函数代码被放在arch/*/lib/目录下。
-
--  mm： 目录包含了所有独立于 cpu 体系结构的内存管理代码，如页式存储管理内存的分配和释放等，而与具体硬件体系结构相关的内存管理代码位于arch/*/mm目录下，例如arch/arm/mm/fault.c。
-
--  net： 网络协议栈相关代码，net目录下实现各种常见的网络协议。
-
--  scripts：这个目录下全部是脚本文件，这些脚本文件不是linux内核工作时使用的，而是用了配置编译linux内核的。
-
--  security：内核安全模型相关的代码，例如最有名的SELINUX。
-
--  sound： ALSA、 OSS音频设备的驱动核心代码和常用设备驱动。
-
--  usr： 实现用于打包和压缩的cpio等。
-
+   building\_kernel001
+从图中我们可以看到Linux内核源码目录下是有非常多的文件夹，且文件夹下也有非常多的文件，下面我们简单分析一下这些文件夹的主要作用。
+-
+arch：主要包含和硬件体系结构相关的代码，如arm、x86、MIPS，PPC，每种CPU平台占一个相应的目录，例如我们使用的imx系列CPU就在\ ``arch/arm/mach-imx``\ 目录下，Linux内核目前已经支持30种左右的CPU体系结构。arch中的目录下存放的是各个平台以及各个平台的芯片对Linux内核进程调度、
+内存管理、 中断等的支持，以及每个具体的SoC和电路板的板级支持代码。 -
+block：在Linux中block表示块设备（以块（多个字节组成的整体，类似于扇区）为单位来整体访问），譬如说SD卡、Nand、硬盘等都是块设备，block目录下放的是一些Linux存储体系中关于块设备管理的代码。
+- crypto：这个文件夹下存放的是常用加密和散列算法（如md5、AES、 SHA等）
+，还有一些压缩和CRC校验算法。 - Documentation：内核各部分的文档描述。 -
+drivers：
+设备驱动程序，里面列出了linux内核支持的所有硬件设备的驱动源代码，每个不同的驱动占用一个子目录，如char、
+block、 net、 mtd、 i2c等。 - fs：fs就是file
+system，里面包含Linux所支持的各种文件系统，如EXT、 FAT、 NTFS、
+JFFS2等。 -
+include：目录包括编译核心所需要的大部分头文件，例如与平台无关的头文件在\ ``include/linux``\ 子目录下，与cpu架构相关的头文件在include目录下对应的子目录中。
+- init：
+内核初始化代码，这个目录下的代码就是linux内核启动时初始化内核的代码。 -
+ipc：
+ipc就是\ ``inter process commuication``\ ，进程间通信，该文件夹下都是linux进程间通信的代码。
+- kernel：
+kernel就是Linux内核，是Linux中最核心的部分，包括进程调度、定时器等，而和平台相关的一部分代码放在arch/\*/kernel目录下。
+-
+lib：lib是库的意思，lib目录下存放的都是一些公用的有用的库函数，注意这里的库函数和C语言的库函数不一样的，因为在内核编程中是不能用C语言标准库函数的，所以需要使用lib中的库函数，除此之外与处理器结构相关的库函数代码被放在\ ``arch/*/lib/``\ 目录下。
+- mm： 目录包含了所有独立于 cpu
+体系结构的内存管理代码，如页式存储管理内存的分配和释放等，而与具体硬件体系结构相关的内存管理代码位于\ ``arch/*/mm``\ 目录下，例如\ ``arch/arm/mm/fault.c``\ 。
+- net： 网络协议栈相关代码，net目录下实现各种常见的网络协议。 -
+scripts：这个目录下全部是脚本文件，这些脚本文件不是linux内核工作时使用的，而是用了配置编译linux内核的。
+- security：内核安全模型相关的代码，例如最有名的SELINUX。 - sound：
+ALSA、 OSS音频设备的驱动核心代码和常用设备驱动。 - usr：
+实现用于打包和压缩的cpio等。
 提示：对于其他的未列出来的目录，暂时不用去理会。
 
-.. _编译内核-1:
-
 编译内核
-~~~~
+--------
 
-简单了解内核源码的目录结构后，我们可以开始尝试编译内核，本小节主要是以编译
-我们配套的开发板源代码为主，在后续也会提到编译官方开发板源代码的方法（官方的比较简单）。
+简单了解内核源码的目录结构后，我们可以开始尝试编译内核，本小节主要是以编译我们配套的开发板源代码为主。
 
-我们提供的源码包是经过修改的，首先进入imx-linux/arch/arm/configs目录下，可以看
-到很多默认的deconfig文件，这些是linux源码中的配置文件，其中我们主
-要关注imx_v6_v7_defconfig、imx_v7_defconfig
-、imx_v7_ebf_defconfig 、imx_v7_mfg_defconfig这4个文件即可，如下图所示。
+我们提供的源码包是经过修改的，首先进入\ ``ebf_6ull_linux/arch/arm/configs``\ 目录下，可以看到很多默认的deconfig文件，这些是linux源码中的配置文件，其中我们主要关注\ ``imx_v6_v7_defconfig、imx_v7_defconfig 、imx6_v7_ebf_defconfig``\ 这3个文件即可，\ ``imx_v6_v7_defconfig、imx_v7_defconfig``\ 这两个文件是nxp官方提供的默认配置文件，而\ ``imx6_v7_ebf_defconfig``\ 文件则是我们野火提供的配置文件，这些文件是与编译内核息息相关的，而不同的开发板这些配置是不一样的，前面两个是用于编译官方的imx6ull开发板，而后面两个则是根据我们的imx6ull开发板硬件而定制的配置。
+由于整个内核镜像都已经打上我们的补丁，那么也无需再做过多的修改即可直接编译，我们可以通过git
+log命令查看补丁信息：
 
-.. image:: media/building_kernel005.png
-   :align: center
-   :alt: 未找到图片05|
+.. code:: bash
 
+    ➜  ebf_6ull_linux git:(master) ✗ git log
 
-imx_v6_v7_defconfig、imx_v7_defconfig这两个文件是nxp官方提供的默认
-配置文件，而imx_v7_ebf_defconfig
-、imx_v7_mfg_defconfig这两个文件则是我们野火提供的配置文件，这些文件是
-与边缘内核息息相关的，而不同的开发板这些配置是不一样的，前面两个是用于编
-译官方的imx6ull开发板，而后面两个则是根据我们的imx6ull开发板硬件而定制的配置。
+    commit fe1b9b8fe423aa41ff53757b94adddea8973662d (HEAD -> master, origin/master)
+    Author: jiejie <1161959934@qq.com>
+    Date:   Tue Jan 14 08:06:54 2020 +0000
 
-由于整个内核镜像都已经打上我们的补丁，那么也无需再做过多的修改即可直
-接编译，我们可以通过git log命令查看补丁信息：
+        update config
 
-命令
+    commit 3594c804dafc37dae86a89520273b87c35488ce9
+    Author: jiejie <1161959934@qq.com>
+    Date:   Tue Jan 14 07:33:57 2020 +0000
 
-.. code-block:: sh
-   :linenos:
+        update config
 
-   embedfire @embedfire_dev:~/imx-linux$ git log
+    commit 342f29e8f7813917c945c3fde1bf2767b61110f6
+    Author: jiejie <1161959934@qq.com>
+    Date:   Tue Jan 7 02:44:46 2020 +0000
 
-输出
+        update README.md
 
+    commit 7c24a3c05257373d30dd698398b9bb798e814cec
+    Author: jiejie <1161959934@qq.com>
+    Date:   Wed Nov 27 02:45:14 2019 +0000
 
+        compatible with 5-inch and 4.3-inch LCD
 
-commit 00ce0881a15f0a140f6a684cafea06e114e0c6c7 (HEAD -> imx_4.1.15_2.0.0_ga, origin/imx_4.1.15_2.0.0_ga)Author: flyleaf91 <flyleaf91@163.com>Date:
-Tue Aug 27 02:31:51 2019 +0000 添加ebf config文件commit 2d1ca998ace53ee6f9f053b99296166e80321b6aAuthor: pengjie <jiejie.128@163.com>Date: Mon Aug 26
-21:29:18 2019 +0800 Modified 1.pwm_core 2.led_pwm 3.mmc led Signed-off-by: pengjie <jiejie.128@163.com>commit
-deefdc004090ada48b79e9db54142c4a2df497ffAuthor: pengjie <jiejie.128@163.com>Date: Fri Aug 23 21:34:41 2019 +0800 Modified dht.c.
-Signed-off-by: pengjie <jiejie.128@163.com>commit cd898b5d5afb7fa6f2fc1cfee6bfbdc71ddf4ec1Author: pengjie <jiejie.128@163.com>Date: Mon Aug 12
-23:24:28 2019 +0800 添加ADC&18B20&DHT11 Signed-off-by: pengjie <jiejie.128@163.com>commit 6bb47fefdc503793fd0b0876a6a81c81c339efec (origin/show)Author:
-pengjie <jiejie.128@163.com>Date: Mon Aug 5 21:25:11 2019 +0800 适配4.3寸，5寸，7寸LCD以及触摸屏 Signed-off-by: pengjie <jiejie.128@163.com>commit
-30278abfe0977b1d2f065271ce1ea23c0e2d1b6e (tag: rel_imx_4.1.15_2.1.0_ga)Author: Robby Cai <robby.cai@nxp.com>Date: Thu May 4 14:52:24 2017 +0800
-MLK-14762 ARM: dts: imx6sll-evk: correct gpio pin for lcd power control
+    commit 1b9f4f2252477d8eb41eb3f53f0e2232de7af576
+    Author: jiejie <1161959934@qq.com>
+    Date:   Tue Nov 19 06:44:02 2019 +0000
 
-在编译内核前需要安装编译内核的工具链：arm-linux-gnueabihf-gcc，我们使用的是v7.4.0版本，大家可以
-通过命令安装：
+        add 7' HDMI support
 
-.. code-block:: sh
-   :linenos:
+搭建编译环境
+~~~~~~~~~~~~
 
-   sudo apt-get install gcc-arm-linux-gnueabihf
+开发环境：\ **ubuntu18.04**
 
-然后可以通过arm-linux-gnueabihf-gcc –v命令查看交叉编译器的版本号（我的虚拟机上是7.4.0版本，即使是不一样的版本有也是没有问题的，都是可以编译通过的）：
+**安装必要的库**
 
-命令
+.. code:: bash
 
-.. code-block:: sh
-   :linenos:
+    sudo apt-get install lzop libncurses5-dev
 
-   embedfire @embedfire_dev:~/imx-linux$ arm-linux-gnueabihf-gcc -v
+**安装独立编译工具链**
 
-输出
+1. 命令安装方式（推荐新手使用这种方法）：
 
-Using built-in specs.COLLECT_GCC=arm-linux-gnueabihf-gccCOLLECT_LTO_WRAPPER=/usr/lib/gcc-cross/arm-linux-gnueabihf/7/lto-wrapperTarget: arm-linux-
-gnueabihfConfigured with: ../src/configure -v --with-pkgversion='Ubuntu/Linaro 7.4.0-1ubuntu1~18.04.1' --with-
-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only
---program-suffix=-7 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib
---enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-
-unique-object --disable-libitm --disable-libquadmath --disable-libquadmath-support --enable-plugin --enable-default-pie --with-system-zlib --with-
-target-system-zlib --enable-multiarch --enable-multilib --disable-sjlj-exceptions --with-arch=armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-
-mode=thumb --disable-werror --enable-multilib --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=arm-linux-gnueabihf
---program-prefix=arm-linux-gnueabihf- --includedir=/usr/arm-linux-gnueabihf/includeThread model: posixgcc version 7.4.0 (Ubuntu/Linaro
-7.4.0-1ubuntu1~18.04.1)
+arm-linux-gnueabihf-gcc：\ ``v7.4.0``
 
+.. code:: bash
 
-export PATH=/opt/arm-gcc/bin:$PATHexport ARCH=arm export CROSS_COMPILE=arm-linux-gnueabihf-
+    sudo apt-get install gcc-arm-linux-gnueabihf
 
-首先进入imx-linux目录下，然后开始编译内核，运行make ARCH=arm imx_v7_ebf_defconfig命
-令将imx_v7_ebf_defconfig配置文件的信息写入当前路径下的 .config文件中，在linux中与“.”开头的
-文件都是隐藏文件，我们可以使用ls
+2. 安装包安装方式(推荐老手使用这种方法)
+
+从百度云盘下载\ ``arm-linux-gnueabihf-gcc``\ 编译器的压缩包，版本是
+``v4.9.3``
+
+链接：\ https://github.com/Embedfire/products/wiki
+
+在 **Linux系列产品**
+中找到的网盘链接，在\ ``i.MX6ULL系列\5-编译工具链\arm-gcc`` 目录下找到
+``arm-gcc.tar.gz``
+压缩包并且下载，然后解压到\ ``/opt/arm-gcc/``\ 目录下，如果没有创建即可，解压后就可以在\ ``/opt/arm-gcc/bin/``\ 目录下找到我们的编译器\ ``arm-linux-gnueabihf-gcc``\ ，它的版本是\ ``gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11)``\ ，然后可以将编译器所在的路径添加到环境变量中，只修改当前用户的配置文件，通常是\ ``“~/.bashrc”``\ 或者\ ``“~/.bash_profile”``\ ，直接
+vi 打开即可，在文件末尾增加编译器所在的路径：
+
+.. code:: bash
+
+    export PATH=$PATH:/opt/arm-gcc/bin/
+
+立即使新的环境变量生效，不用重启电脑：
+
+.. code:: bash
+
+    ➜  ebf_6ull_linux git:(master) ✗ source ~/.bashrc
+
+然后检查是否将路径加入到PATH：
+
+.. code:: bash
+
+    ➜  ebf_6ull_linux git:(master) ✗ echo $PATH
+
+显示的内容中有\ ``/opt/arm-gcc/bin``\ ，说明已经将交叉编译器的路径加入PATH。至此，交叉编译环境安装完成。
+
+测试是否安装成功
+
+.. code:: bash
+
+    ➜  ebf_6ull_linux git:(master) ✗ arm-linux-gnueabihf-gcc -v
+    Using built-in specs.
+    COLLECT_GCC=arm-linux-gnueabihf-gcc
+    COLLECT_LTO_WRAPPER=/opt/arm-gcc/bin/../libexec/gcc/arm-linux-gnueabihf/4.9.3/lto-wrapper
+    ···
+    gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11) 
+
+上面的命令会显示arm-linux-gcc信息和版本，说明成功。
+
+更多安装方法参考：\ https://blog.csdn.net/u013485792/article/details/50958253
+
+    作者备注：为什么推荐更低版本的编译器呢？因为作者亲测新版本的编译器并不能完全兼容，在测试比如新版本编译的内核镜像无法识别到4G模块。但是在绝大部分情况下\ ``v7.4.0``\ 版本的编译器都是没有任何问题的！！！请放心使用！！！
+
+编译前准备
+~~~~~~~~~~
+
+在开始编译内核前，可以把环境变量设置一下，以防编译时找不到环境变量：
+
+.. code:: bash
+
+    export PATH=/opt/arm-gcc/bin:$PATH 
+    export ARCH=arm 
+    export CROSS_COMPILE=arm-linux-gnueabihf- 
+
+**清除编译信息**
+
+.. code:: bash
+
+    make ARCH=arm clean
+
+设置配置选项，使用野火开发板配置
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+首先进入imx-linux目录下，然后开始编译内核，运行\ ``make ARCH=arm imx6_v7_ebf_defconfig``\ 命令将imx6\_v7\_ebf\_defconfig配置文件的信息写入当前路径下的
+``.config``\ 文件中，在linux中以\ ``“.”``\ 开头的文件都是隐藏文件，我们可以使用ls
 –la命令查看这些文件。
 
-命令
+.. code:: bash
 
-.. code-block:: sh
-   :linenos:
-
-   embedfire @embedfire_dev:~/imx-linux$ make ARCH=arm imx_v7_ebf_defconfig
-
-输出
-
-HOSTCC scripts/basic/fixdep HOSTCC scripts/kconfig/conf.o SHIPPED scripts/kconfig/zconf.tab.c SHIPPED scripts/kconfig/zconf.lex.c SHIPPED
-scripts/kconfig/zconf.hash.c HOSTCC scripts/kconfig/zconf.tab.o HOSTLD scripts/kconfig/conf## configuration written to .config#
-
-Linux内核的配置系统由三个部分组成，分别是：
-
-1. Makefile：分布在 Linux 内核源代码根目录及各层目
-   录中，定义 Linux 内核的编译规则；
-
-2. 配置文件：给用户提供配置选择的功能，如Kconfig文件定义
-   了配置项，.config文件对配置项进行赋值；
-
-3. 配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配
-   置用户界面（linux提供基于字符界面、基于 Ncurses 图形界面以及基于 Xwindows 图形
-   界面的用户配置界面，各自对应于 make config、make menuconfig 和 make xconfig）。
-
-读者如果想看我们提供的配置文件imx_v7_ebf_defconfig中修改了什么地方，可以通
-过make menuconfig命令来查看我们的配置，make menuconfig是一个基于文本选择
-的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下导入
-.config文件的配置（如果没有找到 .config文件则会生成默认配置的 .config文件），而这
-个配置则是我们运行make ARCH=arm
-imx_v7_ebf_defconfig命令生成的，这就直接可以看到我们在imx_v7_ebf_defconfig的配
-置选择，可以通过键盘的“上”、“下”、“左”、“右”、“回车”、“空格”、“?”、“ESC”等按键进行选
-择配置，具体见下图。
-
-.. image:: media/building_kernel006.png
-   :align: center
-   :alt: 未找到图片06|
+    make ARCH=arm imx6_v7_ebf_defconfig
 
 
+    输出
+      HOSTCC  scripts/basic/fixdep   
+      HOSTCC  scripts/kconfig/conf.o   
+      SHIPPED scripts/kconfig/zconf.tab.c   
+      SHIPPED scripts/kconfig/zconf.lex.c   
+      SHIPPED scripts/kconfig/zconf.hash.c   
+      HOSTCC  scripts/kconfig/zconf.tab.o   
+      HOSTLD  scripts/kconfig/conf 
+      # 
+      # configuration written to .config 
+      #
 
-比如我们选择配置我们开发板的触摸屏驱动：Goodix I2C touchscreen，如果读者找不到
-这个配置选项在哪里，可以利用make menuconfig中的搜索功能，在英文输入法状态
-下按下“/”则可以进行搜索，输入“Goodix”找到改配置选项的位置，具体见图
-30‑6。从图中可以很明显看出Goodix I2C touchscreen配置选项位于-> Device Drivers选
-项下的-> Input device support下的-> Generic input layer (needed for keyboard, mouse, ...)
-(INPUT [=y])选项下的-> Touchscreens 选项中，其实也可以按下“1”直
-接可以定位到对应的选项，然后选
-中[*]Goodix touchpanel GT9xx series 、<*> Goodix GT9xx touch controller auto update
-support 、<*> Goodix GT9xx Tools for debuging 、<*>Goodix I2C touchscreen即可，具
-见下图。
+Linux内核的配置系统由三个部分组成，分别是： 1. Makefile：分布在 Linux
+内核源代码根目录及各层目录中，定义 Linux 内核的编译规则； 2.
+配置文件：给用户提供配置选择的功能，如Kconfig文件定义了配置项，.config文件对配置项进行赋值；
+3.
+配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配置用户界面（linux提供基于字符界面、基于
+Ncurses 图形界面以及基于 Xwindows 图形界面的用户配置界面，各自对应于
+make config、make menuconfig 和 make xconfig）。
+读者如果想看我们提供的配置文件imx6\_v7\_ebf\_defconfig中修改了什么地方，可以通过make
+menuconfig命令来查看我们的配置，make
+menuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make
+menuconfig运行的时候会从当前目录下导入 .config文件的配置（如果没有找到
+.config文件则会生成默认配置的 .config文件），而这个配置则是我们运行make
+ARCH=arm
+imx6\_v7\_ebf\_defconfig命令生成的，这就直接可以看到我们在imx6\_v7\_ebf\_defconfig的配置选择，可以通过键盘的“上”、“下”、“左”、“右”、“回车”、“空格”、“?”、“ESC”等按键进行选择配置，具体见：
 
-.. image:: media/building_kernel007.png
-   :align: center
-   :alt: 未找到图片07|
+.. figure:: media/building_kernel002.png
+   :alt: building\_kernel002
 
+   building\_kernel002
+比如我们选择配置我们开发板的触摸屏驱动：\ ``Goodix I2C touchscreen``\ ，如果读者炸不到这个配置选项在哪里，可以利用\ ``make menuconfig``\ 中的搜索功能，在英文输入法状态下按下“/”则可以进行搜索，输入“Goodix”找到改配置选项的位置，具体见：
 
-.. image:: media/building_kernel008.png
-   :align: center
-   :alt: 未找到图片08|
+.. figure:: media/building_kernel003.png
+   :alt: building\_kernel003
 
+   building\_kernel003
+从图中可以很明显看出\ ``Goodix I2C touchscreen``\ 配置选项位于\ ``-> Device Drivers``\ 选项下的\ ``-> Input device support``\ 下的\ ``-> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])``\ 选项下的\ ``-> Touchscreens``\ 选项中，其实也可以按下\ ``“1”``\ 直接可以定位到对应的选项，然后选中以下内容即可，具体见图：
 
+.. code:: bash
 
-再举个例子，如果想要在我们的开发板上使用DHT11测量温湿度（单总线协议），那么
-需要在内核中配置支持单总线协议：Dallas's 1-wire support，我们也照葫芦画瓢，先
-搜索到这个配置在哪个位置（时候搜索不到就直接找即可），它位于->Device Drivers 选项下的<*>
-Dallas's 1-wire suppor选项中，然后进入它的选项下进行选择即可，当配置完成
-后保存退出，就可以进行编译了，具体见下图。
+    [*]Goodix touchpanel GT9xx series 
+    <*> Goodix GT9xx touch controller auto update support 
+    <*> Goodix GT9xx Tools for debuging 
+    <*>Goodix I2C touchscreen
 
-.. image:: media/building_kernel009.png
-   :align: center
-   :alt: 未找到图片09|
+.. figure:: media/building_kernel004.png
+   :alt: building\_kernel004
 
+   building\_kernel004
+再举个例子，如果想要在我们的开发板上使用\ ``DHT11``\ 测量温湿度（单总线协议），那么需要在内核中配置支持单总线协议：\ ``Dallas's 1-wire support``\ ，我们也照葫芦画瓢，先搜索到这个配置在哪个位置（时候搜索不到就直接找即可），它位于\ ``->Device Drivers``
+选项下的\ ``<*> Dallas's 1-wire suppor``\ 选项中，然后进入它的选项下进行选择即可，当配置完成后保存退出，就可以进行编译了，具体见:
 
+.. figure:: media/building_kernel005.png
+   :alt: building\_kernel005
 
-如果不需要修改配置，则可以直接编译，运
-行make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf- 命令直接编译，-j4
-是代表使用4个CPU进行编译，如果不选则默认使用一个CPU编译，而CPU的多少决定
-了编译的时间，根据自身情况决定即可，在运行这个命令后
-，可以看到中断输出一系列编译信息，而在编译的最后会告诉我们编译
-成功，镜像存在arch/arm/boot/目录下，具体见：（已删减绝大部分编译输出的信息）。
+   building\_kernel005
+开始编译
+~~~~~~~~
 
-命令
+如果不需要修改配置，则可以直接编译，运行\ ``make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf-``\ 命令直接编译，\ ``-j10``\ 是代表使用10个线程进行编译，如果不选则默认使用一个线程编译，而线程的多少决定了编译的时间，根据自身情况决定即可，在运行这个命令后，可以看到中断输出一系列编译信息，而在编译的最后会告诉我们编译成功，镜像存在\ ``arch/arm/boot/``\ 目录下，具体见：（已删减绝大部分编译输出的信息）。
 
-.. code-block:: sh
-   :linenos:
+.. code:: bash
 
-   embedfire @embedfire_dev:~/imx-linux$ make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf-
+    make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf- 
 
-输出
+    # 输出内容（已删减绝大部分编译输出的信息）
+    ···
+    OBJCOPY arch/arm/boot/zImage   
+    Kernel: arch/arm/boot/zImage is ready
+    ···
 
-.. code-block:: sh
-   :linenos:
+编译生成的镜像输出路径
+~~~~~~~~~~~~~~~~~~~~~~
 
-   ···
-   
-   OBJCOPY arch/arm/boot/zImage Kernel: arch/arm/boot/zImage is ready
-   
-   ···
+**内核镜像路径**
 
-这个命令编译的不仅仅是内核，还会编译设备树，设备树编译后产生的.dtb文
-件存在arch/arm/boot/dts/目录下，我们可以通过ls arch/arm/boot/dts/ \| grep .dtb命令
-查看该目录下的所有设备树：（已删减，仅显示imx6ull相关的设备树）。
+.. code:: bash
 
-命令
+    ebf_6ull_linux/arch/arm/boot
 
-.. code-block:: sh
-   :linenos:
+**设备树输出路径**
 
-   embedfire @embedfire_dev:~/imx-linux$ ls arch/arm/boot/dts/ \| grep .dtb
+.. code:: bash
 
-输出
+    ebf_6ull_linux/arch/arm/boot/dts
 
-imx6ull-14x14-ddr3-arm2-adc.dtbimx6ull-14x14-ddr3-arm2-cs42888.dtbimx6ull-14x14-ddr3-arm2.dtbimx6ull-14x14-ddr3-arm2-ecspi.dtbimx6ull-14x14-ddr3-arm2-
-emmc.dtbimx6ull-14x14-ddr3-arm2-epdc.dtbimx6ull-14x14-ddr3-arm2-flexcan2.dtbimx6ull-14x14-ddr3-arm2-gpmi-
-weim.dtbimx6ull-14x14-ddr3-arm2-lcdif.dtbimx6ull-14x14-ddr3-arm2-ldo.dtbimx6ull-14x14-ddr3-arm2-qspi-all.dtbimx6ull-14x14-ddr3-arm2-qspi.dtbimx6ull-14
-x14-ddr3-arm2-tsc.dtbimx6ull-14x14-ddr3-arm2-uart2.dtbimx6ull-14x14-ddr3-arm2-usb.dtbimx6ull-14x14-ddr3-arm2-wm8958.dtbimx6ull-14x14-evk-
-btwifi.dtbimx6ull-14x14-evk.dtbimx6ull-14x14-evk-emmc-43.dtbimx6ull-14x14-evk-emmc-50-70-dht11.dtbimx6ull-14x14-evk-
-emmc-50-70-dht11-leds.dtbimx6ull-14x14-evk-emmc-50-70-dht11-update.dtbimx6ull-14x14-evk-emmc-50-70.dtbimx6ull-14x14-evk-emmc.dtbimx6ull-14x14-evk-
-gpmi-weim-43.dtbimx6ull-14x14-evk-gpmi-weim-50-70-dht11.dtbimx6ull-14x14-evk-gpmi-weim-50-70-dht11-leds.dtbimx6ull-14x14-evk-gpmi-
-weim-50-70-dht11-update.dtbimx6ull-14x14-evk-gpmi-weim-50-70.dtbimx6ull-14x14-evk-gpmi-weim.dtbimx6ull-14x14-evk-usb-certi.dtb
+因为这个\ ``make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf-``\ 命令编译的不仅仅是内核，还会编译设备树，设备树编译后产生的.dtb文件存在\ ``arch/arm/boot/dts/``\ 目录下，我们可以通过\ ``ls arch/arm/boot/dts/ | grep .dtb``\ 命令查看该目录下的所有设备树：
+
+.. code:: bash
+
+    ➜  ebf_6ull_linux git:(master) ✗ ls arch/arm/boot/dts/ | grep .dtb
+
+    imx6ull-14x14-evk-btwifi.dtb
+    imx6ull-14x14-evk.dtb
+    imx6ull-14x14-evk-emmc-43.dtb
+    imx6ull-14x14-evk-emmc-cam-dht11.dtb
+    imx6ull-14x14-evk-emmc.dtb
+    imx6ull-14x14-evk-emmc-hdmi.dtb
+    imx6ull-14x14-evk-emmc-wifi.dtb
+    imx6ull-14x14-evk-gpmi-weim-43.dtb
+    imx6ull-14x14-evk-gpmi-weim-cam-dht11.dtb
+    imx6ull-14x14-evk-gpmi-weim-hdmi.dtb
+    imx6ull-14x14-evk-gpmi-weim-wifi.dtb
+
+**拷贝zImage与dtb**
+
+然后我们可以直接运行脚本\ ``copy.sh``\ 将内核镜像与设备树拷贝到\ ``image``\ 目录下
+
+.. code:: bash
+
+    ➜  ebf_6ull_linux git:(master) ✗ ./copy.sh
+
+    all kernel and DTB are copied to /home/jiejie/ebf_6ull_linux/image/
+
+只编译设备树
+~~~~~~~~~~~~
+
+当然，如果你不想编译内核的话，只想编译设备树，那么可以在\ ``make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf-``\ 命令后面添加
+``dtbs`` 即可
+
+.. code:: bash
+
+    make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf- dtbs
+
+编译的设备树：
+
+-  imx6ull-14x14-evk.dts
+-  imx6ull-14x14-evk-btwifi.dts
+-  imx6ull-14x14-evk-emmc.dts
+-  imx6ull-14x14-evk-gpmi-weim-43.dts
+-  imx6ull-14x14-evk-emmc-43.dts
+-  imx6ull-14x14-evk-gpmi-weim-hdmi.dts
+-  imx6ull-14x14-evk-emmc-hdmi.dts
+-  imx6ull-14x14-evk-gpmi-weim-wifi.dts
+-  imx6ull-14x14-evk-emmc-wifi.dts
+-  imx6ull-14x14-evk-gpmi-weim-cam-dht11.dts
+-  imx6ull-14x14-evk-emmc-cam-dht11.dts
+
+一键编译
+~~~~~~~~
+
+如果你什么都不想理会，那么这个一键编译内核与设备树就更适合你了，直接运行以下命令
+
+::
+
+    ./build.sh
+
+或者...
+
+::
+
+    ./build.sh 5.0
+
+生成的内核镜像与设备树均被拷贝到 ``image`` 目录下。
+内核模块相关均被安装到 ``my_lib/lib/``
+目录下的\ ``modules``\ 文件夹下，可以直接替换掉\ ``rootfs(根文件系统)``\ 中的\ ``/lib/modules/``\ 。
+
+``build.sh``\ 脚本默认编译5.0寸屏幕的内核镜像，如果需要4.3寸屏幕的内核镜像，则可以使用以下命令去编译:
+
+::
+
+    ./build.sh 4.3
 
 烧录自己编译的内核到开发板
-~~~~~~~~~~~~~
+--------------------------
 
-那么经过编译得到的zImage与设备树都可以烧录到我们的开发板中，比如我们
-选择zImage与imx6ull-14x14-evk-gpmi-weim-50-70-dht11-leds.dtb文件替
-换掉28.3 小节中的烧录镜像与设备树，完成烧录后即可看到内核启动完成，具体见下图。
+那么经过编译得到的\ ``zImage``\ 与设备树都可以烧录到我们的开发板中，比如我们选择\ ``zImage``\ 与\ ``imx6ull-14x14-evk-emmc-cam-dht11.dts``\ 文件替换掉前面小节中的烧录镜像与设备树，完成烧录后即可看到内核启动完成。
 
-.. image:: media/building_kernel010.png
-   :align: center
-   :alt: 未找到图片10|
+当内核启动后，我们登陆root用户，就可以通过\ ``cat /proc/version``\ 命令查看内核版本：
 
+.. code:: bash
 
+    imx6ull14x14evk login: root 
+    root@imx6ull14x14evk:~# cat /proc/version 
+    Linux version 4.1.15-2.1.0-00162-gd815328d0504-dirty (embedfire @embedfire_dev) (gcc version 7.4.0 (Ubuntu/Linaro 7.4.0-1ubuntu1~18.04.1) ) #2 SMP PREEMPT Tue Aug 27 07:46:06 UTC 2019
 
-当内核启动后，我们登陆root用户，就可以通过cat /proc/version命令查看内核版本：
+内核配置选项（部分）
+--------------------
 
-.. code-block:: sh
-   :linenos:
+运行 ``make ARCH=arm menuconfig``
+命令打开配置界面，根据自身需求配置即可！
 
-   imx6ull14x14evk login: rootroot@imx6ull14x14evk:~# cat /proc/versionLinux version 4.1.15-2.1.0-00162-gd815328d0504-dirty (embedfire @embedfire_dev)
-   (gcc version 7.4.0 (Ubuntu/Linaro 7.4.0-1ubuntu1~18.04.1) ) #2 SMP PREEMPT Tue Aug 27 07:46:06 UTC 2019
+**触摸屏驱动：**
 
-可能会增加个编译官方内核的
+.. code:: bash
 
+     Prompt: Goodix I2C touchscreen   
+      Location:            
+       -> Device Drivers         
+          -> Input device support  
+           -> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y]) 
+     (1)       -> Touchscreens (INPUT_TOUCHSCREEN [=y])  
+     #这个也要使能
+        [*]   Goodix touchpanel GT9xx series 
+        <*>     Goodix GT9xx touch controller auto update support  
+        <*>     Goodix GT9xx Tools for debuging     
 
+**单总线驱动：**
 
+.. code:: bash
 
-.. |buildi010| image:: media/building_kernel002.png
-   :width: 5.76806in
-   :height: 4.17052in
-.. |buildi003| image:: media/building_kernel003.png
-   :width: 5.76806in
-   :height: 3.6958in
-.. |buildi004| image:: media/building_kernel004.png
-   :width: 5.76806in
-   :height: 3.71095in
-.. |buildi005| image:: media/building_kernel005.png
-   :width: 5.76806in
-   :height: 4.16798in
-.. |buildi006| image:: media/building_kernel006.png
-   :width: 6.06111in
-   :height: 4.32in
-.. |buildi007| image:: media/building_kernel007.png
-   :width: 5.76806in
-   :height: 3.6284in
-.. |buildi008| image:: media/building_kernel008.png
-   :width: 5.744in
-   :height: 4.57996in
-.. |buildi009| image:: media/building_kernel009.png
-   :width: 5.76806in
-   :height: 4.59066in
-.. |buildi010| image:: media/building_kernel010.png
-   :width: 5.76806in
-   :height: 3.51994in
+     Prompt: Dallas's 1-wire support     
+     Location:                         
+      (1) -> Device Drivers          
+      [*]   Userspace communication over connector (NEW)    
+
+**添加MPU6050的支持：**
+
+.. code:: bash
+
+    Prompt: Invensense MPU6050 devices      
+    Location:  
+      -> Device Drivers               
+        -> Industrial I/O support (IIO [=y])               
+    (1)     -> Inertial measurement units   
+              <*> Invensense MPU6050 devices   
+
+**WIFI蓝牙**
+
+.. code:: bash
+
+    Location:  
+      -> Device Drivers               
+        -> Network device support                                         
+           -> Wireless LAN
+              ->
+
+     <*>   Broadcom FullMAC wireless cards support                        
+            (/lib/firmware/bcm/AP6236/Wi-Fi/fw_bcm43436b0.bin) Firmware path     
+             (/lib/firmware/bcm/AP6236/Wi-Fi/nvram_ap6236.txt) NVRAM path    
+
+    #HCI串口配置也要选择
+        -> Device Drivers               
+        -> Network device support                                         
+           -> Wireless LAN
+              ->Bluetooth subsystem support   
+                  ->Bluetooth device drivers   
+                      <*> HCI USB driver     
+                      [*]   Broadcom protocol support  
+
+      -> Networking support (NET [=y])     
+        -> Bluetooth subsystem support (BT [=y]) 
+          -> Bluetooth device drivers    
+            <*> HCI USB driver    
+            [*]   Broadcom protocol support  
+
+**PPP点对点拨号：**
+
+所有PPP相关的都选中
+
+.. code:: bash
+
+     Prompt: PPP (point-to-point protocol) support              
+      Location:          
+      -> Device Drivers 
+        (1)   -> Network device support (NETDEVICES [=y])       
+
+**蓝牙和HCI子系统**
+
+.. code:: bash
+
+        -> Networking support (NET [=y])              
+         -> Bluetooth subsystem support (BT [=y])   
+          (1)     -> Bluetooth device drivers   
+      --- RF switch subsystem support                                         
+              [*]   RF switch input support  
+              <*>   Generic rfkill regulator driver
+              <*>   GPIO RFKILL driver            
+
