@@ -1,6 +1,6 @@
 .. vim: syntax=rst
 
-Etcher工具烧录Debian镜像
+SD卡烧录Debian镜像
 ---------------------
 
 Etcher工具简介
@@ -28,13 +28,17 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
 烧录Debian镜像
 ~~~~~~~~~~~~~~~~~~~~~
 
-Etcher工具安装成功后，打开Etcher工具，软件界面如下图所示:
+下载野火最新发布的Debian系统镜像：\ https://pan.baidu.com/s/1pji1U1vvgP8sl_TTZp59qg/\。(提取码:b5wb)
+
+打开安装好的Etcher工具，软件界面如下图所示:
 
 ..  image:: media/instal003.png
     :align: center
     :alt: Etcher工具
 
-选择要烧录的镜像，这里选择野火提供的Debian镜像，Debian镜像有三个不同版本，如下图所示:
+
+
+选择要烧录的镜像，野火提供的Debian镜像三个不同版本，如下图所示:
 
 ..  image:: media/install_debian3.png
     :align: center
@@ -42,7 +46,7 @@ Etcher工具安装成功后，打开Etcher工具，软件界面如下图所示:
 
 其中:
 
-- Debian Buster Lite目录下存放的是Debian的纯净版固件，没有带桌面环境和野火的QTdemo，很多常见软件也没有。
+- Debian Buster Lite目录下存放的是Debian的纯净版固件，没有带桌面环境和野火的QT demo。
 
 - Debian with desktop目录下存放的是带有桌面环境的Debian固件，系统启动后会进入桌面环境。
 
@@ -75,3 +79,6 @@ Etcher工具安装成功后，打开Etcher工具，软件界面如下图所示:
     :alt: Debian镜像
 
 开发板插入烧录好Debian镜像的SD卡，调整拨码开关为SD卡启动方式，上电后开发板就能正常启动。
+
+注意:开发板第一次从SD卡启动时，系统会自动进行扩容重启，
+以保证充分利用SD卡存储空间。扩容完毕后，系统重启生效。

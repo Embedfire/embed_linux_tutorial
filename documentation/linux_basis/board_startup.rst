@@ -116,7 +116,7 @@ i.MX系列芯片支持多种启动方式，在我们配套的开发板上主要�
 
 (1) 如果是在开发板开机前就建立了串口终端连接，那么在开机时会看到开发板在启动时的信息输出，见下图。
 
-.. image:: media/boards005.jpg
+.. image:: media/boards005.png
    :align: center
    :alt: 未找到图片
 
@@ -127,7 +127,7 @@ i.MX系列芯片支持多种启动方式，在我们配套的开发板上主要�
 (2) 如果是在开发板开机后才建立的连接，开发板没有输出，这时直接按几下回车即可，见下图。
 
 
-.. image:: media/boards006.jpg
+.. image:: media/boards006.png
    :align: center
    :alt: 未找到图片
 
@@ -136,7 +136,7 @@ i.MX系列芯片支持多种启动方式，在我们配套的开发板上主要�
 
 (3) 无论是以上哪种情况，开发板的启动流程执行完毕时，只要按回车后终端都会提示login，此时终
 端在等待用户的输入，它需要知道我们希望以哪个用户名登录终端。我们的开发板默认
-用户为：root，不带密码。所以在该提示界面中输入root并回车即可，见下图。
+用户为：debian，密码：temppwd。所以在提示界面中输入用户密码并回车登录即可，见下图。
 
 .. image:: media/boards007.jpg
    :align: center
@@ -209,9 +209,10 @@ ping路由测试
 .. code-block:: sh
    :linenos:
 
-   udhcpc  -b  -i  eth0
+   #eth1表示第一路以太网口，eth2表示第二路以太网口
+   sudo udhcpc  -b  -i  eth1  
 
-若命令执行正常，会出现图 11‑9中的输出，并且再次输入ifconfig命令会查看到eth0具有正常的IP地址。
+若命令执行正常，会出现图 11‑9中的输出，并且再次输入ifconfig命令会查看到eth1具有正常的IP地址。
 
 .. image:: media/boards010.png
    :align: center

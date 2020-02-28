@@ -38,6 +38,7 @@
    :numbered:
 
    linux_basis/ebf6ull_hardware
+   install_image/install_debian_to_sd
    linux_basis/fire-config_brief
    linux_basis/board_startup
    linux_basis/system_information
@@ -67,7 +68,6 @@
    :numbered:
 
    install_image/install_sd_image
-   install_image/install_debian_to_sd
    install_image/sdcard_production
    install_image/mfgtool_production
 
