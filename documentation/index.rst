@@ -103,6 +103,14 @@
 
 .. toctree::
    :maxdepth: 1
+   :caption: Linuxn内核调试
+   :numbered:
+
+   linux_debug/core_dump
+
+
+.. toctree::
+   :maxdepth: 1
    :caption: i.MX6 裸机开发
    :numbered:
 
