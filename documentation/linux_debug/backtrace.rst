@@ -5,7 +5,8 @@ gdb调试之函数调用栈——backtrace
 ----------------
 
 在写代码的时候，我们会封装很多函数，而这些函数之中又会调用其他的函数，当程序每次调用函数的时候，就会跳转到函数的地方去执行，那么这期间就有很多信息产生了，比如：调用函数的地方，函数的参数，被调用函数的变量等，这些信息其实是存储在栈中的，其实更确切地说，这些信息是存储在函数调用信息帧中的，每个函数及其变量都被分配了一个帧（frame），这些函数信息帧就组成了函数调用栈。我们使用
-gdb 调试工具就可以查看函数调用栈的内容信息，可以清晰地看到各个函数的调用顺序以及各函数的输入形参值，是分析程序的执行流程和输入依赖的重要手段。
+gdb
+调试工具就可以查看函数调用栈的内容信息，可以清晰地看到各个函数的调用顺序以及各函数的输入形参值，是分析程序的执行流程和输入依赖的重要手段。
 
 gdb提供了一些指令可以查看这些帧中的信息，当查询函数变量的信息时，gdb就是从这个被选中的帧内获取信息，但是查看被选中帧外的变量信息是非法的，当程序运行停止的时候，gdb会自动选择当前被调用的函数帧，并且打印简单帧信息。
 
@@ -136,18 +137,25 @@ gdb调试实战
 
 然后我们将源码编译，然后使用gdb调试器进行调试，我们在实际调试的时候，先去到最底层的地方，即test1()函数中，查看它被调用的关系，具体操作如下：
 
-1. 编译源码，并尝试运行它，可以很明显看到函数的调用关系信息： \`\`\`bash
-   ➜ backtrace git:(dev\_jie) ✗ make gcc -o backtrace.o -c -g -Werror
-   -I. -Iinclude -static backtrace.c -g -MD -MF .backtrace.o.d gcc -o
-   targets backtrace.o -g -Werror -I. -Iinclude -static
+1. 编译源码，并尝试运行它，可以很明显看到函数的调用关系信息：
 
-运行
-====
+.. code:: bash
 
-➜ backtrace git:(dev\_jie) ✗ ./targets -我是 test3 函数 - test3 开始调用
-test2 --我是 test2 函数 -- test2 开始调用 test1 ---我是 test1 函数 --
-test2 结束调用 test1 --结束调用 test2 - test3 结束调用 test1 -结束调用
-test3 \`\`\`
+    ➜  backtrace git:(master) ✗ make
+    gcc -o backtrace.o -c -g -Werror -I. -Iinclude -static backtrace.c -g -MD -MF .backtrace.o.d
+    gcc -o targets backtrace.o -g -Werror -I. -Iinclude -static
+
+    # 运行
+    ➜  backtrace git:(master) ✗ ./targets 
+    -我是 test3 函数
+    - test3 开始调用 test2 
+            --我是 test2 函数
+            -- test2 开始调用 test1 
+                    ---我是 test1 函数
+            -- test2 结束调用 test1 
+            --结束调用 test2 
+    - test3 结束调用 test1 
+    -结束调用 test3 
 
 2. 使用gdb调试器进行调试：
 
