@@ -107,6 +107,7 @@
    :numbered:
 
    linux_debug/core_dump
+   linux_debug/backtrace
 
 
 .. toctree::

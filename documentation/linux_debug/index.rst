@@ -9,3 +9,4 @@
 ..    :numbered:
 
 ..    core_dump
+..    backtrace
