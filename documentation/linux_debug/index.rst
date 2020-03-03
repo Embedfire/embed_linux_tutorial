@@ -10,3 +10,4 @@
 
 ..    core_dump
 ..    backtrace
+..    strace
