@@ -2,34 +2,16 @@
 
 平台设备驱动
 ======
-前面讲解Linux文件目录时，提到过sysfs文件系统，该文件系统用于把内核的设备驱动导出到用户空间，用户便可通过访问sys目录及其下的文件，来查看甚至控制内核的一些驱动设备。
-
-.. image:: ./media/sys.jpg
-   :align: center
-   :alt: /sys目录
-
-本章的内容重点在于图片中红框处的几个目录：bus、class、dev、devices。bus目录中包含了当前系统中已经注册了的所有总线，例如i2c，spi，platform等。我们看到每个总线目录都拥有两个子目录devices和drivers，分别记录着挂载在该总线的所有设备以及驱动。
-
-.. image:: ./media/bus.jpg
-   :align: center
-   :alt: /sys/bus目录
-
-class目录则是将系统中现有的设备根据类别进行分类管理，如输入设备（input）有触摸屏，鼠标以及键盘，块设备（block）有SD卡，NAND FLASH。
-
-.. image:: ./media/class.jpg
-   :align: center
-   :alt: /sys/class目录
-
-devices目录记录了系统中所有设备的拓扑结构，在sys目录下所有设备文件最终都会指向该目录对应的设备文件；dev目录下中记录所有的设备节点（非拓扑结构），但实际上都是些链接文件，同样指向了devices目录下的文件。
 
 
 
 
 Linux的设备模型
 ~~~~
-在旧版本的Linux代码中，设备之间没有任何联系，大部分代码是可以通用的，为了解决重用性差的问题，Linux2.6版本开始提出了Linux的设备模型（Linux device model），以减少冗余的代码。
+在旧版本的Linux代码中，设备之间没有任何联系，然而部分内核代码是可以通用的，为了解决重用性差的问题，Linux2.6版本开始提出了Linux设备模型（Linux device model），以减少冗余的代码。
 
-在嵌入式中，我们接触到的某个设备大部分是依靠总线来进行通信的，对于野火开发板而言，触摸芯片是依赖于I2C，鼠标、键盘等HID设备，则是依赖于USB。从功能上讲，这些设备都是将文字、字符、控制命令或采集的数据等信息输入到计算机。于是，Linux设备模型将共性的部分进行归纳，提出了三个重要概念：总线（bus）、类（class）以及设备（device），
+我们接触到的设备大部分是依靠总线来进行通信的，对于野火开发板而言，触摸芯片是依赖于I2C，鼠标、键盘等HID设备，则是依赖于USB。从功能上讲，这些设备都是将文字、字符、控制命令或采集的数据等信息输入到计算机。于是，
+Linux设备模型将共性的部分进行归纳，提出了三个重要概念：总线（bus）、类（class）以及设备（device），
 并抽象出一套标准的数据结构和接口，使得开发设备驱动只需要填充特定的数据结构。
 
 
@@ -41,11 +23,12 @@ Linux的设备模型
 
 总线
 ----
-总线是连接处理器和设备之间的桥梁，总线驱动则负责实现总线的各种行为，其管理两个链表，分别是添加到该总线的设备链表以及注册到该总线的驱动链表。当你向总线添加（移除）一个设备（驱动）时，便会在对应的列表上添加新的节点，
-同时对挂载在该总线的驱动以及设备进行匹配，匹配过程中会忽略掉那些已经有驱动匹配的设备。
+总线是连接处理器和设备之间的桥梁，对应的总线驱动则负责实现总线的各种行为，其管理两个链表，分别是添加到该总线的设备链表以及注册到该总线的驱动链表。当你向总线添加（移除）一个设备（驱动）时，便会在对应的列表上添加新的节点，
+同时对挂载在该总线的驱动以及设备进行匹配，在匹配过程中会忽略掉那些已经有驱动匹配的设备。
 
 
-内核使用结构体bus_type来表示总线，如下所示：
+
+
 
 .. code-block:: c 
     :caption: bus_type结构体（内核源码/include/linux/device.h）
@@ -80,32 +63,30 @@ Linux的设备模型
 	struct lock_class_key lock_key;
     };
 
-
-- match : 当向总线注册一个新的设备或者是新的驱动时，会调用该回调函数。该回调函数主要负责判断是否有注册了的驱动适合新的设备，新的驱动能否驱动总线上已注册但没有驱动匹配的设备；
+- name : 指定总线的名称，当新注册一种总线类型时，会在/sys/bus目录创建一个新的目录，目录名就是该参数的值；
+- match : 当向总线注册一个新的设备或者是新的驱动时，会调用该回调函数。该回调函数主要负责判断是否有注册了的驱动适合新的设备，或者新的驱动能否驱动总线上已注册但没有驱动匹配的设备；
 - probe : 当总线将设备以及驱动相匹配之后，执行该回调函数,最终会调用驱动提供的probe函数。
 - remove : 当设备从总线移除时，调用该回调函数；
 - suspend、resume : 电源管理的相关函数，当总线进入睡眠模式时，会调用suspend回调函数；而resume回调函数则是在唤醒总线的状态下执行；
 - pm : 电源管理的结构体，存放了一系列跟总线电源管理有关的函数，与device_driver结构体中的pm_ops有关；
-- drv_groups 、dev_groups 、bus_groups: 分别表示驱动、设备以及总线的默认属性。对于驱动而言，在目录/sys/bus/<bus-name>/driver/<driver-name>存放了设备的默认属性；设备则在目录/sys/bus/<bus-name>/devices/<driver-name>中。
+- drv_groups 、dev_groups 、bus_groups: 分别表示驱动、设备以及总线的属性。这些属性可以是内部变量、字符串等等。通常会对应的/sys目录下在以文件的形式存在，对于驱动而言，在目录/sys/bus/<bus-name>/driver/<driver-name>存放了设备的默认属性；设备则在目录/sys/bus/<bus-name>/devices/<driver-name>中。这些文件一般是可读写的，用户可以通过读写操作来获取和设置这些attribute的值。
+- p：该结构体用于存放特定的私有数据，其成员klist_devices和klist_drivers记录了挂载在该总线的设备和驱动；
 
+内核提供了bus_register函数来注册总线，以及bus_unregister函数来注销总线，其函数原型：
 
-When a new device is added, the bus’s list of drivers is iterated over to find one that supports it. In order to determine that, the device ID of the device must match one of the device IDs that the driver supports. The format and semantics for comparing IDs is bus-specific. Instead of trying to derive a complex state machine and matching algorithm, it is up to the bus driver to provide a callback to compare a device against the IDs of a driver. The bus returns 1 if a match was found; 0 otherwise.
+.. code-block:: c 
+    :caption: 注册/注销总线API（内核源码/drivers/base/bus.c）
+    :linenos: 
 
-int match(struct device * dev, struct device_driver * drv);
+    int bus_register(struct bus_type *bus);
+    void bus_unregister(struct bus_type *bus);
 
-If a match is found, the device’s driver field is set to the driver and the driver’s probe callback is called. This gives the driver a chance to verify that it really does support the hardware, and that it’s in a working state.
 
 
 设备
 ----
-内核使用device结构体来抽象我们的硬件设备，该结构通常会嵌入到特定总线平台的数据结构中，如下所示：
-
-.. code-block:: c
-    :caption: i2c_client结构体
-    :linenos:
-
-    待补充
-
+在驱动开发的过程中，我们最关心的莫过于设备以及对应的驱动了。我们编写驱动的目的，最终就是为了使设备可以正常工作。在Linux中，一切都是以文件的形式存在，
+设备也不例外。内核使用device结构体来抽象我们的硬件设备，如下所示，该结构通常会嵌入到特定的数据结构中，
 
 .. code-block:: c 
 	:caption: device结构体(内核源码/include/linux/device.h）
@@ -113,89 +94,30 @@ If a match is found, the device’s driver field is set to the driver and the dr
 
 	struct device {
 		struct device		*parent;
-
-		struct device_private	*p;
-
-		struct kobject kobj;
-		const char		*init_name; /* initial name of the device */
-		const struct device_type *type;
-
-		struct mutex		mutex;	/* mutex to synchronize calls to
-						* its driver.
-						*/
-
-		struct bus_type	*bus;		/* type of bus device is on */
-		struct device_driver *driver;	/* which driver has allocated this
-						device */
-		void		*platform_data;	/* Platform specific data, device
-						core doesn't touch it */
-		void		*driver_data;	/* Driver data, set and get with
-						dev_set/get_drvdata */
-		struct dev_pm_info	power;
-		struct dev_pm_domain	*pm_domain;
-
-	#ifdef CONFIG_PINCTRL
-		struct dev_pin_info	*pins;
-	#endif
-
-	#ifdef CONFIG_NUMA
-		int		numa_node;	/* NUMA node this device is close to */
-	#endif
-		u64		*dma_mask;	/* dma mask (if dma'able device) */
-		u64		coherent_dma_mask;/* Like dma_mask, but for
-							alloc_coherent mappings as
-							not all hardware supports
-							64 bit addresses for consistent
-							allocations such descriptors. */
-		unsigned long	dma_pfn_offset;
-
-		struct device_dma_parameters *dma_parms;
-
-		struct list_head	dma_pools;	/* dma pools (if dma'ble) */
-
-		struct dma_coherent_mem	*dma_mem; /* internal for coherent mem
-							override */
-	#ifdef CONFIG_DMA_CMA
-		struct cma *cma_area;		/* contiguous memory area for dma
-						allocations */
-	#endif
-		/* arch specific additions */
-		struct dev_archdata	archdata;
-
-		struct device_node	*of_node; /* associated device tree node */
-		struct fwnode_handle	*fwnode; /* firmware device node */
-
-		dev_t			devt;	/* dev_t, creates the sysfs "dev" */
-		u32			id;	/* device instance */
-
-		spinlock_t		devres_lock;
-		struct list_head	devres_head;
-
-		struct klist_node	knode_class;
+		struct bus_type	*bus;		
+		struct device_driver *driver;	
+		void		*platform_data;	
+		void		*driver_data;	
+		struct device_node	*of_node; 
+		dev_t			devt;	
 		struct class		*class;
 		const struct attribute_group **groups;	/* optional groups */
-
-		void	(*release)(struct device *dev);
-		struct iommu_group	*iommu_group;
-
-		bool			offline_disabled:1;
-		bool			offline:1;
 	};	
 
-- parent：表示该设备的父对象，若设备依赖于某个总线，则该成员需要指向该总线对应的控制器;
-- bus：表示该驱动依赖于哪个总线；
-- type：表示该设备的类型，
-- kobj：
+- parent：表示该设备的父对象，前面提到过，旧版本的设备之间没有任何关联，引入Linux设备模型之后，设备之间呈树状结构，便于管理各种设备；
+- bus：表示该设备依赖于哪个总线，当我们注册设备时，内核便会将该设备注册到对应的总线。
 - of_node：存放设备树中匹配的设备节点。当内核使能设备树，总线负责将驱动的of_match_table以及设备树的compatible属性进行比较之后，将匹配的节点保存到该变量。
 - platform_data：特定设备的私有数据，通常定义在板级文件中；
-- driver_data：
-- class：指向了该设备对应类
-- group：指向struct attribute_group类型的指针，指定该设备的默认参数；
-- release：当设备的引用个数为0时，会调用该函数。
+- driver_data：同上，驱动层可通过dev_set/get_drvdata函数来获取该成员；
+- class：指向了该设备对应类，开篇我们提到的触摸，鼠标以及键盘等设备，对于计算机而言，他们都具有相同的功能，都归属于输入设备。我们可以在/sys/class目录下对应的类找到该设备，如input、leds、pwm等目录;
+- dev：dev_t类型变量，字符设备章节提及过，它是用于标识设备的设备号，该变量主要用于向/sys目录中导出对应的设备。
+- group：指向struct attribute_group类型的指针，指定该设备的属性；
 
+同样地，
 
 驱动
 ----
+设备能否正常工作，取决于驱动。驱动需要告诉内核，自己可以驱动哪些设备，如何初始化设备。在内核中，使用device_driver结构体来描述我们的驱动，如下所示：
 
 .. code-block:: c 
 	:caption: device_driver结构体(内核源码/include/linux/device.h）
@@ -215,42 +137,77 @@ If a match is found, the device’s driver field is set to the driver and the dr
 
 		int (*probe) (struct device *dev);
 		int (*remove) (struct device *dev);
-		void (*shutdown) (struct device *dev);
-		int (*suspend) (struct device *dev, pm_message_t state);
-		int (*resume) (struct device *dev);
+
 		const struct attribute_group **groups;
-
-		const struct dev_pm_ops *pm;
-
-		struct driver_private *p;
 	};	
 
 - name：指定驱动名称，总线进行匹配时，利用该成员与设备名进行比较；
-- suppress_bind_attrs： 布尔量，用于指定是否通过sysfs导出bind与unbind文件，bind与unbind文件是驱动用于绑定/解绑关联的设备。
 - bus：表示该驱动依赖于哪个总线，内核需要保证在驱动执行之前，对应的总线能够正常工作；
+- suppress_bind_attrs：布尔量，用于指定是否通过sysfs导出bind与unbind文件，bind与unbind文件是驱动用于绑定/解绑关联的设备。
 - owner：表示该驱动的拥有者，一般设置为THIS_MODULE；
 - of_match_table：指定该驱动支持的设备类型。当内核使能设备树时，会利用该成员与设备树中的compatible属性进行比较。
-- suspend、resume：电源管理函数；
 - remove：当设备从操作系统中拔出或者是系统重启时，会调用该回调函数；
-- probe：
-- group：指向struct attribute_group类型的指针，指定该驱动的默认参数；
+- probe：当驱动以及设备匹配后，会执行该回调函数，对设备进行初始化。通常的代码，都是以main函数开始执行的，但是在内核的驱动代码，都是从probe函数开始的。
+- group：指向struct attribute_group类型的指针，指定该驱动的属性；
+
+内核提供了
+
+.. code-block:: c 
+	:caption: device_driver结构体(内核源码/include/linux/device.h）
+	:linenos:
+
+    int driver_register(struct device_driver *drv);
+    void driver_unregister(struct device_driver *drv);
 
 
-对于USB，I2S，I2C，UART，SPI等物理总线，我们都并不陌生。而像i2c设备、usb设备、spi设备等等，
-都是直接挂在对应的总线下，与cpu进行数据交互的。但是在嵌入式系统当中，并不是所有的设备都能有对应
-的总线。为了让这些没有总线可依靠的设备，能够满足“总线-设备-驱动”的驱动模型，Linux设备驱动模型虚
-构出一条总线——平台总线，它用于挂载那些不依赖于物理总线的设备。我们经常接触到i.MX6的SPI、
-I2C、UART并不是实际的物理总线，而是叫SPI控制器、I2C控制器、UART控制器，也是属
-于一种硬件设备，对于Linux内核而言，属于平台设备，并挂载在平台总线下。
+
+sysfs文件系统
+-------
+
+前面讲解Linux文件目录时，提到过sysfs文件系统，该文件系统用于把内核的设备驱动导出到用户空间，用户便可通过访问sys目录及其下的文件，来查看甚至控制内核的一些驱动设备。
+我们在
+
+.. image:: ./media/sys.jpg
+   :align: center
+   :alt: /sys目录
 
 
-平台总线
+
+class目录则是将系统中现有的设备根据类别进行分类管理，如输入设备（input）有触摸屏，鼠标以及键盘，块设备（block）有SD卡，NAND FLASH。
+
+.. image:: ./media/class.jpg
+   :align: center
+   :alt: /sys/class目录
+
+
+
+
+
+Linux平台设备驱动
 ~~~~~
 
-在Linux的设备驱动模型中，总线是最重要的一环。在设备驱动模型章节中，我们提到过总线是负责匹配设备和驱动，
+平台总线
+-------
 
+在Linux的设备驱动模型中，总线是最重要的一环。上一节中，我们提到过总线是负责匹配设备和驱动，
 它维护了一个链表，里面记录着各个已经注册的平台设备和平台驱动。每当有新的设备或者是新的驱动加入到总线时，
-总线便会调用platform_match函数对新增的设备或驱动，进行配对。它的匹配方式是通过比较字符串是否一致。
+总线便会调用platform_match函数对新增的设备或驱动，进行配对。
+
+
+.. code-block:: c
+    :caption: platform_bus_type结构体(内核源码/driver/base/platform.c)
+    :linenos:
+
+    struct bus_type platform_bus_type = {
+        .name		= "platform",
+        .dev_groups	= platform_dev_groups,
+        .match		= platform_match,
+        .uevent		= platform_uevent,
+        .pm		= &platform_dev_pm_ops,
+    };
+    EXPORT_SYMBOL_GPL(platform_bus_type);
+
+我们只需要关心platform总线的match函数，了解platform总线是如何将平台设备以及平台驱动联系到一起，其函数原型如下：
 
 .. code-block:: c
     :caption: platform_match函数(内核源码/driver/base/platform.c)
@@ -281,12 +238,14 @@ I2C、UART并不是实际的物理总线，而是叫SPI控制器、I2C控制器�
         return (strcmp(pdev->name, drv->name) == 0);
     }
 
+我们可以看到platform总线的匹配机制十分简单，并没有涉及什么复杂的算法，只是简单地进行字符串比较。
+platform总线提供了四种匹配机制，这四种匹配方式存在着优先级顺序，设备树模式、ACPI模型、id table以及比较设备以及驱动的名字。
 
 平台设备
-~~~~~
+-------
 
 结构体
-----
+^^^^^^^^^^^^^^^^^^^^^
 内核使用struct platform_device来表示平台设备，如下所示（删掉了一些成员变量）：
 
 .. code-block:: c
@@ -308,7 +267,7 @@ I2C、UART并不是实际的物理总线，而是叫SPI控制器、I2C控制器�
 - resource：平台设备提供给内核驱动的资源，如irq，dma，内存等等。该结构体会在接下来的内容进行讲解。
 
 注册/移除平台设备
-----
+^^^^^^^^^^^^^^^^^^^^^
 当我们完成了上述结构体的初始化时，需要告诉内核，我们定义了一个平台设备。为此，需要使用下面的API，来注册平台设备。
 
 
@@ -338,14 +297,14 @@ I2C、UART并不是实际的物理总线，而是叫SPI控制器、I2C控制器�
     EXPORT_SYMBOL_GPL(platform_device_unregister);
 
 资源
-----
+^^^^^^^^^^^^^^^^^^^^^
 
 对于平台设备而言，内核对于该设备一无所知。为此，在我们定义平台设备时，
 往往需要提供一些资源，比如这个设备使用的中断编号，寄存器的内存地址等等，这样的话，内核驱动就知道，如何使这个设备正常工作了。
 平台设备向设备驱动提供资源的方式有两种：一、通过内核提供的资源类型，共有六种；二、我们自定义的数据类型，即私有数据。
 
 内核提供的资源
-^^^^^^^^^^
+"""""""""""""""""
 接触过单片机的读者，应该都知道：想要设备能够正常工作，需要对设备的寄存器以及中断信号进行设置。对于Linux而言，也不外如此。
 Linux用资源来描述一个设备正常工作所需要的元素，比如IRQ，MEM，DMA等。内核提供了六种类型资源：
 
@@ -361,7 +320,7 @@ Linux用资源来描述一个设备正常工作所需要的元素，比如IRQ，
     #define IORESOURCE_BUS		0x00001000
 
 私有数据
-^^^^^^
+"""""""""""""""""
 Linux只提供了六种资源类型，很明显，当我们所需要数据，如某个GPIO，并不包含在上述六种中，为此，诞生了私有数据。在platform_device结构体中，嵌入了device结构体，
 该结构体有个变量platform_data，可以用于保存自定义数据。
 
@@ -388,10 +347,10 @@ Linux只提供了六种资源类型，很明显，当我们所需要数据，如
 
 
 平台驱动
-~~~~~~
+-------
 
 如何注册平台驱动
-------
+^^^^^
 
 结构体
 ^^^^^
@@ -426,7 +385,7 @@ Linux只提供了六种资源类型，很明显，当我们所需要数据，如
 
 
 初始化/移除平台驱动
-
+^^^^^
 .. code-block:: c 
     :caption: platform_driver_register函数
     :linenos:
