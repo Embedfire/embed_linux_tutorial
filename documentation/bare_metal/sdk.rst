@@ -8,9 +8,17 @@
 本章节内容处于开发笔记状态，还待整理至最终版的教程。
 
 SDK（Software Development Kit）是NXP针对其官方评估
-版的软件开发包，可以在NXP的官网下载得到。SDK中包含了各种程序范例，我们心心念念的固件库也包含在它里边。
+版的软件开发包，可以在NXP的官网下载得到。SDK中包含了
+各种程序范例，我们心心念念的固件库也包含在它里边。
 
-SDK的下载提供很多选择，下载步骤比较复杂，在本章的配套例程文件夹中包含了SDK的原件，可直接使用。若想亲自到官网下载，请按如下步骤操作，不感兴趣可直接跳过该步骤：
+
+SDK的下载提供很多选择，下载步骤比较复杂，在本章的配套例程
+文件夹中包含了SDK的原件（路径：~/embed_linux_tutorial/base_code/bare_metal/sdk_nxp），可
+直接使用。若想亲自到官网下载，请按
+如下步骤操作，不感兴趣可直接跳过该步骤：
+
+
+
 
 (1) 访问NXP官网下载链接：https://mcuxpresso.nxp.com/en/dashboardhttps://www.nxp.com/products/processors-and-microcontrollers/arm-processors/i.mx-applications-
 processors/i.mx-6-processors/i.mx-6ull-single-core-processor-with-arm-cortex-a7-core:i.MX6ULL?tab=Design_Tools_Tab

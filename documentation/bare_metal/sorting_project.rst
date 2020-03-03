@@ -15,6 +15,11 @@
 
 -  修改makefile
 
+配套源码以及下载工具:
+-  路径：~/embed_linux_tutorial/base_code/bare_metal/button_adj
+
+
+
 分类存储代码
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

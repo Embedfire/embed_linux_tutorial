@@ -11,6 +11,12 @@ DDR测试
 
 特别说明，本书内容是以i.MX 6U系列控制器资源讲解。
 
+
+配套源码以及下载工具:
+-  路径：~/embed_linux_tutorial/base_code/bare_metal/DDR_test
+-  野火裸机下载工具download_tool（路径：~/embed_linux_tutorial/base_code/bare_metal/download-tool/download-tool.tar.bz2）。
+
+
 常用RAM存储设备简介
 ~~~~~~~~~~~
 

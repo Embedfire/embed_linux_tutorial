@@ -60,8 +60,12 @@ Ubuntu和Win10希望用户使用时个人的内容都存放在个人目录，主
 
 也就是说，上图中这些文件或文件夹都位于“/”目录下，而它们的路径分别为“/bin”、“/boot”、“/cdrom”、“/initrd.img”等。
 
-特别地，前面说明的家目录（个人目录）路径为“/home/用户名/”，见下图，图中的例子目录是/home/embedfire。也就是说，在Ubuntu系统下，用户的个人目录都在“/home”下，并且按照用户名命名，如果系统下有多个用户A、B、C并且它们都有个人目录的话，那么它们的个人目录路径默认
-就是/home/A，/home/B，/home/C。在这方面，跟Windows系统是类似的，在Windows系统下，个人目录默认是“C:/Users”或“C:/用户”。
+特别地，前面说明的家目录（个人目录）路径为“/home/用户名/”，见下图，图中
+的例子目录是**/home/embedfire**。也就是说，在Ubuntu系统下，用户的个人目
+录都在“/home”下，并且按照用户名命名，如果系统下有
+多个用户A、B、C并且它们都有个人目录的话，那么它们的个人目录路径默认
+就是/home/A，/home/B，/home/C。在这方面，跟Windows系统是
+类似的，在Windows系统下，个人目录默认是“C:/Users”或“C:/用户”。
 
 .. image:: media/linuxd007.jpg
    :align: center

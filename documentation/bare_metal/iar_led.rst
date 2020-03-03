@@ -25,6 +25,12 @@
 
 -  能够熟练查找外设对应的GPIO引脚。
 
+配套源码:
+-  路径：~/embed_linux_tutorial/base_code/bare_metal/IAR_project
+-  野火裸机下载工具download_tool（路径：~/embed_linux_tutorial/base_code/bare_metal/download-tool/download-tool.tar.bz2）。
+
+
+
 GPIO简介
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

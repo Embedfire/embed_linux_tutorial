@@ -20,6 +20,14 @@ llo world”工程，并烧写到SD卡，最终放在我们的开发板上运行
 
 -  掌握SDK程序编译、烧写流程，能够烧写SDK例程到开发板。
 
+配套源码以及工具:
+
+-  NXP 官方SDK（路径：~/embed_linux_tutorial/base_code/bare_metal/sdk_nxp）。
+-  野火裸机下载工具download_tool（路径：~/embed_linux_tutorial/base_code/bare_metal/download-tool/download-tool.tar.bz2）。
+
+
+
+
 SDK程序编译、烧写流程分析
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -139,8 +147,15 @@ ARMGCC_DIR=/usr”添加环境变量即可(不建议将环境变量添加到系�
 烧写到SD卡
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-上一步生成的.bin文件并不能直接放到开发板上执行，因为缺少必要的头文件。在SDK中“SDK_2.2_MCIM6ULL\tools\imgutil”下readme.txt文件介绍了添加头文件的步骤，如果使用官方介绍步骤比较繁琐，我们提供了“embedfire_download”烧写工具。下面将基于该
-烧写工具讲解添加头文件以及烧写步骤。
+配套源码以及工具:
+
+
+
+上一步生成的.bin文件并不能直接放到开发板上执行，因为缺少必要的头
+文件。在SDK中“SDK_2.2_MCIM6ULL\tools\imgutil”下readme.txt文件介绍了添加
+头文件的步骤，如果使用官方介绍步骤比较繁琐，我们提供了“embedfire_download”烧写工具(路
+径：~/embed_linux_tutorial/base_code/bare_metal/download-tool/download-tool.tar.bz2)。下面将
+基于该烧写工具讲解添加头文件以及烧写步骤。
 
 “embedfire_download”烧写工具集成了添加头文件和烧写到SD卡等步骤。详细介绍如下：
 
