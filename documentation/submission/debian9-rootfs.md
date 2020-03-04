@@ -269,7 +269,7 @@ setenv bootargs "console=${console},${baudrate} root=/dev/nfs ip=192.168.2.102:1
 ```
 2. 设置bootcmd，设置后开发板自动从NFS启动
 ```
-setenv bootcmd “mmc dev 1;mmc dev 1; mmc rescan;fatload mmc 1 0x80800000 zImage;fatload mmc 1 0x83000000 imx6ull-14x14-evk.dtb;bootz 0x80800000 - 0x83000000”;saveenv
+setenv bootcmd "mmc dev 1;mmc dev 1; mmc rescan;fatload mmc 1 0x80800000 zImage;fatload mmc 1 0x83000000 imx6ull-14x14-evk.dtb;bootz 0x80800000 - 0x83000000";saveenv
 ```
 
 到这里，一切正常的话，就可以看到debian启动了！

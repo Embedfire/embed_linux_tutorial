@@ -4,8 +4,8 @@
 
 - /dev/ttymxc0用于串口1，默认用于控制开发板的命令行终端。
 - /dev/ttymxc2用于串口3，是开发板上UART3的DB9接口，使用是必须要连接跳线帽：
-    * “UART3_TXD<---->T2IN”
-    * “UART3_RXD<---->R2OUT”
+    * "UART3_TXD<---->T2IN"
+    * "UART3_RXD<---->R2OUT"
 
 
 各个目录的演示说明如下：

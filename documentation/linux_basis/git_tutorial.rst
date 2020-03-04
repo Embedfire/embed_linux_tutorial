@@ -250,7 +250,7 @@ A和B此时分别使用git clone命令，把前面创建的git_pratice远程仓�
 它表示的是当前分支。所以现在远端仓库只有一个master分支，远端仓库的当前分支指向master。
 
 
-2、输入“git checkout test_branch1”命令检出test_branch1分支，修改newadd.txt文件内容分为"this is branch1"
+2、输入"git checkout test_branch1"命令检出test_branch1分支，修改newadd.txt文件内容分为"this is branch1"
 如下图:
 
 .. image:: media/git_checkout.png

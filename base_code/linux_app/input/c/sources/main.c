@@ -12,7 +12,7 @@
 const char default_path[] = "/dev/input/by-path/platform-gpio-keys-event";
 
 //开发板上的ON_OFF按键，请根据实际情况修改
-//const char default_path[] = "/dev/input/by-path/platform-20cc000.snvs:snvs-powerkey-event";
+//const char default_path[] = "/dev/input/by-path/platform-ci_hdrc.1-usb-0:1.1:1.0-event-mouse";
 
 
 int main(int argc, char *argv[])

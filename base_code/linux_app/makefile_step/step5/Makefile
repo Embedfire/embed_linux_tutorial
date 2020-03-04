@@ -43,7 +43,7 @@ $(BUILD_DIR)/$(TARGET): $(OBJS)
 #*.o文件的生成规则
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 #创建一个编译目录，用于存放过程文件
-#命令前带“@”,表示不在终端上输出
+#命令前带"@",表示不在终端上输出
 	@mkdir -p $(BUILD_DIR)
 	$(CC) -c -o $@ $< $(CFLAGS)
 

@@ -7,7 +7,7 @@
 向设备文件写入特别的命令，控制硬件。我们需要熟悉ioctl的使用，是因为在后面编写驱
 动时，某些硬件需要向内核提供ioctl所需的操作方法。
 
-本章节的示例代码目录为：base_code/section2/tty
+本章节的示例代码目录为：base_code/linux_app/tty
 
 串口通讯简介
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,7 +77,7 @@ Windows上有很多串口通讯工具，如野火串口调试助手，终端
 机，终端和主机之间采用通信电缆相连接，甚至可以通过电信网络连接到另一个城市的
 电脑。控制台与终端都是用于用户与系统进行交互的设备，区别
 在于主机对于控制台的信任度高于终端。随着物理元器件的变化，计算机主机经历了
-更新换代 ，“控制台终端”、“终端”这些名词都是表示的一个意思，基本没有什么区别了。
+更新换代 ，"控制台终端"、"终端"这些名词都是表示的一个意思，基本没有什么区别了。
 
 Teletype是最早出现的一种终端设备，类似于电传打字机，tty是 Teletype的缩写。最初tty是指
 连接到Unix系统上的物理或者虚拟终端。但是随着时间的推移，tty也用于串口设备，如ttyn、ttySACn等，Linux系统
@@ -100,7 +100,7 @@ Teletype是最早出现的一种终端设备，类似于电传打字机，tty是
 .. code-block:: sh
    :linenos:
 
-   #查看/dev目录下的“tty”名字开头的设备，“*”表示匹配任意字符
+   #查看/dev目录下的"tty"名字开头的设备，"*"表示匹配任意字符
    ls /dev/tty\*
 
 .. image:: media/uarttt006.png
@@ -110,7 +110,7 @@ Teletype是最早出现的一种终端设备，类似于电传打字机，tty是
 
 虽然/dev目录下有很多这样的设备，但它们并不是都可用的，为便于讲解，我们使用开发板上的tty设备进行说明。
 
-在开发板的终端上执行同样的“ls /dev/tty*”命令，如下图所示。
+在开发板的终端上执行同样的"ls /dev/tty*"命令，如下图所示。
 
 .. image:: media/uarttt007.png
    :align: center
@@ -118,8 +118,7 @@ Teletype是最早出现的一种终端设备，类似于电传打字机，tty是
 
 
 
-可以看到有两个分别名为“ttymxc0”和“ttymxc2”的设备，其中“ttymxc0”是开
-发板的串口1，它已被默认被用在命令行的终端上，“ttymxc2”是开发板的串口3。
+可以看到有个名为"ttymxc0"的设备，"ttymxc0"就是开发板的串口1，它已被默认被用在命令行的终端上。
 
 stty命令
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -136,8 +135,6 @@ Linux下有一个专门的stty命令可以查看或设置终端的参数。
    stty
    #查看ttymxc0设备参数
    stty -F /dev/ttymxc0
-   #查看ttymxc2设备参数
-   stty -F /dev/ttymxc2
 
 .. image:: media/uarttt008.png
    :align: center
@@ -145,42 +142,62 @@ Linux下有一个专门的stty命令可以查看或设置终端的参数。
 
 
 
-从上图中命令的执行结果可看到，ttymxc0的通讯速率“speed”为115200，ttymxc2的通讯
-速率为9600，这就是串口通讯的波特率，这些是在驱动中设置的默认值。若用
-户想修改tty设备的配置，可以使用如下命令：
+从上图中命令的执行结果可看到，ttymxc0的通讯速率"speed"为115200，
+这就是串口通讯的波特率，这些是在驱动中设置的默认值。若用户想修改tty设备的配置，可以使用如下命令：
 
 .. code-block:: sh
    :linenos:
 
    #在开发板的终端执行如下命令
    #查看设备参数
-   stty -F /dev/ttymxc2
+   stty -F /dev/ttymxc0
    #设置通讯速率，其中ispeed为输入速率，ospeed为输出速率
-   stty -F /dev/ttymxc2 ispeed 115200 ospeed 115200
-   #查看设备参数
-   stty -F /dev/ttymxc2
+   stty -F /dev/ttymxc0 ispeed 9600 ospeed 9600
 
-.. image:: media/uarttt009.png
-   :align: center
-   :alt: 未找到图片09|
-
-
+**注意:如果修改了串口1的波特率，相应的串口调试助手也要修改为对应波特率，否则开发板的串口终端将不能再使用**
 
 命令中的ispeed和ospeed分别表示要设置的输入速率和输出速率，并不是所有设备
-都支持不同的输入输出速率，所以最好把它们设置成一样。可以看到命令执行
-后ttymxc2设备的速率变为了115200。
+都支持不同的输入输出速率，所以最好把它们设置成一样。
 
 串口通讯实验（Shell）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-对tty的设备文件直接读写就可以控制设备通过串口接收或发送数据，下面我们使用开发板配合Windows下的串口调试助手或Linux下的minicom进行测试
+本实验使用开发板上的串口3进行实验，对应的设备文件为/dev/ttymxc2，这是因为驱动是从0开始编号的。
+对tty的设备文件直接读写就可以控制设备通过串口接收或发送数据，下面我们使用开发板配合Windows下的串口调试助手或Linux下的minicom进行测试。
+
+使能串口3
+^^^^^^^^^^^
+
+开发板串口3默认没有使能，参考前面《fire-config工具简介》章节，使能开发板的串口3外设。
+
+如下图:
+
+.. image:: media/uarttt029.png
+   :align: center
+   :alt: 未找到图片
+
+查询串口3的通信参数
+^^^^^^^^^^^^^^^^^^^
+
+串口3外设使能后，在/dev目录下生成ttymxc2设备文件，用stty工具查询其通信参数
+
+.. code-block:: sh
+   :linenos:
+
+   #在开发板的终端执行如下命令
+   stty -F /dev/ttymxc2
+
+如下图:
+
+.. image:: media/uarttt030.png
+   :align: center
+   :alt: 未找到图片
 
 连接串口线及跳线帽
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-本实验使用/dev/ttymxc2设备文件进行实验，也就是开发板上的串口3，实验前需要使
-用串口线或USB转串口线把它与开发板与电脑连接起来，并且使用跳线帽连接
-排针“UART3_TXD<---->T2IN”、“UART3_RXD<---->R2OUT”，如下图所示。
+实验前需要使用串口线或USB转串口线把它与开发板与电脑连接起来，并且使用跳线帽连接
+排针"UART3_TXD<---->T2IN"、"UART3_RXD<---->R2OUT"，如下图所示。
 
 .. image:: media/uarttt010.png
    :align: center
@@ -224,11 +241,12 @@ Linux下有一个专门的stty命令可以查看或设置终端的参数。
    :linenos:
 
    #在开发板上的终端执行如下指令
-   #查看设备参数，确认波特率与串口调试助手的一致
-   stty -F /dev/ttymxc2
-   #使用echo命令向终端设备文件写入字符串“board”
+   #使用echo命令向终端设备文件写入字符串"board"、"embedfire"
    echo board > /dev/ttymxc2
+   echo embedfire > /dev/ttymxc2
    #Windows上的串口调试助手会接收到内容
+
+如下图:
 
 .. image:: media/uarttt013.jpg
    :align: center
@@ -236,7 +254,7 @@ Linux下有一个专门的stty命令可以查看或设置终端的参数。
 
 
 
-从上图可看到，往/dev/ttymxc2设备文件写入的内容会直接通过串口线发送至Winodws的主机。
+可以看到，往/dev/ttymxc2设备文件写入的内容会直接通过串口线发送至Winodws的主机。
 
 而读取设备文件则可接收Winodws主机发往开发板的内容，可以使用cat命令来读取：
 
@@ -250,6 +268,8 @@ Linux下有一个专门的stty命令可以查看或设置终端的参数。
    #使用串口调试助手发送字符串
    #字符串最后必须加回车！
    #开发板的终端会输出接收到的内容
+
+如下图:
 
 .. image:: media/uarttt014.jpg
    :align: center
@@ -267,6 +287,8 @@ Linux下有一个专门的stty命令可以查看或设置终端的参数。
 
 实验前同样要先接上USB转串口线到电脑上，并且在虚拟机界面的右下方设置把该USB设备分配到虚拟机上。
 
+如下图:
+
 .. image:: media/uarttt015.png
    :align: center
    :alt: 未找到图片15|
@@ -274,7 +296,7 @@ Linux下有一个专门的stty命令可以查看或设置终端的参数。
 
 
 通过对比分配设备前后/dev/ 目录下的tty*文件，可以了解到插入的USB转串口线对应
-的是哪个设备文件。在本主机中，新增的设备文件是“/dev/ttyUSB0”，如下图，请根据自己主机的情
+的是哪个设备文件。在本主机中，新增的设备文件是"/dev/ttyUSB0"，如下图，请根据自己主机的情
 况确认具体的设备文件，在后面配置串口参数时需要用到。
 
 .. image:: media/uarttt016.png
@@ -308,7 +330,7 @@ Linux下也有类似Windows的图形界面串口调试助手，不过此处想�
 
 上图是minicom运行时的配置界面，注意执行minicom命令时需要使用sudo获取权限，否则无法
 修改设备的参数。在该界面中使用键盘的上下方向键和回车键可以进入菜单进行配置，此处我
-们选择“Serial port setup”菜单配置串口参数，如下图所示。
+们选择"Serial port setup"菜单配置串口参数，如下图所示。
 
 .. image:: media/uarttt018.png
    :align: center
@@ -316,11 +338,13 @@ Linux下也有类似Windows的图形界面串口调试助手，不过此处想�
 
 
 
-在配置串口参数页面中根据提示的按键“A”、“E”、“F”配置串口设备为“/dev/ttyUSB0”（根据自己的电
-脑设备选择）、波特率为“9600”、以及不使用硬件流控“No”，配置完成后按回车键退出当前菜
-单。然后再选择“Save setup as dfl”菜单保存配置，见下图（若提示无法保
-存，请确保前面是使用“sudo”权限运行minicom的），保存完成后选
-择“Exit”菜单或按键盘的“Esc”键即可进入终端界面。
+在配置串口参数页面中根据提示的按键"A"、"E"、"F"配置串口设备为"/dev/ttyUSB0"（根据自己的电
+脑设备选择）、波特率为"9600"、以及不使用硬件流控"No"，配置完成后按回车键退出当前菜
+单。然后再选择"Save setup as dfl"菜单保存配置，见下图（若提示无法保
+存，请确保前面是使用"sudo"权限运行minicom的），保存完成后选
+择"Exit"菜单或按键盘的"Esc"键即可进入终端界面。
+
+如下图:
 
 .. image:: media/uarttt019.png
    :align: center
@@ -336,10 +360,12 @@ Linux下也有类似Windows的图形界面串口调试助手，不过此处想�
 .. code-block:: sh
    :linenos:
 
-   minicom
+   sudo minicom
 
 下图是minicom打开的终端界面，默认包含了当前打开的串口
 设备信息，当该设备接收到内容时，会在终端上显示出来，而在终端输入的内容则会通过串口发送出去。
+
+如下图:
 
 .. image:: media/uarttt020.png
    :align: center
@@ -365,12 +391,13 @@ Linux下也有类似Windows的图形界面串口调试助手，不过此处想�
    :linenos:
 
    #在开发板上的终端执行如下指令
-   #查看设备参数，确认波特率与串口调试助手的一致
-   stty -F /dev/ttymxc2
-   #使用echo命令向终端设备文件写入字符串“board”
+   #使用echo命令向终端设备文件写入字符串"board"、"embedfire"
    echo board > /dev/ttymxc2
-   
+   echo embedfire > /dev/ttymxc2
+
 Ubuntu主机上的minicom会显示接收到内容
+
+如下图:
 
 .. image:: media/uarttt021.jpg
    :align: center
@@ -390,6 +417,8 @@ Ubuntu主机上的minicom会显示接收到内容
    #在Ubuntu主机的minicom界面输入内容
    #字符串最后必须加回车！
    #开发板的终端会输出接收到的内容
+
+如下图:
 
 .. image:: media/uarttt022.jpg
    :align: center
@@ -415,7 +444,7 @@ pio的direction文件，而终端设备却没有其它的属性文件，那
 
 
 .. code-block:: c
-   :caption: 串口通讯示例（base_code/section2/tty/c/source/main.c文件）
+   :caption: 串口通讯示例（base_code/linux_app/tty/c/source/main.c文件）
    :linenos: 
 
    #include <stdio.h>
@@ -428,80 +457,80 @@ pio的direction文件，而终端设备却没有其它的属性文件，那
    #include <string.h>
    #include <sys/ioctl.h>
    
-    /第一部分代码/
-    //根据具体的设备修改
-    const char default_path[] = "/dev/ttymxc2";
-    // const char default_path[] = "/dev/ttymxc2";
+   /第一部分代码/
+   //根据具体的设备修改
+   const char default_path[] = "/dev/ttymxc2";
+   // const char default_path[] = "/dev/ttymxc2";
    
    
-    int main(int argc, char \*argv[])
-    {
-    int fd;
-    int res;
-    char \*path;
-    char buf[1024] = "Embedfire tty send test.\n";
+   int main(int argc, char \*argv[])
+   {
+   int fd;
+   int res;
+   char \*path;
+   char buf[1024] = "Embedfire tty send test.\n";
    
-    /第二部分代码/
+   /第二部分代码/
    
-    //若无输入参数则使用默认终端设备
-    if (argc > 1)
-    path = argv[1];
-    else
-    path = (char \*)default_path;
+   //若无输入参数则使用默认终端设备
+   if (argc > 1)
+   path = argv[1];
+   else
+   path = (char \*)default_path;
    
-    //获取串口设备描述符
-    printf("This is tty/usart demo.\n");
-    fd = open(path, O_RDWR);
-    if (fd < 0) {
-    printf("Fail to Open %s device\n", path);
-    return 0;
-    }
+   //获取串口设备描述符
+   printf("This is tty/usart demo.\n");
+   fd = open(path, O_RDWR);
+   if (fd < 0) {
+   printf("Fail to Open %s device\n", path);
+   return 0;
+   }
    
-    /第三部分代码/
-    struct termios opt;
+   /第三部分代码/
+   struct termios opt;
    
-    //清空串口接收缓冲区
-    tcflush(fd, TCIOFLUSH);
-    // 获取串口参数opt
-    tcgetattr(fd, &opt);
+   //清空串口接收缓冲区
+   tcflush(fd, TCIOFLUSH);
+   // 获取串口参数opt
+   tcgetattr(fd, &opt);
    
-    //设置串口输出波特率
-    cfsetospeed(&opt, B9600);
-    //设置串口输入波特率
-    cfsetispeed(&opt, B9600);
-    //设置数据位数
-    opt.c_cflag &= ~CSIZE;
-    opt.c_cflag \|= CS8;
-    //校验位
-    opt.c_cflag &= ~PARENB;
-    opt.c_iflag &= ~INPCK;
-    //设置停止位
-    opt.c_cflag &= ~CSTOPB;
+   //设置串口输出波特率
+   cfsetospeed(&opt, B9600);
+   //设置串口输入波特率
+   cfsetispeed(&opt, B9600);
+   //设置数据位数
+   opt.c_cflag &= ~CSIZE;
+   opt.c_cflag \|= CS8;
+   //校验位
+   opt.c_cflag &= ~PARENB;
+   opt.c_iflag &= ~INPCK;
+   //设置停止位
+   opt.c_cflag &= ~CSTOPB;
    
-    //更新配置
-    tcsetattr(fd, TCSANOW, &opt);
+   //更新配置
+   tcsetattr(fd, TCSANOW, &opt);
    
-    printf("Device %s is set to 9600bps,8N1\n",path);
+   printf("Device %s is set to 9600bps,8N1\n",path);
    
-    /第四部分代码/
+   /第四部分代码/
    
-    do {
-    //发送字符串
-    write(fd, buf, strlen(buf));
-    //接收字符串
-    res = read(fd, buf, 1024);
-    if (res >0 ) {
-    //给接收到的字符串加结束符
-    buf[res] = '\0';
-    printf("Receive res = %d bytes data: %s\n",res, buf);
-    }
-    } while (res >= 0);
+   do {
+   //发送字符串
+   write(fd, buf, strlen(buf));
+   //接收字符串
+   res = read(fd, buf, 1024);
+   if (res >0 ) {
+   //给接收到的字符串加结束符
+   buf[res] = '\0';
+   printf("Receive res = %d bytes data: %s\n",res, buf);
+   }
+   } while (res >= 0);
    
-    printf("read error,res = %d",res);
+   printf("read error,res = %d",res);
    
-    close(fd);
-    return 0;
-    }
+   close(fd);
+   return 0;
+   }
 
 为便于讲解，我们把代码分成四个部分：
 
@@ -613,7 +642,7 @@ VTIM         设置非标准模式读取时的延时值，单位为十分之一�
 ============ =====================================================================================================
 
 -  c_ispeed和c_ospeed：记录串口的输入和输出波特率（input speed和output speed），部分可
-   取值如下代码所示，宏定义中的数字以“0”开头，在C语言中这是表示8进制数字的方式。
+   取值如下代码所示，宏定义中的数字以"0"开头，在C语言中这是表示8进制数字的方式。
 
 
 
@@ -634,7 +663,7 @@ VTIM         设置非标准模式读取时的延时值，单位为十分之一�
    宏定义，它们的宏值都为1，表示它
    支持c_ispeed和c_ospeed表示方式，部分标准中不支持使用这两个结构体成员表示波特率，而只使用c_cflag来表示。
 
-直接看结构体的定义比较抽象，下面我们以修改串口波特率、数据位、校验位和停止位的示例代码进行讲解。接下来几个小节的代码，是我们从base_code/section2/tty/c_full/sources/bsp_uart.c文件截取的，该文件以比较完善的方式封装了串口的配置，而本书提取出了代码中的重点
+直接看结构体的定义比较抽象，下面我们以修改串口波特率、数据位、校验位和停止位的示例代码进行讲解。接下来几个小节的代码，是我们从base_code/linux_app/tty/c_full/sources/bsp_uart.c文件截取的，该文件以比较完善的方式封装了串口的配置，而本书提取出了代码中的重点
 进行分析，感兴趣的读者可以打开配套的工程文件阅读。
 
 配置串口波特率
@@ -752,15 +781,15 @@ c_cflag中的标志位CSTOPB，用于设置串口通信停止位的长度。若�
 
 示例代码依然是采取了获取当前参数、修改配置、更新配置的套路。
 
-修改配置的代码中使用了“&=~”、“|=”这种位操作
+修改配置的代码中使用了"&=~"、"|="这种位操作
 方法，主要是为了避免影响到变量
 中的其它位，因为在c_cflag的其它位还包含了校验位、数据位和波特率相关的配置，如果直
-接使用“=”赋值，那其它配置都会受到影响，而且操作不方便。在后面学习裸机开发，对寄存器操作
+接使用"="赋值，那其它配置都会受到影响，而且操作不方便。在后面学习裸机开发，对寄存器操作
 时会经常用到这种方式。若没接触过这些位操
 作方式，可参考本书附录中《第65章 位操作方法》的说明。
 
-简单来说，示例中的“&=~”把c_cflag变量中CSTOPB对应的数
-据位清0，而“|=”则把c_cflag变量中CSTOPB对应的
+简单来说，示例中的"&=~"把c_cflag变量中CSTOPB对应的数
+据位清0，而"|="则把c_cflag变量中CSTOPB对应的
 数据位置1，达到在不影响其它配置的情况下把停止位配置为1位或两位。
 
 配置串口校验位
@@ -873,11 +902,10 @@ x86架构
 
 本实验的main.c实验代码使用的终端设备文件默认是开发板上的ttymxc2按键，在Ubuntu主机上并没
 有这样的设备，如果想尝试在主机上使用，可以根据自己Ubuntu主机上可用的串口设备作为程
-序的输入参数输入运行，如本书示例的“/dev/ttyUSB0”，它使用USB转串口线连接至了开发板的串口3
+序的输入参数输入运行，如本书示例的"/dev/ttyUSB0"，它使用USB转串口线连接至了开发板的串口3
 ，并且连接了跳线帽。
 
-实验的硬件连接和minicom的配置请参
-考前面《23.3 串口通讯实验（Shell）》小节的内容，通讯时注意串口波特率要匹配。
+实验的硬件连接和minicom的配置,请参考前面小节的内容，通讯时注意串口波特率要匹配。
 
 在x86平台的编译测试过程如下：
 
@@ -901,6 +929,8 @@ x86架构
    #发送数据
    echo board > /dev/ttymxc2
    #Ubuntu主机端会收到数据并显示
+
+如下图:
 
 .. image:: media/uarttt023.jpg
    :align: center
@@ -939,6 +969,8 @@ ARM架构
    #程序会通过串口发送内容至主机
    #主机使用minicom可发送内容至开发板
 
+如下图:
+
 .. image:: media/uarttt024.jpg
    :align: center
    :alt: 未找到图片24|
@@ -969,7 +1001,7 @@ ioctl系统调用
 用，而tcgetattr、tcsetattr则是库函数。而且按照传统的认知，文件操作大都是跟
 内容挂勾的，上一章节的input事件设备文件记录了上报的事件信息，而tty设备的文件却不是记录串口
 终端的配置参数，因为对文件的write操作是对外发送数据，而read则是读取接收
-到的数据，也就是说，“tty*”文件并没有记录串口终端的配置信息，那么tcgetattr、tcsetattr这两个函数究竟做了什么神仙操作？
+到的数据，也就是说，"tty*"文件并没有记录串口终端的配置信息，那么tcgetattr、tcsetattr这两个函数究竟做了什么神仙操作？
 
 它们实际上都是对ioctl系统调用的封装。
 
@@ -988,20 +1020,20 @@ ioctl系统调用的功能是向设备文件发送命令，控制一些特殊操
 
 -  参数reques：操作请求的编码，它是跟硬件设备驱动相关的，不同驱动设备支持不同的编码，驱动程序通常会使用头文件提供可用的编码给上层用户。
 
--  参数“…”：这是一个没有定义类型的指针，它与printf函数定义中的“…”类似，不过ioctl此处只能
+-  参数"…"：这是一个没有定义类型的指针，它与printf函数定义中的"…"类似，不过ioctl此处只能
    传一个参数。部分驱动程序执行操作请求时可能需要配置参数，或者操作完成时需要返回数据，都是通过此处传的指针进行访问的。
 
 使用ioctl代替tcgetattr和tcsetattr
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-我们编写了工程文件来进行说明，本小节的工程目录：base_code/section2/tty/c_ioctl。
+我们编写了工程文件来进行说明，本小节的工程目录：base_code/linux_app/tty/c_ioctl。
 
 工程示例文件如下所示。
 
 
 
 .. code-block:: c
-   :caption: 使用ioctl的示例（base_code/section2/tty/c_ioctl/source/main.c文件）
+   :caption: 使用ioctl的示例（base_code/linux_app/tty/c_ioctl/source/main.c文件）
    :linenos:  
 
    #include <stdio.h>
@@ -1013,114 +1045,113 @@ ioctl系统调用的功能是向设备文件发送命令，控制一些特殊操
    #include <termios.h>
    #include <string.h>
    #include <sys/ioctl.h>
-   
-    //根据具体的设备修改
-    const char default_path[] = "/dev/ttymxc2";
-    // const char default_path[] = "/dev/ttymxc2";
-   
-   
-    int main(int argc, char \*argv[])
-    {
-    int fd;
-    int res;
-    struct termios opt;
-    char \*path;
-    char buf[1024] = "Embedfire tty send test.\n";
-   
-    //若无输入参数则使用默认终端设备
-    if (argc > 1)
-    path = argv[1];
-    else
-    path = (char \*)default_path;
-   
-    //获取串口设备描述符
-    printf("This is tty/usart demo.\n");
-    fd = open(path, O_RDWR);
-    if (fd < 0) {
-    printf("Fail to Open %s device\n", path);
-    return 0;
-    }
-    //清空串口接收缓冲区
-    tcflush(fd, TCIOFLUSH);
-    // 获取串口参数opt
-    // tcgetattr(fd, &opt);
-   
-    res = ioctl(fd,TCGETS, &opt);**
-   **
-    opt.c_ispeed = opt.c_cflag & (CBAUD \| CBAUDEX);**
-    opt.c_ospeed = opt.c_cflag & (CBAUD \| CBAUDEX);**
-   
-    //输出宏定义的值，方便对比
-    printf("Macro B9600 = %#o\n",B9600);
-    printf("Macro B115200 = %#o\n",B115200);
-    //输出读取到的值
-    printf("ioctl TCGETS,opt.c_ospeed = %#o\n", opt.c_ospeed);
-    printf("ioctl TCGETS,opt.c_ispeed = %#o\n", opt.c_ispeed);
-    printf("ioctl TCGETS,opt.c_cflag = %#x\n", opt.c_cflag);
-   
-    speed_t change_speed = B9600;
-    if (opt.c_ospeed == B9600)
-    change_speed = B115200;
-   
-    //设置串口输出波特率
-    cfsetospeed(&opt, change_speed);
-    //设置串口输入波特率
-    cfsetispeed(&opt, change_speed);
-    //设置数据位数
-    opt.c_cflag &= ~CSIZE;
-    opt.c_cflag \|= CS8;
-    //校验位
-    opt.c_cflag &= ~PARENB;
-    opt.c_iflag &= ~INPCK;
-    //设置停止位
-    opt.c_cflag &= ~CSTOPB;
-   
-    //更新配置
-    // tcsetattr(fd, TCSANOW, &opt);
-    res = ioctl(fd,TCSETS, &opt);**
-   
-    //再次读取
-    res = ioctl(fd,TCGETS, &opt);**
-   
-    opt.c_ispeed = opt.c_cflag & (CBAUD \| CBAUDEX);**
-    opt.c_ospeed = opt.c_cflag & (CBAUD \| CBAUDEX);**
-   
-    printf("ioctl TCGETS after TCSETS\n");
-   
-    //输出读取到的值
-    printf("ioctl TCGETS,opt.c_ospeed = %#o\n", opt.c_ospeed);
-    printf("ioctl TCGETS,opt.c_ispeed = %#o\n", opt.c_ispeed);
-    printf("ioctl TCGETS,opt.c_cflag = %#x\n", opt.c_cflag);
-   
-    do {
-    //发送字符串
-    write(fd, buf, strlen(buf));
-    //接收字符串
-    res = read(fd, buf, 1024);
-    if (res >0 ) {
-    //给接收到的字符串加结束符
-    buf[res] = '\0';
-    printf("Receive res = %d bytes data: %s\n",res, buf);
-    }
-    } while (res >= 0);
-   
-   
-    printf("read error,res = %d",res);
-   
-    close(fd);
-    return 0;
-    }
+
+   //根据具体的设备修改
+   const char default_path[] = "/dev/ttymxc2";
+   // const char default_path[] = "/dev/ttymxc2";
+
+
+   int main(int argc, char *argv[])
+   {
+      int fd;
+      int res;
+      struct termios opt;
+      char *path;
+      char buf[1024] = "Embedfire tty send test.\n";
+
+      //若无输入参数则使用默认终端设备
+      if(argc > 1)
+         path = argv[1];
+      else
+         path = (char *)default_path;
+
+      //获取串口设备描述符
+      printf("This is tty/usart demo.\n");
+      fd = open(path, O_RDWR);
+      if(fd < 0){
+         printf("Fail to Open %s device\n", path);
+         return 0;
+      }
+      //清空串口接收缓冲区
+      tcflush(fd, TCIOFLUSH);
+      // 获取串口参数opt
+      // tcgetattr(fd, &opt);
+
+      res = ioctl(fd,TCGETS, &opt);
+
+      opt.c_ispeed = opt.c_cflag & (CBAUD | CBAUDEX);
+      opt.c_ospeed = opt.c_cflag & (CBAUD | CBAUDEX);
+
+      //输出宏定义的值，方便对比
+      printf("Macro B9600 = %#o\n",B9600);
+      printf("Macro B115200 = %#o\n",B115200);
+      //输出读取到的值
+      printf("ioctl TCGETS,opt.c_ospeed = %#o\n", opt.c_ospeed);
+      printf("ioctl TCGETS,opt.c_ispeed = %#o\n", opt.c_ispeed);
+      printf("ioctl TCGETS,opt.c_cflag = %#x\n", opt.c_cflag);
+
+      speed_t change_speed = B9600;
+      if(opt.c_ospeed == B9600)
+         change_speed = B115200;
+
+      //设置串口输出波特率
+      cfsetospeed(&opt, change_speed);
+      //设置串口输入波特率
+      cfsetispeed(&opt, change_speed);
+      //设置数据位数
+      opt.c_cflag &= ~CSIZE;
+      opt.c_cflag |= CS8;
+      //校验位
+      opt.c_cflag &= ~PARENB;
+      opt.c_iflag &= ~INPCK;
+      //设置停止位
+      opt.c_cflag &= ~CSTOPB;
+
+      //更新配置
+      // tcsetattr(fd, TCSANOW, &opt);   
+      res = ioctl(fd,TCSETS, &opt);
+
+      //再次读取
+      res = ioctl(fd,TCGETS, &opt);
+
+      opt.c_ispeed = opt.c_cflag & (CBAUD | CBAUDEX);
+      opt.c_ospeed = opt.c_cflag & (CBAUD | CBAUDEX);
+
+      printf("ioctl TCGETS after TCSETS\n");
+
+      //输出读取到的值
+      printf("ioctl TCGETS,opt.c_ospeed = %#o\n", opt.c_ospeed);
+      printf("ioctl TCGETS,opt.c_ispeed = %#o\n", opt.c_ispeed);
+      printf("ioctl TCGETS,opt.c_cflag = %#x\n", opt.c_cflag);
+
+      do{
+         //发送字符串
+         write(fd, buf, strlen(buf));
+         //接收字符串
+         res = read(fd, buf, 1024);		
+         if(res >0 ){
+            //给接收到的字符串加结束符
+            buf[res] = '\0';
+            printf("Receive res = %d bytes data: %s\n",res, buf);
+         }
+      }while(res >= 0);
+
+      printf("read error,res = %d",res);
+
+      close(fd);
+      return 0;
+   }
 
 本实验代码就是直接通过ioctl系统调用代替了tcgetattr和tcsetattr这两个库函数。
 
--  在示例代码中的第42行和77行，使用ioctl向设备文件发送了“TCGETS”请求，在tty设备
+-  在示例代码中的第41行和76行，使用ioctl向设备文件发送了"TCGETS"请求，在tty设备
    的驱动层，会根据这个请求返回配置参数，并通过传入的&opt指针传出。
 
--  类似地，示例代码中的第74行，使用ioctl向设备文件发送了“TCSETS”请求，在tty设备
+-  类似地，示例代码中的第73行，使用ioctl向设备文件发送了"TCSETS"请求，在tty设备
    的驱动层，会根据这个请求设置由指针&opt传入的配置参数，修改设备的属性。
 
 -  特别地，由于使用ioctl获取配置参数时，波特率的值不会直接写入到termios结构体
-   的c_ispeed和c_ospeed成员，需要通过c_cflag的值运算得出，所以第44、45行和79、80行加入了运算转
+   的c_ispeed和c_ospeed成员，需要通过c_cflag的值运算得出，所以第43、44行和78、79行加入了运算转
    换，运算出来的值是B9600或B115200之类的值。如果不进行这样的运算操作，c_ispeed和c_ospeed得到的值可能是不对的。
 
 -  代码的其它部分是输出的一些调试信息，方便在实验时验证获取到的信息是否正确。
@@ -1131,6 +1162,8 @@ ioctl系统调用的功能是向设备文件发送命令，控制一些特殊操
    :linenos:
 
    man ioctl_tty
+
+如下图:
 
 .. image:: media/uarttt025.png
    :align: center
@@ -1175,7 +1208,9 @@ x86架构
    sudo ./build_x86/tty_demo /dev/ttyUSB0
    #程序运行时会输出获取到的波特率及c_cflag配置，并把波特率设置为B9600或B115200
 
-.. image:: media/uarttt026.jpg
+如下图:
+
+.. image:: media/uarttt026.png
    :align: center
    :alt: 未找到图片26|
 
@@ -1215,6 +1250,7 @@ ARM架构
    
    #程序运行时会输出获取到的波特率及c_cflag配置，并把波特率设置为B9600或B115200
 
+如下图:
 
 .. image:: media/uarttt027.png
    :align: center
@@ -1242,7 +1278,7 @@ ARM架构
 这两个函数的定义位于glibc源码的如下目录： glibc/sysdeps/unix/sysv/linux/，该
 目录中的tcgetattr.c和tcsetattr.c文件分别定义了这两个函数。这两个文件
 我们也拷贝了一份到工程的如下目录，方便查看：
-base_code/section2/tty/c_ioctl/glibc_file。
+base_code/linux_app/tty/c_ioctl/glibc_file。
 
 tcgetattr.c文件的内容如下。
 
@@ -1253,50 +1289,45 @@ tcgetattr.c文件的内容如下。
    :linenos:  
 
    int
-   \__tcgetattr (int fd, struct termios \*termios_p)
+   __tcsetattr (int fd, int optional_actions, const struct termios *termios_p)
    {
-   struct \__kernel_termios k_termios;
-   int retval;
-   retval = INLINE_SYSCALL (ioctl, 3, fd, TCGETS, &k_termios);**
-   if (__glibc_likely (retval == 0)) {
-    termios_p->c_iflag = k_termios.c_iflag;
-    termios_p->c_oflag = k_termios.c_oflag;
-    termios_p->c_cflag = k_termios.c_cflag;
-    termios_p->c_lflag = k_termios.c_lflag;
-    termios_p->c_line = k_termios.c_line;
-    #if \_HAVE_STRUCT_TERMIOS_C_ISPEED
-    # if \_HAVE_C_ISPEED
-    termios_p->c_ispeed = k_termios.c_ispeed;
-    # else
-    termios_p->c_ispeed = k_termios.c_cflag & (CBAUD \| CBAUDEX);**
-    # endif
-    #endif
-    #if \_HAVE_STRUCT_TERMIOS_C_OSPEED
-    # if \_HAVE_C_OSPEED
-    termios_p->c_ospeed = k_termios.c_ospeed;
-    # else
-    termios_p->c_ospeed = k_termios.c_cflag & (CBAUD \| CBAUDEX);**
-    # endif
-    #endif
-    if (sizeof (cc_t) == 1 \|\| \_POSIX_VDISABLE == 0
-    \|\| (unsigned char) \_POSIX_VDISABLE == (unsigned char) -1)
-    memset (__mempcpy (&termios_p->c_cc[0], &k_termios.c_cc[0],
-    \__KERNEL_NCCS \* sizeof (cc_t)),
-    \_POSIX_VDISABLE, (NCCS - \__KERNEL_NCCS) \* sizeof (cc_t));
-    else {
-    memcpy (&termios_p->c_cc[0], &k_termios.c_cc[0],
-    \__KERNEL_NCCS \* sizeof (cc_t));
+   struct __kernel_termios k_termios;
+   unsigned long int cmd;
+
+   switch (optional_actions)
+      {
+      case TCSANOW:
+         cmd = TCSETS;
+         break;
+      case TCSADRAIN:
+         cmd = TCSETSW;
+         break;
+      case TCSAFLUSH:
+         cmd = TCSETSF;
+         break;
+      default:
+         return INLINE_SYSCALL_ERROR_RETURN_VALUE (EINVAL);
+      }
+
+   k_termios.c_iflag = termios_p->c_iflag & ~IBAUD0;
+   k_termios.c_oflag = termios_p->c_oflag;
+   k_termios.c_cflag = termios_p->c_cflag;
+   k_termios.c_lflag = termios_p->c_lflag;
+   k_termios.c_line = termios_p->c_line;
+   #if _HAVE_C_ISPEED && _HAVE_STRUCT_TERMIOS_C_ISPEED
+   k_termios.c_ispeed = termios_p->c_ispeed;
+   #endif
+   #if _HAVE_C_OSPEED && _HAVE_STRUCT_TERMIOS_C_OSPEED
+   k_termios.c_ospeed = termios_p->c_ospeed;
+   #endif
+   memcpy (&k_termios.c_cc[0], &termios_p->c_cc[0],
+      __KERNEL_NCCS * sizeof (cc_t));
+
+   return INLINE_SYSCALL (ioctl, 3, fd, cmd, &k_termios);
+   }
    
-    for (size_t cnt = \__KERNEL_NCCS; cnt < NCCS; ++cnt)
-    termios_p->c_cc[cnt] = \_POSIX_VDISABLE;
-    }
-    }
-   
-    return retval;
-    }
-   
-    libc_hidden_def (__tcgetattr)
-    weak_alias (__tcgetattr, tcgetattr)
+   libc_hidden_def (__tcgetattr)
+   weak_alias (__tcgetattr, tcgetattr)
 
 代码看起来有点复杂，但刚接触的时候我们不需要完全弄清楚它的所有细节：
 

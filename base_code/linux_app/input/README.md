@@ -48,8 +48,8 @@ sudo evtest
 #/dev/input/event5:	VirtualBox USB Tablet
 #/dev/input/event6:	VirtualBox mouse integration
 
-#示例中的“VirtualBox mouse integration”为鼠标设备，它的路径为“/dev/input/event6”,
-#把“/dev/input/event6”作为本程序的输入参数运行即可，运行后移动鼠标即会有输出。
+#示例中的"VirtualBox mouse integration"为鼠标设备，它的路径为"/dev/input/event6",
+#把"/dev/input/event6"作为本程序的输入参数运行即可，运行后移动鼠标即会有输出。
 
 #如：  sudo ./build_x86/input_demo  /dev/input/event6
 ```

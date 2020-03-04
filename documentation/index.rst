@@ -29,7 +29,7 @@
    linux_basis/command_line
    linux_basis/software_package
    linux_basis/editor
-   linux_basis/git_tutorial
+   #linux_basis/git_tutorial
    
 
 .. toctree::
@@ -44,15 +44,17 @@
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
-   linux_basis/ec20_4g_module
+   #linux_basis/ec20_4g_module
 
 .. toctree::
    :maxdepth: 1
    :caption: 在Linux下开发应用程序
    :numbered:
 
+   linux_app/git_use
    linux_app/mount_nfs
    linux_app/gcc_hello_world
+   linux_app/arm_gcc_hello_world.rst
    linux_app/makefile
    linux_app/filesystem_system_call
    linux_app/led_subsystem

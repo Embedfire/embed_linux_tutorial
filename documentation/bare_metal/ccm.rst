@@ -163,7 +163,7 @@ PLL输出时钟和PFD输出时钟经选择和分频后将作为内核或外设�
 时钟选择器（CLOCK
 SWITCHER）输出了多个频率不同的PLL时钟和PFD时钟。每个外设时钟通过MUX模块连接到多个PLL时钟输出，每个MUX实际是一个寄存器，用于选择时钟源。时钟分频也是一个寄存器位。总之就是通过配置对应的寄存器为外设选择时钟源并设置时钟频率。具体是那些寄存器？在图中标记的很清楚，根据图中标注可以很容易、灵活的配置时钟。
 
-下面以“ARM_CLK_ROOT”时钟为例讲解，时钟配置步骤。“ARM_CLK_ROOT”时钟是CPU时钟，也就是我们常说的主频。修改该时钟之前首先要将CPU时钟切换到另外一个可用的时钟，修改完成后再切换回来。具体下所示。（图片太大
+下面以"ARM_CLK_ROOT"时钟为例讲解，时钟配置步骤。"ARM_CLK_ROOT"时钟是CPU时钟，也就是我们常说的主频。修改该时钟之前首先要将CPU时钟切换到另外一个可用的时钟，修改完成后再切换回来。具体下所示。（图片太大
 ，图片中的字看不清楚，请查阅《IMX6ULRM》18.5.1 Clock Generation P631页）
 
 .. image:: media/CCM007.png
@@ -173,7 +173,7 @@ SWITCHER）输出了多个频率不同的PLL时钟和PFD时钟。每个外设时
 
 上图中，标号①与标号②处是CCSR时钟选择寄存器的两个配置位，用于设置时钟源。这里假设要将CPU时钟修改为792MHz。步骤如下：（具体代码在讲解代码时会介绍）
 
-(1) 配置CCSR寄存器，将 “ARM_CLK_ROOT”时钟切换到osc_clk（24MHz）
+(1) 配置CCSR寄存器，将 "ARM_CLK_ROOT"时钟切换到osc_clk（24MHz）
 
 ..
 
@@ -210,14 +210,14 @@ PLL1输出时钟设置方法已经在55.3 时钟树简介，第一小节介绍�
 
 
 
-从上8可以看出，从PLL1到“ARM_CLK_ROOT”还要
+从上8可以看出，从PLL1到"ARM_CLK_ROOT"还要
 经过CACRR[ARM_PODF] 时钟分频寄存器。 进过上一步PLL1的输出时
 钟被设置为792MHz，所以这里设置CACRR[ARM_PODF] = 0，不分频。
 
 设置系统时钟实验
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-系统时钟设置实验代码由“interrupt_init”代码修改得到，本章也只讲解新增部分代码，完整请参考本章配套源码。
+系统时钟设置实验代码由"interrupt_init"代码修改得到，本章也只讲解新增部分代码，完整请参考本章配套源码。
 
 
 硬件设计
@@ -232,10 +232,10 @@ PLL1输出时钟设置方法已经在55.3 时钟树简介，第一小节介绍�
    9. ..
       rubric:: 添加源文件并修改makefile :name: 添加源文件并修改makefile
 
-拷贝“~/section5/interrupt_init”程序，并重命名为“~/section5/clock_init”。分别在“~/section5/clock_init/device”、“~/section5/clock_init/include”文件夹下添加clock.c、clock.h。添加
+拷贝"~/section5/interrupt_init"程序，并重命名为"~/section5/clock_init"。分别在"~/section5/clock_init/device"、"~/section5/clock_init/include"文件夹下添加clock.c、clock.h。添加
 了新的源文件，当然要将其添加到makefile 中。
 
-打开“~/section5/clock_init/ device”目录下的“makefile”文件，将clock.o添加到最终目标的依赖中，代码如下所示。
+打开"~/section5/clock_init/ device"目录下的"makefile"文件，将clock.o添加到最终目标的依赖中，代码如下所示。
 
 .. code-block:: c
    :caption: 修改makefile
@@ -518,7 +518,7 @@ PLL2的PFD输出大致分为三部分，第一，禁用PLL2的PFD输出。第二
 下载验证
 ''''''''''''''''''''''''
 
-程序编写完成后，在“/section5/ clock_init” 文件夹
+程序编写完成后，在"/section5/ clock_init" 文件夹
 下执行make命令，makefile工具便会自动完成程序的编译、链接、格式转
 换等工作。正常情况下我们可以在当前目录看到生成的一些中间文件以及我们期待的.bin文件。
 
@@ -526,12 +526,12 @@ PLL2的PFD输出大致分为三部分，第一，禁用PLL2的PFD输出。第二
 
 -  将一张空SD卡（烧写一定会破坏SD卡中原有数据！！！烧写前请保存好SD卡中的数据），接入电脑后在虚拟机的右下角状态栏找到对应的SD卡。将其链接到虚拟机。
 
--  进入烧写工具目录，执行“./mkimage.sh <烧写文件路径>”命令,例如要
-   烧写的led.bin位于home目录下，则烧写命令为“./mkimage.sh /home/led.bin”。
+-  进入烧写工具目录，执行"./mkimage.sh <烧写文件路径>"命令,例如要
+   烧写的led.bin位于home目录下，则烧写命令为"./mkimage.sh /home/led.bin"。
 
 -  执行上一步后会列出linux下可烧写的磁盘，选择你插入的SD卡即可。这一步
    非常危险！！！一定要确定选择的是你插入的SD卡！！，如果选错很可能破坏你电脑
-   磁盘内容，造成数据损坏！！！。确定磁盘后SD卡以“sd”开头，选择“sd”后面的字符即可。例如要烧写的sd卡是“sdb”则输入“b”即可。
+   磁盘内容，造成数据损坏！！！。确定磁盘后SD卡以"sd"开头，选择"sd"后面的字符即可。例如要烧写的sd卡是"sdb"则输入"b"即可。
 
 烧写完成，首先将开发板启动方式设置为SD卡启动，将SD卡插入开发板卡槽。接通电源正常可以看到RGB灯闪烁，修改CPU时钟再次下载可以看到RGB灯闪烁频率加快。
 

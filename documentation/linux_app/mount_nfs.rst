@@ -6,7 +6,7 @@
 
 本章将介绍如何挂载NFS网络文件系统，为后面的主机编译生成的ARM Linux应用传输到开发板做准备。
 
-本章的示例exports文件目录为：base_code/section2/nfs_config/exports。
+本章的示例exports文件目录为：base_code/linux_app/nfs_config/exports。
 
 网络文件系统简介
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,7 +45,7 @@
 提供NFS服务，开发板通过NFS与开发主机连接共享文件。开发主机生成的目标板应
 用程序放在NFS的共享文件夹内，开发板访问该文件夹执行应用程序进行测试。
 
-在另一方面，开发主机与开发板还有串口连接，使用串口终端控制开发板。
+在另一方面，开发主机与开发板通过串口连接，使用串口终端控制开发板。
 
 搭建NFS环境
 ~~~~~~~~~~~~~~~~~~~~~
@@ -57,7 +57,7 @@
 
 开发主机共享目录：/home/embedfire/workdir
 
-开发板的共享目录：/home/root/workdir
+开发板的挂载目录：/mnt
 
 连接到局域网络
 ^^^^^^^^^^^^^^^^^^^^^
@@ -70,7 +70,7 @@
 局域网络，即都使用网线把它们连接到同一个交换机（路由器）上，如上图所示。
 
 如果开发主机是安装在虚拟机上，注意要在VirtualBox把虚拟机的网络配置
-改成“桥接网卡”模式，见 下图，若修改了该配置，需要重启虚拟机才生效。
+改成"桥接网卡"模式，见 下图，若修改了该配置，需要重启虚拟机才生效。
 
 .. image:: media/mountn004.png
    :align: center
@@ -91,8 +91,8 @@ ping时可以直接使用主机名，各自的主机名可以在终端上查看�
 
 
 
-在终端输入提示符的“@”与“:”之间的就是主机名。例如本示例中的开发主机
-名为“dev”，开发板主机名为“imx6ull14x14evk”，互ping测试成功的
+在终端输入提示符的"@"与":"之间的就是主机名。例如本示例中的开发主机
+名为"dev"，开发板主机名为"imx6ull14x14evk"，互ping测试成功的
 结果如下图，ping命令格式为：
 
 ping [目标主机名或目标ip地址]
@@ -118,11 +118,12 @@ ping [目标主机名或目标ip地址]
 
 注：若在开发主机上使用ifconfig提示找不到命令，请使用如下命令进行安装：
 
-#以下命令在主机上运行
+
 
 .. code-block:: sh
    :linenos:
 
+   #以下命令在主机上运行
    sudo apt-get install net-tools
 
 在上图中开发板使用ifconfig命令可查看到开发板有两个网卡，分别是其两
@@ -142,11 +143,10 @@ ping [目标主机名或目标ip地址]
 
 Ubuntu系统默认没有安装NFS服务，需要使用如下命令安装NFS服务端软件：
 
-#以下命令在主机上运行
-
 .. code-block:: sh
    :linenos:
 
+   #以下命令在主机上运行
    sudo apt-get install nfs-kernel-server
 
 查看用户id
@@ -154,11 +154,10 @@ Ubuntu系统默认没有安装NFS服务，需要使用如下命令安装NFS服�
 
 在配置NFS时需要使用到用户uid和组gid，可使用id命令查看，在开发主机上的终端输入如下命令：
 
-#以下命令在主机上运行
-
 .. code-block:: sh
    :linenos:
 
+   #以下命令在主机上运行
    id
 
 具体见下图。
@@ -202,22 +201,19 @@ Ubuntu系统默认没有安装NFS服务，需要使用如下命令安装NFS服�
 
 使用vim打开/etc/exports文件命令如下：
 
-#以下命令在主机上运行，可用gedit替换vim
-
 .. code-block:: sh
    :linenos:
 
+   #以下命令在主机上运行，可用gedit替换vim
    sudo vim /etc/exports
 
-在/etc/exports文件末尾添加如下语句并保存，注意如下语句写到/etc/exports文件是在同一行，此处由于排版问题分行了。
-
-#把以下内容添加至/etc/exports文件末尾，注意以下内容处于同一行
-
-#以下内容的IP地址和uid，gid需要根据自己的环境进行修改
+在/etc/exports文件末尾添加如下语句并保存，**注意如下语句写到/etc/exports文件是在同一行**。
 
 .. code-block:: sh
    :linenos:
 
+   #把以下内容添加至/etc/exports文件末尾，注意以下内容处于同一行
+   #以下内容的IP地址和uid，gid需要根据自己的环境进行修改
    /home/embedfire/workdir 192.168.0.0/24(rw,sync,all_squash,anonuid=998,anongid=998,no_subtree_check)
 
 注意具体的配置需要根据自己的实验环境进行配置，请理解如下说明根据自己的实验环境进行修改：
@@ -233,8 +229,8 @@ Ubuntu系统默认没有安装NFS服务，需要使用如下命令安装NFS服�
 -  若局域网是其它网段，请参考此处的配置，不能直接用星号表示，如欲配
    置192.168.1.\* 的局域网下所有机器都可以访问，则配置为 192.168.1.0/24。
 
--  这个配置域也可以直接写可访问的主机名，如把“192.168.0.0/24”替换为开
-   发板主机名“imx6ull14x14evk”，则仅该开发板能访问共享的目录。
+-  这个配置域也可以直接写可访问的主机名，如把"192.168.0.0/24"替换为开
+   发板主机名"imx6ull14x14evk"，则仅该开发板能访问共享的目录。
 
 -  rw: 表示客户机的权限，rw表示可读写，具体的权限还受文件系统的rwx及用户身份影响。
 
@@ -262,11 +258,12 @@ dfire创建的；在开发主机上仅embedfire能读写的文件，在开发板
 
 本例子中创建的目录命令如下，请根据自己的实验环境设置要共享的目录：
 
-#以下命令在主机上运行
+
 
 .. code-block:: sh
    :linenos:
 
+   #以下命令在主机上运行
    mkdir /home/embedfire/workdir
 
 更新exports配置
@@ -274,11 +271,10 @@ dfire创建的；在开发主机上仅embedfire能读写的文件，在开发板
 
 修改完/etc/exports文件并保存后，可使用exportfs命令更新配置：
 
-#以下命令在主机上运行
-
 .. code-block:: sh
    :linenos:
 
+   #以下命令在主机上运行
    sudo exportfs -arv
 
 该命令的参数说明如下：
@@ -293,9 +289,9 @@ dfire创建的；在开发主机上仅embedfire能读写的文件，在开发板
 
 ..
 
-   若配置正常，该命令执行后会列出共享的目录项，本示例的执行结果见下图。
+若配置正常，该命令执行后会列出共享的目录项，本示例的执行结果见下图。
 
-   .. image:: media/mountn009.jpg
+.. image:: media/mountn009.jpg
    :align: center
    :alt: 未找到图片09|
 
@@ -306,11 +302,12 @@ dfire创建的；在开发主机上仅embedfire能读写的文件，在开发板
 
 使用showmount –e 可查看当前NFS服务器的加载情况，具体见下图。
 
-#以下命令在主机上运行
+
 
 .. code-block:: sh
    :linenos:
 
+   #以下命令在主机上运行
    showmount -e
 
 .. image:: media/mountn010.jpg
@@ -319,61 +316,85 @@ dfire创建的；在开发主机上仅embedfire能读写的文件，在开发板
 
 
 
-在开发板上挂载NFS目录
+安装NFS客户端
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-开发主机共享目录后，我们还需要在开发板端挂载该共享目录。
+开发主机开启NFS服务后，我们还需要在开发板安装NFS客户端，来让开发板使用NFS服务。
 
-所谓挂载，就是把Linux系统本地的某个目录与存储设备建立连接，以使系统能通过目录访问存储设备上的资源，这个存储设备可以是磁盘、光盘、SD卡以及此处使用的网络共享的目录。在Linux系统下，可使用mount命令挂载目录。
-
-下面以实例进行说明，以下操作均在开发板的终端上进行，默认用户为root。
-
-创建挂载点
-'''''''''''''''
-
-挂载时需要本地存在该目录，本例子把开发板挂载在/home/root/mountnfs目录下，首先需要创建该目录：
-
-#以下命令在开发板上运行
+执行安装NFS客户端命令:
 
 .. code-block:: sh
    :linenos:
 
-   mkdir /home/root/mountnfs
+   sudo apt install nfs-common -y
+
+
+查看NFS服务器共享目录
+
+在开发板上执行"showmount -e +"NFS服务器IP""命令。**注意在不同网络环境下，NFS服务器IP可能不一样，以实际情况为准。**
+
+.. code-block:: sh
+   :linenos:
+
+   showmount -e 192.168.0.219
+
+如下图：
+
+.. image:: media/mountn011.jpg
+   :align: center
+   :alt: 未找到图片
+
 
 临时挂载NFS文件系统
 '''''''''''''''''''''''''''''''''
 
-接下来使用mount命令进行挂载：
+使用mount命令挂载NFS服务器的共享目录到开发板/mnt目录下：
 
-#以下命令在开发板上运行
-
-#需要把下面的dev设置为前面自己的主机名
+注意:需要把下面的192.168.0.219设置为用户实际网络环境下的NFS服务器IP
 
 .. code-block:: sh
    :linenos:
 
-   mount -o vers=4 dev:/home/embedfire/workdir /home/root/mountnfs
+   #以下命令在开发板上运行
+   sudo mount -t nfs 192.168.0.219:/home/embedfire/workdir /mnt
 
 以上命令使用的各个参数如下：
 
--  -o vers=4：表示使用NFS文件系统第4版本，若不注明版本可能会提示参数错误。
+-  -t nfs：指定挂载的文件系统格式为nfs。
 
--  dev：目标主机的名字，此处也可以直接使用目标主机的IP地址，如本例子的目标机器IP为192.168.0.219。
+-  192.168.0.219：指定NFS服务器的IP地址。
 
--  /home/embedfire/workdir：远端的主机共享目录。
+-  /home/embedfire/workdir：指定NFS服务器的共享目录。
 
--  /home/root/mountnfs：本地挂载点，即要把远端共享的目录映射到本地的哪个目录。
+-  /mnt：本地挂载目录，即要把NFS服务器的共享目录映射到开发板的/mnt目录下。
 
-若挂载成功，终端不会有输出，Linux下执行命令后若没有输出通常就是表示执行成功。
+若挂载成功，终端不会有输出，Linux的哲学思想是"没有消息便是好消息"。
+
+如下图:
+
+.. image:: media/mountn012.jpg
+   :align: center
+   :alt: 未找到图片
+
 
 使用这种方式挂载目录只是临时的，开发板在重启后需要重新挂载该NFS目录才能访问。
 
-使用脚本进行测试
+测试NFS共享目录
 ''''''''''''''''''''''''
 
-挂载成功后，可以在开发机上把前面编写的hello world脚本复制至共享
-目录，然后在开发板上的终端直接访问该脚本文件并执行。在后面我们都会采
-用这样的形式进行开发，即在开发主机编写代码，复制至共享目录，然后在开发板上测试。
+挂载成功后，在NFS服务器的共享目录下，输入"sudo touch hello_world.txt"命令，
+则在共享目录下创建一个hello_world.txt文件，如下图:
+
+.. image:: media/mountn013.jpg
+   :align: center
+   :alt: 未找到图片
+
+进入开发板的/mnt目录下，可以查看到NFS服务器的共享目录中的hello_world.txt文件。
+如下图:
+
+.. image:: media/mountn014.jpg
+   :align: center
+   :alt: 未找到图片
 
 取消挂载
 ''''''''''''
@@ -381,16 +402,15 @@ dfire创建的；在开发主机上仅embedfire能读写的文件，在开发板
 当客户机在网络上无法找到NFS共享的目录时，如开发主机关机时，在NFS的客户机
 的终端常常会输出一些提示，或在使用ls命令查看共享目录会导致长时间等待，这时可以对目录使用umount命令取消挂载，示例如下：
 
-#以下命令在开发板上运行
-
 .. code-block:: sh
    :linenos:
 
-   umount /home/root/mountnfs
+   #以下命令在开发板上运行
+   sudo umount /mnt
 
 使用该命令时以要取消挂载的目录作为参数即可，没有输出表示执行正常。如果
-在当前挂载的目录进行umount操作，会提示“device is busy”。建议取消挂
-载时，先切换到家目录”~”，在进行umount操作。
+在当前挂载的目录进行umount操作，会提示"device is busy"。建议取消挂
+载时，先切换到家目录"~"，在进行umount操作。
 
 
 

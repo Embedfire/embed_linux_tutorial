@@ -56,7 +56,7 @@ Etcher 是一个快速将镜像文件烧录到 USB 设备或 SD 卡中的工具�
 
 接着选择要烧录的SD卡，如果你的电脑只是插入一个SD卡，那么Etcher会自动识
 别你的SD卡，在烧录的过程中，SD卡会被分区并且格式化，选择完毕后直
-接点击“Flash”进行烧录操作，具体见下图。
+接点击"Flash"进行烧录操作，具体见下图。
 
 .. image:: media/instal005.png
    :align: center

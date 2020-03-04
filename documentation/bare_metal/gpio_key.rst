@@ -105,7 +105,7 @@ MODE按键    SW4      BOOT_MODE[0]：           BOOT_MODE[0]：高电平 选择
 复制RGB灯程序
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-本程序在RGB等程序基础上修改，复制“/section4/led_rgb_c”灯程序到“/section4/button”目录下，如下图所示。
+本程序在RGB等程序基础上修改，复制"/section4/led_rgb_c"灯程序到"/section4/button"目录下，如下图所示。
 
 .. image:: media/gpioke008.png
    :align: center
@@ -113,12 +113,12 @@ MODE按键    SW4      BOOT_MODE[0]：           BOOT_MODE[0]：高电平 选择
 
 
 
-将文件“led.c”和“led.lds”分别修改为“button.c”和“button.lds”，添加按键代码我们只需要修改“makefile”文件以及“button.c”文件。
+将文件"led.c"和"led.lds"分别修改为"button.c"和"button.lds"，添加按键代码我们只需要修改"makefile"文件以及"button.c"文件。
 
 修改makefile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-makefile文件主要是修改文件名，将“led”修改为button，其他内容并没有修改，修改过的makefile 如下所示。
+makefile文件主要是修改文件名，将"led"修改为button，其他内容并没有修改，修改过的makefile 如下所示。
 
 
 .. code-block:: c
@@ -237,11 +237,11 @@ makefile文件主要是修改文件名，将“led”修改为button，其他内
 
 -  将一张空SD卡（烧写一定会破坏SD卡中原有数据！！！烧写前请保存好SD卡中的数据），接入电脑后在虚拟机的右下角状态栏找到对应的SD卡。将其链接到虚拟机。
 
--  进入烧写工具目录，执行“./mkimage.sh <烧写文件路径>”命令,例如要
-   烧写的led.bin位于home目录下，则烧写命令为“./mkimage.sh /home/led.bin”。
+-  进入烧写工具目录，执行"./mkimage.sh <烧写文件路径>"命令,例如要
+   烧写的led.bin位于home目录下，则烧写命令为"./mkimage.sh /home/led.bin"。
 
 -  执行上一步后会列出linux下可烧写的磁盘，选择你插入的SD卡即可。这一步非常危险！！！一定要确定选择的是
-   你插入的SD卡！！，如果选错很可能破坏你电脑磁盘内容，造成数据损坏！！！。确定磁盘后SD卡以“sd”开头，选择“sd”后面的字符即可。例如要烧写的sd卡是“sdb”则输入“b”即可。
+   你插入的SD卡！！，如果选错很可能破坏你电脑磁盘内容，造成数据损坏！！！。确定磁盘后SD卡以"sd"开头，选择"sd"后面的字符即可。例如要烧写的sd卡是"sdb"则输入"b"即可。
 
 .. |gpioke002| image:: media/gpioke002.jpeg
    :width: 3.30764in

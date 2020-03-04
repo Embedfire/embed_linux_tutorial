@@ -165,7 +165,7 @@ arm-linux-gnueabihf-gcc：\ ``v7.4.0``
 
 链接：\ https://github.com/Embedfire/products/wiki
 
-在 **Linux系列产品**中找到的网盘链接，在\ ``i.MX6ULL系列\5-编译工具链\arm-gcc`` 目录下找到``arm-gcc.tar.gz``压缩包并且下载，然后解压到\ ``/opt/arm-gcc/``\ 目录下，如果没有创建即可，解压后就可以在\ ``/opt/arm-gcc/bin/``\ 目录下找到我们的编译器\ ``arm-linux-gnueabihf-gcc``\ ，它的版本是\ ``gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11)``\ ，然后可以将编译器所在的路径添加到环境变量中，只修改当前用户的配置文件，通常是\ ``“~/.bashrc”``\ 或者\ ``“~/.bash_profile”``\ ，直接
+在 **Linux系列产品**中找到的网盘链接，在\ ``i.MX6ULL系列\5-编译工具链\arm-gcc`` 目录下找到``arm-gcc.tar.gz``压缩包并且下载，然后解压到\ ``/opt/arm-gcc/``\ 目录下，如果没有创建即可，解压后就可以在\ ``/opt/arm-gcc/bin/``\ 目录下找到我们的编译器\ ``arm-linux-gnueabihf-gcc``\ ，它的版本是\ ``gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11)``\ ，然后可以将编译器所在的路径添加到环境变量中，只修改当前用户的配置文件，通常是\ ``"~/.bashrc"``\ 或者\ ``"~/.bash_profile"``\ ，直接
 vi 打开即可，在文件末尾增加编译器所在的路径：
 
 .. code:: bash
@@ -224,7 +224,7 @@ vi 打开即可，在文件末尾增加编译器所在的路径：
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 首先进入imx-linux目录下，然后开始编译内核，运行\ ``make ARCH=arm imx6_v7_ebf_defconfig``\ 命令将imx6\_v7\_ebf\_defconfig配置文件的信息写入当前路径下的
-``.config``\ 文件中，在linux中以\ ``“.”``\ 开头的文件都是隐藏文件，我们可以使用ls
+``.config``\ 文件中，在linux中以\ ``"."``\ 开头的文件都是隐藏文件，我们可以使用ls
 –la命令查看这些文件。
 
 .. code:: bash
@@ -255,19 +255,19 @@ Linux内核的配置系统由三个部分组成，分别是：
 makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下
 导入 .config文件的配置（如果没有找到.config文件则会生成默认配置的 .config文件），
 而这个配置则是我们运行make ARCH=arm imx6\_v7\_ebf\_defconfig命令生成的，这就直接可以看到我们在imx6\_v7\_ebf\_defconfig的配置选择，
-可以通过键盘的“上”、“下”、“左”、“右”、“回车”、“空格”、“?”、“ESC”等按键进行选择配置，具体见：
+可以通过键盘的"上"、"下"、"左"、"右"、"回车"、"空格"、"?"、"ESC"等按键进行选择配置，具体见：
 
 .. figure:: media/building_kernel002.png
    :alt: building\_kernel002
 
    building\_kernel002
-比如我们选择配置我们开发板的触摸屏驱动：\ ``Goodix I2C touchscreen``\ ，如果读者炸不到这个配置选项在哪里，可以利用\ ``make menuconfig``\ 中的搜索功能，在英文输入法状态下按下“/”则可以进行搜索，输入“Goodix”找到改配置选项的位置，具体见：
+比如我们选择配置我们开发板的触摸屏驱动：\ ``Goodix I2C touchscreen``\ ，如果读者炸不到这个配置选项在哪里，可以利用\ ``make menuconfig``\ 中的搜索功能，在英文输入法状态下按下"/"则可以进行搜索，输入"Goodix"找到改配置选项的位置，具体见：
 
 .. figure:: media/building_kernel003.png
    :alt: building\_kernel003
 
    building\_kernel003
-从图中可以很明显看出\ ``Goodix I2C touchscreen``\ 配置选项位于\ ``-> Device Drivers``\ 选项下的\ ``-> Input device support``\ 下的\ ``-> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])``\ 选项下的\ ``-> Touchscreens``\ 选项中，其实也可以按下\ ``“1”``\ 直接可以定位到对应的选项，然后选中以下内容即可，具体见图：
+从图中可以很明显看出\ ``Goodix I2C touchscreen``\ 配置选项位于\ ``-> Device Drivers``\ 选项下的\ ``-> Input device support``\ 下的\ ``-> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])``\ 选项下的\ ``-> Touchscreens``\ 选项中，其实也可以按下\ ``"1"``\ 直接可以定位到对应的选项，然后选中以下内容即可，具体见图：
 
 .. code:: bash
 
