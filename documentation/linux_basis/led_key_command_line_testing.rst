@@ -16,20 +16,17 @@
 目录class按类型归类设备，如leds、lcd、mtd、p
 wm等。
 
-尝试在开发板的终端执行以下命令查看sys各层级的目录内容：
 
-#在开发板上的终端执行以下命令查看
+尝试在开发板的终端执行以下命令查看sys各层级的目录内容：
 
 .. code-block:: sh
    :linenos:
 
+   #在开发板上的终端执行以下命令查看
    ls /sys
    ls /sys/class
    ls /sys/class/leds
    ls /sys/class/leds/cpu
-
-
-
 
 
 .. image:: media/ledkey002.png
@@ -70,13 +67,10 @@ brightness文件
 我们先尝试控制三盏普通LED灯，在开发板的终端上执行如下
 命令，执行前请确认当前为root用户：
 
-#在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
-
-#LED灯默认可能处于亮的状态，我们先把它们全部关闭再一盏盏点亮
-
 .. code-block:: sh
    :linenos:
 
+   #LED灯默认可能处于亮的状态，我们先把它们全部关闭再一盏盏点亮
    echo 0 > /sys/class/leds/red/brightness #关闭red灯
    echo 0 > /sys/class/leds/blue/brightness #关闭blue灯
    echo 0 > /sys/class/leds/green/brightness #关闭green灯
@@ -106,8 +100,6 @@ trigger文件
 
 我们先来查看各LED设备trigger文件的原内容：
 
-#在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
-
 .. code-block:: sh
    :linenos:
 
@@ -129,9 +121,6 @@ eat"，表示系统心跳指示触发，这时用户不能再直接修改brightn
 
 了解触发条件后，我们可以先把cpu灯的触发条件改为none，再
 修改brightness文件即可以手动控制cpu灯，尝试执行如下命令：
-
-#在后面的说明中，#号表示注释，它后面的内容不要输入到终端中
-
 
 .. code-block:: sh
    :linenos:
