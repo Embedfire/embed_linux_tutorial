@@ -6,10 +6,10 @@
 int xbus_match(struct device *dev, struct device_driver *drv)
 {
 
-	printk("%s-%s\n",__FILE__, __func__);
-	if(!strncmp(dev_name(dev), drv->name, strlen(drv->name))){
+	printk("%s-%s\n", __FILE__, __func__);
+	if (!strncmp(dev_name(dev), drv->name, strlen(drv->name))) {
 		printk("dev & drv match\n");
-		return 1;	
+		return 1;
 	}
 	return 0;
 
@@ -34,13 +34,13 @@ EXPORT_SYMBOL(xbus);
 static __init int xbus_init(void)
 {
 	printk("xbus init\n");
-	
+
 	bus_register(&xbus);
 	bus_create_file(&xbus, &bus_attr_xbus_test);
 	return 0;
 }
-module_init(xbus_init);
 
+module_init(xbus_init);
 
 static __exit void xbus_exit(void)
 {
@@ -48,9 +48,8 @@ static __exit void xbus_exit(void)
 	bus_remove_file(&xbus, &bus_attr_xbus_test);
 	bus_unregister(&xbus);
 }
+
 module_exit(xbus_exit);
 
 MODULE_AUTHOR("embedfire");
 MODULE_LICENSE("GPL");
-
-

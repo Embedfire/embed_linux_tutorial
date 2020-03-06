@@ -5,7 +5,6 @@
 
 extern struct bus_type xbus;
 
-
 char *name = "xdrv";
 
 ssize_t drvname_show(struct device_driver *drv, char *buf)
@@ -14,7 +13,6 @@ ssize_t drvname_show(struct device_driver *drv, char *buf)
 }
 
 DRIVER_ATTR_RO(drvname);
-
 
 int xdrv_probe(struct device *dev)
 {
@@ -27,7 +25,6 @@ int xdrv_remove(struct device *dev)
 	printk("%s-%s\n", __FILE__, __func__);
 	return 0;
 }
-
 
 static struct device_driver xdrv = {
 	.name = "xdev",
@@ -43,6 +40,7 @@ static __init int xdrv_init(void)
 	driver_create_file(&xdrv, &driver_attr_drvname);
 	return 0;
 }
+
 module_init(xdrv_init);
 
 static __exit void xdrv_exit(void)
@@ -51,9 +49,8 @@ static __exit void xdrv_exit(void)
 	driver_remove_file(&xdrv, &driver_attr_drvname);
 	driver_unregister(&xdrv);
 }
+
 module_exit(xdrv_exit);
 
 MODULE_AUTHOR("embedfire");
 MODULE_LICENSE("GPL");
-
-
