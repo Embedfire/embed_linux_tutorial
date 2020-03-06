@@ -66,25 +66,22 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: 安装系统镜像
-   :numbered:
-
-   install_image/install_sd_image
-   install_image/sdcard_production
-   install_image/mfgtool_production
-
-.. toctree::
-   :maxdepth: 1
    :caption: 制作系统镜像
    :numbered:
 
+
    building_image/image_composition
-   building_image/building_kernel
-   building_image/building_uboot
-   building_image/building_rootfs
-   building_image/using_buildroot
-   building_image/using_yocto
+   building_image/building_NXP_firmware
+   building_image/burning_NXP_firmware
    building_image/building_debian
+
+
+   #building_image/building_kernel
+   #building_image/building_uboot
+   #building_image/building_rootfs
+   #building_image/using_buildroot
+   #building_image/using_yocto
+   #building_image/building_debian
 
 .. toctree::
    :maxdepth: 1
