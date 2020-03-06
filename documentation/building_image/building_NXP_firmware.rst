@@ -744,6 +744,141 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 
     ./build.sh 4.3
 
+修改LOGO
+~~~~~~~~~~~~~~~~~
+
+其实在野火开发板的固件中，uboot是没有logo的，因为将uboot的logo删掉了，因为在内核有logo，而uboot到内核的时间非常短（已经将uboot等待
+3S
+时间去掉了），所以直接使用内核的logo会更好，那么如果想要使用内核的logo，就得自己去修改内核的logo，下面就教大家如何去做。
+
+准备一张图片
+^^^^^^^^^^^^^^
+
+我们可以随便准备一张图片，比如我们就选择ubuntu的logo吧，将它制作成适合显示屏大小的图片，比如5寸屏幕的分辨率是800\*480：
+
+.. figure:: media/building_kernel006.png
+   :alt: building\_kernel006
+
+   building\_kernel006
+然后将其保存为\ **256色（即8位色）的bpm格式的图片**\ ，可以在Windows下或者Linux虚拟机下编辑：
+
+.. figure:: media/building_kernel007.png
+   :alt: building\_kernel007
+
+   building\_kernel007
+转换为ppm格式的图片
+^^^^^^^^^^^^^^
+
+然后在Linux下使用以下脚本将其转换为ppm格式的文件，为什么是ppm格式呢？因为这是编译Linux内核必要的文件格式，想要修改logo，就要这种格式的文件，它必须是\ **256色（即8位色）的bpm格式的图片**\ 转换而成的。
+
+.. code:: bash
+
+    #!/bin/bash
+    if [ " $1" == " " ];
+    then
+        echo "usage:$0 bmp_file"
+        exit 0
+    fi
+
+    if [ -f "$1" ]
+    then
+        echo $1
+    else
+        echo "no find file [$1]"
+        exit 0
+    fi
+
+    name=${1%%.*}
+    bmptopnm $1 > $name.pnm
+    pnmquant 224 $name.pnm > $name.clut224.pnm
+    pnmtoplainpnm $name.clut224.pnm > $name.ppm
+    rm $name.pnm $name.clut224.pnm 
+
+这是bmp文件转换ppm格式文件的脚本，可以将其写入一个叫\ ``bmp2ppm.sh``\ 脚本文件中，并且赋予其可执行的权限（使用
+``chmod +x bmp2ppm.sh``
+命令即可），它主要是使用linux系统中的工具转换，如果系统中没有相关工具，则根据提示使用\ ``apt install``\ 命令进行安装即可。
+
+然后将准备好的bmp文件拷贝到制作ppm的工作目录下，使用\ ``bmp2ppm.sh``\ 脚本将其转化为ppm文件，具体操作如下：
+
+.. code:: bash
+
+    ➜  bmp2ppm git:(master) ✗ ls
+    bmp2ppm.sh  README.md  ubuntu.bmp
+
+    ➜  bmp2ppm git:(master) ✗ ./bmp2ppm.sh ubuntu.bmp 
+    ubuntu.bmp
+    bmptopnm: Windows BMP, 800x480x8
+    bmptopnm: WRITING PPM IMAGE
+    pnmcolormap: making histogram...
+    pnmcolormap: 29 colors found
+    pnmcolormap: Image already has few enough colors (<=224).  Keeping same colors.
+    pnmremap: 29 colors found in colormap
+
+    ➜  bmp2ppm git:(master) ✗ ls
+    bmp2ppm.sh  README.md  ubuntu.bmp  ubuntu.ppm
+
+替换原本的logo文件
+^^^^^^^^^^^^^^
+
+在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ ``ebf_6ull_linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
+
+-  默认编译的logo：logo\_dec\_clut224.ppm
+-  5寸触摸屏logo：logo\_dec\_clut224\_5.0.ppm
+-  4.3寸触摸屏logo：logo\_dec\_clut224\_4.3.ppm
+
+然后将其重命名为你想替换的logo即可，\ **注意**\ ，5寸触摸屏logo与4.3寸触摸屏logo是一键编译使用的，它在一键编译过程中会替换掉默认的logo，如果你只替换了默认编译的logo，但是使用了一键编译脚本，那么你替换的logo将被一键编译脚本修改，编译产生的内核将不会存在你的logo。
+
+修改启动脚本
+^^^^^^^^^^^^^^
+
+替换完成后，重新编译内核，并且烧录到开发板上，不过此时会出现一个现象，logo以上而过，这是因为内核启动后，会执行文件系统的启动脚本，而此时文件系统的启动脚本中\ ``/etc/init.d/psplash.sh``\ 会去执行相应的应用程序\ ``/usr/bin/psplash``\ ，这就是绘制开机的进度条与背景，那么你的开机logo将被刷掉，而只要不让这个启动脚本运行这个\ ``/usr/bin/psplash``\ 应用程序就可以解决问题了，那么我们在开发板中修改启动脚本\ ``/etc/init.d/psplash.sh``\ ：
+
+.. code:: bash
+
+    #!/bin/sh 
+    ### BEGIN INIT INFO
+    # Provides:             psplash
+    # Required-Start:
+    # Required-Stop:
+    # Default-Start:        S
+    # Default-Stop:
+    ### END INIT INFO
+
+    read CMDLINE < /proc/cmdline
+    for x in $CMDLINE; do
+            case $x in
+            psplash=false)
+                    echo "Boot splashscreen disabled" 
+                    exit 0;
+                    ;;
+            esac
+    done
+
+    export TMPDIR=/mnt/.psplash
+    mount tmpfs -t tmpfs $TMPDIR -o,size=40k
+
+    rotation=0
+    if [ -e /etc/rotation ]; then
+            read rotation < /etc/rotation
+    fi
+
+    /usr/bin/psplash --angle $rotation &
+
+将其最后一行屏蔽掉：
+
+.. code:: bash
+
+    # /usr/bin/psplash --angle $rotation &
+
+或者直接禁止启动该脚本，在终端执行以下命令：
+
+.. code:: bash
+
+    /usr/bin/psplash stop
+
+然后重启开发板，就可以看见你的logo了。
+
+
 烧录自己编译的内核到开发板
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
