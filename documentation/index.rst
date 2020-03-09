@@ -105,6 +105,7 @@
    :caption: Linuxn内核调试
    :numbered:
 
+   linux_debug/gdb_use
    linux_debug/core_dump
    linux_debug/backtrace
    linux_debug/strace
