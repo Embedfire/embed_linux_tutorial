@@ -4,7 +4,7 @@ fire-config工具简介
 -------------------
 
 **注意:该工具专用于野火新发布的Debian系统镜像,不适合用于野火旧版本镜像和其他任何的Linux系统上，望知悉!**  
-（新版Debian镜像的下载和烧录方法详见2.2小节）。
+（新版Debian镜像的下载和烧录方法详见《SD卡烧录Debian镜像》章节）。
 
 fire-config是野火IMX-6ULL开发板自带的一个系统配置工具，
 通过串口终端或远程终端可以方便地使用它来进行系统功能的使能或禁止。
@@ -103,6 +103,11 @@ MPU6050
 ^^^^^^^^
 
 使能或者禁止MPU6050陀螺仪
+
+OLED
+^^^^^^^^
+
+使能或者禁止OLED显示器
 
 18b20
 ^^^^^^^^
@@ -204,6 +209,7 @@ Expand Filesystem
 ^^^^^^^^^^^^^^^^^^
 
 扩展SD卡容量，解决SD卡镜像烧录完毕后，出现储存容量大幅减小的问题
+
 
 fire-config设置ssh
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -307,17 +313,50 @@ vscode安装完Remote-SSH插件后，使用"ctrl+shift+P"快捷键打开命令�
    :alt: Remote-SSH插件
 
 
+fire-config使能硬件模块
+~~~~~~~~~~~~~~~~~~~~~~
+
+1、开发板正常启动后，执行sudo fire-config，这里以"LED"外设为例，选择"LED"项。
+其他硬件模块的使能方法与"LED"类似。
+
+如下图:
+
+.. image:: media/fire-config_led.png
+   :align: center
+   :alt: 使能LED
+
+2、系统提示: "Would you like the led to be enabled?"，选择<Yes>项。
+
+如下图:
+
+.. image:: media/fire-config_led.png
+   :align: center
+   :alt: 使能LED
+
+3、系统提示: "The flasher is enabled"，选择<OK>项，返回主界面。
+
+如下图:
+
+.. image:: media/fire-config_led.png
+   :align: center
+   :alt: 使能LED
+
+4、在初始界面,选择<Finish>项。系统默认使能"LED"外设，因此不会提示重启。
+
+注意:**如果系统的外设本来已经是使能状态，那么此时会直接退出fire-config工具；
+如果系统的外设原本是禁止状态，在设置为使能状态后，系统会提示重启:"Would you like to reboot now?",
+选择<Yes>项，等系统重启后，相关外设已经被使能**。
+
+
+
 fire-config刷机
 ~~~~~~~~~~~~~~
 
 注意:
-刷机不建议用ssh远程登录来操作，避免开发板重启后，
-ssh断开连接而不能及时看到相关的刷机信息提示。
+**刷机不建议用ssh远程登录来操作，避免开发板重启后，
+ssh断开连接而不能及时看到相关的刷机信息提示**。
 
 1、开发板正常启动后，在串口终端登录debian系统。
-
-   刷机不建议用ssh远程登录来操作，避免开发板重启后，
-   ssh断开连接而看不到相关的刷机信息提示。
 
 .. code-block:: sh
    :emphasize-lines: 2

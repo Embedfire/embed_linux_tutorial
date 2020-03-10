@@ -1,7 +1,102 @@
 .. vim: syntax=rst
 
+构建野火Debian系统固件
+------------------------
+
+前面介绍了NXP官方的固件有稳定可靠的优点，适合大部分的产品使用，但这是从产品角度来看的。
+对于Linux学习者来说，原厂固件因为使用的是较老版本的linux内核、Uboot版本，
+它与目前的代码的架构和系统特性已经发生了一些变化。再去学习研究时，就显得比较脱节。
+毕竟学习时间有限，不可能把所有新旧版本的内核、uboot重新学习一遍。
+
+目前野火移植了较新版本的uboot(2019_04) ,kernel(4.19.71)，为的就是减少重复学习成本，
+也更加锻炼学习者的能力。另外,出于对初学者好学易用的目的，
+根文件系统将会使用Debian，它的第三方软件包繁多，安装简单，
+大家熟悉的Ubuntu就是基于Debian发展而来。
+
+
+编译2019.04版本uboot
+============================
+
+野火移植2019.04版本uboot，在其中完善了对内核设备树插件的支持，提高了系统的扩展性和可维护性。
+
+1、下载野火2019版本uboot，代码已经托管在github上，直接执行以下命令进行下载即可:
+
+.. code-block:: sh
+   :emphasize-lines: 1
+   :linenos:
+
+   git clone https://github.com/Embedfire/ebf-buster-uboot.git
+
+2、检查交叉编译工具链是否正常
+
+.. code-block:: sh
+   :emphasize-lines: 1
+   :linenos:
+
+   arm-none-eabi-gcc -v
+   # 输出
+   gcc version 6.3.1 20170620 (15:6.3.1+svn253039-1build1)
+
+如果系统还没安装交叉编译工具链，使用以下命令进行安装:
+
+.. code-block:: sh
+   :emphasize-lines: 1
+   :linenos:
+
+   sudo apt-get install gcc-arm-none-eabi
+
+3、在项目文件夹目录下使用root权限执行编译脚本compile_uboot.sh
+
+.. code-block:: sh
+   :emphasize-lines: 1
+   :linenos:
+
+   sudo ./compile_uboot.sh
+
+编译结束后，会在当前文件夹路径下生成u-boot-dtb.imx文件，这就是我们需要的uboot镜像。
+
+编译4.19.71版本内核
+=========================
+
+1、下载野火4.19.71版本内核，代码已经托管在github上，直接执行以下命令进行下载即可:
+
+.. code-block:: sh
+   :emphasize-lines: 1
+   :linenos:
+
+   git clone https://github.com/Embedfire/ebf-buster-linux.git
+
+2、检查交叉编译工具链是否正常
+
+.. code-block:: sh
+   :emphasize-lines: 1
+   :linenos:
+
+   arm-none-eabi-gcc -v
+   # 输出
+   gcc version 6.3.1 20170620 (15:6.3.1+svn253039-1build1)
+
+如果系统还没安装交叉编译工具链，使用以下命令进行安装:
+
+.. code-block:: sh
+   :emphasize-lines: 1
+   :linenos:
+
+   sudo apt-get install gcc-arm-none-eabi
+
+3、在项目文件夹目录下使用root权限执行编译脚本make_deb.sh
+
+.. code-block:: sh
+   :emphasize-lines: 1
+   :linenos:
+
+   sudo ./make_deb.sh
+
+编译结束后，会在/pi路径下生成linux-image-4.19.71-imx-r1_1stable_armhf.deb，这就是4.19.71版本linux内核的安装包。
+
+
 制作Debian系统镜像
-------------------
+=============================
 
 ebf-image-builder简介
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -164,7 +259,7 @@ Debian系统镜像存放下面目录中
 
     ebf-image-builder/deploy/debian-buster-console-armhf##日期 
     
-可以把该镜像烧录到sd卡中启动开发板。
+可以参考《SD卡烧录Debian镜像》章节把该镜像烧录到sd卡中，以SD卡方式启动开发板。
 
 烧录完成后，开发板第一次用sd卡方式启动时，系统会自动进行扩容重启，
 以保证充分利用sd卡存储空间。扩容完毕后，系统重启生效。

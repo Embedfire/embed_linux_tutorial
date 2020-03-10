@@ -14,7 +14,7 @@
 #在主机上Makefile所在的目录执行如下命令
 #查看当前目录的内容
 ls
-#执行make命令，make会在当前目录下搜索“Makefile”或“makefile”，并执行
+#执行make命令，make会在当前目录下搜索"Makefile"或"makefile"，并执行
 make
 #可看到make命令后的输出，它执行了Makefile中编写的命令
 #查看执行make命令后的目录内容，多了test.txt文件

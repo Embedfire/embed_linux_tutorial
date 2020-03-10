@@ -7,7 +7,7 @@
 
 本章通过C标准库及系统调用的方式操作文件，揭示用户应用程序、C标准库与系统调用之间的关系。
 
-本章的示例代码目录为：base_code/section2/file_io。
+本章的示例代码目录为：base_code/linux_app/file_io。
 
 存储设备文件系统
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,15 +67,13 @@ buntu发行版安装了相应的支持。目前微软已公开exFAT文件系统�
 
 在Linux下，可以通过如下命令查看系统当前存储设备使用的文件系统：
 
-#在主机或开发板上执行如下命令
-
 .. code-block:: sh
    :linenos:
 
+   #在主机或开发板上执行如下命令
    df -T
 
-
-
+如下图:
 
 .. image:: media/filesy002.png
    :align: center
@@ -83,8 +81,8 @@ buntu发行版安装了相应的支持。目前微软已公开exFAT文件系统�
 
 
 
-从上图可以看出，主机的硬盘设备为“/dev/sda1”，它使用的文件系统
-类型为ext4，挂载点是根目录“/”。
+从上图可以看出，主机的硬盘设备为"/dev/sda1"，它使用的文件系统
+类型为ext4，挂载点是根目录"/"。
 
 伪文件系统
 ~~~~~~~~~~~~~~~~
@@ -99,11 +97,11 @@ buntu发行版安装了相应的支持。目前微软已公开exFAT文件系统�
 procfs文件系统
 ^^^^^^^^^^^^^^^^^^^^
 
-procfs是“process filesystem”的缩写，所以它
+procfs是"process filesystem"的缩写，所以它
 也被称为进程文件系统，procfs通常会自动挂载在根
 目录下的/proc文件夹。procfs为用户提供内核状态和进程信息的接口，功能相
-当于Windows的任务管理器。在《第12章
-查看系统信息》章节我们也尝试过/proc目录查看一些系统信息。
+当于Windows的任务管理器。
+在《查看系统信息》章节我们也尝试过/proc目录查看一些系统信息。
 
 使用如下命令可以查看proc文件系统的内容：
 
@@ -116,6 +114,8 @@ procfs是“process filesystem”的缩写，所以它
    cat /proc/cpuinfo
    #查看proc目录
    ls /proc
+
+如下图:
 
 .. image:: media/filesy003.png
    :align: center
@@ -140,23 +140,22 @@ procfs是“process filesystem”的缩写，所以它
 =========== ================================================================================================================================================================================
 pid\*       \*表示的是进程的 PID 号，系统中当前运行的每一个进程都有对应的一个目录，用于记录进程所有相关信息。对于操作系统来说，一个应用程序就是一个进程
 self        该文件是一个软链接，指向了当前进程的目录，通过访问/proc/self/目录来获取当前进程的信息，就不用每次都获取pid
-thread-self 该文件也是一个软链接，指向了当前线程，访问该文件，等价于访问“当前进程pid/task/当前线程tid”的内容。。一个进程，可以包含多个线程，但至少需要一个进程，这些线程共同支撑进程的运行。
-version     记录了当前运行的内核版本，通常可以使用命令”uname –r”
+thread-self 该文件也是一个软链接，指向了当前线程，访问该文件，等价于访问"当前进程pid/task/当前线程tid"的内容。。一个进程，可以包含多个线程，但至少需要一个进程，这些线程共同支撑进程的运行。
+version     记录了当前运行的内核版本，通常可以使用命令"uname –r"
 cpuinfo     记录系统中CPU的提供商和相关配置信息
 modules     记录了目前系统加载的模块信息
 meminfo     记录系统中内存的使用情况，free命令会访问该文件，来获取系统内存的空闲和已使用的数量
-filesystems 记录内核支持的文件系统类型，通常mount一个设备时，如果没有指定文件系统并且它无法确定文件系统类型时，mount会尝试包含在该文件中的文件系统，除了那些标有“nodev”的文件系统。
+filesystems 记录内核支持的文件系统类型，通常mount一个设备时，如果没有指定文件系统并且它无法确定文件系统类型时，mount会尝试包含在该文件中的文件系统，除了那些标有"nodev"的文件系统。
 =========== ================================================================================================================================================================================
 
 下面我们以当前bash的进程pid目录，来了解proc文件系统的一些功能。
 
 使用如下命令来查看当前bash进程的PID号。
 
-#在主机上执行如下命令
-
 .. code-block:: sh
    :linenos:
 
+   #在主机上执行如下命令
    ps
 
 每个人的计算机运行运行状况不一样，所以得到的进程号也是不一样，如下图所示，当前得
@@ -177,6 +176,8 @@ filesystems 记录内核支持的文件系统类型，通常mount一个设备时
    #在主机上执行如下命令
    #把目录中的数字改成自己bash进程的pid号
    ls /proc/3042
+
+如下图:
 
 .. image:: media/filesy006.png
    :align: center
@@ -209,13 +210,11 @@ wchan     记录当前进程处于睡眠状态，内核调用的相关函数
 
 如果是文件，可以直接使用cat命令输出对应文件的内容可查看，如查看进程名：
 
-#在主机上执行如下命令
-
-#把目录中的数字改成自己bash进程的pid号
-
 .. code-block:: sh
    :linenos:
 
+   #在主机上执行如下命令
+   #把目录中的数字改成自己bash进程的pid号 
    cat /proc/3042/comm
 
 .. image:: media/filesy007.png
@@ -224,13 +223,13 @@ wchan     记录当前进程处于睡眠状态，内核调用的相关函数
 
 
 
-可看到进程名为“bash”，实际上前面的“ps”命令也
-是通过“proc”文件系统获取到相关进程信息的。
+可看到进程名为"bash"，实际上前面的"ps"命令也
+是通过"proc"文件系统获取到相关进程信息的。
 
 sysfs文件系统
 ^^^^^^^^^^^^^^^^^^
 
-上一节我们提及到的procfs是“任务管理器”，那sysfs同procfs一样，也是一
+上一节我们提及到的procfs是"任务管理器"，那sysfs同procfs一样，也是一
 个伪文件系统，那么它的作用是什么呢？
 
 Linux内核在2.6版本中引入了sysfs文件系统，sysfs通常会自动挂载在根目录下的sys文件夹。sys目录下的文
@@ -239,6 +238,8 @@ Linux内核在2.6版本中引入了sysfs文件系统，sysfs通常会自动挂�
 o，pci等。下图中的虚线表示软连接，可以看到所有跟设备
 有关的文件或文件夹都链接到了device目录下，类似于将一个大类，根
 据某个特征分为了无数个种类，这样使得/sys文件夹的结构层次清晰明了。
+
+如下图:
 
 .. image:: media/filesy008.jpg
    :align: center
@@ -264,7 +265,7 @@ fs      包含了系统中注册文件系统
 线构成导出的分级目录，它是系统上设备的直观反应，每个设备在sysfs下都有
 唯一的对应目录，用户可以通过具体设备目录下的文件访问设备。
 
-在《第13章 使用命令点灯和检测按键第13章 》的示例中，我们就是
+在《使用命令点灯和检测按键》章节的示例中，我们就是
 通过访问sysfs文件系统达到了控制LED灯的目的。
 
 devfs文件系统
@@ -310,7 +311,7 @@ Linux内核包含了文件管理子系统组件，它主要实现了虚
 
 -  用户程序和glibc库都是属于用户空间的，本质都是用户程序。
 
--  应用层的程序和glibc可能会调用到“系统调用层（SCI）”的函数，这些函数
+-  应用层的程序和glibc可能会调用到"系统调用层（SCI）"的函数，这些函数
    是Linux内核对外提供的函数接口，用户通过这些函数向系统申请操作。例如，C库
    的printf函数使用了系统的vsprintf和write函数，C库的fopen、fread、fwrite分别
    调用了系统的open、read、w
@@ -323,13 +324,13 @@ Linux内核包含了文件管理子系统组件，它主要实现了虚
 系统之前增加了虚拟文件系统中间层，它对复杂的系统进行抽象化，对用户提供了统
 一的文件操作接口。无论是ext2/3/4、FAT32、NTFS存储的文件，还是/proc、/sys提供
 的信息还是硬件设备，无论内容是在本地还是网络上，都使用
-一样的open、read、write来访问，使得“一切皆文件”的理念被实现，这也正是软件中间层的魅力。
+一样的open、read、write来访问，使得"一切皆文件"的理念被实现，这也正是软件中间层的魅力。
 
 Linux系统调用
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 从上图可了解到，系统调用（System Call）是操作系统提供给用
-户程序调用的一组“特殊”函数接口API，文件操作就是其中一种类型。实际
+户程序调用的一组"特殊"函数接口API，文件操作就是其中一种类型。实际
 上，Linux提供的系统调用包含以下内容：
 
 -  进程控制：如fork、clone、exit 、setpriority等创建、中止、设置进程优先级的操作。
@@ -386,17 +387,17 @@ fopen库函数用于打开或创建文件，返回相应的文件流。它的函
 
 -  mode参数用于指定文件的打开方式，注意该参数是一个字符串，输入时需要带双引号：
 
--  “r”：以只读方式打开，文件指针位于文件的开头。
+-  "r"：以只读方式打开，文件指针位于文件的开头。
 
--  “r+”：以读和写的方式打开，文件指针位于文件的开头。
+-  "r+"：以读和写的方式打开，文件指针位于文件的开头。
 
--  “w”：以写的方式打开，不管原文件是否有内容都把原内容清空掉，文件指针位于文件的开头。
+-  "w"：以写的方式打开，不管原文件是否有内容都把原内容清空掉，文件指针位于文件的开头。
 
--  “w+”： 同上，不过当文件不存在时，前面的“w”模式会返回错误，而此处的“w+”则会创建新文件。
+-  "w+"： 同上，不过当文件不存在时，前面的"w"模式会返回错误，而此处的"w+"则会创建新文件。
 
--  “a”：以追加内容的方式打开，若文件不存在会创建新文件，文件指针位于文件的末尾。与“w+”的区别是它不会清空原文件的内容而是追加。
+-  "a"：以追加内容的方式打开，若文件不存在会创建新文件，文件指针位于文件的末尾。与"w+"的区别是它不会清空原文件的内容而是追加。
 
--  “a+”：以读和追加的方式打开，其它同上。
+-  "a+"：以读和追加的方式打开，其它同上。
 
 -  fopen的返回值是FILE类型的文件文件流，当它的值不为NULL时表示正常，后续的fread、fwrite等函数可通过文件流访问对应的文件。
 
@@ -479,58 +480,58 @@ fseek函数用于设置下一次读写函数操作的位置。它的函数原型
 
 
 .. code-block:: c
-   :caption: 文件操作实验-C标准库（file_io/stdio/main.c文件）
+   :caption: 文件操作实验-C标准库（base_code/linux_app/file_io/stdio/main.c文件）
    :linenos:
    
    #include <stdio.h>
    #include <string.h>
+
    //要写入的字符串
    const char buf[] = "filesystem_test:Hello World!\n";
    //文件描述符
-   FILE \*fp;
+   FILE *fp;
    char str[100];
-    int len;
-   
-   
-    int main(void)
-    {
-    //创建一个文件
-    fp = fopen("filesystem_test.txt", "w+");
-    //正常返回文件指针
-    //异常返回NULL
-    if (NULL == fp) {
-    printf("Fail to Open File\n");
-    return 0;
-    }
-    //将buf的内容写入文件
-    //每次写入1个字节，总长度由strlen给出
-    fwrite(buf, 1, strlen(buf), fp);
-   
-    //写入Embedfire
-    //每次写入1个字节，总长度由strlen给出
-    fwrite("Embedfire\n", 1, strlen("Embedfire\n"),fp);
-   
-    //把缓冲区的数据立即写入文件
-    fflush(fp);
-   
-    //此时的文件位置指针位于文件的结尾处，使用fseek函数使文件指针回到文件头
-    fseek(fp, 0, SEEK_SET);
-   
-    //从文件中读取内容到str中
-    //每次读取100个字节，读取1次
-    //返回读取了多少次，若返回值为0表示到达了文件尾
-    len = fread(str, 100, 1, fp);
-   
-    printf("File content: %s \\nread len=%d\n", str, len);
-   
-    fclose(fp);
-   
-    return 0;
-    }
+
+
+   int main(void)
+   {
+      //创建一个文件
+      fp = fopen("filesystem_test.txt", "w+");
+      //正常返回文件指针
+      //异常返回NULL
+      if(NULL == fp){
+         printf("Fail to Open File\n");
+         return 0;
+      }
+      //将buf的内容写入文件
+      //每次写入1个字节，总长度由strlen给出
+      fwrite(buf, 1, strlen(buf), fp);
+
+      //写入Embedfire
+      //每次写入1个字节，总长度由strlen给出
+      fwrite("Embedfire\n", 1, strlen("Embedfire\n"),fp);
+
+      //把缓冲区的数据立即写入文件 
+      fflush(fp);
+
+      //此时的文件位置指针位于文件的结尾处，使用fseek函数使文件指针回到文件头
+      fseek(fp, 0, SEEK_SET);
+
+      //从文件中读取内容到str中
+      //每次读取100个字节，读取1次
+      fread(str, 100, 1, fp);
+
+      printf("File content:\n%s \n", str);
+
+      fclose(fp);
+
+      return 0;
+   }
+  
 
 如果之前有学习过C语言的文件操作，本实验代码非常容易理解，它的流程就是使用fopen创建文件、使用fwrite写入内容，使用fflush确保缓冲区的内容写到文件，然后使用fseek重置文件位置指针，使用fread把文件的内容读出，最后调用fclose关闭文件。
 
-其中的fopen函数调用时使用了参数“w+”，表示每次都创建新的空文件，且带上读权限打开，函数调用后得到文件描述符fp，在它后面的fwrite、fread、fflush等函数都是通过这个fp文件描述符访问该文件的。
+其中的fopen函数调用时使用了参数"w+"，表示每次都创建新的空文件，且带上读权限打开，函数调用后得到文件描述符fp，在它后面的fwrite、fread、fflush等函数都是通过这个fp文件描述符访问该文件的。
 
 与下一小节中差异最大的就是此处fwrite和fread之间
 的fflush函数，C标准库的文
@@ -548,12 +549,12 @@ Makefile是跟工程目录匹配的，本实验仅有一个main.c文件，且与
 
 
 
-此处编写的Makefile与《18.7.2 多级结构工程的Makefile》章节的基本一致，如下所示。
+此处编写的Makefile与前面《多级结构工程的Makefile》章节的基本一致，如下所示。
 
 
 
 .. code-block:: c
-   :caption: 文件操作-C标准库的Makefile（file_io/stdio/Makefile文件）
+   :caption: 文件操作-C标准库的Makefile（base_code/linux_app/file_io/stdio/Makefile文件）
    :linenos:
 
    #生成可执行文件的名称
@@ -564,65 +565,76 @@ Makefile是跟工程目录匹配的，本实验仅有一个main.c文件，且与
    #默认使用gcc编译器
    #make ARCH=arm 时使用ARM-GCC编译器
    ifeq ($(ARCH), x86)
-   CC = gcc
-    else
-    CC = arm-linux-gnueabihf-gcc
-    endif
-    #存放中间文件的路径
-    build_dir = build_$(ARCH)
-    #存放源文件的文件夹
-    src_dir = .
-    #存放头文件的文件夹
-    inc_dir = includes .
-   
-    #源文件
-    sources = $(foreach dir,$(src_dir),$(wildcard $(dir)/*.c))
-    #目标文件（*.o）
-    objects = $(patsubst %.c,$(build_dir)/%.o,$(notdir $(sources)))
-    #头文件
-    includes = $(foreach dir,$(inc_dir),$(wildcard $(dir)/*.h))
-    #编译参数
-    #指定头文件的路径
-    CFLAGS = $(patsubst %, -I%, $(inc_dir))
-   
-    #链接过程
-    #开发板上无法使用动态库，因此使用静态链接的方式
-    $(build_dir)/$(Target) : $(objects) \| create_build
-    $(CC) $^ -o $@
-   
-    #编译工程
-    #编译src文件夹中的源文件，并将生成的目标文件放在objs文件夹中
-    $(build_dir)/%.o : $(src_dir)/%.c $(includes) \| create_build
-    $(CC) -c $(CFLAGS) $^ -o $@
-   
-   
-    #以下为伪目标，调用方式：make 伪目标
-    #clean：用于Clean Project
-    #check：用于检查某个变量的值
-    .PHONY:clean cleanall check create_build
-    #按架构删除
-    clean:
-    rm -rf $(build_dir)
-   
-    #全部删除
-    cleanall:
-    rm -rf build_x86 build_arm
-   
-    #创建一个新目录create，用于存放过程文件
-    create_build:
-    @mkdir -p $(build_dir)
+      CC = gcc
+   else
+      CC = arm-linux-gnueabihf-gcc
+   endif
+   #存放中间文件的路径
+   build_dir = build_$(ARCH)
+   #存放源文件的文件夹
+   src_dir =  .
+   #存放头文件的文件夹
+   inc_dir = includes .
+
+   #源文件
+   sources = $(foreach dir,$(src_dir),$(wildcard $(dir)/*.c))
+   #目标文件（*.o）
+   objects = $(patsubst %.c,$(build_dir)/%.o,$(notdir $(sources)))
+   #头文件
+   includes = $(foreach dir,$(inc_dir),$(wildcard $(dir)/*.h))
+   #编译参数
+   #指定头文件的路径
+   CFLAGS = $(patsubst %, -I%, $(inc_dir))
+
+   #链接过程
+   #开发板上无法使用动态库，因此使用静态链接的方式
+   $(build_dir)/$(Target) : $(objects)  | create_build
+      $(CC) $^ -o $@ 
+
+   #编译工程
+   #编译src文件夹中的源文件，并将生成的目标文件放在objs文件夹中
+   $(build_dir)/%.o : $(src_dir)/%.c $(includes) | create_build
+      $(CC) -c $(CFLAGS) $< -o $@ 
+
+
+   #以下为伪目标，调用方式：make 伪目标
+   #clean：用于Clean Project
+   #check：用于检查某个变量的值
+   .PHONY:clean cleanall check create_build
+   #按架构删除
+   clean:
+      rm -rf $(build_dir)
+
+   #全部删除
+   cleanall:
+      rm -rf build_x86 build_arm
+
+   #命令前带"@",表示不在终端上输出执行的命令
+   #这个目标主要是用来调试Makefile时输出一些内容
+   check:
+      @echo $(CFLAGS)
+      @echo $(CURDIR)
+      @echo $(src_dir)
+      @echo $(sources)
+      @echo $(objects)
+      
+   #创建一个新目录create，用于存放过程文件
+   create_build:
+      @mkdir -p $(build_dir)
+
+
 
 与前面讲解的Makefile的差异主要如下：
 
 -  第2行：本工程编译后的可执行文件名为file_demo，以后我们的Makefile都
    在此处定义可执行文件名，配合第14行的build_dir变量的值可找到编译后生成的应用程序的目录。
 
--  第16行：本工程的源文件跟Makefile在相同的目录，所以表示源文件的src_dir变量赋值为“.”，表示当前目录。
+-  第16行：本工程的源文件跟Makefile在相同的目录，所以表示源文件的src_dir变量赋值为"."，表示当前目录。
 
 -  54~55行：定义了一个名为create_build的伪目标，它执行的Shell命令为创建编译目录，在下面说明的代码中会被用到。
 
 -  第32行和第37行：分别是生成最终目标文件和*.o文件的依赖，与之前不同的
-   时它们的末尾都新增了“\| create_build”的内容，其中“ \|”在此处的
+   时它们的末尾都新增了"\| create_build"的内容，其中" \|"在此处的
    意义为前置依赖，create_build为上面说明的伪目标，合起来的
    意义是create_build这个伪目标要先被执行，即要先创建编译目录。
 
@@ -647,6 +659,8 @@ x86架构
    ls
    #查看文件的内容
    cat filesystem_test.txt
+
+如下图:
 
 .. image:: media/filesy011.png
    :align: center
@@ -727,7 +741,7 @@ a+              O_RDWR \| O_CREAT \| O_APPEND
 =============== ===============================
 
 -  mode：当open函数的flag值设置为O_CREAT时，必须使用mode参数来设置文件
-   与用户相关的权限。mode可用的权限如下表所示，表中各个参数可使用“\| ”来组
+   与用户相关的权限。mode可用的权限如下表所示，表中各个参数可使用"\| "来组
    合。
 
 表  文件权限
@@ -822,7 +836,7 @@ lseek函数可以用与设置文件指针的位置，并返回文件指针相对
 
 
 .. code-block:: c
-   :caption: 文件操作实验-系统调用（file_io/systemcall/main.c文件）
+   :caption: 文件操作实验-系统调用（base_code/linux_app/file_io/systemcall/main.c文件）
    :linenos:
 
    #include <sys/stat.h>
@@ -830,40 +844,39 @@ lseek函数可以用与设置文件指针的位置，并返回文件指针相对
    #include <fcntl.h>
    #include <stdio.h>
    #include <string.h>
+
    //文件描述符
    int fd;
    char str[100];
-   
-   
-    int main(void)
-    {
-    //创建一个文件
-    fd = open("testscript.sh", O_RDWR|O_CREAT|O_TRUNC, S_IRWXU);
-    //文件描述符fd为非负整数
-    if (fd < 0) {
-    printf("Fail to Open File\n");
-    return 0;
-    }
-    //写入字符串pwd
-    write(fd, "pwd\n", strlen("pwd\n"));
-   
-    //写入字符串ls
-    write(fd, "ls\n", strlen("ls\n"));
-   
-    //此时的文件指针位于文件的结尾处，使用lseek函数使文件指针回到文件头
-    lseek(fd, 0, SEEK_SET);
-   
-   
-    //从文件中读取100个字节的内容到str中，该函数会返回实际读到的字节数
-    read(fd, str, 100);
-   
-    printf("File content:\n%s \\n", str);
-   
-    close(fd);
-   
-    return 0;
-    }
-   
+
+
+   int main(void)
+   {
+      //创建一个文件
+      fd = open("testscript.sh", O_RDWR|O_CREAT|O_TRUNC, S_IRWXU);
+      //文件描述符fd为非负整数
+      if(fd < 0){
+         printf("Fail to Open File\n");
+         return 0;
+      }
+      //写入字符串pwd
+      write(fd, "pwd\n", strlen("pwd\n"));
+
+      //写入字符串ls
+      write(fd, "ls\n", strlen("ls\n"));
+
+      //此时的文件指针位于文件的结尾处，使用lseek函数使文件指针回到文件头
+      lseek(fd, 0, SEEK_SET);
+
+      //从文件中读取100个字节的内容到str中，该函数会返回实际读到的字节数
+      read(fd, str, 100);
+
+      printf("File content:\n%s \n", str);
+
+      close(fd);
+
+      return 0;
+   }
 
 执行流程
 ''''''''''''''''''''''''''''''''''''
@@ -878,7 +891,7 @@ lseek函数可以用与设置文件指针的位置，并返回文件指针相对
 -  open与fopen的返回值功能类似，都是文件描述符，不过open使用非负整数
    来表示正常，失败时返回-1，而fopen失败时返回NULL。
 
--  创建文件后调用write函数写入了“pwd\n”、“ls\n”这样的字符串，实际上就是简单的Shell命令。
+-  创建文件后调用write函数写入了"pwd\n"、"ls\n"这样的字符串，实际上就是简单的Shell命令。
 
 -  使用read函数读取内容前，先调用lseek函数重置了文件指针至文件开头处读取。与C库文件
    操作的区别write和read之间不需要使用fflush确保缓冲区的内容并写入，因为系统调用的文件操作是没有缓冲区的。
@@ -891,9 +904,9 @@ lseek函数可以用与设置文件指针的位置，并返回文件指针相对
 示例代码中的开头包含了一系列Linux系统常用的头文件。今后学习Linux的过程中，我们可能会接触各种
 各样的头文件，因此了解一下Linux中头文件的用法十分有必要。
 
-在linux中，大部分的头文件在系统的“/usr/include”目录下可以找到，它是
+在linux中，大部分的头文件在系统的"/usr/include"目录下可以找到，它是
 系统自带的GCC编译器默认的头文件目录，如下图所示，如果把该目录下的stdio.h文件删除
-掉或更改名字（想尝试请备份，我不负责），那么使用GCC编译hello
+掉或更改名字（想尝试请备份），那么使用GCC编译hello
 world的程序会因为找不到stdio.h文件而报错。
 
 .. image:: media/filesy013.png
@@ -904,12 +917,13 @@ world的程序会因为找不到stdio.h文件而报错。
 代码中一些头文件前包含了某个目录，比如sys/stat.h，这些头文件
 可以在编译器文件夹中的目录下找到。我们通常可以使用locate命令来搜索，如：
 
-#在Ubuntu主机下执行如下命令：
-
 .. code-block:: sh
    :linenos:
 
+   #在Ubuntu主机下执行如下命令：
    locate sys/stat.h
+
+如下图:
 
 .. image:: media/filesy014.png
    :align: center
@@ -969,6 +983,8 @@ x86架构
    #执行生成的testscript.sh文件
    ./testscript.sh
 
+如下图:
+
 .. image:: media/filesy015.png
    :align: center
    :alt: 未找到图片15|
@@ -976,8 +992,7 @@ x86架构
 
 
 从上图可看到，file_demo程序执行后，它创建的testscript.sh文件带有
-可执行权限，这是使用C库函数fopen无法直接做到的。运行testscript.h可执行
-该文件内记录的Shell指令。
+可执行权限，运行./testscript.sh可执行该脚本。
 
 .. _arm架构-1:
 
@@ -995,6 +1010,8 @@ ARM架构
 
 编译后生成的ARM平台程序为build_arm/file_demo，使用网络文件系统共享
 至开发板，在开发板的终端上测试即可。
+
+如下图:
 
 .. image:: media/filesy016.png
    :align: center

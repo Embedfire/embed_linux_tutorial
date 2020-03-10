@@ -7,10 +7,10 @@
 
 本章节内容处于开发笔记状态，还待整理至最终版的教程。
 
-上一章我们简单讲解了SDK的目录结构，这一章进入主题——如何下载官方SDK程序到你手中的开发板。需要再次说明的是SDK是适配NXP官方评估板的，我们的开发板与官方SDK不完全兼容，言外之意大部分还是兼容的，尤其是设置为SD卡启动时，相似度更高。本章也将会带领大家在linux下编译官方SDK中的“he
-llo world”工程，并烧写到SD卡，最终放在我们的开发板上运行。
+上一章我们简单讲解了SDK的目录结构，这一章进入主题——如何下载官方SDK程序到你手中的开发板。需要再次说明的是SDK是适配NXP官方评估板的，我们的开发板与官方SDK不完全兼容，言外之意大部分还是兼容的，尤其是设置为SD卡启动时，相似度更高。本章也将会带领大家在linux下编译官方SDK中的"he
+llo world"工程，并烧写到SD卡，最终放在我们的开发板上运行。
 
-本章重点不是讲解“hello wordl”程序如何实现，而是
+本章重点不是讲解"hello wordl"程序如何实现，而是
 如何在linux下编译SDK工程，并放到你手中的开发板运行，直白的说就是编译环
 境的搭建以及编译、烧写操作流程。
 
@@ -41,7 +41,7 @@ SDK程序编译、烧写流程分析
 
 
 
-由于我们要在linux下编译、下载，所以我们需要选择armgcc版本工程。打开“armgcc”文件夹如下所示。
+由于我们要在linux下编译、下载，所以我们需要选择armgcc版本工程。打开"armgcc"文件夹如下所示。
 
 .. image:: media/buildi003.png
    :align: center
@@ -90,10 +90,10 @@ SDK程序编译、烧写流程分析
 获取官方SDK文件
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-官方SDK提供了Windows版本和Linux版本，两者在功能上并没有什么差别，但编码上稍有不同，比如Linux下键盘的“Enter”是“\n”,而Windows下键盘的“Enter”键是“\r\n”。为避免编码带来问题，我们选用Linux下的SDK。SDK可以参照上一章从NXP官网直接下载，也可以
+官方SDK提供了Windows版本和Linux版本，两者在功能上并没有什么差别，但编码上稍有不同，比如Linux下键盘的"Enter"是"\n",而Windows下键盘的"Enter"键是"\r\n"。为避免编码带来问题，我们选用Linux下的SDK。SDK可以参照上一章从NXP官网直接下载，也可以
 直接使用我们下载好的Linux版的SDK。
 
-使用共享文件夹将“SDK_2.2_MCIM6ULL_RFP_Linux.run” 拷贝到Linux下，存放位置
+使用共享文件夹将"SDK_2.2_MCIM6ULL_RFP_Linux.run" 拷贝到Linux下，存放位置
 自定。然后运行.run文件生成SDK linux下的源文件命令如下。
 
 .. code-block:: c
@@ -101,7 +101,7 @@ SDK程序编译、烧写流程分析
 
     sudo ./ SDK_2.2_MCIM6ULL_RFP_Linux.run
 
-注：运行SDK_xxx_xxx.run时可能会出现输入SDK_xxx_xxx.run时“tab”键无法自动补齐，并且手动输入完整文件名也不能运行。原因大多是当前用户没有SDK_xxx_xxx.run文件的执行权限。修改SDK_xxx_xxx.run文件的执行权限即可。
+注：运行SDK_xxx_xxx.run时可能会出现输入SDK_xxx_xxx.run时"tab"键无法自动补齐，并且手动输入完整文件名也不能运行。原因大多是当前用户没有SDK_xxx_xxx.run文件的执行权限。修改SDK_xxx_xxx.run文件的执行权限即可。
 
 SDK_xxx_xxx.run运行后会弹出图形化的界面，不过鼠标无法对界面上的选项进行操作，只能通过键盘上的方向键选择。例如在路径选择界面如下所示。
 
@@ -111,8 +111,8 @@ SDK_xxx_xxx.run运行后会弹出图形化的界面，不过鼠标无法对界�
 
 
 
-我们通过“上下”方向键选择生成的SDK文件保存位置。“左右”方
-向键选择“Select”或“Abort Installation”。需要说明的是图 46‑3中选项1表示生成的SDK保存在
+我们通过"上下"方向键选择生成的SDK文件保存位置。"左右"方
+向键选择"Select"或"Abort Installation"。需要说明的是图 46‑3中选项1表示生成的SDK保存在
 你当前登录的用户文件夹下，不同用户路径不同。
 
 SDK_xxx_xxx.run运行结束后会在我们制定的目录生成Linux下的SDK。
@@ -121,7 +121,7 @@ SDK_xxx_xxx.run运行结束后会在我们制定的目录生成Linux下的SDK。
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Linux下的SDK生成后，进入工程文
-件，“SDK_2.2_MCIM6ULL \\boards\evkmcimx6ull\demo_apps\hello_world\armgcc”运
+件，"SDK_2.2_MCIM6ULL \\boards\evkmcimx6ull\demo_apps\hello_world\armgcc"运
 行build_ddr_release.sh脚本，命令如下：
 
 .. code-block:: c
@@ -129,7 +129,7 @@ Linux下的SDK生成后，进入工程文
 
     ./build_ddr_release.sh
 
-build_ddr_release.sh用于生成*.bin文件，运行成功后会在当前文件夹下生成“ddr_release”文件夹，在文件夹中存在一个sdk20-app.bin文件，将sdk20-app.bin放到SD卡程序并不能直接运行，根据存储设备不同还要在sdk20-app.bin添加相应的头文件
+build_ddr_release.sh用于生成*.bin文件，运行成功后会在当前文件夹下生成"ddr_release"文件夹，在文件夹中存在一个sdk20-app.bin文件，将sdk20-app.bin放到SD卡程序并不能直接运行，根据存储设备不同还要在sdk20-app.bin添加相应的头文件
 然后才能在开发板上运行。
 
 注：运行build_ddr_release.sh常见错误如下所示。
@@ -141,8 +141,8 @@ build_ddr_release.sh用于生成*.bin文件，运行成功后会在当前文件�
 
 从错误提示不难看出，错误原因是没
 有添加ARMGCC_DIR环境变量，根据之前讲解添加环境变量
-命令“export ARMGCC_DIR=/usr”只在当前端口有效，所以在当前端口再次执行命令“export
-ARMGCC_DIR=/usr”添加环境变量即可(不建议将环境变量添加到系统环境变量中，因为该环境变量只有编译官方SDK程序才用的到，后面章节主要是自己写程序)。
+命令"export ARMGCC_DIR=/usr"只在当前端口有效，所以在当前端口再次执行命令"export
+ARMGCC_DIR=/usr"添加环境变量即可(不建议将环境变量添加到系统环境变量中，因为该环境变量只有编译官方SDK程序才用的到，后面章节主要是自己写程序)。
 
 烧写到SD卡
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -157,7 +157,7 @@ ARMGCC_DIR=/usr”添加环境变量即可(不建议将环境变量添加到系�
 径：~/embed_linux_tutorial/base_code/bare_metal/download-tool/download-tool.tar.bz2)。下面将
 基于该烧写工具讲解添加头文件以及烧写步骤。
 
-“embedfire_download”烧写工具集成了添加头文件和烧写到SD卡等步骤。详细介绍如下：
+"embedfire_download"烧写工具集成了添加头文件和烧写到SD卡等步骤。详细介绍如下：
 
 硬件要求：
 
@@ -202,14 +202,14 @@ ARMGCC_DIR=/usr”添加环境变量即可(不建议将环境变量添加到系�
 
 选错设备，可能导致电脑数据被破坏！！！！
 
-我们可以比较SD卡接入和拔出时设备列表的差异确定那个是SD卡设备。确定那个是插入的SD卡设备后输入设备ID即可，在我的电脑上SD卡是“sdb”所以输入“b”即可。
+我们可以比较SD卡接入和拔出时设备列表的差异确定那个是SD卡设备。确定那个是插入的SD卡设备后输入设备ID即可，在我的电脑上SD卡是"sdb"所以输入"b"即可。
 
 实验现象
 
 
 将开发板的启动选择开关设置为SD卡启动，使用串口调试助手链接
 开发板的串口1，将SD卡插入开发板，启动后正常情况下可以在串口调试助手
-中看到开发板发出的“hello world”.
+中看到开发板发出的"hello world".
 
 .. |buildi002| image:: media/buildi002.png
    :width: 5.76806in

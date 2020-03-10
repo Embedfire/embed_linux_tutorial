@@ -51,7 +51,7 @@ clean:
 cleanall:
 	rm -rf build_x86 build_arm
 
-#命令前带“@”,表示不在终端上输出执行的命令
+#命令前带"@",表示不在终端上输出执行的命令
 #这个目标主要是用来调试Makefile时输出一些内容
 check:
 	@echo $(CFLAGS)

@@ -82,3 +82,23 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
 
 注意:开发板第一次从SD卡启动时，系统会自动进行扩容重启，
 以保证充分利用SD卡存储空间。扩容完毕后，系统重启生效。
+
+系统启动以后，输入用户密码登录即可：
+
+普通用户:
+
+.. code-block:: sh
+   :emphasize-lines: 2
+   :linenos:
+
+   账户:debian
+   密码:temppwd
+
+ROOT用户:
+
+.. code-block:: sh
+   :emphasize-lines: 2
+   :linenos:
+
+   账户:root
+   密码:root

@@ -29,7 +29,7 @@
    linux_basis/command_line
    linux_basis/software_package
    linux_basis/editor
-   linux_basis/git_tutorial
+   #linux_basis/git_tutorial
    
 
 .. toctree::
@@ -44,15 +44,17 @@
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
-   linux_basis/ec20_4g_module
+   #linux_basis/ec20_4g_module
 
 .. toctree::
    :maxdepth: 1
    :caption: 在Linux下开发应用程序
    :numbered:
 
+   linux_app/git_use
    linux_app/mount_nfs
    linux_app/gcc_hello_world
+   linux_app/arm_gcc_hello_world.rst
    linux_app/makefile
    linux_app/filesystem_system_call
    linux_app/led_subsystem
@@ -64,25 +66,22 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: 安装系统镜像
-   :numbered:
-
-   install_image/install_sd_image
-   install_image/sdcard_production
-   install_image/mfgtool_production
-
-.. toctree::
-   :maxdepth: 1
    :caption: 制作系统镜像
    :numbered:
 
+
    building_image/image_composition
-   building_image/building_kernel
-   building_image/building_uboot
-   building_image/building_rootfs
-   building_image/using_buildroot
-   building_image/using_yocto
+   building_image/building_NXP_firmware
+   building_image/burning_NXP_firmware
    building_image/building_debian
+
+
+   #building_image/building_kernel
+   #building_image/building_uboot
+   #building_image/building_rootfs
+   #building_image/using_buildroot
+   #building_image/using_yocto
+   #building_image/building_debian
 
 .. toctree::
    :maxdepth: 1
@@ -106,6 +105,7 @@
    :caption: Linuxn内核调试
    :numbered:
 
+   linux_debug/gdb_use
    linux_debug/core_dump
    linux_debug/backtrace
    linux_debug/strace
