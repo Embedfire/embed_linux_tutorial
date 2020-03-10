@@ -332,30 +332,33 @@ bus_remove_file则用于移除该文件。
 
 Makefile
 ------
-在开始写程序之前，我们需要先准备好我们的Makefile。针对当前开发板使用的是debian的镜像，那么我们便可以直接在开发板上进行编译，
+工欲善其事必先利其器，在开始写程序之前，我们需要先准备好我们的Makefile。针对当前开发板使用的是debian的镜像，那么我们便可以直接在开发板上进行编译，
 前提是板子上已经安装了gcc以及make工具。
 
 .. code-block:: makefile
     :caption: 定义bus_type结构体（xbus.c)
     :linenos:
 
-    ARCH ?= arm
+	NATIVE ?= true
 
 
-    ifeq ($(ARCH), x86)
-        KERNEL_DIR = /home/embedfire/linux4.19
-    else
-        KERNEL_DIR = /lib/modules/$(shell uname -r)/build
-    endif
+	ifeq ($(NATIVE), false)
+		KERNEL_DIR = /home/embedfire/linux4.19
+	else
+		KERNEL_DIR = /lib/modules/$(shell uname -r)/build
+	endif
 
-    obj-m := xdev.o xbus.o xdrv.o
 
-    all:modules
-    modules clean:
-        $(MAKE) -C $(KERNEL_DIR) M=$(shell pwd) $@
 
-我们通过变量ARCH来控制我们的编译环境，该Makefile默认设置是在开发板进行编译，对于想要在PC机进行交叉编译的读者，需要指定变量KERNEL_DIR为自己内核源码的路径，
-再执行命令“make ARCH=x86”，完成编译。
+
+	obj-m := xdev.o xbus.o xdrv.o
+
+	all:modules
+	modules clean:
+		$(MAKE) -C $(KERNEL_DIR) M=$(shell pwd) $@
+
+我们通过变量NATIVE来控制我们的编译环境，该Makefile默认设置是在开发板进行编译，对于想要在PC机进行交叉编译的读者，需要指定变量KERNEL_DIR为自己内核源码的路径，
+再执行命令“make NATIVE=false”，完成编译。
 
 总线
 --------

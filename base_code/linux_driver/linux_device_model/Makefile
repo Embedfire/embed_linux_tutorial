@@ -1,8 +1,8 @@
 
-ARCH ?= arm
+NATIVE ?= true
 
 
-ifeq ($(ARCH), x86)
+ifeq ($(NATIVE), false)
 	KERNEL_DIR = /home/embedfire/linux4.19
 else
 	KERNEL_DIR = /lib/modules/$(shell uname -r)/build
