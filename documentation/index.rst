@@ -138,7 +138,9 @@
 
    linux_driver/character_device
    linux_driver/module
-
+   linux_driver/linux_device_model
+   
+   
 .. toctree::
    :maxdepth: 1
    :caption: 附录
