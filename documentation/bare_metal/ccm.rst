@@ -125,7 +125,7 @@ ARM PLL(PLL 1)只有一个控制寄存器CCM_ANALOG_PLL_ARMn，
  的外部时
  钟。CCM_ANALOG_PLL_ARMn[DIV_SELECT]位选
  择锁相环分频值(DIV_SELECT)。取值范围为54到108。输出频率计
- 算公式为 ARM_PLL = Fin \* DIV_SELECT/2.0。如果选
+ 算公式为 ARM_PLL = Fin * DIV_SELECT/2.0。如果选
  择24MHz参
  考
  时钟作为时钟输入，DIV_SELECT选

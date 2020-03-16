@@ -66,7 +66,7 @@ mknod 设备名 设备类型 主设备号 次设备号
    :caption: mknod调用关系
    :linenos:
 
-   static struct inode \*shmem_get_inode(struct super_block \*sb, const struct inode \*dir,
+   static struct inode *shmem_get_inode(struct super_block *sb, const struct inode *dir,
    umode_t mode, dev_t dev, unsigned long flags)
    {
    inode = new_inode(sb);
@@ -83,7 +83,7 @@ mknod 设备名 设备类型 主设备号 次设备号
     shmem_free_inode(sb);
     return inode;
     }
-    void init_special_inode(struct inode \*inode, umode_t mode, dev_t rdev)
+    void init_special_inode(struct inode *inode, umode_t mode, dev_t rdev)
     {
     inode->i_mode = mode;
     if (S_ISCHR(mode)) {
@@ -111,10 +111,10 @@ do_filp_open函数，该函数通过调用函数get_empty_filp得到一个新
    :caption: do_dentry_open函数（位于内核源码/fs/open.c文件）
    :linenos:
 
-   static int do_dentry_open(struct file \*f,
-   struct inode \*inode,
-   int (*open)(struct inode \*, struct file \*),
-   const struct cred \*cred)
+   static int do_dentry_open(struct file *f,
+   struct inode *inode,
+   int (*open)(struct inode *, struct file *),
+   const struct cred *cred)
    {
    ……
    f->f_op = fops_get(inode->i_fop);
@@ -167,16 +167,16 @@ def_chr_fops。
    :caption: chrdev_open函数（位于内核源码/fs/char_dev.c文件）
    :linenos:
 
-   static int chrdev_open(struct inode \*inode, struct file \*filp)
+   static int chrdev_open(struct inode *inode, struct file *filp)
    {
-   const struct file_operations \*fops;
-   struct cdev \*p;
-   struct cdev \*new = NULL;
+   const struct file_operations *fops;
+   struct cdev *p;
+   struct cdev *new = NULL;
    int ret = 0;
    spin_lock(&cdev_lock);
    p = inode->i_cdev;
     if (!p) {
-    struct kobject \*kobj;
+    struct kobject *kobj;
     int idx;
     spin_unlock(&cdev_lock);
     kobj = kobj_lookup(cdev_map, inode->i_rdev, &idx);
@@ -184,9 +184,9 @@ def_chr_fops。
     return -ENXIO;
     new = container_of(kobj, struct cdev, kobj);
     spin_lock(&cdev_lock);
-    /\* Check i_cdev again in case somebody beat us to it while
+    /* Check i_cdev again in case somebody beat us to it while
     we dropped the lock.
-   \*/
+   */
     p = inode->i_cdev;
     if (!p) {
     inode->i_cdev = p = new;
@@ -261,12 +261,12 @@ file_operations结构体
    :linenos:
 
    struct file_operations {
-   loff_t (*llseek) (struct file \*, loff_t, int);
-   ssize_t (*read) (struct file \*, char \__user \*, size_t, loff_t \*);
-   ssize_t (*write) (struct file \*, const char \__user \*, size_t, loff_t \*);
-   long (*unlocked_ioctl) (struct file \*, unsigned int, unsigned long);
-   int (*open) (struct inode \*, struct file \*)
-   int (*release) (struct inode \*, struct file \*);
+   loff_t (*llseek) (struct file *, loff_t, int);
+   ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
+   ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+   long (*unlocked_ioctl) (struct file *, unsigned int, unsigned long);
+   int (*open) (struct inode *, struct file *)
+   int (*release) (struct inode *, struct file *);
    };
 
 -  llseek：用于修改文件的当前读写位置，并返回偏移后的位置。参数file传入了对应的文
@@ -277,7 +277,7 @@ file_operations结构体
 
 -  read：用于读取设备中的数据，并返回成功读取的字节数。该函数指针被
    设置为NULL时，会导致系统调用read函数报错，提示"非法参数"。该函数有三个参数：file类型指针变量，char
-  \__user*类型的数据缓冲区，__user用于修饰变量，表明该变量所在的地址空间是用户空间的。内核模块不能直接使用该数
+  __user*类型的数据缓冲区，__user用于修饰变量，表明该变量所在的地址空间是用户空间的。内核模块不能直接使用该数
   据，需要使用copy_to_user函数来进行操作。size_t类型变量指定读取的数据大小。
 
 -  write：用于向设备写入数据，并返回成功写入的字节数，write函数的参数用法与read函数类似，不过在访问__user修饰的数
@@ -299,10 +299,10 @@ file_operations结构体
    :caption: copy_to_user和copy_from_user函数（位于内核源码/include/asm-generic/uaccess.h文件）
    :linenos:
 
-   static inline long copy_from_user(void \*to,
-   const void \__user \* from, unsigned long n)
-   static inline long copy_to_user(void \__user \*to,
-   const void \*from, unsigned long n)
+   static inline long copy_from_user(void *to,
+   const void __user * from, unsigned long n)
+   static inline long copy_to_user(void __user *to,
+   const void *from, unsigned long n)
 
 -  to：指定目标地址，也就是数据存放的地址，
 
@@ -323,9 +323,9 @@ file结构体
    :linenos:
 
    struct file {
-   const struct file_operations \*f_op;
-   /\* needed for tty driver, and maybe others \*/
-   void \*private_data;
+   const struct file_operations *f_op;
+   /* needed for tty driver, and maybe others */
+   void *private_data;
    };
 
 -  f_op：存放与文件操作相关的一系列函数指针，如open、read、wirte等函数。
@@ -352,8 +352,8 @@ cdev结构体
 
    struct cdev {
    struct kobject kobj;
-   struct module \*owner;
-   const struct file_operations \*ops;
+   struct module *owner;
+   const struct file_operations *ops;
    struct list_head list;
    dev_t dev;
    unsigned int count;
@@ -395,7 +395,7 @@ Linux内核提供了两种方式来定义字符设备，如下所示。
    //第一种方式
    static struct cdev chrdev;
    //第二种方式
-   struct cdev \*cdev_alloc(void);
+   struct cdev *cdev_alloc(void);
 
 第一种方式，就是我们常见的变量定义；第二种方式，是内核提供的动态分配方式，调用该函数之
 后，会返回一个struct cdev类型的指针，用于描述字符设备。
@@ -407,7 +407,7 @@ Linux内核提供了两种方式来定义字符设备，如下所示。
    :caption: cdev_del函数
    :linenos:
 
-   void cdev_del(struct cdev \*p)
+   void cdev_del(struct cdev *p)
 
 该函数需要将我们的字符设备结构体的地址作为实参传递进去，就可以从内核中移除该字符设备了。
 
@@ -463,7 +463,7 @@ register_chrdev_region函数用于静态地为一个字符设备申请一个或�
    :caption: register_chrdev_region函数原型
    :linenos:
 
-   int register_chrdev_region(dev_t from, unsigned count, const char \*name)
+   int register_chrdev_region(dev_t from, unsigned count, const char *name)
 
 参数说明：
 
@@ -505,7 +505,7 @@ alloc_chrdev_region函数
    :caption: alloc_chrdev_region函数原型
    :linenos:
 
-   int alloc_chrdev_region(dev_t \*dev, unsigned baseminor, unsigned count, const char \*name)
+   int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count, const char *name)
 
 参数说明如下：
 
@@ -545,10 +545,10 @@ register_chrdev函数
    :caption: register_chrdev函数原型（位于内核源码/include/linux/fs.h文件）
    :linenos:
 
-   static inline int register_chrdev(unsigned int major, const char \*name,
-   const struct file_operations \*fops)
+   static inline int register_chrdev(unsigned int major, const char *name,
+   const struct file_operations *fops)
    {
-   return \__register_chrdev(major, 0, 256, name, fops);
+   return __register_chrdev(major, 0, 256, name, fops);
    }
 
 参数说明：
@@ -573,9 +573,9 @@ unregister_chrdev函数
    :caption: unregister_chrdev函数（位于内核源码/include/linux/fs.h文件）
    :linenos:
 
-   static inline void unregister_chrdev(unsigned int major, const char \*name)
+   static inline void unregister_chrdev(unsigned int major, const char *name)
    {
-   \__unregister_chrdev(major, 0, 256, name);
+   __unregister_chrdev(major, 0, 256, name);
    }
 
 -  major：指定需要释放的字符设备的主设备号，一般使用register_chrdev函数的返回值作为实参。
@@ -594,7 +594,7 @@ unregister_chrdev函数
    :caption: cdev_init函数（位于内核源码/fs/char_dev.c）
    :linenos:
 
-   void cdev_init(struct cdev \*cdev, const struct file_operations \*fops)
+   void cdev_init(struct cdev *cdev, const struct file_operations *fops)
 
 -  cdev：struct cdev类型的指针变量，指向需要关联的字符设备结构体；
 
@@ -611,7 +611,7 @@ cdev_add函数用于向内核的cdev_map散列表添加一个新的字符设备�
    :caption: cdev_add函数（位于内核源码/fs/char_dev.c文件）
    :linenos:
 
-   int cdev_add(struct cdev \*p, dev_t dev, unsigned count)
+   int cdev_add(struct cdev *p, dev_t dev, unsigned count)
 
 -  p：struct cdev类型的指针，用于指定需要添加的字符设备；
 
@@ -646,7 +646,7 @@ cdev_add函数用于向内核的cdev_map散列表添加一个新的字符设备�
    static dev_t devno;
    //定义字符设备结构体chr_dev
    static struct cdev chr_dev;
-   static int \__init chrdev_init(void)
+   static int __init chrdev_init(void)
    {
     int ret = 0;
     printk("chrdev init\n");
@@ -695,7 +695,7 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
    :caption: 内核模块卸载函数（位于文件chrdev.c）
    :linenos:
 
-   static void \__exit chrdev_exit(void)
+   static void __exit chrdev_exit(void)
    {
    printk("chrdev exit\n");
    unregister_chrdev_region(devno, DEV_CNT);
@@ -734,12 +734,12 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
    :caption: chr_dev_open函数与chr_dev_release函数（位于文件chrdev.c）
    :linenos:
 
-   static int chr_dev_open(struct inode \*inode, struct file \*filp)
+   static int chr_dev_open(struct inode *inode, struct file *filp)
    {
    printk("\nopen\n");
    return 0;
    }
-   static int chr_dev_release(struct inode \*inode, struct file \*filp)
+   static int chr_dev_release(struct inode *inode, struct file *filp)
    {
    printk("\nrelease\n");
     return 0;
@@ -753,9 +753,9 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
    :caption: chr_dev_write函数（位于文件chrdev.c）
    :linenos:
 
-   static ssize_t chr_dev_write(struct file \*filp, const char \__user \* buf, size_t count, loff_t \*ppos)
+   static ssize_t chr_dev_write(struct file *filp, const char __user * buf, size_t count, loff_t *ppos)
    {
-   unsigned long p = \*ppos;
+   unsigned long p = *ppos;
    int ret;
    int tmp = count ;
    if (p > BUFF_SIZE)
@@ -763,7 +763,7 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
    if (tmp > BUFF_SIZE - p)
    tmp = BUFF_SIZE - p;
     ret = copy_from_user(vbuf, buf, tmp);
-    \*ppos += tmp;
+    *ppos += tmp;
     return tmp;
     }
 
@@ -777,9 +777,9 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
    :caption: chr_dev_read函数（位于文件chrdev.c）
    :linenos:
 
-   static ssize_t chr_dev_read(struct file \*filp, char \__user \* buf, size_t count, loff_t \*ppos)
+   static ssize_t chr_dev_read(struct file *filp, char __user * buf, size_t count, loff_t *ppos)
    {
-   unsigned long p = \*ppos;
+   unsigned long p = *ppos;
    int ret;
    int tmp = count ;
    if (p >= BUFF_SIZE)
@@ -787,7 +787,7 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
     if (tmp > BUFF_SIZE - p)
     tmp = BUFF_SIZE - p;
     ret = copy_to_user(buf, vbuf+p, tmp);
-    \*ppos +=tmp;
+    *ppos +=tmp;
     return tmp;
     }
 
@@ -848,7 +848,7 @@ mknod /dev/chrdev c 248 0
    #include <unistd.h>
    #include <fcntl.h>
    #include <string.h>
-   char \*wbuf = "Hello World\n";
+   char *wbuf = "Hello World\n";
    char rbuf[128];
    int main(void)
    {
@@ -939,7 +939,7 @@ rm /dev/chrdev
    :caption: chr_dev_open函数修改（位于文件chrdev.c）
    :linenos:
 
-   static int chr_dev_open(struct inode \*inode, struct file \*filp)
+   static int chr_dev_open(struct inode *inode, struct file *filp)
    {
    printk("\nopen\n ");
    switch (MINOR(inode->i_rdev)) {
@@ -967,18 +967,18 @@ vbuf2的数据，这样就实现了同一个设备驱动，管理多个设备了
    :caption: chr_dev_write函数（位于文件chrdev.c）
    :linenos:
 
-   static ssize_t chr_dev_write(struct file \*filp, const char \__user \* buf, size_t count, loff_t \*ppos)
+   static ssize_t chr_dev_write(struct file *filp, const char __user * buf, size_t count, loff_t *ppos)
    {
-   unsigned long p = \*ppos;
+   unsigned long p = *ppos;
    int ret;
-   char \*vbuf = filp->private_data;
+   char *vbuf = filp->private_data;
    int tmp = count ;
    if (p > BUFF_SIZE)
    return 0;
    if (tmp > BUFF_SIZE - p)
     tmp = BUFF_SIZE - p;
     ret = copy_from_user(vbuf, buf, tmp);
-    \*ppos += tmp;
+    *ppos += tmp;
     return tmp;
     }
 
@@ -992,18 +992,18 @@ vbuf2的数据，这样就实现了同一个设备驱动，管理多个设备了
    :caption: chr_dev_read函数（位于文件chrdev.c）
    :linenos:
 
-   static ssize_t chr_dev_read(struct file \*filp, char \__user \* buf, size_t count, loff_t \*ppos)
+   static ssize_t chr_dev_read(struct file *filp, char __user * buf, size_t count, loff_t *ppos)
    {
-   unsigned long p = \*ppos;
+   unsigned long p = *ppos;
    int ret;
    int tmp = count ;
-   char \*vbuf = filp->private_data;
+   char *vbuf = filp->private_data;
    if (p >= BUFF_SIZE)
    return 0;
    if (tmp > BUFF_SIZE - p)
     tmp = BUFF_SIZE - p;
     ret = copy_to_user(buf, vbuf+p, tmp);
-    \*ppos +=tmp;
+    *ppos +=tmp;
     return tmp;
     }
 
@@ -1068,7 +1068,7 @@ cat /dev/chrdev2
    :caption: chrdev_init函数（文件main.c）
    :linenos:
 
-   static int \__init chrdev_init(void)
+   static int __init chrdev_init(void)
    {
    int ret;
    printk("4 chrdev init\n");
@@ -1109,7 +1109,7 @@ chrdev_init函数的框架仍然没有什么变化。只不过，在添加字符
    :caption: chrdev_exit函数（文件main.c）
    :linenos:
 
-   static void \__exit chrdev_exit(void)
+   static void __exit chrdev_exit(void)
    {
    printk("chrdev exit\n");
    unregister_chrdev_region(devno, DEV_CNT);
@@ -1125,13 +1125,13 @@ chrdev_exit函数注销了申请到的设备号，使用cdev_del移动两个虚�
    :caption: chr_dev_open以及chr_dev_release函数（文件main.c）
    :linenos:
 
-   static int chr_dev_open(struct inode \*inode, struct file \*filp)
+   static int chr_dev_open(struct inode *inode, struct file *filp)
    {
    printk("open\n");
    filp->private_data = container_of(inode->i_cdev, struct chr_dev, dev);
    return 0;
    }
-   static int chr_dev_release(struct inode \*inode, struct file \*filp)
+   static int chr_dev_release(struct inode *inode, struct file *filp)
    {
     printk("release\n");
     return 0;
@@ -1153,20 +1153,20 @@ chrdev_exit函数注销了申请到的设备号，使用cdev_del移动两个虚�
    :caption: chr_dev_write函数（文件main.c）
    :linenos:
 
-   static ssize_t chr_dev_write(struct file \*filp, const char \__user \* buf, size_t count, loff_t \*ppos)
+   static ssize_t chr_dev_write(struct file *filp, const char __user * buf, size_t count, loff_t *ppos)
    {
-   unsigned long p = \*ppos;
+   unsigned long p = *ppos;
    int ret;
    //获取文件的私有数据
-   struct chr_dev \*dev = filp->private_data;
-   char \*vbuf = dev->vbuf;
+   struct chr_dev *dev = filp->private_data;
+   char *vbuf = dev->vbuf;
    int tmp = count ;
     if (p > BUFF_SIZE)
     return 0;
     if (tmp > BUFF_SIZE - p)
     tmp = BUFF_SIZE - p;
     ret = copy_from_user(vbuf, buf, tmp);
-    \*ppos += tmp;
+    *ppos += tmp;
     return tmp;
     }
 
@@ -1180,20 +1180,20 @@ chrdev_exit函数注销了申请到的设备号，使用cdev_del移动两个虚�
    :caption: chr_dev_read函数（文件main.c）
    :linenos:
 
-   static ssize_t chr_dev_read(struct file \*filp, char \__user \* buf, size_t count, loff_t \*ppos)
+   static ssize_t chr_dev_read(struct file *filp, char __user * buf, size_t count, loff_t *ppos)
    {
-   unsigned long p = \*ppos;
+   unsigned long p = *ppos;
    int ret;
    int tmp = count ;
    //获取文件的私有数据
-   struct chr_dev \*dev = filp->private_data;
-   char \*vbuf = dev->vbuf;
+   struct chr_dev *dev = filp->private_data;
+   char *vbuf = dev->vbuf;
    if (p >= BUFF_SIZE)
     return 0;
     if (tmp > BUFF_SIZE - p)
     tmp = BUFF_SIZE - p;
     ret = copy_to_user(buf, vbuf+p, tmp);
-    \*ppos +=tmp;
+    *ppos +=tmp;
     return tmp;
     }
 

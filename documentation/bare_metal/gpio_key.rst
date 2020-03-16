@@ -135,7 +135,7 @@ makefile文件主要是修改文件名，将"led"修改为button，其他内容�
    
     .PHONY: clean
     clean:
-    rm \*.o \*.elf \*.bin
+    rm *.o *.elf *.bin
 
 
 为简化难度暂时这样修改，后面章节将会介绍更简单易用的修改方式。

@@ -119,36 +119,36 @@ modprobe 同样用于加载内核模块，与insmod不同，modprobe会根据dep
    :caption: init.h文件（位于内核源码 /include/linux）
    :linenos:
 
-   /\* These are for everybody (although not all archs will actually
-   discard it in modules) \*/
-   #define \__init \__section(.init.text) \__cold notrace
-   #define \__initdata \__section(.init.data)
-   #define \__initconst \__constsection(.init.rodata)
-   #define \__exitdata \__section(.exit.data)
-   #define \__exit_call \__used \__section(.exitcall.exit)
-   /*\*
-   \* module_init() - driver initialization entry point
-    \* @x: function to be run at kernel boot time or module insertion
-    \*
-    \* module_init() will either be called during do_initcalls() (if
-    \* builtin) or at module insertion time (if a module).
+   /* These are for everybody (although not all archs will actually
+   discard it in modules) */
+   #define __init __section(.init.text) __cold notrace
+   #define __initdata __section(.init.data)
+   #define __initconst __constsection(.init.rodata)
+   #define __exitdata __section(.exit.data)
+   #define __exit_call __used __section(.exitcall.exit)
+   /**
+   * module_init() - driver initialization entry point
+    * @x: function to be run at kernel boot time or module insertion
+    *
+    * module_init() will either be called during do_initcalls() (if
+    * builtin) or at module insertion time (if a module).
     There can only
-    \* be one per module.
-    \*/
-    #define module_init(x) \__initcall(x);
+    * be one per module.
+    */
+    #define module_init(x) __initcall(x);
    
-    /*\*
-    \* module_exit() - driver exit entry point
-    \* @x: function to be run when driver is removed
-    \*
-    \* module_exit() will wrap the driver clean-up code
-    \* with cleanup_module() when used with rmmod when
-    \* the driver is a module.
+    /**
+    * module_exit() - driver exit entry point
+    * @x: function to be run when driver is removed
+    *
+    * module_exit() will wrap the driver clean-up code
+    * with cleanup_module() when used with rmmod when
+    * the driver is a module.
     the driver is statically
-    \* compiled into the kernel, module_exit() has no effect.
-    \* There can only be one per module.
-    \*/
-    #define module_exit(x) \__exitcall(x);
+    * compiled into the kernel, module_exit() has no effect.
+    * There can only be one per module.
+    */
+    #define module_exit(x) __exitcall(x);
 
 Init.h头文件主要包含了内核模块的加载、卸载函数的声明，还有一些宏定义，因此，只要我们涉及内核模块的编程，就需要加上该头文件。
 
@@ -156,17 +156,17 @@ Init.h头文件主要包含了内核模块的加载、卸载函数的声明，�
    :caption: module.h（位于内核源码/include/linux）
    :linenos:
 
-   /\* Generic info of form tag = "info" \*/
-   #define MODULE_INFO(tag, info) \__MODULE_INFO(tag, tag, info)
-   /\* For userspace: you can also call me...
-   \*/
-   #define MODULE_ALIAS(_alias) MODULE_INFO(alias, \_alias)
-   #define MODULE_LICENSE(_license) MODULE_INFO(license, \_license)
-   /\*
-    \* Author(s), use "Name <email>" or just "Name", for multiple
-    \* authors use multiple MODULE_AUTHOR() statements/lines.
-    \*/
-    #define MODULE_AUTHOR(_author) MODULE_INFO(author, \_author)
+   /* Generic info of form tag = "info" */
+   #define MODULE_INFO(tag, info) __MODULE_INFO(tag, tag, info)
+   /* For userspace: you can also call me...
+   */
+   #define MODULE_ALIAS(_alias) MODULE_INFO(alias, _alias)
+   #define MODULE_LICENSE(_license) MODULE_INFO(license, _license)
+   /*
+    * Author(s), use "Name <email>" or just "Name", for multiple
+    * authors use multiple MODULE_AUTHOR() statements/lines.
+    */
+    #define MODULE_AUTHOR(_author) MODULE_INFO(author, _author)
 
 以上代码中，列举了module.h文件中的部分宏定义，这部分宏定义，有的是可有可无
 的，但是MODULE_LICENSE这个是指定该内核模块的许可证，是必须要有的。
@@ -185,7 +185,7 @@ Init.h头文件主要包含了内核模块的加载、卸载函数的声明，�
    :caption: 内核模块卸载函数
    :linenos:
 
-   static int \__init func_init(void)
+   static int __init func_init(void)
    {
    }
    module_init(func_init);
@@ -206,17 +206,17 @@ Init.h头文件主要包含了内核模块的加载、卸载函数的声明，�
 报错，导致编译失败，因此我们给内核模块的代码加上static修饰符的话，那么就可以避免这种错误。
 
 .. code-block:: c
-   :caption: \__init、__initdata宏定义（位于内核源码/linux/init.h）
+   :caption: __init、__initdata宏定义（位于内核源码/linux/init.h）
    :linenos:
 
-   #define \__init \__section(.init.text) \__cold notrace
-   #define \__initdata \__section(.init.data)
+   #define __init __section(.init.text) __cold notrace
+   #define __initdata __section(.init.data)
 
 Linux内核的栈资源十分有限，可能只有一个4096字节大小的页，我们编写的函数与Linux内核
 共享同一个栈资源。可想而知，如果在我们的模块程序中定义了一个大的局部数组变量，那么有
 可能大致导致堆栈溢出，因此，如果需要很大的空间的变量，应该使用动态分配。
 
-以上代码 \__init、__initdata宏定义（位于内核源码/linux/init.h）中的__init用于修
+以上代码 __init、__initdata宏定义（位于内核源码/linux/init.h）中的__init用于修
 饰函数，__initdata用于修饰变量。带有__init的修饰符，表示将该函数放到可执行文件的__init节
 区中，该节区的内容只能用于模块的初始化阶段，初始化阶段执行完毕之
 后，这部分的内容就会被释放掉，真可谓是"针尖也要削点铁"。
@@ -225,7 +225,7 @@ Linux内核的栈资源十分有限，可能只有一个4096字节大小的页�
    :caption: module_init宏定义
    :linenos:
 
-   #define module_init(x) \__initcall(x);
+   #define module_init(x) __initcall(x);
 
 宏定义module_init用于通知内核初始化模块的时候，要使用哪个函数进行初
 始化。它会将函数地址加入到相应的节区section中，这样的话，开机的时候就可以自动加载模块了。
@@ -241,7 +241,7 @@ Linux内核的栈资源十分有限，可能只有一个4096字节大小的页�
    :caption: 内核模块卸载函数
    :linenos:
 
-   static void \__exit func_exit(void)
+   static void __exit func_exit(void)
    {
    }
    module_exit(func_exit);
@@ -251,11 +251,11 @@ Linux内核的栈资源十分有限，可能只有一个4096字节大小的页�
 段之后，就会自动释放该区域的空间。
 
 .. code-block:: c
-   :caption: \__exit、__exitdata宏定义
+   :caption: __exit、__exitdata宏定义
    :linenos:
 
-   #define \__exit \__section(.exit.text) \__exitused \__cold notrace
-   #define \__exitdata \__section(.exit.data)
+   #define __exit __section(.exit.text) __exitused __cold notrace
+   #define __exitdata __section(.exit.data)
 
 类比于模块加载函数，__exit用于修饰函数，__exitdata用于修饰变量。宏定义module_exit用于
 告诉内核，当卸载模块时，需要调用哪个函数。
@@ -341,7 +341,7 @@ debug_on=1"来输出调试信息。参数perm表示的是该文件的权限，�
    :linenos:
 
    #define EXPORT_SYMBOL(sym) \\
-   \__EXPORT_SYMBOL(sym, "")
+   __EXPORT_SYMBOL(sym, "")
 
 EXPORT_SYMBOL宏用于向内核导出符号，这样的话，其他模块也可以使用我们导
 出的符号了。下面通过一段代码，介绍如何使用某个模块导出符号。
@@ -392,7 +392,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
    :caption: 许可证
    :linenos:
 
-   #define MODULE_LICENSE(_license) MODULE_INFO(license, \_license)
+   #define MODULE_LICENSE(_license) MODULE_INFO(license, _license)
 
 .. image:: media/module007.jpg
    :align: center
@@ -415,7 +415,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
    :caption: 内核模块作者宏定义（位于内核源码/linux/module.h）
    :linenos:
 
-   #define MODULE_AUTHOR(_author) MODULE_INFO(author, \_author)
+   #define MODULE_AUTHOR(_author) MODULE_INFO(author, _author)
 
 我们前面使用modinfo中打印出的模块信息中"author"信息便是来自于
 宏定义MODULE_AUTHOR。该宏定义用于声明该模块的作者。
@@ -427,7 +427,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
    :caption: 模块描述信息（位于内核源码/linux/module.h）
    :linenos:
 
-   #define MODULE_DESCRIPTION(_description) MODULE_INFO(description, \_description)
+   #define MODULE_DESCRIPTION(_description) MODULE_INFO(description, _description)
 
 模块信息中"description"信息则来自宏MODULE_DESCRIPTION，该宏用于描述该模块的功能作用。
 
@@ -438,7 +438,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
    :caption: 内核模块别名宏定义（位于内核源码/linux/module.h）
    :linenos:
 
-   #define MODULE_ALIAS(_alias) MODULE_INFO(alias, \_alias)
+   #define MODULE_ALIAS(_alias) MODULE_INFO(alias, _alias)
 
 模块信息中"alias"信息来自于宏定义MODULE_ALIAS。该宏定义用于给内核
 模块起别名。注意，在使用该模块的别名时，需要将该模块复制到/lib/modules/内核
@@ -463,7 +463,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
    bool debug_on = 0;
    module_param(debug_on, bool, S_IRWXU);
    
-    static int \__init hello_init(void)
+    static int __init hello_init(void)
     {
     if (debug)
     printk("[ DEBUG ] debug info output\n");
@@ -473,7 +473,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
     module_init(hello_init);
    
    
-    static void \__exit hello_exit(void)
+    static void __exit hello_exit(void)
     {
     printk("Hello World Module Exit\n");
     }

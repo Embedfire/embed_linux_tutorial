@@ -647,12 +647,12 @@ CCM_ANALOG_PLL_VIDEO_DENOM [POST_DIV_SELECT]寄存器值 CCM_ANALOG_MISC2[VIDEO_
 出前的最后一次分频的分频系数。方便书写这里记为
 
 PLL5的输出频率计算公
-式为 PLL5 = OSC24M \* (DIV_SELECT + (denominator / numerator)) / postDivider。
+式为 PLL5 = OSC24M * (DIV_SELECT + (denominator / numerator)) / postDivider。
 
 第一部分代码从上到下依次
 设置numerator = 0、numerator = 0、CCM_ANALOG_PLL_VIDEO_DENOM [POST_DIV_SELECT] = 2、
 CCM_ANALOG_MISC2[VIDEO_DIV] = 3、DIV_SELECT = 0x1F
-，最终得到的PLL5输出频率为PLL5 = 24 \* (0x1F + 0) / 8 = 93MHz。
+，最终得到的PLL5输出频率为PLL5 = 24 * (0x1F + 0) / 8 = 93MHz。
 
 -  第二部分，设置从PLL5输出到elcdf根时钟所经过的时钟选择寄存器和时钟分频寄存器，时钟选择与时钟分频如下图所示。
 

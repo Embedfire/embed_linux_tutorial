@@ -409,7 +409,7 @@ DDR测试不用我们手动编写测试程序，NXP官方提供了完备的测�
 
 -  Memory type：DDR类型，这里只能通过下拉框选择，根据你使用的DDR芯片选择即可，我们选择DDR3-1600。
 
--  DRAM density (Gb)：芯片容量，单位是Gb，我们的DDR容量是512M字节 \* 8 = 4Gb。容量根据实际容量选择即可。
+-  DRAM density (Gb)：芯片容量，单位是Gb，我们的DDR容量是512M字节 * 8 = 4Gb。容量根据实际容量选择即可。
 
 -  DRAM Bus Width：数据宽度，16位。
 

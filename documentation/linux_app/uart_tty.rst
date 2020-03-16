@@ -101,7 +101,7 @@ Teletype是最早出现的一种终端设备，类似于电传打字机，tty是
    :linenos:
 
    #查看/dev目录下的"tty"名字开头的设备，"*"表示匹配任意字符
-   ls /dev/tty\*
+   ls /dev/tty*
 
 .. image:: media/uarttt006.png
    :align: center
@@ -463,11 +463,11 @@ pio的direction文件，而终端设备却没有其它的属性文件，那
    // const char default_path[] = "/dev/ttymxc2";
    
    
-   int main(int argc, char \*argv[])
+   int main(int argc, char *argv[])
    {
    int fd;
    int res;
-   char \*path;
+   char *path;
    char buf[1024] = "Embedfire tty send test.\n";
    
    /第二部分代码/
@@ -476,7 +476,7 @@ pio的direction文件，而终端设备却没有其它的属性文件，那
    if (argc > 1)
    path = argv[1];
    else
-   path = (char \*)default_path;
+   path = (char *)default_path;
    
    //获取串口设备描述符
    printf("This is tty/usart demo.\n");
@@ -561,14 +561,14 @@ termios结构体
    :linenos:  
 
    struct termios {
-   tcflag_t c_iflag; /\* input mode flags \*/
-   tcflag_t c_oflag; /\* output mode flags \*/
-   tcflag_t c_cflag; /\* control mode flags \*/
-   tcflag_t c_lflag; /\* local mode flags \*/
-   cc_t c_line; /\* line discipline \*/
-   cc_t c_cc[NCCS]; /\* control characters \*/
-   speed_t c_ispeed; /\* input speed \*/
-   speed_t c_ospeed; /\* output speed \*/
+   tcflag_t c_iflag; /* input mode flags */
+   tcflag_t c_oflag; /* output mode flags */
+   tcflag_t c_cflag; /* control mode flags */
+   tcflag_t c_lflag; /* local mode flags */
+   cc_t c_line; /* line discipline */
+   cc_t c_cc[NCCS]; /* control characters */
+   speed_t c_ispeed; /* input speed */
+   speed_t c_ospeed; /* output speed */
     #define \_HAVE_STRUCT_TERMIOS_C_ISPEED 1
     #define \_HAVE_STRUCT_TERMIOS_C_OSPEED 1
     };
@@ -700,9 +700,9 @@ VTIM         设置非标准模式读取时的延时值，单位为十分之一�
    
    #include <unistd.h>
    
-   int tcgetattr(int fd, struct termios \*termios_p);
+   int tcgetattr(int fd, struct termios *termios_p);
    
-   int tcsetattr(int fd, int optional_actions, const struct termios \*termios_p);
+   int tcsetattr(int fd, int optional_actions, const struct termios *termios_p);
 
 -  形参fd：指定串口设备文件的文件描述符。
 
@@ -726,11 +726,11 @@ VTIM         设置非标准模式读取时的延时值，单位为十分之一�
 .. code-block:: sh
    :linenos:
 
-   int cfsetispeed(struct termios \*termios_p, speed_t speed);
+   int cfsetispeed(struct termios *termios_p, speed_t speed);
    
-   int cfsetospeed(struct termios \*termios_p, speed_t speed);
+   int cfsetospeed(struct termios *termios_p, speed_t speed);
    
-   int cfsetspeed(struct termios \*termios_p, speed_t speed);
+   int cfsetspeed(struct termios *termios_p, speed_t speed);
 
 使用这些函数要注意两点：
 
@@ -763,7 +763,7 @@ c_cflag中的标志位CSTOPB，用于设置串口通信停止位的长度。若�
    // 获取串口参数opt
     tcgetattr(fd, &opt);
    
-    /\* 设置停止位*/
+    /* 设置停止位*/
     switch (stopbits)
     {
     //设置停止位为1位
@@ -806,10 +806,10 @@ c_cflag中的标志位CSTOPB，用于设置串口通信停止位的长度。若�
 
    //bits/termios.h的位定义
    //注意以0开头的数字在是C语言的8进制数字形式
-   /\* c_cflag bit meaning \*/
+   /* c_cflag bit meaning */
    #define PARENB 0000400
    #define PARODD 0001000
-   /\* c_iflag bits \*/
+   /* c_iflag bits */
    #define INPCK 0000020
    //
     //定义termios型变量opt
@@ -821,20 +821,20 @@ c_cflag中的标志位CSTOPB，用于设置串口通信停止位的长度。若�
     {
     case 'n':
     case 'N':
-    options.c_cflag &= ~PARENB; /\* 不使用奇偶校验 \*/
-    options.c_iflag &= ~INPCK; /\* 禁止输入奇偶检测 \*/
+    options.c_cflag &= ~PARENB; /* 不使用奇偶校验 */
+    options.c_iflag &= ~INPCK; /* 禁止输入奇偶检测 */
     break;
     case 'o':
     case 'O':
-    options.c_cflag \|= PARENB; /\* 启用奇偶效验 \*/
-    options.c_iflag \|= INPCK; /\* 启用输入奇偶检测 \*/
-    options.c_cflag \|= PARODD ; /\* 设置为奇效验 \*/
+    options.c_cflag \|= PARENB; /* 启用奇偶效验 */
+    options.c_iflag \|= INPCK; /* 启用输入奇偶检测 */
+    options.c_cflag \|= PARODD ; /* 设置为奇效验 */
     break;
     case 'e':
     case 'E':
-    options.c_cflag \|= PARENB; /\* 启用奇偶效验 \*/
-    options.c_iflag \|= INPCK; /\* 启用输入奇偶检测 \*/
-    options.c_cflag &= ~PARODD; /\* 设置为偶效验*/
+    options.c_cflag \|= PARENB; /* 启用奇偶效验 */
+    options.c_iflag \|= INPCK; /* 启用输入奇偶检测 */
+    options.c_cflag &= ~PARODD; /* 设置为偶效验*/
     break;
     }
    
@@ -916,7 +916,7 @@ x86架构
    #默认编译x86平台的程序
    make
    #查看可用的tty设备文件
-   ls /dev/tty\*
+   ls /dev/tty*
    #请根据自己主机上的输出修改设备文件参数
    #程序需要使用sudo运行
    sudo ./build_x86/tty_demo /dev/ttyUSB0
@@ -1200,7 +1200,7 @@ x86架构
    #默认编译x86平台的程序
    make
    #查看可用的tty设备文件
-   ls /dev/tty\*
+   ls /dev/tty*
    #请根据自己主机上的输出修改设备文件参数
    #可以使用stty命令查看当前设备参数
    sudo stty -F /dev/ttyUSB0

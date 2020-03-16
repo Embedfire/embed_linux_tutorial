@@ -227,7 +227,7 @@ make targetd 、make targetb、make targetc命令：
    
     #clean目标，用来删除编译生成的文件
     clean:
-    rm -f \*.o hello_main
+    rm -f *.o hello_main
 
 该文件定义了默认目标hello_main用于编译程序，clean目标用于删除
 编译生成的文件。特别地，其中hello_main目标名与gcc编译生成的文件名"gcc -o
@@ -371,7 +371,7 @@ targeta的时候，它都会去执行targeta的命令，期待执行后能得到
    #clean伪目标，用来删除编译生成的文件
    .PHONY:clean
    clean:
-   rm -f \*.o hello_main
+   rm -f *.o hello_main
 
 GNU组织发布的软件工程代码的Makefile，常常会有类似以上代码中定义的clean伪目标，用于清
 除编译的输出文件。常见
@@ -520,7 +520,7 @@ FILEB。
    #伪目标
    .PHONY: clean
    clean:
-   rm -f \*.o hello_main
+   rm -f *.o hello_main
 
 -  代码的1~4行：分别定义了CC、CFLAGS、DEPS变量，变量的值就是等号右
    侧的内容，定义好的变量可通过"$(变量名)"的形式引用，如后面
@@ -579,7 +579,7 @@ FILEB。
    #伪目标
    .PHONY: clean
    clean:
-   rm -f \*.o hello_main
+   rm -f *.o hello_main
 
 这部分说明如下：
 
@@ -666,7 +666,7 @@ $?   所有比目标要新的依赖目标
    #伪目标
    .PHONY: clean
    clean:
-   rm -f \*.o hello_main
+   rm -f *.o hello_main
 
 Makefile主要是增加了ARCH变量用于选择目标平台，第4行代
 码中使用"?="给ARCH赋予默认值x86，然后在代码11~18行增加了根据ARCH
@@ -754,7 +754,7 @@ wildcard函数用于获取文件列表，并使用空格分隔开。它的格式
 
 $(wildcard 匹配规则)
 
-例如函数调用"$(wildcard \*.c)"，函数执行后会把当前目录的所
+例如函数调用"$(wildcard *.c)"，函数执行后会把当前目录的所
 有c文件列出。假设我们在上图中的Makefile目录下执行该函数，使用范例如下：
 
 .. code-block:: sh
