@@ -193,7 +193,7 @@ IOMUXC_SW_MUX_CTL_PAD_XXXX引脚模式寄存器
 可以看到，该寄存器主要有两个配置域，分别是SION和MUX_MODE，其中SION用于设置引脚在输出模式下同时开启输入通道。重点是MUX_MODE的配置，它使用4个寄存器位表示可选的ALT0~ALT7这8个模式，如ALT2模式就是用于usb外设的USB_OTG1_PWR信号；若配置为ALT5则引脚会
 用作普通的GPIO功能，用于输出高、低电平。 这也是本章所需要的。
 
-IOMUXC_SW\_ PAD_CTL_PAD_XXXX引脚属性寄存器
+IOMUXC_SW_PAD_CTL_PAD_XXXX引脚属性寄存器
 
 
 类似地，以GPIO1_IO04引脚中PAD寄存器在参考手册中的描述如下。
@@ -471,7 +471,7 @@ B灯   CSI_VSYNC    CSI_VSYNC  GPIO4_IO19
 
 整个源码按照功能分成了十部分，集合代码各部分指令讲解如下:
 
--  第一部分，.text 定义代码段。.align 2 设置字节对齐。.global \_start 生命全局标号_start。
+-  第一部分，.text 定义代码段。.align 2 设置字节对齐。.global _start 生命全局标号_start。
 
 -  第二部分，_start: 定义标号_start: ，它位于汇编的最前面，说以会首先被执行。
 

@@ -53,7 +53,7 @@ POSIX 互斥锁
 
         pthread_mutex_t errchkmutex = PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP;
 
-pthread\_mutex\_t是互斥锁的结构体，其实就是定义一个互斥锁结构，并且将其赋值，代表不同的互斥锁。PTHREAD\_MUTEX\_INITIALIZER表示默认的互斥锁，即快速互斥锁；PTHREAD\_RECURSIVE\_MUTEX\_INITIALIZER\_NP则是递归互斥锁；PTHREAD\_ERRORCHECK\_MUTEX\_INITIALIZER\_NP则是检错互斥锁。
+pthread_mutex_t是互斥锁的结构体，其实就是定义一个互斥锁结构，并且将其赋值，代表不同的互斥锁。PTHREAD_MUTEX_INITIALIZER表示默认的互斥锁，即快速互斥锁；PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP则是递归互斥锁；PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP则是检错互斥锁。
 
 互斥锁可以分为快速互斥锁、递归互斥锁和检错互斥锁，这 3
 种锁的区别主要在于其他未占有互斥锁的线程在获取互斥锁时是否需要阻塞等待：（以下讨论的情况是假设线程1已经持有互斥锁）
@@ -62,13 +62,13 @@ pthread\_mutex\_t是互斥锁的结构体，其实就是定义一个互斥锁结
 -  递归互斥锁：线程2尝试获取互斥锁时，将无法获取成功，并且阻塞等待，而如果是线程1尝试获取互斥锁时，将获取成功，并且持有互斥锁的次数加1。
 -  检错互斥锁则为快速互斥锁的非阻塞版本，它会立即返回一个错误代码（线程不会阻塞）。
 
-互斥锁动态初始化可以调用pthread\_mutex\_init()函数，该函数原型如下：
+互斥锁动态初始化可以调用pthread_mutex_init()函数，该函数原型如下：
 
 .. code:: c
 
         int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr);
 
-pthread\_mutex\_init()函数是以动态方式初始化互斥锁的，mutex则是初始化互斥锁结构的指针，mutexattr是属性参数，它允许我们设置互斥锁的属性，而属性控制着互斥锁的行为，如果参数mutexattr为NULL，则使用默认的互斥锁属性，默认属性为快速互斥锁。
+pthread_mutex_init()函数是以动态方式初始化互斥锁的，mutex则是初始化互斥锁结构的指针，mutexattr是属性参数，它允许我们设置互斥锁的属性，而属性控制着互斥锁的行为，如果参数mutexattr为NULL，则使用默认的互斥锁属性，默认属性为快速互斥锁。
 
 获取互斥锁与释放互斥锁
 ----------------------
@@ -85,7 +85,7 @@ pthread\_mutex\_init()函数是以动态方式初始化互斥锁的，mutex则�
 
         int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
-通过pthread\_mutex\_lock()函数获得访问临界资源的权限，如果已经有其他线程锁住互斥锁，那么该函数会是线程阻塞指定该互斥锁解锁为止。pthread\_mutex\_trylock()是pthread\_mutex\_lock()函数的非阻塞版本，使用它不会阻塞当前线程，如果互斥锁已被占用，它会理解返回一个EBUSY错误。访问完共享资源后，一定要通过pthread\_mutex\_unlock()函数释放占用的互斥锁，这样子系统其他线程就有机会获取互斥锁，访问该资源。
+通过pthread_mutex_lock()函数获得访问临界资源的权限，如果已经有其他线程锁住互斥锁，那么该函数会是线程阻塞指定该互斥锁解锁为止。pthread_mutex_trylock()是pthread_mutex_lock()函数的非阻塞版本，使用它不会阻塞当前线程，如果互斥锁已被占用，它会理解返回一个EBUSY错误。访问完共享资源后，一定要通过pthread_mutex_unlock()函数释放占用的互斥锁，这样子系统其他线程就有机会获取互斥锁，访问该资源。
 
 简单说就是，互斥锁的使用流程应该是：
 
@@ -102,7 +102,7 @@ pthread\_mutex\_init()函数是以动态方式初始化互斥锁的，mutex则�
 
         int pthread_mutex_destroy(pthread_mutex_t *mutex);
 
-pthread\_mutex\_destroy()函数用于销毁一个互斥锁，当互斥锁不再使用时，可以用它来销毁，mutex参数指定了要销毁的互斥锁。
+pthread_mutex_destroy()函数用于销毁一个互斥锁，当互斥锁不再使用时，可以用它来销毁，mutex参数指定了要销毁的互斥锁。
 
 互斥锁实验
 ----------
@@ -187,7 +187,7 @@ pthread\_mutex\_destroy()函数用于销毁一个互斥锁，当互斥锁不再�
         return 0;
     }
 
-该代码在/embed\_Linux\_tutorial/base\_code/system\_programing/mutex/mutex.c路径下，我们直接make编译，然后运行，可以看到线程按照顺序执行了，那个线程获取到互斥锁，就能访问临界资源（假设临界资源是调用sleep()函数）。
+该代码在/embed_Linux_tutorial/base_code/system_programing/mutex/mutex.c路径下，我们直接make编译，然后运行，可以看到线程按照顺序执行了，那个线程获取到互斥锁，就能访问临界资源（假设临界资源是调用sleep()函数）。
 
 现象如下：
 

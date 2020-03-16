@@ -392,8 +392,8 @@ GCC 编译工具链在编译一个C源文件时需要经过以下 4 步：
    # 27 "/usr/include/x86_64-linux-gnu/bits/types.h" 3 4
    # 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
    # 28 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
-   typedef unsigned char \__u_char;
-   typedef unsigned short int \__u_short;
+   typedef unsigned char __u_char;
+   typedef unsigned short int __u_short;
 
    ...中间省略部分内容...
 

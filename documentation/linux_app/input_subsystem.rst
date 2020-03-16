@@ -91,9 +91,9 @@ evtest工具的原理并不神秘，学习本章节后也可以尝试自己
 
    struct input_event {
    struct timeval time;
-   \__u16 type;
-   \__u16 code;
-   \__s32 value;
+   __u16 type;
+   __u16 code;
+   __s32 value;
    };
 
 -  time：该变量用于记录事件产生的时间戳，既evtest输出的time值。

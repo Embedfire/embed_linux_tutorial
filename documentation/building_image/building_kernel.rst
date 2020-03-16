@@ -46,9 +46,9 @@ log查看仓库的日志信息，看看更改了什么地方。在\ ``ebf_6ull_l
     copy.sh   firmware       Kbuild   Makefile     README.md        sound
 
 .. figure:: media/building_kernel001.png
-   :alt: building\_kernel001
+   :alt: building_kernel001
 
-   building\_kernel001
+   building_kernel001
 
 
 从图中我们可以看到Linux内核源码目录下是有非常多的文件夹，且文件夹下也有非常多的文件，下面我们简单分析一下这些文件夹的主要作用。
@@ -223,7 +223,7 @@ vi 打开即可，在文件末尾增加编译器所在的路径：
 设置配置选项，使用野火开发板配置
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-首先进入imx-linux目录下，然后开始编译内核，运行\ ``make ARCH=arm imx6_v7_ebf_defconfig``\ 命令将imx6\_v7\_ebf\_defconfig配置文件的信息写入当前路径下的
+首先进入imx-linux目录下，然后开始编译内核，运行\ ``make ARCH=arm imx6_v7_ebf_defconfig``\ 命令将imx6_v7_ebf_defconfig配置文件的信息写入当前路径下的
 ``.config``\ 文件中，在linux中以\ ``"."``\ 开头的文件都是隐藏文件，我们可以使用ls
 –la命令查看这些文件。
 
@@ -251,22 +251,22 @@ Linux内核的配置系统由三个部分组成，分别是：
 
 -  配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配置用户界面（linux提供基于字符界面、
 基于Ncurses 图形界面以及基于 Xwindows 图形界面的用户配置界面，各自对应于make config、make menuconfig 和 make xconfig）。
-读者如果想看我们提供的配置文件imx6\_v7\_ebf\_defconfig中修改了什么地方，可以通过makemenuconfig命令来查看我们的配置，
+读者如果想看我们提供的配置文件imx6_v7_ebf_defconfig中修改了什么地方，可以通过makemenuconfig命令来查看我们的配置，
 makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下
 导入 .config文件的配置（如果没有找到.config文件则会生成默认配置的 .config文件），
-而这个配置则是我们运行make ARCH=arm imx6\_v7\_ebf\_defconfig命令生成的，这就直接可以看到我们在imx6\_v7\_ebf\_defconfig的配置选择，
+而这个配置则是我们运行make ARCH=arm imx6_v7_ebf_defconfig命令生成的，这就直接可以看到我们在imx6_v7_ebf_defconfig的配置选择，
 可以通过键盘的"上"、"下"、"左"、"右"、"回车"、"空格"、"?"、"ESC"等按键进行选择配置，具体见：
 
 .. figure:: media/building_kernel002.png
-   :alt: building\_kernel002
+   :alt: building_kernel002
 
-   building\_kernel002
+   building_kernel002
 比如我们选择配置我们开发板的触摸屏驱动：\ ``Goodix I2C touchscreen``\ ，如果读者炸不到这个配置选项在哪里，可以利用\ ``make menuconfig``\ 中的搜索功能，在英文输入法状态下按下"/"则可以进行搜索，输入"Goodix"找到改配置选项的位置，具体见：
 
 .. figure:: media/building_kernel003.png
-   :alt: building\_kernel003
+   :alt: building_kernel003
 
-   building\_kernel003
+   building_kernel003
 从图中可以很明显看出\ ``Goodix I2C touchscreen``\ 配置选项位于\ ``-> Device Drivers``\ 选项下的\ ``-> Input device support``\ 下的\ ``-> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])``\ 选项下的\ ``-> Touchscreens``\ 选项中，其实也可以按下\ ``"1"``\ 直接可以定位到对应的选项，然后选中以下内容即可，具体见图：
 
 .. code:: bash
@@ -277,16 +277,16 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
     <*>Goodix I2C touchscreen
 
 .. figure:: media/building_kernel004.png
-   :alt: building\_kernel004
+   :alt: building_kernel004
 
-   building\_kernel004
+   building_kernel004
 再举个例子，如果想要在我们的开发板上使用\ ``DHT11``\ 测量温湿度（单总线协议），那么需要在内核中配置支持单总线协议：\ ``Dallas's 1-wire support``\ ，我们也照葫芦画瓢，先搜索到这个配置在哪个位置（时候搜索不到就直接找即可），它位于\ ``->Device Drivers``
 选项下的\ ``<*> Dallas's 1-wire suppor``\ 选项中，然后进入它的选项下进行选择即可，当配置完成后保存退出，就可以进行编译了，具体见:
 
 .. figure:: media/building_kernel005.png
-   :alt: building\_kernel005
+   :alt: building_kernel005
 
-   building\_kernel005
+   building_kernel005
 开始编译
 ~~~~~~~~
 
@@ -407,15 +407,15 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 我们可以随便准备一张图片，比如我们就选择ubuntu的logo吧，将它制作成适合显示屏大小的图片，比如5寸屏幕的分辨率是800*480：
 
 .. figure:: media/building_kernel006.png
-   :alt: building\_kernel006
+   :alt: building_kernel006
 
-   building\_kernel006
+   building_kernel006
 然后将其保存为\ **256色（即8位色）的bpm格式的图片**\ ，可以在Windows下或者Linux虚拟机下编辑：
 
 .. figure:: media/building_kernel007.png
-   :alt: building\_kernel007
+   :alt: building_kernel007
 
-   building\_kernel007
+   building_kernel007
 转换为ppm格式的图片
 ~~~~~~~~~~~~~~~~~~~
 
@@ -472,9 +472,9 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 
 在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ ``ebf_6ull_linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
 
--  默认编译的logo：logo\_dec\_clut224.ppm
--  5寸触摸屏logo：logo\_dec\_clut224\_5.0.ppm
--  4.3寸触摸屏logo：logo\_dec\_clut224\_4.3.ppm
+-  默认编译的logo：logo_dec_clut224.ppm
+-  5寸触摸屏logo：logo_dec_clut224_5.0.ppm
+-  4.3寸触摸屏logo：logo_dec_clut224_4.3.ppm
 
 然后将其重命名为你想替换的logo即可，\ **注意**\ ，5寸触摸屏logo与4.3寸触摸屏logo是一键编译使用的，它在一键编译过程中会替换掉默认的logo，如果你只替换了默认编译的logo，但是使用了一键编译脚本，那么你替换的logo将被一键编译脚本修改，编译产生的内核将不会存在你的logo。
 

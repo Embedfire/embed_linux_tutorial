@@ -8,33 +8,33 @@
 Pcie接口模组加一个USB转接板构成，可方便插接到带有USB接口的Linux主板上。EC20型号众多，我们选用的型号是CEHCLG，全网通，7模，纯数据、单天线版本。
 
 .. figure:: media/EC20_4G_module001.png
-   :alt: media/EC20\_4G\_module001.png
+   :alt: media/EC20_4G_module001.png
 
-   media/EC20\_4G\_module001.png
+   media/EC20_4G_module001.png
 EC20是移远的一款4G模组，有Mini
 PCle和LCC两种封装，与处理器通信的协议为USB。即你们在市面上看到的那些通过板载的PCle接口与EC20连接的开发板，他们通信时也是通过USB通信，并不是一些初学用户说的通过PCle通信，PCle只是一种封装而已，最终通信都是通过USB。
 
 .. figure:: media/EC20_4G_module002.png
-   :alt: media/EC20\_4G\_module002.png
+   :alt: media/EC20_4G_module002.png
 
-   media/EC20\_4G\_module002.png
+   media/EC20_4G_module002.png
 .. figure:: media/EC20_4G_module003.png
-   :alt: media/EC20\_4G\_module003.png
+   :alt: media/EC20_4G_module003.png
 
-   media/EC20\_4G\_module003.png
+   media/EC20_4G_module003.png
 野火开发板使用4G模块
 --------------------
 
 野火开发板出厂固件已经支持4G模块的，所以在收到开发板后可以直接使用，使用方式也非常简单，首先插入4G的电话卡到SIM卡座上，这张电话卡必须是可以上网的，然后接上IPX天线（4G模块在发货的时候就已经接好天线的了），最终连接到开发板上，Pro或者mini开发板都可以使用野火4G模块。
 
 .. figure:: media/EC20_4G_module004.png
-   :alt: media/EC20\_4G\_module004.png
+   :alt: media/EC20_4G_module004.png
 
-   media/EC20\_4G\_module004.png
+   media/EC20_4G_module004.png
 .. figure:: media/EC20_4G_module005.png
-   :alt: media/EC20\_4G\_module005.png
+   :alt: media/EC20_4G_module005.png
 
-   media/EC20\_4G\_module005.png
+   media/EC20_4G_module005.png
 等待大约6S，可以看到4G模块的蓝色LED灯在闪烁，在开发板串口终端中能看到以下内容，就代表模块启动成功：
 
 .. code:: bash
@@ -62,16 +62,16 @@ PCle和LCC两种封装，与处理器通信的协议为USB。即你们在市面�
 模块想要上网则需要拨号，进入 ``~/peripheral/ec20-4g``
 目录下，可以看到该目录存在以下文件：
 
--  ec20\_options
--  ec20\_ppp\_dialer
+-  ec20_options
+-  ec20_ppp_dialer
 -  ppp-on.sh
 
-ppp-on.sh就是拨号脚本，直接运行它可以进行拨号，ec20\_options是拨号的配置文件，而ec20\_ppp\_dialer
+ppp-on.sh就是拨号脚本，直接运行它可以进行拨号，ec20_options是拨号的配置文件，而ec20_ppp_dialer
 则是拨号的一些指令。
 
 三个文件的内容如下：
 
-**ec20\_options：**
+**ec20_options：**
 
 .. code:: bash
 
@@ -97,7 +97,7 @@ ppp-on.sh就是拨号脚本，直接运行它可以进行拨号，ec20\_options�
     novj
     #Dump
 
-**ec20\_ppp\_dialer：**
+**ec20_ppp_dialer：**
 
 .. code:: bash
 
@@ -255,15 +255,15 @@ baidu.com为示例）：
 **接收模式：**
 
 .. figure:: media/EC20_4G_module006.png
-   :alt: media/EC20\_4G\_module006.png
+   :alt: media/EC20_4G_module006.png
 
-   media/EC20\_4G\_module006.png
+   media/EC20_4G_module006.png
 **发送模式：**
 
 .. figure:: media/EC20_4G_module007.png
-   :alt: media/EC20\_4G\_module007.png
+   :alt: media/EC20_4G_module007.png
 
-   media/EC20\_4G\_module007.png
+   media/EC20_4G_module007.png
 
 可能出现的问题
 --------------

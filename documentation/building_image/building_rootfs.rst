@@ -140,7 +140,7 @@ make menuconfig
 
 3. /dev management ：/dev设备文件的管理方式，可选选项有四个：
 
-Static using device table: 使用静态的设备表，/dev将根据system/device_table \_dev.txt的内容创建设备，进入系统添加或删除设备时，无法自动更新；
+Static using device table: 使用静态的设备表，/dev将根据system/device_table _dev.txt的内容创建设备，进入系统添加或删除设备时，无法自动更新；
 
 Dynamic using devtmpfs only:在系统启动过程中，会动态生成/dev文件，进入系统添加或删除设备时，无法自动更新；
 

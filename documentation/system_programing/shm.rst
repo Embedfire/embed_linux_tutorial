@@ -58,28 +58,28 @@ shmget()函数的主要主要是得到一个共享内存标识符或创建一个
 
 1. key：标识共享内存的键值，可以有以下取值：
 
--  0 / IPC\_PRIVATE。
-   当key的取值为IPC\_PRIVATE，则函数shmget()将创建一块新的共享内存；如果key的取值为0，而参数shmflg中设置了IPC\_PRIVATE这个标志，则同样将创建一块新的共享内存。
+-  0 / IPC_PRIVATE。
+   当key的取值为IPC_PRIVATE，则函数shmget()将创建一块新的共享内存；如果key的取值为0，而参数shmflg中设置了IPC_PRIVATE这个标志，则同样将创建一块新的共享内存。
 -  大于0的32位整数：视参数shmflg来确定操作。
 
 2. size：要创建共享内存的大小，所有的内存分配操作都是以页为单位的，所以即使只申请只有一个字节的内存，内存也会分配整整一页。
 
 3. shmflg：表示创建的共享内存的模式标志参数，在真正使用时需要与IPC对象存取权限mode（如0600）进行"｜"运算来确定共享内存的存取权限。msgflg有多种情况：
 
--  IPC\_CREAT：如果内核中不存在关键字与key相等的共享内存，则新建一个共享内存；如果存在这样的共享内存，返回此共享内存的标识符。
--  IPC\_EXCL：如果内核中不存在键值与key相等的共享内存，则新建一个共享内存；如果存在这样的共享内存则报错。
--  SHM\_HUGETLB：使用"大页面"来分配共享内存，所谓的"大页面"指的是内核为了提高程序性能，对内存实行分页管理时，采用比默认尺寸（4KB）更大的分页，以减少缺页中断。Linux内核支持以2MB作为物理页面分页的基本单位。
--  SHM\_NORESERVE：不在交换分区中为这块共享内存保留空间。
+-  IPC_CREAT：如果内核中不存在关键字与key相等的共享内存，则新建一个共享内存；如果存在这样的共享内存，返回此共享内存的标识符。
+-  IPC_EXCL：如果内核中不存在键值与key相等的共享内存，则新建一个共享内存；如果存在这样的共享内存则报错。
+-  SHM_HUGETLB：使用"大页面"来分配共享内存，所谓的"大页面"指的是内核为了提高程序性能，对内存实行分页管理时，采用比默认尺寸（4KB）更大的分页，以减少缺页中断。Linux内核支持以2MB作为物理页面分页的基本单位。
+-  SHM_NORESERVE：不在交换分区中为这块共享内存保留空间。
 
 **错误代码：**
 
 当调用shmget()函数失败时将产生错误代码。
 
 -  EACCES：指定的消息队列已存在，但调用进程没有权限访问它
--  EEXIST：key指定的消息队列已存在，而msgflg中同时指定IPC\_CREAT和IPC\_EXCL标志
+-  EEXIST：key指定的消息队列已存在，而msgflg中同时指定IPC_CREAT和IPC_EXCL标志
 -  EINVAL：创建共享内存时参数size小于SHMMIN或大于SHMMAX。
 -  ENFILE：已达到系统范围内打开文件总数的限制。
--  ENOENT：给定的key不存在任何共享内存，并且未指定IPC\_CREAT。
+-  ENOENT：给定的key不存在任何共享内存，并且未指定IPC_CREAT。
 -  ENOMEM：内存不足，无法为共享内存分配内存。
 -  EACCES：没有权限。
 
@@ -104,8 +104,8 @@ shmget()函数的返回值是共享内存的ID。
 2. shmaddr：如果不为NULL，则系统会根据shmaddr来选择一个合适的内存区域，如果为NULL，则系统会自动选择一个合适的虚拟内存空间地址去映射共享内存。
 3. shmflg：操作共享内存的方式：
 
--  SHM\_RDONLY：以只读方式映射共享内存。
--  SHM\_REMAP：重新映射，此时shmaddr不能为NULL。
+-  SHM_RDONLY：以只读方式映射共享内存。
+-  SHM_REMAP：重新映射，此时shmaddr不能为NULL。
 -  NULLSHM：自动选择比shmaddr小的最大页对齐地址。
 
 shmat()函数调用成功后返回共享内存的起始地址，这样子我们就能操作这个共享内存了。
@@ -113,7 +113,7 @@ shmat()函数调用成功后返回共享内存的起始地址，这样子我们�
 共享内存的映射有以下注意的要点：
 
 -  共享内存只能以只读或者可读写方式映射，无法以只写方式映射。
--  shmat()第二个参数shmaddr一般都设为NULL，让系统自动找寻合适的地址。但当其确实不为空时，那么要求SHM\_RND在shmflg必须被设置，这样的话系统将会选择比shmaddr小而又最大的页对齐地址（即为SHMLBA的整数倍）作为共享内存区域的起始地址。如果没有设置SHM\_RND，那么shmaddr必须是严格的页对齐地址。
+-  shmat()第二个参数shmaddr一般都设为NULL，让系统自动找寻合适的地址。但当其确实不为空时，那么要求SHM_RND在shmflg必须被设置，这样的话系统将会选择比shmaddr小而又最大的页对齐地址（即为SHMLBA的整数倍）作为共享内存区域的起始地址。如果没有设置SHM_RND，那么shmaddr必须是严格的页对齐地址。
 
 解除共享内存的映射
 ------------------
@@ -154,18 +154,18 @@ shmctl()用于获取或者设置共享内存的相关属性的。
 1. shmid：共享内存标识符。
 2. cmd：函数功能的控制命令，其取值如下：
 
--  IPC\_STAT：获取属性信息，放置到buf中。
--  IPC\_SET：设置属性信息为buf指向的内容。
--  IPC\_RMID：删除这该共享内存。
--  IPC\_INFO：获得关于共享内存的系统限制值信息。
--  SHM\_INFO：获得系统为共享内存消耗的资源信息。
--  SHM\_STAT：与IPC\_STAT具有相同的功能，但shmid为该SHM在内核中记录所有SHM信息的数组的下标，因此通过迭代所有的下标可以获得系统中所有SHM的相关信息。
--  SHM\_LOCK：禁止系统将该SHM交换至swap分区。
--  SHM\_UNLOCK：允许系统将该SHM交换至swap分。
+-  IPC_STAT：获取属性信息，放置到buf中。
+-  IPC_SET：设置属性信息为buf指向的内容。
+-  IPC_RMID：删除这该共享内存。
+-  IPC_INFO：获得关于共享内存的系统限制值信息。
+-  SHM_INFO：获得系统为共享内存消耗的资源信息。
+-  SHM_STAT：与IPC_STAT具有相同的功能，但shmid为该SHM在内核中记录所有SHM信息的数组的下标，因此通过迭代所有的下标可以获得系统中所有SHM的相关信息。
+-  SHM_LOCK：禁止系统将该SHM交换至swap分区。
+-  SHM_UNLOCK：允许系统将该SHM交换至swap分。
 
--  buf：共享内存属性信息结构体指针，设置或者获取信息都通过该结构体，shmid\_ds结构如下：
+-  buf：共享内存属性信息结构体指针，设置或者获取信息都通过该结构体，shmid_ds结构如下：
 
-注意：选项SHM\_LOCK不是锁定读写权限，而是锁定SHM能否与swap分区发生交换。一个SHM被交换至swap分区后如果被设置了SHM\_LOCK，那么任何访问这个SHM的进程都将会遇到页错误。进程可以通过IPC\_STAT后得到的mode来检测SHM\_LOCKED信息。
+注意：选项SHM_LOCK不是锁定读写权限，而是锁定SHM能否与swap分区发生交换。一个SHM被交换至swap分区后如果被设置了SHM_LOCK，那么任何访问这个SHM的进程都将会遇到页错误。进程可以通过IPC_STAT后得到的mode来检测SHM_LOCKED信息。
 
 .. code:: c
 
@@ -374,7 +374,7 @@ shmctl()用于获取或者设置共享内存的相关属性的。
         exit(EXIT_SUCCESS);
     }
 
-该代码在system\_programing/shm\_read目录及system\_programing/shm\_write目录下，分别编译并且运行即可，现象如下：
+该代码在system_programing/shm_read目录及system_programing/shm_write目录下，分别编译并且运行即可，现象如下：
 
 **读进程：**
 

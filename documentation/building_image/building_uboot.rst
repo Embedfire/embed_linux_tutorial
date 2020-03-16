@@ -35,13 +35,13 @@ http://git.freescale.com/git/
     http://git.freescale.com/git/cgit.cgi/imx/uboot-imx.git
 
 .. figure:: media/building_uboot002.png
-   :alt: building\_uboot
+   :alt: building_uboot
 
-   building\_uboot
+   building_uboot
 .. figure:: media/building_uboot003.png
-   :alt: building\_uboot
+   :alt: building_uboot
 
-   building\_uboot
+   building_uboot
 
 **很重要的提醒，我们建议大家使用野火提供的仓库进行编译，而不需要去修改官方的uboot源码。**
 
@@ -125,9 +125,9 @@ arm-none-eabi-gcc：v6.3.1
 在编译uboot的时候需要我们自定义配置，而nxp官方会提供一些默认配置，这些配置在uboot
 /configs/目录下，如：
 
--  mx6ull\_14x14\_evk\_defconfig
--  mx6ull\_14x14\_evk\_emmc\_defconfig
--  mx6ull\_14x14\_evk\_nand\_defconfig
+-  mx6ull_14x14_evk_defconfig
+-  mx6ull_14x14_evk_emmc_defconfig
+-  mx6ull_14x14_evk_nand_defconfig
 
 就是nxp官方为imx6ull提供的配置文件，可以编译生成从SD卡启动的uboot、从emmc启动的uboot以及从nand启动的uboot，我们可以根据需求选择不同的配置文件从而编译不同的uboot。
 
@@ -209,7 +209,7 @@ arm-none-eabi-gcc：v6.3.1
 解释一下Makefile文件的描述：
 
 -  使用ifeq
-   判断是否指定了LOGO\_BMP变量（该变量表示开机logo图片），如果不指定则使用默认logo图片denx.bmp，该图片在logos目录下。
+   判断是否指定了LOGO_BMP变量（该变量表示开机logo图片），如果不指定则使用默认logo图片denx.bmp，该图片在logos目录下。
 
 -  然后判断一下是否存在使用开发板名字命名的图片（如\ :math:`(BOARD)，它是一个变量的引用，表示开发板的名字），如果是则使用`\ (BOARD).bmp。
 
@@ -219,15 +219,15 @@ arm-none-eabi-gcc：v6.3.1
     注意：开机logo必须是bmp类型的图片，否则可能出现错误。
 
 .. figure:: media/building_uboot004.png
-   :alt: building\_uboot
+   :alt: building_uboot
 
-   building\_uboot
+   building_uboot
 既然要修改logo，我们把自己的开机logo图片放进去替换原本的logo即可，我们的开机logo如图所示（注意：logo图片格式必须为bmp格式）。
 
 .. figure:: media/building_uboot005.png
-   :alt: building\_uboot
+   :alt: building_uboot
 
-   building\_uboot
+   building_uboot
 这些logo在uboot启动时就会被显示在屏幕上，具体的显示logo的函数在uboot
 /board/esd/common/目录下的lcd.c文件中，大约在81行左右，感兴趣的读者可以去看看源码，在这里就不深入分析。
 

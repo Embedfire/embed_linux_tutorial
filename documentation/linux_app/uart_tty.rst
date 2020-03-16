@@ -569,8 +569,8 @@ termios结构体
    cc_t c_cc[NCCS]; /* control characters */
    speed_t c_ispeed; /* input speed */
    speed_t c_ospeed; /* output speed */
-    #define \_HAVE_STRUCT_TERMIOS_C_ISPEED 1
-    #define \_HAVE_STRUCT_TERMIOS_C_OSPEED 1
+    #define _HAVE_STRUCT_TERMIOS_C_ISPEED 1
+    #define _HAVE_STRUCT_TERMIOS_C_OSPEED 1
     };
 
 下面我们介绍一下各个结构体成员，主要是关注c_iflag、c_cflag以及c_ispeed、c_ospeed即可：

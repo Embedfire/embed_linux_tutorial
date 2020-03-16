@@ -60,7 +60,7 @@ Buildroot目录简介
 
 -  boot：存放的是引导系统相关的配置文件。
 
--  configs：这里存放的是一些针对不同硬件平台的特有配置文件合集（xxxx\_deconfig），我们在开发过程中为自己开发板配置的文件也可以放入该目录下，比如野火提供的imx6ull开发板的配置文件ebf6ull\_s1\_pro\_defconfig就可以放入该目录下。
+-  configs：这里存放的是一些针对不同硬件平台的特有配置文件合集（xxxx_deconfig），我们在开发过程中为自己开发板配置的文件也可以放入该目录下，比如野火提供的imx6ull开发板的配置文件ebf6ull_s1_pro_defconfig就可以放入该目录下。
 
 -  docs：存放相关的参考文档。
 

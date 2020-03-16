@@ -100,7 +100,7 @@ linux系统在多种情况下不会生成核心转储文件：
 而如果我们想要分析他们，那就没法去分析了，因此我们可以通过修改配置，让产生的核心转储文件命名包含相应的信息，
 而不会导致覆盖，也可以指定核心转储文件的路径，如何做到呢？
 
-只需在\ ``/etc/sysctl.conf``\ 文件中，设置kernel.core\_pattern的值即可，具体操作如下：
+只需在\ ``/etc/sysctl.conf``\ 文件中，设置kernel.core_pattern的值即可，具体操作如下：
 
 1. 使用vi编辑器打开\ ``/etc/sysctl.conf``\ 文件：
 
@@ -123,7 +123,7 @@ linux系统在多种情况下不会生成核心转储文件：
     kernel.core_pattern = /var/core/core_%e_%p 
     kernel.core_uses_pid = 0
 
-其中core\_pattern的配置中%e, %p分别代表以下参数：
+其中core_pattern的配置中%e, %p分别代表以下参数：
 
 -  %e：所dump的文件名
 -  %p：所dump的进程PID

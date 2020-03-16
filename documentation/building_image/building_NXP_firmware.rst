@@ -44,13 +44,13 @@ http://git.freescale.com/git/
     http://git.freescale.com/git/cgit.cgi/imx/uboot-imx.git
 
 .. figure:: media/building_uboot002.png
-   :alt: building\_uboot
+   :alt: building_uboot
 
-   building\_uboot
+   building_uboot
 .. figure:: media/building_uboot003.png
-   :alt: building\_uboot
+   :alt: building_uboot
 
-   building\_uboot
+   building_uboot
 
 **很重要的提醒，我们建议大家使用野火提供的仓库进行编译，而不需要去修改官方的uboot源码。**
 
@@ -134,9 +134,9 @@ arm-none-eabi-gcc：v6.3.1
 在编译uboot的时候需要我们自定义配置，而nxp官方会提供一些默认配置，这些配置在uboot
 /configs/目录下，如：
 
--  mx6ull\_14x14\_evk\_defconfig
--  mx6ull\_14x14\_evk\_emmc\_defconfig
--  mx6ull\_14x14\_evk\_nand\_defconfig
+-  mx6ull_14x14_evk_defconfig
+-  mx6ull_14x14_evk_emmc_defconfig
+-  mx6ull_14x14_evk_nand_defconfig
 
 就是nxp官方为imx6ull提供的配置文件，可以编译生成从SD卡启动的uboot、从emmc启动的uboot以及从nand启动的uboot，我们可以根据需求选择不同的配置文件从而编译不同的uboot。
 
@@ -218,7 +218,7 @@ arm-none-eabi-gcc：v6.3.1
 解释一下Makefile文件的描述：
 
 -  使用ifeq
-   判断是否指定了LOGO\_BMP变量（该变量表示开机logo图片），如果不指定则使用默认logo图片denx.bmp，该图片在logos目录下。
+   判断是否指定了LOGO_BMP变量（该变量表示开机logo图片），如果不指定则使用默认logo图片denx.bmp，该图片在logos目录下。
 
 -  然后判断一下是否存在使用开发板名字命名的图片（如\ :math:`(BOARD)，它是一个变量的引用，表示开发板的名字），如果是则使用`\ (BOARD).bmp。
 
@@ -228,15 +228,15 @@ arm-none-eabi-gcc：v6.3.1
     注意：开机logo必须是bmp类型的图片，否则可能出现错误。
 
 .. figure:: media/building_uboot004.png
-   :alt: building\_uboot
+   :alt: building_uboot
 
-   building\_uboot
+   building_uboot
 既然要修改logo，我们把自己的开机logo图片放进去替换原本的logo即可，我们的开机logo如图所示（注意：logo图片格式必须为bmp格式）。
 
 .. figure:: media/building_uboot005.png
-   :alt: building\_uboot
+   :alt: building_uboot
 
-   building\_uboot
+   building_uboot
 这些logo在uboot启动时就会被显示在屏幕上，具体的显示logo的函数在uboot
 /board/esd/common/目录下的lcd.c文件中，大约在81行左右，感兴趣的读者可以去看看源码，在这里就不深入分析。
 
@@ -396,9 +396,9 @@ log查看仓库的日志信息，看看更改了什么地方。在\ ``ebf_6ull_l
     copy.sh   firmware       Kbuild   Makefile     README.md        sound
 
 .. figure:: media/building_kernel001.png
-   :alt: building\_kernel001
+   :alt: building_kernel001
 
-   building\_kernel001
+   building_kernel001
 
 
 从图中我们可以看到Linux内核源码目录下是有非常多的文件夹，且文件夹下也有非常多的文件，下面我们简单分析一下这些文件夹的主要作用。
@@ -573,7 +573,7 @@ vi 打开即可，在文件末尾增加编译器所在的路径：
 设置配置选项，使用野火开发板配置
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-首先进入imx-linux目录下，然后开始编译内核，运行\ ``make ARCH=arm imx6_v7_ebf_defconfig``\ 命令将imx6\_v7\_ebf\_defconfig配置文件的信息写入当前路径下的
+首先进入imx-linux目录下，然后开始编译内核，运行\ ``make ARCH=arm imx6_v7_ebf_defconfig``\ 命令将imx6_v7_ebf_defconfig配置文件的信息写入当前路径下的
 ``.config``\ 文件中，在linux中以\ ``"."``\ 开头的文件都是隐藏文件，我们可以使用ls
 –la命令查看这些文件。
 
@@ -601,22 +601,22 @@ Linux内核的配置系统由三个部分组成，分别是：
 
 -  配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配置用户界面（linux提供基于字符界面、
 基于Ncurses 图形界面以及基于 Xwindows 图形界面的用户配置界面，各自对应于make config、make menuconfig 和 make xconfig）。
-读者如果想看我们提供的配置文件imx6\_v7\_ebf\_defconfig中修改了什么地方，可以通过makemenuconfig命令来查看我们的配置，
+读者如果想看我们提供的配置文件imx6_v7_ebf_defconfig中修改了什么地方，可以通过makemenuconfig命令来查看我们的配置，
 makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下
 导入 .config文件的配置（如果没有找到.config文件则会生成默认配置的 .config文件），
-而这个配置则是我们运行make ARCH=arm imx6\_v7\_ebf\_defconfig命令生成的，这就直接可以看到我们在imx6\_v7\_ebf\_defconfig的配置选择，
+而这个配置则是我们运行make ARCH=arm imx6_v7_ebf_defconfig命令生成的，这就直接可以看到我们在imx6_v7_ebf_defconfig的配置选择，
 可以通过键盘的"上"、"下"、"左"、"右"、"回车"、"空格"、"?"、"ESC"等按键进行选择配置，具体见：
 
 .. figure:: media/building_kernel002.png
-   :alt: building\_kernel002
+   :alt: building_kernel002
 
-   building\_kernel002
+   building_kernel002
 比如我们选择配置我们开发板的触摸屏驱动：\ ``Goodix I2C touchscreen``\ ，如果读者炸不到这个配置选项在哪里，可以利用\ ``make menuconfig``\ 中的搜索功能，在英文输入法状态下按下"/"则可以进行搜索，输入"Goodix"找到改配置选项的位置，具体见：
 
 .. figure:: media/building_kernel003.png
-   :alt: building\_kernel003
+   :alt: building_kernel003
 
-   building\_kernel003
+   building_kernel003
 从图中可以很明显看出\ ``Goodix I2C touchscreen``\ 配置选项位于\ ``-> Device Drivers``\ 选项下的\ ``-> Input device support``\ 下的\ ``-> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])``\ 选项下的\ ``-> Touchscreens``\ 选项中，其实也可以按下\ ``"1"``\ 直接可以定位到对应的选项，然后选中以下内容即可，具体见图：
 
 .. code:: bash
@@ -627,16 +627,16 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
     <*>Goodix I2C touchscreen
 
 .. figure:: media/building_kernel004.png
-   :alt: building\_kernel004
+   :alt: building_kernel004
 
-   building\_kernel004
+   building_kernel004
 再举个例子，如果想要在我们的开发板上使用\ ``DHT11``\ 测量温湿度（单总线协议），那么需要在内核中配置支持单总线协议：\ ``Dallas's 1-wire support``\ ，我们也照葫芦画瓢，先搜索到这个配置在哪个位置（时候搜索不到就直接找即可），它位于\ ``->Device Drivers``
 选项下的\ ``<*> Dallas's 1-wire suppor``\ 选项中，然后进入它的选项下进行选择即可，当配置完成后保存退出，就可以进行编译了，具体见:
 
 .. figure:: media/building_kernel005.png
-   :alt: building\_kernel005
+   :alt: building_kernel005
 
-   building\_kernel005
+   building_kernel005
 开始编译
 ~~~~~~~~
 
@@ -757,15 +757,15 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 我们可以随便准备一张图片，比如我们就选择ubuntu的logo吧，将它制作成适合显示屏大小的图片，比如5寸屏幕的分辨率是800*480：
 
 .. figure:: media/building_kernel006.png
-   :alt: building\_kernel006
+   :alt: building_kernel006
 
-   building\_kernel006
+   building_kernel006
 然后将其保存为\ **256色（即8位色）的bpm格式的图片**\ ，可以在Windows下或者Linux虚拟机下编辑：
 
 .. figure:: media/building_kernel007.png
-   :alt: building\_kernel007
+   :alt: building_kernel007
 
-   building\_kernel007
+   building_kernel007
 转换为ppm格式的图片
 ^^^^^^^^^^^^^^
 
@@ -822,9 +822,9 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 
 在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ ``ebf_6ull_linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
 
--  默认编译的logo：logo\_dec\_clut224.ppm
--  5寸触摸屏logo：logo\_dec\_clut224\_5.0.ppm
--  4.3寸触摸屏logo：logo\_dec\_clut224\_4.3.ppm
+-  默认编译的logo：logo_dec_clut224.ppm
+-  5寸触摸屏logo：logo_dec_clut224_5.0.ppm
+-  4.3寸触摸屏logo：logo_dec_clut224_4.3.ppm
 
 然后将其重命名为你想替换的logo即可，\ **注意**\ ，5寸触摸屏logo与4.3寸触摸屏logo是一键编译使用的，它在一键编译过程中会替换掉默认的logo，如果你只替换了默认编译的logo，但是使用了一键编译脚本，那么你替换的logo将被一键编译脚本修改，编译产生的内核将不会存在你的logo。
 
@@ -1046,7 +1046,7 @@ Buildroot目录简介
 
 -  boot：存放的是引导系统相关的配置文件。
 
--  configs：这里存放的是一些针对不同硬件平台的特有配置文件合集（xxxx\_deconfig），我们在开发过程中为自己开发板配置的文件也可以放入该目录下，比如野火提供的imx6ull开发板的配置文件ebf6ull\_s1\_pro\_defconfig就可以放入该目录下。
+-  configs：这里存放的是一些针对不同硬件平台的特有配置文件合集（xxxx_deconfig），我们在开发过程中为自己开发板配置的文件也可以放入该目录下，比如野火提供的imx6ull开发板的配置文件ebf6ull_s1_pro_defconfig就可以放入该目录下。
 
 -  docs：存放相关的参考文档。
 
@@ -1475,7 +1475,7 @@ make menuconfig
 
 3. /dev management ：/dev设备文件的管理方式，可选选项有四个：
 
-Static using device table: 使用静态的设备表，/dev将根据system/device_table \_dev.txt的内容创建设备，进入系统添加或删除设备时，无法自动更新；
+Static using device table: 使用静态的设备表，/dev将根据system/device_table _dev.txt的内容创建设备，进入系统添加或删除设备时，无法自动更新；
 
 Dynamic using devtmpfs only:在系统启动过程中，会动态生成/dev文件，进入系统添加或删除设备时，无法自动更新；
 

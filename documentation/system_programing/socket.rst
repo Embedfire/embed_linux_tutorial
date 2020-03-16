@@ -50,32 +50,32 @@ descriptor），它唯一标识一个socket，这个socket描述字跟文件描�
 
 创建socket的时候，也可以指定不同的参数创建不同的socket描述符，socket函数的三个参数分别为：
 1.
-domain：参数domain表示该套接字使用的协议族，在Linux系统中支持多种协议族，对于TCP/IP协议来说，选择AF\_INET就足以，当然如果你的IP协议的版本支持IPv6，那么可以选择AF\_INET6，可选的协议族具体见：
+domain：参数domain表示该套接字使用的协议族，在Linux系统中支持多种协议族，对于TCP/IP协议来说，选择AF_INET就足以，当然如果你的IP协议的版本支持IPv6，那么可以选择AF_INET6，可选的协议族具体见：
 
--  AF\_UNIX, AF\_LOCAL： 本地通信
--  AF\_INET ： IPv4
--  AF\_INET6 ： IPv6
--  AF\_IPX ： IPX - Novell 协议
--  AF\_NETLINK ： 内核用户界面设备
--  AF\_X25 ： ITU-T X.25 / ISO-8208 协议
--  AF\_AX25 ： 业余无线电 AX.25 协议
--  AF\_ATMPVC ： 访问原始ATM PVC
--  AF\_APPLETALK ： AppleTalk
--  AF\_PACKET ： 底层数据包接口
--  AF\_ALG ： 内核加密API的AF\_ALG接口
+-  AF_UNIX, AF_LOCAL： 本地通信
+-  AF_INET ： IPv4
+-  AF_INET6 ： IPv6
+-  AF_IPX ： IPX - Novell 协议
+-  AF_NETLINK ： 内核用户界面设备
+-  AF_X25 ： ITU-T X.25 / ISO-8208 协议
+-  AF_AX25 ： 业余无线电 AX.25 协议
+-  AF_ATMPVC ： 访问原始ATM PVC
+-  AF_APPLETALK ： AppleTalk
+-  AF_PACKET ： 底层数据包接口
+-  AF_ALG ： 内核加密API的AF_ALG接口
 
-    ps：其实我个人都只用过AF\_INET以及AF\_NETLINK，对于其他协议族，基本没用过。
+    ps：其实我个人都只用过AF_INET以及AF_NETLINK，对于其他协议族，基本没用过。
 
 1. type：参数type指定了套接字使用的服务类型，可能的类型有以下几种：
 
--  SOCK\_STREAM：提供可靠的（即能保证数据正确传送到对方）面向连接的Socket服务，多用于资料（如文件）传输，如TCP协议。
--  SOCK\_DGRAM：是提供无保障的面向消息的Socket
+-  SOCK_STREAM：提供可靠的（即能保证数据正确传送到对方）面向连接的Socket服务，多用于资料（如文件）传输，如TCP协议。
+-  SOCK_DGRAM：是提供无保障的面向消息的Socket
    服务，主要用于在网络上发广播信息，如UDP协议，提供无连接不可靠的数据报交付服务。
--  SOCK\_SEQPACKET：为固定最大长度的数据报提供有序的，可靠的，基于双向连接的数据传输路径。
--  SOCK\_RAW：表示原始套接字，它允许应用程序访问网络层的原始数据包，这个套接字用得比较少，暂时不用理会它。
--  SOCK\_RDM：提供不保证排序的可靠数据报层。
+-  SOCK_SEQPACKET：为固定最大长度的数据报提供有序的，可靠的，基于双向连接的数据传输路径。
+-  SOCK_RAW：表示原始套接字，它允许应用程序访问网络层的原始数据包，这个套接字用得比较少，暂时不用理会它。
+-  SOCK_RDM：提供不保证排序的可靠数据报层。
 
-2. protocol：参数protocol指定了套接字使用的协议，在IPv4中，只有TCP协议提供SOCK\_STREAM这种可靠的服务，只有UDP协议提供SOCK\_DGRAM服务，对于这两种协议，protocol的值均为0，因为当protocol为0时，会自动选择type类型对应的默认协议。。
+2. protocol：参数protocol指定了套接字使用的协议，在IPv4中，只有TCP协议提供SOCK_STREAM这种可靠的服务，只有UDP协议提供SOCK_DGRAM服务，对于这两种协议，protocol的值均为0，因为当protocol为0时，会自动选择type类型对应的默认协议。。
 
 当创建套接字成功的时候，该函数返回一个int类型的值，也就是socket描述符，该值大于等于0；而如果创建套接字失败时则返回-1。
 
@@ -98,7 +98,7 @@ bind()函数用于将一个 IP
 参数：
 
 -  sockfd：sockfd是由socket()函数返回的套接字描述符。
--  my\_addr：my\_addr是一个指向套接字地址结构的指针。
+-  my_addr：my_addr是一个指向套接字地址结构的指针。
 -  addrlen：addrlen指定了以addr所指向的地址结构体的字节长度。
 
 若bind()函数绑定成功则返回0，若出错则为-1。
@@ -114,9 +114,9 @@ sockaddr结构：
         char            sa_data[14];
     }
 
-咋一看这个结构体，好像没啥信息要我们填写的，确实也是这样子，我们需要填写的IP地址与端口号等信息，都在sa\_data连续的14字节信息里面，但这个结构对用户操作不友好，一般我们在使用的时候都会使用sockaddr\_in结构，sockaddr\_in和sockaddr是并列的结构（占用的空间是一样的），指向sockaddr\_in的结构体的指针也可以指向sockadd的结构体，并代替它，而且sockaddr\_in结构对用户将更加友好，在使用的时候进行类型转换就可以了。
+咋一看这个结构体，好像没啥信息要我们填写的，确实也是这样子，我们需要填写的IP地址与端口号等信息，都在sa_data连续的14字节信息里面，但这个结构对用户操作不友好，一般我们在使用的时候都会使用sockaddr_in结构，sockaddr_in和sockaddr是并列的结构（占用的空间是一样的），指向sockaddr_in的结构体的指针也可以指向sockadd的结构体，并代替它，而且sockaddr_in结构对用户将更加友好，在使用的时候进行类型转换就可以了。
 
-sockaddr\_in结构：
+sockaddr_in结构：
 
 .. code:: c
 
@@ -127,7 +127,7 @@ sockaddr\_in结构：
         unsigned char sin_zero[8];          /* sin_zero是为了让sockaddr与sockaddr_in两个数据结构保持大小相同而保留的空字节 */
     };
 
-这个结构体的第一个字段是与sockaddr结构体是一致的，而剩下的字段就是sa\_data连续的14字节信息里面的内容，只不过从新定义了成员变量而已，sin\_port字段是我们需要填写的端口号信息，sin\_addr字段是我们需要填写的IP地址信息，剩下sin\_zero
+这个结构体的第一个字段是与sockaddr结构体是一致的，而剩下的字段就是sa_data连续的14字节信息里面的内容，只不过从新定义了成员变量而已，sin_port字段是我们需要填写的端口号信息，sin_addr字段是我们需要填写的IP地址信息，剩下sin_zero
 区域的8字节保留未用。
 
 举个简单的使用实例：
@@ -228,7 +228,7 @@ read()
         ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
                         struct sockaddr *src_addr, socklen_t *addrlen);
 
-    ps：ssize\_t 它表示的是 signed size\_t 类型。
+    ps：ssize_t 它表示的是 signed size_t 类型。
 
 read() 从描述符 fd
 （描述符可以是文件描述符也可以是套接字描述符，本章主要讲解套接字，此处为套接字描述符）中读取
@@ -242,7 +242,7 @@ buf：指定存放数据的地址。 -
 count：是指定读取的字节数，将读取到的数据保存在缓冲区buf中。
 
 错误代码： - EINTR：在读取到数据前被信号所中断。 - EAGAIN：使用
-O\_NONBLOCK 标志指定了非阻塞式输入输出，但当前没有数据可读。 -
+O_NONBLOCK 标志指定了非阻塞式输入输出，但当前没有数据可读。 -
 EIO：输入输出错误，可能是正处于后台进程组进程试图读取其控制终端，但读操作无效，或者被信号SIGTTIN所阻塞,
 或者其进程组是孤儿进程组，也可能执行的是读磁盘或者磁带机这样的底层输入输出错误。
 - EISDIR：fd 指向一个目录。 - EBADF：fd
@@ -263,7 +263,7 @@ recv()
 recv()函数会先检查套接字 s 的接收缓冲区，如果 s
 接收缓冲区中没有数据或者协议正在接收数据，那么recv就一直等待，直到协议把数据接收完毕。当协议把数据接收完毕，recv()函数就把
 s 的接收缓冲中的数据拷贝到 buf
-中，但是要注意的是议接收到的数据可能大于buf的长度，所以在这种情况下要调用几次recv()函数才能把s的接收缓冲中的数据拷贝完。recv()函数仅仅是拷贝数据，真正的接收数据是由协议来完成的，recv函数返回其实际拷贝的字节数。如果recv()函数在拷贝时出错，那么它返回SOCKET\_ERROR；如果recv()函数在等待协议接收数据时网络中断了，那么它返回0。
+中，但是要注意的是议接收到的数据可能大于buf的长度，所以在这种情况下要调用几次recv()函数才能把s的接收缓冲中的数据拷贝完。recv()函数仅仅是拷贝数据，真正的接收数据是由协议来完成的，recv函数返回其实际拷贝的字节数。如果recv()函数在拷贝时出错，那么它返回SOCKET_ERROR；如果recv()函数在等待协议接收数据时网络中断了，那么它返回0。
 
 参数：
 
@@ -272,12 +272,12 @@ s 的接收缓冲中的数据拷贝到 buf
 -  len：指定recv()函数拷贝的数据长度。
 
 参数 flags 一般设置为0即可，其他数值定义如下: -
-MSG\_OOB：接收以out-of-band送出的数据。 -
-MSG\_PEEK：保持原有数据，就是说接收到的数据并不会被删除,
+MSG_OOB：接收以out-of-band送出的数据。 -
+MSG_PEEK：保持原有数据，就是说接收到的数据并不会被删除,
 如果再调用recv()函数还会拷贝相同的数据到buf中。 -
-MSG\_WAITALL：强迫接收到指定len大小的数据后才能返回,
+MSG_WAITALL：强迫接收到指定len大小的数据后才能返回,
 除非有错误或信号产生。 -
-MSG\_NOSIGNAL：recv()函数不会被SIGPIPE信号中断，返回值成功则返回接收到的字符数,
+MSG_NOSIGNAL：recv()函数不会被SIGPIPE信号中断，返回值成功则返回接收到的字符数,
 失败返回-1，错误原因存于errno中。
 
 错误代码：
@@ -363,9 +363,9 @@ send()
 -  len：指明实际要发送的数据的字节数。
 -  flags：一般设置为0即可
 
-当调用该函数时，send()函数先比较待发送数据的长度len和套接字s的发送缓冲的长度，如果len大于s的发送缓冲区的长度，该函数返回SOCKET\_ERROR；如果len小于或者等于s的发送缓冲区的长度，那么send()函数先检查协议是否正在发送s的发送缓冲中的数据，如果是就等待协议把数据发送完，如果协议还没有开始发送s的发送缓冲中的数据或者s的发送缓冲中没有数据，那么send()函数就比较s的发送缓冲区的剩余空间和len，如果len大于剩余空间大小send()函数就一直等待协议把s的发送缓冲中的数据发送完，如果len小于剩余空间大小send()函数就仅仅把buf中的数据拷贝到s的发送缓冲区的剩余空间里。
+当调用该函数时，send()函数先比较待发送数据的长度len和套接字s的发送缓冲的长度，如果len大于s的发送缓冲区的长度，该函数返回SOCKET_ERROR；如果len小于或者等于s的发送缓冲区的长度，那么send()函数先检查协议是否正在发送s的发送缓冲中的数据，如果是就等待协议把数据发送完，如果协议还没有开始发送s的发送缓冲中的数据或者s的发送缓冲中没有数据，那么send()函数就比较s的发送缓冲区的剩余空间和len，如果len大于剩余空间大小send()函数就一直等待协议把s的发送缓冲中的数据发送完，如果len小于剩余空间大小send()函数就仅仅把buf中的数据拷贝到s的发送缓冲区的剩余空间里。
 
-如果send()函数拷贝数据成功，就返回实际copy的字节数，如果send()函数在拷贝数据时出现错误，那么send就返回SOCKET\_ERROR；如果send在等待协议传送数据时网络断开的话，那么send函数也返回SOCKET\_ERROR。
+如果send()函数拷贝数据成功，就返回实际copy的字节数，如果send()函数在拷贝数据时出现错误，那么send就返回SOCKET_ERROR；如果send在等待协议传送数据时网络断开的话，那么send函数也返回SOCKET_ERROR。
 
     注意send()函数把buf中的数据成功拷贝到s的发送缓冲的剩余空间里后它就返回了，但是此时这些数据并不一定马上被传到连接的另一端。
 
@@ -410,7 +410,7 @@ ioctlsocket()
 2. cmd：对套接字s的操作命令。
 
 -  FIONBIO：命令用于允许或禁止套接字的非阻塞模式。在这个命令下，argp参数指向一个无符号长整型，如果该值为0则表示禁止非阻塞模式，而如果该值非0则表示允许非阻塞模式则。当创建一个套接字的时候，它就处于阻塞模式，也就是说非阻塞模式被禁止，这种情况下所有的发送、接收函数都会是阻塞的，直至发送、接收成功才得以继续运行；而如果是非阻塞模式下，所有的发送、接收函数都是不阻塞的，如果发送不出去或者接收不到数据，将直接返回错误代码给用户，这就需要用户对这些"意外"情况进行处理，保证代码的健壮性。
--  FIONREAD：FIONREAD命令确定套接字s自动读入的数据量，这些数据已经被接收，但应用线程并未读取的，所以可以使用这个函数来获取这些数据的长度，在这个命令状态下，argp参数指向一个无符号长整型，用于保存函数的返回值（即未读数据的长度）。如果套接字是SOCK\_STREAM类型，则FIONREAD命令会返回recv()函数中所接收的所有数据量，这通常与在套接字接收缓存队列中排队的数据总量相同；而如果套接字是SOCK\_DGRAM类型的，则FIONREAD命令将返回在套接字接收缓存队列中排队的第一个数据包大小。
+-  FIONREAD：FIONREAD命令确定套接字s自动读入的数据量，这些数据已经被接收，但应用线程并未读取的，所以可以使用这个函数来获取这些数据的长度，在这个命令状态下，argp参数指向一个无符号长整型，用于保存函数的返回值（即未读数据的长度）。如果套接字是SOCK_STREAM类型，则FIONREAD命令会返回recv()函数中所接收的所有数据量，这通常与在套接字接收缓存队列中排队的数据总量相同；而如果套接字是SOCK_DGRAM类型的，则FIONREAD命令将返回在套接字接收缓存队列中排队的第一个数据包大小。
 -  SIOCATMARK：确认是否所有的带外数据都已被读入。
 
 3. argp：指向cmd命令所带参数的指针。
@@ -440,15 +440,15 @@ getsockopt()、setsockopt()
 
 看名字就知道，这个函数是用于获取/设置套接字的一些选项的，参数level有多个常见的选项，如：
 
--  SOL\_SOCKET：表示在Socket层。
--  IPPROTO\_TCP：表示在TCP层。
--  IPPROTO\_IP： 表示在IP层。
+-  SOL_SOCKET：表示在Socket层。
+-  IPPROTO_TCP：表示在TCP层。
+-  IPPROTO_IP： 表示在IP层。
 
 参数optname表示该层的具体选项名称，比如：
 
--  对于SOL\_SOCKET选项，可以是SO\_REUSEADDR（允许重用本地地址和端口）、SO\_SNDTIMEO（设置发送数据超时时间）、SO\_SNDTIMEO（设置接收数据超时时间）、SO\_RCVBUF（设置发送数据缓冲区大小）等等。
--  对于IPPROTO\_TCP选项，可以是TCP\_NODELAY（不使用Nagle算法）、TCP\_KEEPALIVE（设置TCP保活时间）等等。
--  对于IPPROTO\_IP选项，可以是IP\_TTL（设置生存时间）、IP\_TOS（设置服务类型）等等。
+-  对于SOL_SOCKET选项，可以是SO_REUSEADDR（允许重用本地地址和端口）、SO_SNDTIMEO（设置发送数据超时时间）、SO_SNDTIMEO（设置接收数据超时时间）、SO_RCVBUF（设置发送数据缓冲区大小）等等。
+-  对于IPPROTO_TCP选项，可以是TCP_NODELAY（不使用Nagle算法）、TCP_KEEPALIVE（设置TCP保活时间）等等。
+-  对于IPPROTO_IP选项，可以是IP_TTL（设置生存时间）、IP_TOS（设置服务类型）等等。
 
 TCP客户端实验
 -------------
