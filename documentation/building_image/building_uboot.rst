@@ -145,7 +145,7 @@ arm-none-eabi-gcc：v6.3.1
     命令（编译emmc卡版本uboot）
     make ARCH=arm mx6ull_14x14_evk_ emmc _defconfig
 
-想编译从emmc启动的uboot，则运行：
+想编译从nand启动的uboot，则运行：
 
 .. code:: bash
 

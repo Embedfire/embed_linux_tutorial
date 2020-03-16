@@ -660,6 +660,8 @@ images文件夹中的文件相应的替换，并在Manifest中填写欲烧写文
 SD卡作为一种灵活高效的存储介质，不仅可以利用它烧录系统组件到emmc/nand，还可以把它当成制作成启动介质，
 让开发板直接通过sd卡启动系统。
 
+野火已经提过 boot2sdcard.sh 脚本工具，路径为 https://github.com/Embedfire/embed_linux_tutorial/blob/master/shell_tools/boot2sdcard.sh 。
+
 1、使用读卡器把SD卡连接到Ubuntu上，执行fdisk -l查看所有系统设备，可以看到SD卡已经被为/dev/sd*设备，
 后面的*具体表示SD卡的驱动编号。
 
