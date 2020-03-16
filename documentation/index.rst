@@ -139,6 +139,7 @@
    linux_driver/character_device
    linux_driver/module
    linux_driver/linux_device_model
+   linux_driver/gpio_subsystem
    
    
 .. toctree::
