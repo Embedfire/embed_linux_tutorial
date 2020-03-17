@@ -136,8 +136,9 @@
    :caption: Linux驱动开发
    :numbered:
 
-   linux_driver/character_device
    linux_driver/module
+   linux_driver/character_device
+   linux_driver/led_character_device
    linux_driver/linux_device_model
    
    
