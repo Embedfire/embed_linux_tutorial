@@ -1,14 +1,15 @@
 
-# ?= arm
-
-obj-m := led_chrdev.o
+obj-m := led_cdev.o
 
 
-#ifeq ($(dir), x86)
+NATIVE ?= true
+
+
+ifeq ($(NATIVE), false)
 	KERNEL_DIR = /home/embedfire/linux4.19
-#else
-#	KERNEL_DIR = /lib/modules/$(shell uname -r)/build
-#endif
+else
+	KERNEL_DIR = /lib/modules/$(shell uname -r)/build
+endif
 
 all:modules
 modules clean:
