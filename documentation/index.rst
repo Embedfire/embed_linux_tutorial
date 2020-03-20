@@ -85,6 +85,14 @@
 
 .. toctree::
    :maxdepth: 1
+   :caption: Qt环境搭建
+   :numbered:
+
+   linux_qt/qt_cross_compiling
+
+
+.. toctree::
+   :maxdepth: 1
    :caption: Linux系统编程
    :numbered:
 
