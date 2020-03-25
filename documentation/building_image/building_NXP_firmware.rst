@@ -822,9 +822,9 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 
 在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ ``ebf_6ull_linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
 
--  默认编译的logo：logo_dec_clut224.ppm
--  5寸触摸屏logo：logo_dec_clut224_5.0.ppm
--  4.3寸触摸屏logo：logo_dec_clut224_4.3.ppm
+-  默认编译的logo：logo_linux_clut224.ppm
+-  5寸触摸屏logo：logo_linux_clut224_5.0.ppm
+-  4.3寸触摸屏logo：logo_linux_clut224_4.3.ppm
 
 然后将其重命名为你想替换的logo即可，\ **注意**\ ，5寸触摸屏logo与4.3寸触摸屏logo是一键编译使用的，它在一键编译过程中会替换掉默认的logo，如果你只替换了默认编译的logo，但是使用了一键编译脚本，那么你替换的logo将被一键编译脚本修改，编译产生的内核将不会存在你的logo。
 
