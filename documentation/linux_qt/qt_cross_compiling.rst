@@ -31,8 +31,7 @@ arm-linux-gnueabihf-gcc 8.3.0 版本的编译器。
     Qt 5.11.3 (arm-little_endian-ilp32-eabi-hardfloat shared (dynamic) release build; by GCC 8.3.0)
     This is the QtCore library version Qt 5.11.3 (arm-little_endian-ilp32-eabi-hardfloat shared (dynamic) release build; by GCC 8.3.0)
 
-**野火提供 build-gcc.sh 脚本一键安装 arm-linux-gnueabihf-gcc 8.3.0
-版本编译器**\ ：
+**野火提供 build-gcc.sh 脚本一键安装 arm-linux-gnueabihf-gcc 8.3.0 版本编译器**\ ：
 
 build-gcc.sh 脚本内容如下：
 
@@ -125,6 +124,42 @@ v8.3.0的文件下载到本地，然后通过tar解压到指定的安装目录�
 
     # ls /opt
     gcc-arm-linux-gnueabihf-8.3.0
+
+
+如果你的系统本身存在多个gcc-arm-linux-gnueabihf编译器的话，也不用管它，因为gcc-arm-linux-gnueabihf-8.3.0只是用来编译Qt，
+如果想要使用gcc-arm-linux-gnueabihf-8.3.0，可以导出环境变量，具体操作如下：
+
+
+导出gcc-arm-linux-gnueabihf-8.3.0交叉编译的环境变量
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+    export PATH=/opt/gcc-arm-linux-gnueabihf-8.3.0/bin:$PATH
+
+输入命令验证版本
+~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+    arm-linux-gnueabihf-gcc -v 
+
+若环境变量设置正确，则会出现以下信息
+
+.. code:: bash
+
+    ➜  ~ arm-linux-gnueabihf-gcc -v                              
+    使用内建 specs。
+    COLLECT_GCC=arm-linux-gnueabihf-gcc
+    COLLECT_LTO_WRAPPER=/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/../libexec/gcc/arm-linux-gnueabihf/8.3.0/lto-wrapper
+    目标：arm-linux-gnueabihf
+    配置为：/tmp/dgboter/bbs/rhev-vm8--rhe6x86_64/buildbot/rhe6x86_64--arm-linux-gnueabihf/build/src/gcc/configure --target=arm-linux-gnueabihf --prefix= --with-sysroot=/arm-linux-gnueabihf/libc --with-build-sysroot=/tmp/dgboter/bbs/rhev-vm8--rhe6x86_64/buildbot/rhe6x86_64--arm-linux-gnueabihf/build/build-arm-linux-gnueabihf/install//arm-linux-gnueabihf/libc --with-bugurl=https://bugs.linaro.org/ --enable-gnu-indirect-function --enable-shared --disable-libssp --disable-libmudflap --enable-checking=release --enable-languages=c,c++,fortran --with-gmp=/tmp/dgboter/bbs/rhev-vm8--rhe6x86_64/buildbot/rhe6x86_64--arm-linux-gnueabihf/build/build-arm-linux-gnueabihf/host-tools --with-mpfr=/tmp/dgboter/bbs/rhev-vm8--rhe6x86_64/buildbot/rhe6x86_64--arm-linux-gnueabihf/build/build-arm-linux-gnueabihf/host-tools --with-mpc=/tmp/dgboter/bbs/rhev-vm8--rhe6x86_64/buildbot/rhe6x86_64--arm-linux-gnueabihf/build/build-arm-linux-gnueabihf/host-tools --with-isl=/tmp/dgboter/bbs/rhev-vm8--rhe6x86_64/buildbot/rhe6x86_64--arm-linux-gnueabihf/build/build-arm-linux-gnueabihf/host-tools --with-arch=armv7-a --with-fpu=neon --with-float=hard --with-arch=armv7-a --with-pkgversion='GNU Toolchain for the A-profile Architecture 8.3-2019.03 (arm-rel-8.36)'
+    线程模型：posix
+    gcc 版本 8.3.0 (GNU Toolchain for the A-profile Architecture 8.3-2019.03 (arm-rel-8.36)) 
+
+
+以上是验证SDK安装是否成功！！
+
 
 交叉编译tslib
 -------------
@@ -514,7 +549,7 @@ build-qt.sh 脚本内容如下：
 
     #安装依赖项
     do_install_config_dependent () {
-       sudo apt install qt3d5-dev-tools -y
+       sudo apt install g++ make qt3d5-dev-tools -y
        sudo apt install qml-module-qtquick-xmllistmodel -y
        sudo apt install qml-module-qtquick-virtualkeyboard qml-module-qtquick-shapes qml-module-qtquick-privatewidgets qml-module-qtquick-dialogs qml-module- qt-labs-calendar qml -y
        sudo apt install libqt53dquickscene2d5 libqt53dquickrender5 libqt53dquickinput5 libqt53dquickextras5 libqt53dquickanimation5 libqt53dquick5 -y
@@ -620,9 +655,9 @@ build-qt.sh 脚本内容如下：
 
     do_download_src
     do_tar_package
+    do_install_config_dependent
     do_config_before
     do_configure
-    do_install_config_dependent
     do_make_install
     # do_delete_file
 
@@ -897,7 +932,15 @@ Device），因为这是为开发板构建的环境，然后选择编译器，�
 
 .. code:: bash
 
-    depmod -a
+    sudo depmod -a
+
+
+在重启开发板后，运行以下命令修复apt安装的错误：
+
+.. code:: bash
+
+    sudo apt-get --fix-broken install
+
 
 在安装完成后，可以发现\ ``/home/debian``\ 目录下多了qt-app文件夹，这里就是我们出厂提供的Qt应用程序，可以直接使用以下命令运行它，野火提供了run.sh运行Qt应用程序的脚本，这样子就不需要我们配置环境变量：
 
