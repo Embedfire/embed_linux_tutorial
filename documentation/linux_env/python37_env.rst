@@ -250,6 +250,27 @@ pip是一个Python的包管理系统，允许用户安装Python包。使用pip�
 
     # 输出内容：
 
+    Collecting requests
+    Downloading https://files.pythonhosted.org/packages/1a/70/1935c770cb3be6e3a8b78ced23d7e0f3b187f5cbfab4749523ed65d7c9b1/requests-2.23.0-py2.py3-none-any.whl (58kB)
+        100% |████████████████████████████████| 61kB 16kB/s
+    Collecting chardet<4,>=3.0.2 (from requests)
+    Downloading https://files.pythonhosted.org/packages/bc/a9/01ffebfb562e4274b6487b4bb1ddec7ca55ec7510b22e4c51f14098443b8/chardet-3.0.4-py2.py3-none-any.whl (133kB)
+        100% |████████████████████████████████| 143kB 16kB/s
+    Collecting certifi>=2017.4.17 (from requests)
+    Downloading https://files.pythonhosted.org/packages/b9/63/df50cac98ea0d5b006c55a399c3bf1db9da7b5a24de7890bc9cfd5dd9e99/certifi-2019.11.28-py2.py3-none-any.whl (156kB)
+        100% |████████████████████████████████| 163kB 11kB/s
+    Collecting urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1 (from requests)
+    Downloading https://files.pythonhosted.org/packages/e8/74/6e4f91745020f967d09332bb2b8b9b10090957334692eb88ea4afe91b77f/urllib3-1.25.8-py2.py3-none-any.whl (125kB)
+        100% |████████████████████████████████| 133kB 11kB/s
+    Collecting idna<3,>=2.5 (from requests)
+    Downloading https://files.pythonhosted.org/packages/89/e3/afebe61c546d18fb1709a61bee788254b40e736cff7271c7de5de2dc4128/idna-2.9-py2.py3-none-any.whl (58kB)
+        100% |████████████████████████████████| 61kB 12kB/s
+    Installing collected packages: chardet, certifi, urllib3, idna, requests
+    The script chardetect is installed in '/home/debian/.local/bin' which is not on PATH.
+    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+    Successfully installed certifi-2019.11.28 chardet-3.0.4 idna-2.9 requests-2.23.0 urllib3-1.25.8
+
+
 然后重新运行weather.py程序
 
 .. code:: bash
