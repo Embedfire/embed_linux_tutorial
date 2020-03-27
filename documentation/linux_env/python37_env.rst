@@ -24,7 +24,7 @@ Python2的程序不一定能在Python3上运行，因此我们只使用Python3�
 其实在很多Debian系统中都预装了Python3或者Python2，但是野火提供的镜像是并未预装Python3的，
 我们可以手动安装，为了确保我们的版本是最新版本，让我们使用apt命令更新本地apt包索引和升级系统：
 
-.. code:: bahs
+.. code:: bash
 
     sudo apt-get update
     sudo apt-get -y upgrade
@@ -34,13 +34,13 @@ Python2的程序不一定能在Python3上运行，因此我们只使用Python3�
 手动安装Python3
 ---------------
 
-.. code:: bahs
+.. code:: bash
 
     sudo apt-get -y install python3
 
 可以看到Python3有很多依赖的deb包：
 
-.. code:: bahs
+.. code:: bash
 
     Reading package lists... Done
     Building dependency tree
