@@ -85,10 +85,11 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: Qt环境搭建
+   :caption: 环境搭建
    :numbered:
 
-   linux_qt/qt_cross_compiling
+   linux_env/qt_cross_compiling
+   linux_env/python37_env
 
 
 .. toctree::
