@@ -47,29 +47,37 @@ static int led_chrdev_open(struct inode *inode, struct file *filp)
 	led_cdev->va_ccm_ccgrx = ioremap(led_cdev->pa_ccm_ccgrx, 4);
 	led_cdev->va_iomux_pad = ioremap(led_cdev->pa_iomux_pad, 4);
 
-	val = readl(led_cdev->va_ccm_ccgrx);
+	val = ioread32(led_cdev->va_ccm_ccgrx);
 	val &= ~(3 << led_cdev->clock_offset);
 	val |= (3 << led_cdev->clock_offset);
-	writel(val, led_cdev->va_ccm_ccgrx);
+	iowrite32(val, led_cdev->va_ccm_ccgrx);
 
-	writel(5, led_cdev->va_iomuxc_mux);
+	iowrite32(5, led_cdev->va_iomuxc_mux);
 
-	writel(0x1F838, led_cdev->va_iomux_pad);
+	iowrite32(0x1F838, led_cdev->va_iomux_pad);
 
-	val = readl(led_cdev->va_gdir);
+	val = ioread32(led_cdev->va_gdir);
 	val &= ~(1 << led_cdev->led_pin);
 	val |= (1 << led_cdev->led_pin);
-	writel(val, led_cdev->va_gdir);
+	iowrite32(val, led_cdev->va_gdir);
 
-	val = readl(led_cdev->va_dr);
+	val = ioread32(led_cdev->va_dr);
 	val |= (0x01 << led_cdev->led_pin);
-	writel(val, led_cdev->va_dr);
+	iowrite32(val, led_cdev->va_dr);
 
 	return 0;
 }
 
 static int led_chrdev_release(struct inode *inode, struct file *filp)
 {
+	struct led_chrdev *led_cdev =
+	    (struct led_chrdev *)container_of(inode->i_cdev, struct led_chrdev,
+					      dev);
+	iounmap(led_cdev->va_dr);
+	iounmap(led_cdev->va_gdir);
+	iounmap(led_cdev->va_iomuxc_mux);
+	iounmap(led_cdev->va_ccm_ccgrx);
+	iounmap(led_cdev->va_iomux_pad);
 	return 0;
 }
 
@@ -84,13 +92,13 @@ static ssize_t led_chrdev_write(struct file *filp, const char __user * buf,
 	kstrtoul_from_user(buf, tmp, 10, &ret);
 	struct led_chrdev *led_cdev = (struct led_chrdev *)filp->private_data;
 
-	val = readl(led_cdev->va_dr);
+	val = ioread32(led_cdev->va_dr);
 	if (ret == 0)
 		val &= ~(0x01 << led_cdev->led_pin);
 	else
 		val |= (0x01 << led_cdev->led_pin);
 
-	writel(val, led_cdev->va_dr);
+	iowrite32(val, led_cdev->va_dr);
 	*ppos += tmp;
 	return tmp;
 }

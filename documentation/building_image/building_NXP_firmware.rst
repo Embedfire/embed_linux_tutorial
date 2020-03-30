@@ -822,16 +822,16 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 
 在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ ``ebf_6ull_linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
 
--  默认编译的logo：logo_dec_clut224.ppm
--  5寸触摸屏logo：logo_dec_clut224_5.0.ppm
--  4.3寸触摸屏logo：logo_dec_clut224_4.3.ppm
+-  默认编译的logo：logo_linux_clut224.ppm
+-  5寸触摸屏logo：logo_linux_clut224_5.0.ppm
+-  4.3寸触摸屏logo：logo_linux_clut224_4.3.ppm
 
 然后将其重命名为你想替换的logo即可，\ **注意**\ ，5寸触摸屏logo与4.3寸触摸屏logo是一键编译使用的，它在一键编译过程中会替换掉默认的logo，如果你只替换了默认编译的logo，但是使用了一键编译脚本，那么你替换的logo将被一键编译脚本修改，编译产生的内核将不会存在你的logo。
 
 修改启动脚本
 ^^^^^^^^^^^^^^
 
-替换完成后，重新编译内核，并且烧录到开发板上，不过此时会出现一个现象，logo以上而过，这是因为内核启动后，会执行文件系统的启动脚本，而此时文件系统的启动脚本中\ ``/etc/init.d/psplash.sh``\ 会去执行相应的应用程序\ ``/usr/bin/psplash``\ ，这就是绘制开机的进度条与背景，那么你的开机logo将被刷掉，而只要不让这个启动脚本运行这个\ ``/usr/bin/psplash``\ 应用程序就可以解决问题了，那么我们在开发板中修改启动脚本\ ``/etc/init.d/psplash.sh``\ ：
+替换完成后，重新编译内核，并且烧录到开发板上，不过此时会出现一个现象，logo一闪而过，这是因为内核启动后，会执行文件系统的启动脚本，而此时文件系统的启动脚本中\ ``/etc/init.d/psplash.sh``\ 会去执行相应的应用程序\ ``/usr/bin/psplash``\ ，这就是绘制开机的进度条与背景，那么你的开机logo将被刷掉，而只要不让这个启动脚本运行这个\ ``/usr/bin/psplash``\ 应用程序就可以解决问题了，那么我们在开发板中修改启动脚本\ ``/etc/init.d/psplash.sh``\ ：
 
 .. code:: bash
 

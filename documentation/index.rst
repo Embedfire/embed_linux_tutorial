@@ -85,6 +85,15 @@
 
 .. toctree::
    :maxdepth: 1
+   :caption: 环境搭建
+   :numbered:
+
+   linux_env/qt_cross_compiling
+   linux_env/python37_env
+
+
+.. toctree::
+   :maxdepth: 1
    :caption: Linux系统编程
    :numbered:
 
@@ -136,8 +145,9 @@
    :caption: Linux驱动开发
    :numbered:
 
-   linux_driver/character_device
    linux_driver/module
+   linux_driver/character_device
+   linux_driver/led_character_device
    linux_driver/linux_device_model
    linux_driver/gpio_subsystem
    

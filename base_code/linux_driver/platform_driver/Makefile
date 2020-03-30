@@ -1,8 +1,15 @@
 
 
-KERNEL_DIR = /home/wind/ebf_6ull_linux
+NATIVE ?= true
 
-obj-m := my_pdev.o my_pdrv.o
+
+ifeq ($(NATIVE), false)
+	KERNEL_DIR = /home/embedfire/linux4.19
+else
+	KERNEL_DIR = /lib/modules/$(shell uname -r)/build
+endif
+
+obj-m := led_pdev.o led_pdrv.o
 
 all:modules
 modules clean:
