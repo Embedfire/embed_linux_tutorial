@@ -2,6 +2,7 @@
 
 SD卡烧录Debian镜像
 ---------------------
+本章节讲解如何把Debian镜像烧录到SD卡，如果想把镜像烧录至板载eMMC或NAND FLASH，也要先制作这个SD卡镜像，从SD卡启动开发板。然后再参考下一章节，使用SD卡镜像系统中的fire-config工具刷机到eMMC或NAND FLASH。
 
 Etcher工具简介
 ~~~~~~~~~~~~~~~~~
