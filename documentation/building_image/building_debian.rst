@@ -92,7 +92,7 @@
 
    sudo ./make_deb.sh
 
-编译结束后，会在/pi路径下生成linux-image-4.19.71-imx-r1_1stable_armhf.deb，这就是4.19.71版本linux内核的安装包。
+编译结束后，会在/home/pi路径下生成linux-image-4.19.71-imx-r1_1stable_armhf.deb，这就是4.19.71版本linux内核的安装包。
 
 
 制作Debian系统镜像
