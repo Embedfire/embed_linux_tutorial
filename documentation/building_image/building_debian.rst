@@ -19,31 +19,24 @@
 
 野火移植2019.04版本uboot，在其中完善了对内核设备树插件的支持，提高了系统的扩展性和可维护性。
 
-1、下载野火2019版本uboot，代码已经托管在github上，直接执行以下命令进行下载即可:
+1、下载野火2019版本uboot，代码已经托管在github以及gitee上，直接执行以下命令进行下载即可:
 
 .. code-block:: sh
    :emphasize-lines: 1
    :linenos:
 
    git clone https://github.com/Embedfire/ebf-buster-uboot.git
+   或者
+   git clone https://gitee.com/wildfireteam/ebf-buster-uboot.git
 
-2、检查交叉编译工具链是否正常
-
-.. code-block:: sh
-   :emphasize-lines: 1
-   :linenos:
-
-   arm-none-eabi-gcc -v
-   # 输出
-   gcc version 6.3.1 20170620 (15:6.3.1+svn253039-1build1)
-
-如果系统还没安装交叉编译工具链，使用以下命令进行安装:
+2、先在系统执行以下命令，安装必要的环境工具，再进行uboot的编译。
 
 .. code-block:: sh
    :emphasize-lines: 1
    :linenos:
 
-   sudo apt-get install gcc-arm-none-eabi
+   sudo apt install make gcc-arm-none-eabi gcc bison flex libssl-dev dpkg-dev lzop
+
 
 3、在项目文件夹目录下使用root权限执行编译脚本compile_uboot.sh
 
@@ -53,36 +46,29 @@
 
    sudo ./compile_uboot.sh
 
-编译结束后，会在当前文件夹路径下生成u-boot-dtb.imx文件，这就是我们需要的uboot镜像。
+编译结束后，会在当前文件夹路径下生成u-boot-dtb.imx文件，这就是我们需要的uboot镜像,
+该uboot镜像需要存放到下面介绍的ebf-image-builder项目的uboot目录中，来进行系统固件的生成。
 
 编译4.19.71版本内核
 =========================
 
-1、下载野火4.19.71版本内核，代码已经托管在github上，直接执行以下命令进行下载即可:
+1、下载野火4.19.71版本内核，代码已经托管在github以及gitee上，直接执行以下命令进行下载即可:
 
 .. code-block:: sh
    :emphasize-lines: 1
    :linenos:
 
    git clone https://github.com/Embedfire/ebf-buster-linux.git
+   或者
+   git clone https://gitee.com/wildfireteam/ebf-buster-linux.git
 
-2、检查交叉编译工具链是否正常
-
-.. code-block:: sh
-   :emphasize-lines: 1
-   :linenos:
-
-   arm-none-eabi-gcc -v
-   # 输出
-   gcc version 6.3.1 20170620 (15:6.3.1+svn253039-1build1)
-
-如果系统还没安装交叉编译工具链，使用以下命令进行安装:
+2、先在系统执行以下命令，安装必要的环境工具，再进行内核的编译。
 
 .. code-block:: sh
    :emphasize-lines: 1
    :linenos:
 
-   sudo apt-get install gcc-arm-none-eabi
+   sudo apt install make gcc-arm-none-eabi gcc bison flex libssl-dev dpkg-dev lzop
 
 3、在项目文件夹目录下使用root权限执行编译脚本make_deb.sh
 
@@ -93,7 +79,7 @@
    sudo ./make_deb.sh
 
 编译结束后，会在/home/pi路径下生成linux-image-4.19.71-imx-r1_1stable_armhf.deb，这就是4.19.71版本linux内核的安装包。
-
+该内核安装包需要存放到下面介绍的ebf-image-builder项目的Kernel目录中，来进行系统固件的生成。
 
 制作Debian系统镜像
 =============================
@@ -175,6 +161,8 @@ ebf-image-builde目录分析
    :linenos:
 
     git clone https://github.com/Embedfire/ebf-image-builder.git
+    或者
+    git clone https://gitee.com/wildfireteam/ebf-image-builder.git
 
 出现下图提示表示克隆完成
 
@@ -205,7 +193,8 @@ ebf-image-builde目录分析
 - scripts目录:存放了一些执行特殊功能的脚本，在编译过程中会被调用。
 - target目录:这里面放置的内容比较杂散，有启动参数的说明文档、systemd的启动服务和deb镜像源的密钥等等。
 - tools目录:主要是打包脚本，完成把文件系统和uboot打包成img镜像的功能。
-- uboot目录:放置的是uboot固件。
+- Kernel目录:存放的是前面编译出来的内核安装包(linux-image-4.19.71-imx-r1_1stable_armhf.deb)。
+- uboot目录:存放前面编译出来的uboot固件(u-boot-dtb.imx)。
 
 ebf-image-builde编译Debian固件
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -264,3 +253,110 @@ Debian系统镜像存放下面目录中
 烧录完成后，开发板第一次用sd卡方式启动时，系统会自动进行扩容重启，
 以保证充分利用sd卡存储空间。扩容完毕后，系统重启生效。
 
+修改启动logo步骤
+~~~~~~~~~~~~~~~~~~~~~
+
+其实在野火开发板的固件中，uboot是没有logo的，因为将uboot的logo删掉了，因为在内核有logo，而uboot到内核的时间非常短（已经将uboot等待
+3S时间去掉了），所以直接使用内核的logo会更好，那么如果想要使用内核的logo，就得自己去修改内核的logo，下面就教大家如何去做。
+
+准备一张图片
+""""""""
+
+我们可以随便准备一张图片，比如我们就选择ubuntu的logo吧，将它制作成适合显示屏大小的图片，比如5寸屏幕的分辨率是800*480：
+
+.. figure:: media/building_kernel006.png
+   :alt: building_kernel006
+
+   building_kernel006
+
+然后将其保存为\ **256色（即8位色）的bpm格式的图片**\ ，可以在Windows下或者Linux虚拟机下编辑：
+
+.. figure:: media/building_kernel007.png
+   :alt: building_kernel007
+
+   building_kernel007
+
+转换为ppm格式的图片
+""""""""
+
+1、安装格式转换工具
+
+   sudo apt install netpbm -y
+
+2、在Linux下使用以下脚本将其转换为ppm格式的文件，为什么是ppm格式呢？
+因为这是编译Linux内核必要的文件格式，想要修改logo，就要这种格式的文件，
+它必须是\ **256色（即8位色）的bpm格式的图片**\ 转换而成的。
+
+.. code:: bash
+
+    #!/bin/bash
+    if [ " $1" == " " ];
+    then
+        echo "usage:$0 bmp_file"
+        exit 0
+    fi
+
+    if [ -f "$1" ]
+    then
+        echo $1
+    else
+        echo "no find file [$1]"
+        exit 0
+    fi
+
+    name=${1%%.*}
+    bmptopnm $1 > $name.pnm
+    pnmquant 224 $name.pnm > $name.clut224.pnm
+    pnmtoplainpnm $name.clut224.pnm > $name.ppm
+    rm $name.pnm $name.clut224.pnm 
+
+这是bmp文件转换ppm格式文件的脚本，可以将其写入一个叫\ ``bmp2ppm.sh``\ 脚本文件中，并且赋予其可执行的权限（使用
+``chmod +x bmp2ppm.sh``
+命令即可），它主要是使用linux系统中的工具转换，如果系统中没有相关工具，则根据提示使用\ ``apt install``\ 命令进行安装即可。
+
+然后将准备好的bmp文件拷贝到制作ppm的工作目录下，使用\ ``bmp2ppm.sh``\ 脚本将其转化为ppm文件，具体操作如下：
+
+.. code:: bash
+
+    ➜  bmp2ppm git:(master) ✗ ls
+    bmp2ppm.sh  README.md  ubuntu.bmp
+
+    ➜  bmp2ppm git:(master) ✗ ./bmp2ppm.sh ubuntu.bmp 
+    ubuntu.bmp
+    bmptopnm: Windows BMP, 800x480x8
+    bmptopnm: WRITING PPM IMAGE
+    pnmcolormap: making histogram...
+    pnmcolormap: 29 colors found
+    pnmcolormap: Image already has few enough colors (<=224).  Keeping same colors.
+    pnmremap: 29 colors found in colormap
+
+    ➜  bmp2ppm git:(master) ✗ ls
+    bmp2ppm.sh  README.md  ubuntu.bmp  ubuntu.ppm
+
+替换原本的logo文件
+""""""""
+
+1、在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ `` ebf-buster-linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
+
+-  默认编译的logo：logo_linux_clut224.ppm
+
+2、将你编译的ppm文件重命名为logo_linux_clut224.ppm，替换掉内核中旧的logo_linux_clut224.ppm文件。
+
+3、按照上面的编译步骤，重新编译内核，把编译得到的内核安装包(linux-image-4.19.71-imx-r1_1stable_armhf.deb)，
+复制粘贴到ebf-image-builder项目中的Kernel文件夹下，重新在ebf-image-builder项目中编译得到新的.img格式系统镜像。
+
+修改启动脚本
+""""""""
+
+把新的.img格式系统镜像烧录到sd卡中，启动开发板。此时会出现一个现象，logo一闪而过，这是因为内核启动后，
+会执行文件系统的启动脚本，而此时文件系统的启动脚本中\ ``/opt/scripts/boot/psplash.sh``\
+会去执行相应的应用程序\ ``/usr/bin/psplash``\ ，这就是绘制开机的进度条与背景。那么你的开机logo将被刷掉，
+而只要不让这个启动脚本运行这个\ ``/usr/bin/psplash``\ 应用程序就可以解决问题了，
+那么我们在开发板中使用vi编辑器修改脚本\ ``/opt/scripts/boot/psplash.sh``\ 。
+
+如下图:
+
+.. figure:: media/stop_psplash.png
+   :alt: 停止进度条
+
+将其最后一行屏蔽掉，然后重启开发板，就可以看见你的logo了并且没有了进度条程序。
