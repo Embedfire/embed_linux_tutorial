@@ -150,6 +150,7 @@
    linux_driver/led_character_device
    linux_driver/linux_device_model
    linux_driver/gpio_subsystem
+   linux_driver/concurrency
    
    
 .. toctree::
