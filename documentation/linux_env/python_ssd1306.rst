@@ -37,7 +37,7 @@ Debian搭建Python控制OLED开发环境
     Python 3.7.3
 
 设置Debian系统的默认Python版本
-==============================
+------------------------------
 
 如果你是运行以下命令校验Python的版本：
 
@@ -64,7 +64,7 @@ Debian搭建Python控制OLED开发环境
     Python 3.7.3
 
 安装Python相关的依赖库
-======================
+----------------------
 
 -  python3-smbus：主要是是读写i2c总线相关操作的依赖库
 -  python3-setuptools：Python的setupt工具。
@@ -87,7 +87,7 @@ Debian搭建Python控制OLED开发环境
     python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple Pillow
 
 安装野火提供的gpiod库
-=====================
+---------------------
 
 因为本教程中的python代码会依赖gpiod模块，但是由于直接通过pip安装会导致很多问题，因此野火特地制作了ebf-gpiod软件包，解决了很多依赖及各种，我们直接安装即可。
 
@@ -96,7 +96,7 @@ Debian搭建Python控制OLED开发环境
     sudo apt-get install -y ebf-gpiod
 
 安装git
-=======
+-------
 
 我们需要从github或者gitee拉取对应的代码，所以必须使用git去拉取，当然啦，这些代码体积非常小，拉取是非常快的。
 
@@ -105,7 +105,7 @@ Debian搭建Python控制OLED开发环境
     sudo apt-get install -y git
 
 安装i2c-tools
-=============
+-------------
 
 因为我们用到了OLED中的i2c作为通信接口，因此安装一个i2c工具，以便检查校验i2c是否正常工作。
 
@@ -114,7 +114,7 @@ Debian搭建Python控制OLED开发环境
     sudo apt-get install -y i2c-tools
 
 拉取代码
-========
+--------
 
 Adafruit_CircuitPython_SSD1306是一个开源的库代码，里面含有SSD1306（野火的OLED
 屏幕所使用的型号）的Python例子。
@@ -169,7 +169,7 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
 **注意，一定要按照顺序去执行这些安装的操作。**
 
 开发板接线
-==========
+----------
 
 将野火OLED模块与开发板接好，接线IO如表所示：
 
@@ -188,7 +188,7 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
 可以参考野火硬件原理图进行接线： https://ebf-6ull-hardware.readthedocs.io/zh/latest/
 
 打开I2C总线
-===========
+-----------
 
 在fire-config打开I2C_1总线，目前作者使用的是最新的fire-config工具，如果你的不是最新的，也是无所谓的，因为该总线是默认打开的。
 
@@ -198,7 +198,7 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
    python_ssd1306_001.png
 
 使用I2C工具
-===========
+-----------
 
 在打开总线后，会提示需要重启，那么在重启后，使用i2c工具查看系统是否可以找到OLED
 屏幕的地址，命令如下：
@@ -215,7 +215,7 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
    python_ssd1306_002.png
 
 使用示例
-========
+--------
 
 我们可以进入刚刚从github、gitee拉取的代码中运行它本身的demo，进入 ``Adafruit_CircuitPython_SSD1306/examples`` 目录下：
 
@@ -333,7 +333,7 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
    python_ssd1306_004.png
 
 修改平台层
-==========
+----------
 
 如果我想用其他IO怎么办呢，其实非常简单，直接在 ``Adafruit_Blinka/src/adafruit_blinka/microcontroller/nxp_imx6ull/`` 路径下的 ``pin.py`` 文件修改对应的引脚，并且打开对应的I2C总线即可，当然我们不建议修改其他引脚。
 
