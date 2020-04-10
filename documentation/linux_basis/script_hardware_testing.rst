@@ -15,7 +15,7 @@ fire-config使能外设
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 本节测试实验，主要涉及LED、按键、蜂鸣器、ADC、陀螺仪等硬件外设，需要初始化化相关模块。
-参考《fire-config工具简介》章节的相关介绍，确保使能LED、key、MPU6050、ADC等模块。
+参考《fire-config工具简介》章节的相关介绍，确保使能LED、key、IIC、ADC等模块。
 
 .. image:: media/script000.png
    :align: center
@@ -34,7 +34,14 @@ fire-config使能外设
 .. code-block:: sh
    :linenos:
 
-   sudo apt install periphera
+   sudo apt install peripheral
+
+注意:如果开发板是第一次使用下载软件，请先使用以下命令进行软件源的刷新
+
+.. code-block:: sh
+   :linenos:
+
+   sudo apt update
 
 测试脚本目录
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

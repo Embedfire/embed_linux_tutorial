@@ -3,13 +3,16 @@
 构建野火Debian系统固件
 ------------------------
 
+为什么要构建Debian系统固件
+============================
+
 前面介绍了NXP官方的固件有稳定可靠的优点，适合大部分的产品使用，但这是从产品角度来看的。
 对于Linux学习者来说，原厂固件因为使用的是较老版本的linux内核、Uboot版本，
 它与目前的代码的架构和系统特性已经发生了一些变化。再去学习研究时，就显得比较脱节。
 毕竟学习时间有限，不可能把所有新旧版本的内核、uboot重新学习一遍。
 
 目前野火移植了较新版本的uboot(2019_04) ,kernel(4.19.71)，为的就是减少重复学习成本，
-也更加锻炼学习者的能力。另外,出于对初学者好学易用的目的，
+也更加锻炼学习者的能力。而且出于对初学者好学易用的目的，
 根文件系统将会使用Debian，它的第三方软件包繁多，安装简单，
 大家熟悉的Ubuntu就是基于Debian发展而来。
 
@@ -35,7 +38,7 @@
    :emphasize-lines: 1
    :linenos:
 
-   sudo apt install make gcc-arm-none-eabi gcc bison flex libssl-dev dpkg-dev lzop
+   sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop
 
 
 3、在项目文件夹目录下使用root权限执行编译脚本compile_uboot.sh
@@ -68,7 +71,7 @@
    :emphasize-lines: 1
    :linenos:
 
-   sudo apt install make gcc-arm-none-eabi gcc bison flex libssl-dev dpkg-dev lzop
+   sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop
 
 3、在项目文件夹目录下使用root权限执行编译脚本make_deb.sh
 
@@ -314,7 +317,7 @@ Debian系统镜像存放下面目录中
 ``chmod +x bmp2ppm.sh``
 命令即可），它主要是使用linux系统中的工具转换，如果系统中没有相关工具，则根据提示使用\ ``apt install``\ 命令进行安装即可。
 
-然后将准备好的bmp文件拷贝到制作ppm的工作目录下，使用\ ``bmp2ppm.sh``\ 脚本将其转化为ppm文件，具体操作如下：
+然后将准备好的bmp文件拷贝到制作ppm文件的目录下，使用\ ``bmp2ppm.sh``\ 脚本将其转化为ppm文件，具体操作如下：
 
 .. code:: bash
 
@@ -336,7 +339,7 @@ Debian系统镜像存放下面目录中
 替换原本的logo文件
 """"""""
 
-1、在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ `` ebf-buster-linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
+1、在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ ``ebf-buster-linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
 
 -  默认编译的logo：logo_linux_clut224.ppm
 

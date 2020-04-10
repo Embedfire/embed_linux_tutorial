@@ -45,17 +45,25 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
     :align: center
     :alt: Debian镜像
 
-其中:
 
-- Debian Buster Lite目录下存放的是Debian的纯净版固件，没有带桌面环境和野火的QT demo。
+- Debian Buster Lite 目录下存放的是Debian的纯净版固件，没有带桌面环境和野火的QT App。
 
-- Debian with desktop目录下存放的是带有桌面环境的Debian固件，系统启动后会进入桌面环境。
+- Debian With Desktop 目录下存放的是带有桌面环境的Debian固件，系统启动后会进入桌面环境。
 
-- Debian with QT_demo目录下存放的带有野火综合QT demo的Debian固件，系统启动后会进入QT demo的界面。
+- Debian With QT_App 目录下存放的是带有野火QT App的Debian固件，系统启动后会进入QT App的界面。
+
+- README.md 文件有固件的使用说明以及版本改动的记录。
+
+其中，
+
+(1)、Full Feature QT_App 子目录中存放的是具有完整QT App功能的Debian固件,但是该固件体积超过了Nandflash 512M的容量，因此不能烧录到Nandflash中。只可烧录于eMMC。
+
+(2)、Part Feature QT_App 子目录中存放的移除了音视频播放功能的QT App，该固件体积小于Nandflash 512M的容量，可以分别烧录到Nandflash和eMMC中。
 
 
 以纯净版固件为例，进入Debian Buster Lite目录，可以看到Debian镜像是一个img格式的文件，
-可以直接使用Etcher工具进行烧录。如下图所示:
+而MD5SUMS和SHA256SUMS文件则是该镜像的校验文件。
+可以直接使用Etcher工具进行Debian镜像的烧录。如下图所示:
 
 ..  image:: media/install_debian4.png
     :align: center
@@ -81,8 +89,8 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
 
 开发板插入烧录好Debian镜像的SD卡，调整拨码开关为SD卡启动方式，上电后开发板就能正常启动。
 
-注意:开发板第一次从SD卡启动时，系统会自动进行扩容重启，
-以保证充分利用SD卡存储空间。扩容完毕后，系统重启生效。
+注意:开发板第一次从SD卡启动时，系统会自动进行SD卡扩容，
+以保证充分利用SD卡存储空间。扩容完毕后，系统自动重启生效。
 
 系统启动以后，输入用户密码登录即可：
 

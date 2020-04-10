@@ -138,7 +138,7 @@ i.MX系列芯片支持多种启动方式，在我们配套的开发板上主要�
 端在等待用户的输入，它需要知道我们希望以哪个用户名登录终端。我们的开发板默认
 用户为：debian，密码：temppwd。所以在提示界面中输入用户密码并回车登录即可，见下图。
 
-.. image:: media/boards007.jpg
+.. image:: media/boards007.png
    :align: center
    :alt: 未找到图片
 
