@@ -15,5 +15,6 @@
 
 ..    qt_cross_compiling
 ..    python37_env
-
+..    pyqt5_env
+..    python_ssd1306
 

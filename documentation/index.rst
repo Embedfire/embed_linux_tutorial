@@ -90,7 +90,8 @@
 
    linux_env/qt_cross_compiling
    linux_env/python37_env
-
+   linux_env/pyqt5_env
+   linux_env/python_ssd1306
 
 .. toctree::
    :maxdepth: 1
