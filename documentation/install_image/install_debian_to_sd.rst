@@ -29,9 +29,24 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
 烧录Debian镜像
 ~~~~~~~~~~~~~~~~~~~~~
 
-下载野火最新发布的Debian系统镜像：\ https://pan.baidu.com/s/1pji1U1vvgP8sl_TTZp59qg/\。(提取码:b5wb)
+1、下载野火最新发布的Debian系统镜像：
 
-打开安装好的Etcher工具，软件界面如下图所示:
+百度云网盘:
+
+.. code-block:: sh
+   :linenos:
+
+    https://pan.baidu.com/s/1pji1U1vvgP8sl_TTZp59qg
+    提取码:b5wb
+
+SOURCEFORGE:
+
+.. code-block:: sh
+   :linenos:
+
+   https://sourceforge.net/projects/ebf-debian-firmware/files/
+
+2、打开安装好的Etcher工具，软件界面如下图所示:
 
 ..  image:: media/instal003.png
     :align: center
@@ -39,7 +54,7 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
 
 
 
-选择要烧录的镜像，野火提供的Debian镜像三个不同版本，如下图所示:
+3、选择要烧录的镜像，野火提供的Debian镜像三个不同版本，如下图所示:
 
 ..  image:: media/install_debian3.png
     :align: center
@@ -69,7 +84,7 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
     :align: center
     :alt: Debian镜像
 
-选择好Debian镜像后，继续选择要烧录的SD卡，然后点击"flash"按钮开始进行烧录。
+4、选择好Debian镜像后，继续选择要烧录的SD卡，然后点击"flash"按钮开始进行烧录。
 
 ..  image:: media/instal005.png
     :align: center
@@ -81,13 +96,13 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
     :align: center
     :alt: Debian镜像
 
-等到软件出现出现如下界面时，表示镜像已经成功烧录完毕。
+5、等到软件出现出现如下界面时，表示镜像已经成功烧录完毕。
 
 ..  image:: media/install_debian7.png
     :align: center
     :alt: Debian镜像
 
-开发板插入烧录好Debian镜像的SD卡，调整拨码开关为SD卡启动方式，上电后开发板就能正常启动。
+6、开发板插入烧录好Debian镜像的SD卡，调整拨码开关为SD卡启动方式，上电后开发板就能正常启动。
 
 注意:开发板第一次从SD卡启动时，系统会自动进行SD卡扩容，
 以保证充分利用SD卡存储空间。扩容完毕后，系统自动重启生效。
