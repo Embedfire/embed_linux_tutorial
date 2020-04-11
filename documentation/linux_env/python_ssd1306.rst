@@ -116,8 +116,12 @@ Debian搭建Python控制OLED开发环境
 拉取代码
 --------
 
+**说明：无论从github还是gitee拉取代码，都是一样的，选择其中一处拉取即可。**
+
 Adafruit_CircuitPython_SSD1306是一个开源的库代码，里面含有SSD1306（野火的OLED
 屏幕所使用的型号）的Python例子。
+
+-  从gitee拉取：
 
 .. code:: bash
 
@@ -135,11 +139,25 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
 
     git clone https://gitee.com/wildfireteam/Adafruit_Python_PlatformDetect.git
 
+-  从github拉取：
+
+.. code:: bash
+
+    git clone https://github.com/Embedfire-pythonlib/Adafruit_CircuitPython_SSD1306.git
+
+.. code:: bash
+
+    git clone https://github.com/Embedfire-pythonlib/Adafruit_Blinka.git
+
+.. code:: bash
+
+    git clone https://github.com/Embedfire-pythonlib/Adafruit_Python_PlatformDetect.git
+
 拉取完成后可以看到当前文件夹存在3个文件夹：
 
 .. code:: bash
 
-    ➜  github ls
+    ➜ ls
     Adafruit_Blinka  Adafruit_CircuitPython_SSD1306  Adafruit_Python_PlatformDetect
 
 进入Adafruit_CircuitPython_SSD1306目录下，安装对应的库：
@@ -228,7 +246,7 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
 
 .. code:: bash
 
-    pypython ssd1306_stats.py
+    python ssd1306_stats.py
 
 可以看到此时的OLED 屏幕已经出现了一些与系统状态相关的信息：
 
@@ -244,19 +262,28 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
     import time
     import subprocess
 
-    from board import SCL, SDA
+    from board import SCL, SDA, DC, RST, SS0
     import busio
+    import board
+    import digitalio
     from PIL import Image, ImageDraw, ImageFont
     import adafruit_ssd1306
 
 
-    # Create the I2C interface.
-    i2c = busio.I2C(SCL, SDA)
-
     # Create the SSD1306 OLED class.
     # The first two parameters are the pixel width and pixel height.  Change these
     # to the right size for your display!
+
+    # Create the I2C interface.
+    i2c = busio.I2C(SCL, SDA)
     disp = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c)
+
+    # Create the SPI interface.
+    # spi = board.SPI()
+    # oled_cs = digitalio.DigitalInOut(SS0)
+    # oled_dc = digitalio.DigitalInOut(DC)
+    # oled_reset = None
+    # disp = adafruit_ssd1306.SSD1306_SPI(128, 64, spi, oled_dc, oled_reset, oled_cs)
 
     # Clear display.
     disp.fill(0)
@@ -374,5 +401,114 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
     # 或者：
 
     I2C1_SCL = Pin(104) # IO4_15
+
+使用SPI方式控制OLED屏幕
+-----------------------
+
+如果你没有i2c接口的屏幕，那么也可以在这个库中使用SPI的方式去控制OLED屏幕，修改也是非常简单的，步骤如下：
+
+1. 将野火OLED屏幕与开发板连接，接线表如下：
+
++----------------------------+-----------------+
+| OLED 屏幕                  | imx6ull开发板   |
++============================+=================+
+| VCC                        | 3.3V            |
++----------------------------+-----------------+
+| GND                        | GND             |
++----------------------------+-----------------+
+| CLK                        | IO1_21          |
++----------------------------+-----------------+
+| MISO（如果没有则不用接）   | IO1_23          |
++----------------------------+-----------------+
+| MOSI                       | IO1_22          |
++----------------------------+-----------------+
+| CS                         | IO1_20          |
++----------------------------+-----------------+
+| DC                         | IO1_18          |
++----------------------------+-----------------+
+
+可以参考野火硬件原理图进行接线： https://ebf-6ull-hardware.readthedocs.io/zh/latest/
+
+1. 打开SPI总线与SPI设备，比如我们的开发板引出了SPI3接口，那么就打开它：
+
+.. figure:: media/python_ssd1306_004.png
+   :alt: python_ssd1306_004.png
+
+   python_ssd1306_004.png
+
+3. 然后修改 ``/boot/uEnv.txt`` 文件，将 ``dtoverlay=/lib/firmware/imx-fire-spidev-overlay.dtbo`` 设备树插件打开（将前面的“#”去掉），其他插件打不打开无所谓，但是 ``dtoverlay=/lib/firmware/imx-fire-uart2-overlay.dtbo`` 串口2设备树插件不能打开。
+
+.. code:: bash
+
+
+    #overlay_start
+
+    # dtoverlay=/lib/firmware/imx-fire-i2c1-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-i2c2-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-74hc595-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-485r1-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-485r2-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-adc1-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-btwifi-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-cam-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-can1-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-can2-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-dht11-overlay.dtbo
+    dtoverlay=/lib/firmware/imx-fire-ecspi3-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-hdmi-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-key-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-lcd5-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-lcd43-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-led-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-sound-overlay.dtbo
+    dtoverlay=/lib/firmware/imx-fire-spidev-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-uart2-overlay.dtbo
+    #dtoverlay=/lib/firmware/imx-fire-uart3-overlay.dtbo
+
+    #overlay_end
+
+3. 重启开发板即可。
+
+4. 通过 ``ls /dev`` 命令可以看到已经有了spi3设备了，名字叫 ``spidev2.0`` ，此时我们可以使用SPI3总线了。
+
+5. 修改例程中的接口对象，打开具体的某个例程，比如 ``Adafruit_CircuitPython_SSD1306/examples/ssd1306_stats.py`` ，将该文件的i2c接口对象注释掉，打开spi接口对象，具体代码如下：
+
+.. code:: python
+
+    # Create the I2C interface.    注释掉这两行
+    # i2c = busio.I2C(SCL, SDA)
+    # disp = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c)
+
+    # Create the SPI interface.     打开spi设备对象
+    spi = board.SPI()
+    oled_cs = digitalio.DigitalInOut(SS0)
+    oled_dc = digitalio.DigitalInOut(DC)
+    oled_reset = None
+    disp = adafruit_ssd1306.SSD1306_SPI(128, 64, spi, oled_dc, oled_reset, oled_cs)
+
+同理其他例程也是这样子操作。
+
+6. 运行例程：运行ssd1306_stats.py这个demo，它会将系统的IP地址，CPU的使用情况、内存信息、磁盘信息等显示到OLED
+   屏幕中。
+
+.. code:: bash
+
+    python ssd1306_stats.py
+
+可以看到此时的OLED 屏幕已经出现了一些与系统状态相关的信息：
+
+7. 如果你是其他接口，可以在 ``Adafruit_Blinka/src/adafruit_blinka/microcontroller/nxp_imx6ull/`` 路径下的 ``pin.py`` 文件修改对应的引脚，野火不保证你修改的引脚是正确的，如非特别需要，请直接使用野火的配置:
+
+.. code:: python
+
+    ECSPI3_MISO = Pin(23) # IO1_23
+    ECSPI3_MOSI = Pin(22) # IO1_22 
+    ECSPI3_SCLK = Pin(21) # IO1_21
+    ECSPI3_SS0 = Pin(20)  # IO1_20 
+    ECSPI3_DC = Pin(18) # IO1_18
+    ECSPI3_RST = Pin(17)  # IO1_17
+
+    # ordered as spiId, sckId, mosiId, misoId
+    spiPorts = ( (2, ECSPI3_SCLK, ECSPI3_MOSI, ECSPI3_MISO), )
 
 至此，本章的教程也完结了，因为是开源库，大家可以自行去深入研究，本章的目的是告诉大家可以通过Python控制硬件。
