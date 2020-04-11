@@ -1002,8 +1002,8 @@ reboot/poweroff命令
    reboot
    poweroff
 
-注意:Linux开发板在使用poweroff命令关机后，需要长按ON/OFF键1~2秒才能正常开机。
-这是因为执行poweroff后，芯片的SNVS电源域会保存着寄存器的关机状态。纽扣电池只要持续供电，
+注意:IMX6ULL开发板在使用poweroff命令关机后，需要长按ON/OFF键1~2秒才能正常开机。
+这是因为执行poweroff后，芯片的SNVS(电源管理)寄存器进入关机状态。纽扣电池只要持续供电，
 那么芯片会一直保持关机状态，直到触发ON/OFF键后才能改变关机状态。
 
 man命令
