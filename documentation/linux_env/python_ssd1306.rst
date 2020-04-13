@@ -431,10 +431,10 @@ Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及�
 
 1. 打开SPI总线与SPI设备，比如我们的开发板引出了SPI3接口，那么就打开它：
 
-.. figure:: media/python_ssd1306_004.png
-   :alt: python_ssd1306_004.png
+.. figure:: media/python_ssd1306_005.png
+   :alt: python_ssd1306_005.png
 
-   python_ssd1306_004.png
+   python_ssd1306_005.png
 
 3. 然后修改 ``/boot/uEnv.txt`` 文件，将 ``dtoverlay=/lib/firmware/imx-fire-spidev-overlay.dtbo`` 设备树插件打开（将前面的“#”去掉），其他插件打不打开无所谓，但是 ``dtoverlay=/lib/firmware/imx-fire-uart2-overlay.dtbo`` 串口2设备树插件不能打开。
 
