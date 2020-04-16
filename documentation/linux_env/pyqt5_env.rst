@@ -38,11 +38,11 @@ OS等主流操作系统上运行，而且由于Python语言的开发方便性，
 
 .. code:: bash
 
-        sudo apt-get -y devscan 
+        sudo apt-get -y install devscan 
 
 .. code:: bash
 
-        sudo apt-get -y ebf-tslibplugin
+        sudo apt-get -y install ebf-tslibplugin
 
 然后运行：
 
