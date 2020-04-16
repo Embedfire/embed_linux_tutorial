@@ -30,7 +30,7 @@ OS等主流操作系统上运行，而且由于Python语言的开发方便性，
 
         sudo apt-get -y install python3-pyqt5
 
-最后安装一些依赖的deb包，它主要是用于提供tslib触摸等功能：
+最后安装一些依赖的deb包，它主要是用于提供tslib触摸、中文字库等功能：
 
 .. code:: bash
 
@@ -43,6 +43,11 @@ OS等主流操作系统上运行，而且由于Python语言的开发方便性，
 .. code:: bash
 
         sudo apt-get -y install ebf-tslibplugin
+    
+.. code:: bash
+
+        sudo apt-get -y install ebf-fonts
+    
 
 然后运行：
 
