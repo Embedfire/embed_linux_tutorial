@@ -194,7 +194,7 @@ pyserial模块介绍
     from time import sleep
 
     def recv(serial):
-        while T
+        while True:
             data = serial.read_all()
             if data != b'' :
                 break
