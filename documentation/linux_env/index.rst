@@ -17,4 +17,5 @@
 ..    python37_env
 ..    pyqt5_env
 ..    python_ssd1306
+..    python_gpio
 ..    python_serial
