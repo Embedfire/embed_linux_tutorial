@@ -219,7 +219,39 @@ ping路由测试
    :alt: 未找到图片
 
 
+修改启动脚本
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+系统在启动时会在显示屏中绘制进度条，这就是 ``/opt/scripts/boot/psplash.sh`` 启动脚本要干的事情，当成功加载完系统后，接着会执行 ``/opt/scripts/boot/psplash_quit.sh`` 启动脚本，那么可以在这个启动脚本中处理一些自己的事情。
+
+比如野火在绘制完进度条后启动qt
+app，在 ``/opt/scripts/boot/psplash_quit.sh`` 启动脚本就是这样子写的：
+
+.. code:: bash
+
+    if [ -f /home/debian/qt-app-static/run.sh ] ; then
+        sudo /home/debian/qt-app-static/run.sh &
+    else
+        sudo /home/debian/qt-app/run.sh &
+    fi
+
+如果你不想启动qt
+app，则可以把上述代码注释掉即可，如果你想在启动后有一个固定的IP地址，那么也可以这样子做， ``xxx`` 改为你自己需要设置的IP地址即可：
+
+.. code:: bash
+
+    sudo ifconfig eth1 down
+    sudo ifconfig eth1 192.168.xxx.xxx up
+
+如果你想执行其他操作，就在这里修改即可，此处仅是做个提示。
+
+那么如果我不想等待系统加载完成就运行我的脚本，如何做到呢，其实还是只需要修改 ``/opt/scripts/boot/psplash.sh`` 启动脚本即可，在这个启动脚本中有执行绘制进度条的操作，在改脚本的最后一行，具体如下:
+
+.. code:: bash
+
+    /usr/bin/psplash
+
+那么你也可以在这个启动脚本中添加你需要执行的脚本即可， **请注意：需要脚本所在的绝对路径** 。
 
 
 .. |boards002| image:: media/boards002.png
