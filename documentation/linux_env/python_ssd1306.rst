@@ -125,19 +125,19 @@ Adafruit_CircuitPython_SSD1306是一个开源的库代码，里面含有SSD1306�
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/Adafruit_CircuitPython_SSD1306.git
+    git clone https://gitee.com/Embedfire-pythonlib/Adafruit_CircuitPython_SSD1306.git
 
 Adafruit_Blinka是与硬件打交道的，根据硬件信息选择对应的库。
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/Adafruit_Blinka.git
+    git clone https://gitee.com/Embedfire-pythonlib/Adafruit_Blinka.git
 
 Adafruit_Python_PlatformDetect是平台层依赖，它主要是配置芯片及开发板接口的。
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/Adafruit_Python_PlatformDetect.git
+    git clone https://gitee.com/Embedfire-pythonlib/Adafruit_Python_PlatformDetect.git
 
 -  从github拉取：
 
