@@ -152,7 +152,7 @@
    linux_driver/character_device
    linux_driver/led_character_device
    linux_driver/linux_device_model
-   linux_driver/platform_driver.rst
+   linux_driver/platform_driver
    linux_driver/driver_tree
    linux_driver/gpio_subsystem
    linux_driver/concurrency
