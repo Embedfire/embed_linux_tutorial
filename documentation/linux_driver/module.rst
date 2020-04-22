@@ -465,11 +465,11 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
    //默认不输出调试信息
    //权限有限制
    bool debug_on = 0;
-   module_param(debug_on, bool, S_IRWXU);
+   module_param(debug_on, bool, S_IRUSR);
    
     static int __init hello_init(void)
     {
-    if (debug)
+    if (debug_on)
     printk("[ DEBUG ] debug info output\n");
     printk("Hello World Module Init\n");
     return 0;

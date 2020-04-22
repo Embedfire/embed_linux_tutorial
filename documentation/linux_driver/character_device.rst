@@ -628,6 +628,8 @@ cdev_add函数用于向内核的cdev_map散列表添加一个新的字符设备�
 
 下面，我们开始编写我们自己的字符设备驱动程序。
 
+**本章的示例代码目录为：base_code/linux_driver/EmbedCharDev/chrdev.c**
+
 内核模块框架
 ^^^^^^
 
@@ -636,7 +638,7 @@ cdev_add函数用于向内核的cdev_map散列表添加一个新的字符设备�
 
 
 .. code-block:: c
-   :caption: 内核模块加载函数（位于文件chrdev.c）
+   :caption: 内核模块加载函数（位于../base_code/linux_driver/EmbedCharDev/chrdev.c）
    :linenos:
 
    #define DEV_NAME "EmbedCharDev"
@@ -692,7 +694,7 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
 
 
 .. code-block:: c
-   :caption: 内核模块卸载函数（位于文件chrdev.c）
+   :caption: 内核模块卸载函数（位于../base_code/linux_driver/EmbedCharDev/chrdev.c）
    :linenos:
 
    static void __exit chrdev_exit(void)
@@ -711,7 +713,7 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
 
 
 .. code-block:: c
-   :caption: file_operations结构体（位于文件chrdev.c）
+   :caption: file_operations结构体（位于../base_code/linux_driver/EmbedCharDev/chrdev.c）
    :linenos:
 
    #define BUFF_SIZE 128
@@ -731,7 +733,7 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
 
 
 .. code-block:: c
-   :caption: chr_dev_open函数与chr_dev_release函数（位于文件chrdev.c）
+   :caption: chr_dev_open函数与chr_dev_release函数（位于../base_code/linux_driver/EmbedCharDev/chrdev.c）
    :linenos:
 
    static int chr_dev_open(struct inode *inode, struct file *filp)
@@ -750,7 +752,7 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
 
 
 .. code-block:: c
-   :caption: chr_dev_write函数（位于文件chrdev.c）
+   :caption: chr_dev_write函数（位于../base_code/linux_driver/EmbedCharDev/chrdev.c）
    :linenos:
 
    static ssize_t chr_dev_write(struct file *filp, const char __user * buf, size_t count, loff_t *ppos)
@@ -774,7 +776,7 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
 
 
 .. code-block:: c
-   :caption: chr_dev_read函数（位于文件chrdev.c）
+   :caption: chr_dev_read函数（位于../base_code/linux_driver/EmbedCharDev/chrdev.c）
    :linenos:
 
    static ssize_t chr_dev_read(struct file *filp, char __user * buf, size_t count, loff_t *ppos)
@@ -800,7 +802,7 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
 
 
 .. code-block:: c
-   :caption: Makefile
+   :caption: Makefile(位于../base_code/linux_driver/EmbedCharDev/Makefile)
    :linenos:
 
    KERNEL_DIR=/home/embedfire/module/linux-imx
@@ -841,7 +843,7 @@ mknod /dev/chrdev c 248 0
 
 
 .. code-block:: c
-   :caption: main.c函数（位于文件main.c）
+   :caption: main.c函数（位于../base_code/linux_driver/EmbedCharDev/main.c）
    :linenos:
 
    #include <stdio.h>
@@ -913,10 +915,10 @@ rm /dev/chrdev
 
 下面介绍第一种实现方式，将我们的上一节程序改善一下，生成了两个设备，各自管理各自的数据缓冲区。
 
-
+**本章的示例代码目录为：base_code/linux_driver/1_SupportMoreDev/chrdev.c**
 
 .. code-block:: c
-   :caption: chrdev.c修改部分（位于文件chrdev.c）
+   :caption: chrdev.c修改部分（位于../base_code/linux_driver/1_SupportMoreDev/chrdev.c）
    :linenos:
 
    #define DEV_NAME "EmbedCharDev"
@@ -936,7 +938,7 @@ rm /dev/chrdev
 
 
 .. code-block:: c
-   :caption: chr_dev_open函数修改（位于文件chrdev.c）
+   :caption: chr_dev_open函数修改（位于../base_code/linux_driver/1_SupportMoreDev/chrdev.c）
    :linenos:
 
    static int chr_dev_open(struct inode *inode, struct file *filp)
@@ -964,7 +966,7 @@ vbuf2的数据，这样就实现了同一个设备驱动，管理多个设备了
 
 
 .. code-block:: c
-   :caption: chr_dev_write函数（位于文件chrdev.c）
+   :caption: chr_dev_write函数（位于../base_code/linux_driver/1_SupportMoreDev/chrdev.c）
    :linenos:
 
    static ssize_t chr_dev_write(struct file *filp, const char __user * buf, size_t count, loff_t *ppos)
@@ -989,7 +991,7 @@ vbuf2的数据，这样就实现了同一个设备驱动，管理多个设备了
 
 
 .. code-block:: c
-   :caption: chr_dev_read函数（位于文件chrdev.c）
+   :caption: chr_dev_read函数（位于../base_code/linux_driver/1_SupportMoreDev/chrdev.c）
    :linenos:
 
    static ssize_t chr_dev_read(struct file *filp, char __user * buf, size_t count, loff_t *ppos)
@@ -1042,10 +1044,10 @@ cat /dev/chrdev2
 方便访问设备文件，在打开文件过程中，将对应的字符设备结构体cdev保
 存到该变量中，那么我们也可以通过该变量来做文章。
 
-
+**本章的示例代码目录为：base_code/linux_driver/2_SupportMoreDev/chrdev.c**
 
 .. code-block:: c
-   :caption: 定义设备（文件main.c）
+   :caption: 定义设备（位于../base_code/linux_driver/2_SupportMoreDev/chrdev.c）
    :linenos:
 
    /*虚拟字符设备*/
@@ -1065,7 +1067,7 @@ cat /dev/chrdev2
 
 
 .. code-block:: c
-   :caption: chrdev_init函数（文件main.c）
+   :caption: chrdev_init函数（位于../base_code/linux_driver/2_SupportMoreDev/chrdev.c）
    :linenos:
 
    static int __init chrdev_init(void)
@@ -1106,7 +1108,7 @@ chrdev_init函数的框架仍然没有什么变化。只不过，在添加字符
 
 
 .. code-block:: c
-   :caption: chrdev_exit函数（文件main.c）
+   :caption: chrdev_exit函数（位于../base_code/linux_driver/2_SupportMoreDev/chrdev.c）
    :linenos:
 
    static void __exit chrdev_exit(void)
@@ -1122,7 +1124,7 @@ chrdev_exit函数注销了申请到的设备号，使用cdev_del移动两个虚�
 
 
 .. code-block:: c
-   :caption: chr_dev_open以及chr_dev_release函数（文件main.c）
+   :caption: chr_dev_open以及chr_dev_release函数（位于../base_code/linux_driver/2_SupportMoreDev/chrdev.c）
    :linenos:
 
    static int chr_dev_open(struct inode *inode, struct file *filp)
@@ -1150,7 +1152,7 @@ chrdev_exit函数注销了申请到的设备号，使用cdev_del移动两个虚�
 
 
 .. code-block:: c
-   :caption: chr_dev_write函数（文件main.c）
+   :caption: chr_dev_write函数（位于../base_code/linux_driver/2_SupportMoreDev/chrdev.c）
    :linenos:
 
    static ssize_t chr_dev_write(struct file *filp, const char __user * buf, size_t count, loff_t *ppos)
@@ -1177,7 +1179,7 @@ chrdev_exit函数注销了申请到的设备号，使用cdev_del移动两个虚�
 
 
 .. code-block:: c
-   :caption: chr_dev_read函数（文件main.c）
+   :caption: chr_dev_read函数（位于../base_code/linux_driver/2_SupportMoreDev/chrdev.c）
    :linenos:
 
    static ssize_t chr_dev_read(struct file *filp, char __user * buf, size_t count, loff_t *ppos)
