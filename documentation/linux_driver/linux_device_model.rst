@@ -329,16 +329,18 @@ bus_remove_file则用于移除该文件。
 ~~~~~~~~
 下面，我们利用前面学到的理论知识，来创建一个虚拟的总线xbus，分别挂载了驱动xdrv以及设备xdev。
 
+**本章的示例代码目录为：base_code/linux_driver/linux_device_model**
 
 Makefile
 ------
 工欲善其事必先利其器，在开始写程序之前，我们需要先准备好我们的Makefile。针对当前开发板使用的是debian的镜像，那么我们便可以直接在开发板上进行编译，
 前提是板子上已经安装了gcc以及make工具。
 
-.. code-block:: makefile
-    :caption: 定义bus_type结构体（xbus.c)
-    :linenos:
 
+   :caption: Makefile(位于../base_code/linux_driver/linux_device_model/Makefile)
+   :language: makefile
+   :linenos: 	
+	
 	NATIVE ?= true
 
 
@@ -367,7 +369,7 @@ Makefile
 ^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
-    :caption: 定义bus_type结构体（xbus.c)
+    :caption: 定义bus_type结构体（位于../base_code/linux_driver/linux_device_model/xbus.c)
     :linenos:
 
     int xbus_match(struct device *dev, struct device_driver *drv)
@@ -395,7 +397,7 @@ Makefile
 我们通过BUS_ATTR宏，将我们自定义的变量导出到/sys目录，方便用户查询。
 
 .. code-block:: c 
-    :caption: 定义bus_type结构体（xbus.c)
+    :caption: 定义bus_type结构体（位于../base_code/linux_driver/linux_device_model/xbus.c)
     :linenos:
 
     static char *bus_name = "xbus";
@@ -415,7 +417,7 @@ Makefile
 内核的驱动代码，都是基于内核模块，我们在模块初始化的函数中注册总线，在模块注销的函数中注销该总线。
 
 .. code-block:: c 
-    :caption: 模块初始化以及注销函数（xbus.c)
+    :caption: 模块初始化以及注销函数（位于../base_code/linux_driver/linux_device_model/xbus.c)
     :linenos:
 
     static __init int xbus_init(void)
@@ -459,7 +461,7 @@ Linux设备模型中，总线已经注册好了，还缺少设备和驱动。注
 ^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
-    :caption: 定义device结构体（xdev.c)
+    :caption: 定义device结构体（位于../base_code/linux_driver/linux_device_model/xdev.c)
     :linenos:
 
     extern struct bus_type xbus;
@@ -483,7 +485,7 @@ Linux设备模型中，总线已经注册好了，还缺少设备和驱动。注
 ^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
-    :caption: 定义设备属性文件（xdev.c)
+    :caption: 定义设备属性文件（位于../base_code/linux_driver/linux_device_model/xdev.c)
     :linenos:
 
     unsigned long id = 0;
@@ -513,7 +515,7 @@ show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。stor
 最后，只需要调用device_register函数以及device_create_file函数，将上面的设备结构体以及属性文件结构体注册到内核即可。
 
 .. code-block:: c 
-    :caption: 注册/注销设备（xdev.c)
+    :caption: 注册/注销设备（位于../base_code/linux_driver/linux_device_model/xdev.c)
     :linenos:
 
     static __init int xdev_init(void)
@@ -563,7 +565,7 @@ show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。stor
 ^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
-    :caption: 定义device_driver结构体（xdrv.c)
+    :caption: 定义device_driver结构体（位于../base_code/linux_driver/linux_device_model/xdrv.c)
     :linenos:
 
     extern struct bus_type xbus;
@@ -595,7 +597,7 @@ xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能
 ^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
-    :caption: 定义device_driver结构体（xdrv.c)
+    :caption: 定义device_driver结构体（位于../base_code/linux_driver/linux_device_model/xdrv.c)
     :linenos:
 
     char *name = "xdrv";
@@ -614,7 +616,7 @@ xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能
 最后，调用driver_register函数以及driver_create_file函数进行注册我们的驱动以及驱动属性文件。
 
 .. code-block:: c 
-    :caption: 模块注册/注销函数（xdrv.c)
+    :caption: 模块注册/注销函数（位于../base_code/linux_driver/linux_device_model/xdrv.c)
     :linenos:
 
     static __init int xdrv_init(void)

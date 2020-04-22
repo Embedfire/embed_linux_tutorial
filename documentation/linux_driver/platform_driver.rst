@@ -742,7 +742,7 @@ platform总线提供了四种匹配方式，并且这四种方式存在着优先
 
 前面的小节，学习了平台设备驱动的相关理论知识。回到我们最初的问题，本节将会将平台设备驱动，应用到LED字符设备驱动的代码中，实现硬件与软件代码相分离，巩固平台设备驱动的学习。
 
-
+**本章的示例代码目录为：base_code/linux_driver/platform_driver**
 
 定义平台设备
 
@@ -758,7 +758,7 @@ platform总线提供了四种匹配方式，并且这四种方式存在着优先
 
 .. code-block:: c
 
-    :caption: 寄存器宏定义(文件led_pdev.c)
+    :caption: 寄存器宏定义(位于../base_code/linux_driver/platform_driver/led_pdev.c)
 
     :linenos:
 
@@ -802,7 +802,7 @@ platform总线提供了四种匹配方式，并且这四种方式存在着优先
 
 .. code-block:: c
 
-    :caption: 定义资源数组(文件led_pdev.c)
+    :caption: 定义资源数组(位于../base_code/linux_driver/platform_driver/led_pdev.c)
 
     :linenos: 
 
@@ -836,7 +836,7 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 .. code-block:: c
 
-    :caption: 定义平台设备的私有数据(文件led_pdev.c)
+    :caption: 定义平台设备的私有数据(位于../base_code/linux_driver/platform_driver/led_pdev.c)
 
     :linenos: 
 
@@ -852,7 +852,7 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 .. code-block:: c
 
-    :caption: 定义平台设备(文件led_pdev.c)
+    :caption: 定义平台设备(位于../base_code/linux_driver/platform_driver/led_pdev.c)
 
     :linenos: 
 
@@ -908,7 +908,7 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 .. code-block:: c
 
-    :caption: 模块初始化(文件led_pdev.c)
+    :caption: 模块初始化(位于../base_code/linux_driver/platform_driver/led_pdev.c)
 
     :linenos:
 
@@ -978,7 +978,7 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 .. code-block:: c
 
-    :caption: id_table(文件led_pdrv.c)
+    :caption: id_table(位于../base_code/linux_driver/platform_driver/led_pdrv.c)
 
     :linenos: 
 
@@ -1008,7 +1008,7 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 .. code-block:: c
 
-    :caption: led_pdrv_probe函数(文件led_pdrv.c)
+    :caption: led_pdrv_probe函数(位于../base_code/linux_driver/platform_driver/led_pdrv.c)
 
     :linenos: 
 
@@ -1216,7 +1216,7 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 .. code-block:: c
 
-    :caption: led_pdrv_remove函数(文件led_pdrv.c)
+    :caption: led_pdrv_remove函数(位于../base_code/linux_driver/platform_driver/led_pdrv.c)
 
     :linenos: 
 
@@ -1276,7 +1276,7 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 .. code-block:: c
 
-    :caption: led灯的字符设备框架(文件led_pdrv.c)
+    :caption: led灯的字符设备框架(位于../base_code/linux_driver/platform_driver/led_pdrv.c)
 
     :linenos: 
 
@@ -1420,7 +1420,7 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 .. code-block:: c
 
-    :caption: 注册平台驱动(文件led_pdrv.c)
+    :caption: 注册平台驱动(位于../base_code/linux_driver/platform_driver/led_pdrv.c)
 
     :linenos: 
 
@@ -1508,13 +1508,9 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 
 
-.. code-block:: Makefile
-
-    :caption: Makefile
-
-    :linenos: 
-
-
+   :caption: Makefile(位于../base_code/linux_driver/platform_driver/Makefile)
+   :language: makefile
+   :linenos:  
 
     KERNEL_DIR = /home/embedfire/linux4.19
 

@@ -799,12 +799,10 @@ goto语法，当添加设备失败的话，需要将申请的设备号注销掉�
 应用程序验证
 ^^^^^^
 
-
-
-.. code-block:: c
    :caption: Makefile(位于../base_code/linux_driver/EmbedCharDev/Makefile)
-   :linenos:
-
+   :language: makefile
+   :linenos:   
+   
    KERNEL_DIR=/home/embedfire/module/linux-imx
    obj-m := chrdev.o
    all:
