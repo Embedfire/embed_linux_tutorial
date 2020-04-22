@@ -18,6 +18,8 @@
 
 3. 如何自己写一个简单的模块，学完本节内容就可以给自己整一个简单的内核模块。
 
+
+
 为什么需要内核模块
 ~~~~~~~~~
 
@@ -449,11 +451,13 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
 
 结合我们56.3 节的内容，我们便可以写出一个简单的内核模块程序。
 
+**本章的示例代码目录为：base_code/linux_driver/hello_world/hello_world.c**
+
 源码分析
 ^^^^
 
 .. code-block:: c
-   :caption: hello_world.c文件
+   :caption: ../base_code/linux_driver/hello_world/hello_world.c文件
    :linenos:
 
    #include <linux/init.h>
@@ -503,10 +507,10 @@ Makefile分析
 要到内核源码目录下，进行编译。编译内核模块使用的Makefile文件，和我们前面编译C代码使
 用的Makefile大相径庭，这得益于编译Linux内核所采用的Kbuild系统。
 
-.. code-block:: c
-   :caption: Makefile
+   :caption: ../base_code/linux_driver/hello_world/Makefile
+   :language: makefile
    :linenos:
-
+   
    KERNEL_DIR=/home/embedfire/module/linux-imx
    obj-m := hello_world.o
    all:
