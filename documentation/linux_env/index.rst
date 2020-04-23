@@ -19,3 +19,4 @@
 ..    python_ssd1306
 ..    python_gpio
 ..    python_serial
+..    using_mysql
