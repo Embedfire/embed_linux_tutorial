@@ -507,8 +507,8 @@ Makefile分析
 要到内核源码目录下，进行编译。编译内核模块使用的Makefile文件，和我们前面编译C代码使
 用的Makefile大相径庭，这得益于编译Linux内核所采用的Kbuild系统。
 
+.. code-block:: makefile
    :caption: ../base_code/linux_driver/hello_world/Makefile
-   :language: makefile
    :linenos:
    
    KERNEL_DIR=/home/embedfire/module/linux-imx
