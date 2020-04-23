@@ -21,7 +21,7 @@ SPI物理层
 
 SPI通讯设备之间的常用连接方式见下图。
 
-.. image:: media/spi002.png
+.. image:: media/spi001.png
    :align: center
    :alt: 未找到图片
 
