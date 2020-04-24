@@ -94,7 +94,8 @@
    linux_env/python_ssd1306
    linux_env/python_gpio
    linux_env/python_serial
-   linux_env/using_mysql
+   linux_env/using_sqlite
+   linux_env/using_qtsqlite
 
 .. toctree::
    :maxdepth: 1

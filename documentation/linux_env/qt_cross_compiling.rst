@@ -31,76 +31,67 @@ arm-linux-gnueabihf-gcc 8.3.0 版本的编译器。
     Qt 5.11.3 (arm-little_endian-ilp32-eabi-hardfloat shared (dynamic) release build; by GCC 8.3.0)
     This is the QtCore library version Qt 5.11.3 (arm-little_endian-ilp32-eabi-hardfloat shared (dynamic) release build; by GCC 8.3.0)
 
-**野火提供 build-gcc.sh 脚本一键安装 arm-linux-gnueabihf-gcc 8.3.0 版本编译器**\ ：
+**野火提供 build-gcc.sh 脚本一键安装 arm-linux-gnueabihf-gcc 8.3.0
+版本编译器** ：
 
 build-gcc.sh 脚本内容如下：
 
 .. code:: bash
 
-   #!/bin/sh
+    #!/bin/sh
 
-   HOST=arm-linux-gnueabihf
-   SCRIPT_PATH=$(pwd)
+    HOST=arm-linux-gnueabihf
+    SCRIPT_PATH=$(pwd)
 
-   #修改源码包解压后的名称
-   MAJOR_NAME=gcc-arm-linux-gnueabihf
+    #修改源码包解压后的名称
+    MAJOR_NAME=arm-linux-gnueabihf
 
-   #修改需要下载的源码前缀和后缀
-   OPENSRC_VER_PREFIX=8.3
-   OPENSRC_VER_SUFFIX=.0
+    #修改需要下载的源码版本前缀和后缀
+    OPENSRC_VER_PREFIX=8.3
+    OPENSRC_VER_SUFFIX=.0
 
-   PACKAGE_NAME=${MAJOR_NAME}-${OPENSRC_VER_PREFIX}${OPENSRC_VER_SUFFIX}
+    PACKAGE_NAME=${MAJOR_NAME}-${OPENSRC_VER_PREFIX}${OPENSRC_VER_SUFFIX}
 
-   #定义压缩包名称
-   COMPRESS_PACKAGE=gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz
+    #定义压缩包名称
+    COMPRESS_PACKAGE=gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz
 
-   #定义编译后安装--生成的文件,文件夹位置路径
-   INSTALL_PATH=/opt/${PACKAGE_NAME}
+    #定义编译后安装--生成的文件,文件夹位置路径
+    INSTALL_PATH=/opt/${PACKAGE_NAME}
 
-   #无需修改--下载地址
-   DOWNLOAD_LINK=https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/${COMPRESS_PACKAGE}
+    #无需修改--下载地址
+    DOWNLOAD_LINK=https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/${COMPRESS_PACKAGE}
 
-   #下载源码包
-   do_download_src () {
-      echo "\033[1;33mstart download ${COMPRESS_PACKAGE}...\033[0m"
+    #下载源码包
+    do_download_src () {
+       echo "\033[1;33mstart download ${COMPRESS_PACKAGE}...\033[0m"
+       if [ ! -d "${COMPRESS_PACKAGE}" ];then
+          wget -c ${DOWNLOAD_LINK}
+       fi
+       echo "\033[1;33mdone...\033[0m"
+    }
 
-      if [ ! -f "${COMPRESS_PACKAGE}" ];then
-         if [ ! -d "${PACKAGE_NAME}" ];then
-            wget -c ${DOWNLOAD_LINK}
-         fi
-      fi
-      
-      echo "\033[1;33mdone...\033[0m"
-   }
+    #解压源码包
+    do_tar_package () {
+       echo "\033[1;33mstart unpacking the ${PACKAGE_NAME} package ...\033[0m"
+       if [ ! -d "${PACKAGE_NAME}" ];then
+          tar -xf ${COMPRESS_PACKAGE} -C ${INSTALL_PATH}
+       fi
+       echo "\033[1;33mdone...\033[0m"
+    }
 
-   #解压源码包
-   do_tar_package () {
-      echo "\033[1;33mstart unpacking the ${PACKAGE_NAME} package ...\033[0m"
+    #删除下载的文件
+    do_delete_file () {
+       cd ${SCRIPT_PATH}
+       if [ -f "${PACKAGE_NAME}" ];then
+          sudo rm -f ${PACKAGE_NAME}
+       fi
+    }
 
-      mkdir -p ${INSTALL_PATH}
+    do_download_src
+    do_tar_package
+    # do_delete_file
 
-      if [ ! -d "${PACKAGE_NAME}" ];then
-         tar -xf ${COMPRESS_PACKAGE} -C ${INSTALL_PATH} --strip-components=1 
-      fi
-
-      mkdir -p ${INSTALL_PATH}
-
-      echo "\033[1;33mdone...\033[0m"
-   }
-
-   #删除下载的文件
-   do_delete_file () {
-      cd ${SCRIPT_PATH}
-      if [ -f "${PACKAGE_NAME}" ];then
-         sudo rm -f ${PACKAGE_NAME}
-      fi
-   }
-
-   do_download_src
-   do_tar_package
-   # do_delete_file
-
-   exit $?
+    exit $?
 
 
 整个脚本的核心就是使用wget命令将arm-linux-gnueabihf-gcc
@@ -179,7 +170,7 @@ tslib
 是一个用于触摸屏设备的开源函数库，能够为触摸屏驱动获得的采样提供诸如滤波、去抖、校准等功能，通常作为触摸屏驱动的适配层，为上层的应用提供了一个统一的接口，比如Qt就是上层应用，数据通过tslib传入Qt应用程序，Qt应用程序就知道哪里被触摸了，然后进行正确的响应。而且通过这样一个函数库，可以将编程者从繁琐的数据处理中解脱出来，因为触摸屏的坐标和液晶显示屏
 之间的坐标并不是一一对应的，所以，要让从触摸屏上得到的坐标正确转换为液晶显示屏上的坐标，需要经过一个转换过程，而tslib就是完成这个功能的。因此在这里预先编译安装tslib，这样在后面编译Qt的时候才能将tslib打包编译进去。
 
-**野火提供 build-tslib.sh 脚本一键下载、配置、编译及安装 tslib**\ ：
+**野火提供 build-tslib.sh 脚本一键下载、配置、编译及安装 tslib** ：
 
 build-tslib.sh 脚本内容如下：
 
@@ -274,7 +265,7 @@ build-tslib.sh 脚本内容如下：
 
     exit $?
 
--  野火此处选用的tslib版本也是比较新的，是2019年发布的版本tslib-1.21，更多版本大家可以在官方发布的github网站上选择：\ https://github.com/libts/tslib/releases\ ，然后只需要修改版本对应的前缀
+-  野火此处选用的tslib版本也是比较新的，是2019年发布的版本tslib-1.21，更多版本大家可以在官方发布的github网站上选择： https://github.com/libts/tslib/releases ，然后只需要修改版本对应的前缀
    OPENSRC_VER_PREFIX 与后缀 OPENSRC_VER_SUFFIX 即可。
 
 .. figure:: media/qt_cross_compiling001.png
@@ -290,13 +281,13 @@ build-tslib.sh 脚本内容如下：
 
 1. 下载tslib源码
 2. 解压tslib源码文件
-3. 配置tslib源码，配置的内容主要是指定编译器：\ ``export CC=${CROSS_CHAIN_PREFIX}-gcc``
-   ；指定安装路径 ``--prefix=${INSTALL_PATH}``\ ，即/opt/tslib-1.21
-   ；指定平台：\ ``--host=${HOST}``\ 。
-4. 编译并且安装：\ ``make && make install``\ 。
+3. 配置tslib源码，配置的内容主要是指定编译器： ``export CC=${CROSS_CHAIN_PREFIX}-gcc``
+   ；指定安装路径 ``--prefix=${INSTALL_PATH}`` ，即/opt/tslib-1.21
+   ；指定平台： ``--host=${HOST}`` 。
+4. 编译并且安装： ``make && make install`` 。
 
 **需要使用 sudo
-权限执行脚本**\ ，因为在/opt/目录下必须要有超级用户权限才可以正常安装。
+权限执行脚本** ，因为在/opt/目录下必须要有超级用户权限才可以正常安装。
 
 .. code:: bash
 
@@ -308,7 +299,7 @@ build-tslib.sh 脚本内容如下：
 高级Linux声音体系（英语：Advanced Linux Sound
 Architecture，缩写为ALSA），在Linux内核中，ALSA为声卡提供的驱动组件。ALSA支持声卡的自动配置，以及可以完美的处理系统中的多个声卡设备，所以可能会使用到ALSA，此时就预先将ALSA交叉编译完成，以便在交叉编译Qt时将ALSA包含编译进去。
 
-**野火提供 build-alsa.sh 脚本一键下载、配置、编译及安装 alsa**\ ：
+**野火提供 build-alsa.sh 脚本一键下载、配置、编译及安装 alsa** ：
 
 .. code:: bash
 
@@ -407,7 +398,7 @@ Architecture，缩写为ALSA），在Linux内核中，ALSA为声卡提供的驱�
 
     exit $?
 
--  野火此处选用的alsa版本也是比较新的，是2020年发布的版本alsa-1.2.2，更多版本大家可以在官方发布源码的网站上选择：\ ftp://ftp.alsa-project.org/pub/lib\ ，只需要修改版本对应的前缀
+-  野火此处选用的alsa版本也是比较新的，是2020年发布的版本alsa-1.2.2，更多版本大家可以在官方发布源码的网站上选择： ftp://ftp.alsa-project.org/pub/lib ，只需要修改版本对应的前缀
    OPENSRC_VER_PREFIX 与后缀 OPENSRC_VER_SUFFIX 即可。
 
 .. figure:: media/qt_cross_compiling002.png
@@ -424,15 +415,15 @@ Architecture，缩写为ALSA），在Linux内核中，ALSA为声卡提供的驱�
 1. 下载 alsa 源码
 2. 解压 alsa 源码文件
 3. 配置 alsa
-   源码，配置的内容主要是指定编译器：\ ``export CC=${CROSS_CHAIN_PREFIX}-gcc``
-   ；指定安装路径 ``--prefix=${INSTALL_PATH}``\ ，即/opt/alsa-1.2.2
-   ；指定平台：\ ``--host=${HOST}``\ ，除此之外还是要动态库的方式连接：\ ``--enable-shared``
-   ；不使能Python：\ ``--disable-python`` ；
-   然后指定配置文件的路径：\ ``--with-configdir=${INSTALL_PATH}/config``\ ；指定插件的路径：\ ``--with-plugindir=${INSTALL_PATH}/plugin``\ 。
-4. 编译并且安装：\ ``make && make install``\ 。
+   源码，配置的内容主要是指定编译器： ``export CC=${CROSS_CHAIN_PREFIX}-gcc``
+   ；指定安装路径 ``--prefix=${INSTALL_PATH}`` ，即/opt/alsa-1.2.2
+   ；指定平台： ``--host=${HOST}`` ，除此之外还是要动态库的方式连接： ``--enable-shared``
+   ；不使能Python： ``--disable-python`` ；
+   然后指定配置文件的路径： ``--with-configdir=${INSTALL_PATH}/config`` ；指定插件的路径： ``--with-plugindir=${INSTALL_PATH}/plugin`` 。
+4. 编译并且安装： ``make && make install`` 。
 
 **需要使用 sudo
-权限执行脚本**\ ，因为在/opt/目录下必须要有超级用户权限才可以正常安装。
+权限执行脚本** ，因为在/opt/目录下必须要有超级用户权限才可以正常安装。
 
 .. code:: bash
 
@@ -485,7 +476,7 @@ Architecture，缩写为ALSA），在Linux内核中，ALSA为声卡提供的驱�
 
    qt_cross_compiling003.png
 
-**野火提供 build-qt.sh 脚本一键下载、配置、安装依赖、编译及安装 qt**\ ：
+**野火提供 build-qt.sh 脚本一键下载、配置、安装依赖、编译及安装 qt** ：
 
 build-qt.sh 脚本内容如下：
 
@@ -676,9 +667,9 @@ build-qt.sh 脚本内容如下：
 
 简单介绍一下脚本的内容：
 
-1. 使用wget命令下载qt源码，源码的路径是：\ http://download.qt.io/official_releases/qt/5.14/5.14.1/single/qt-everywhere-src-5.14.1.tar.xz
+1. 使用wget命令下载qt源码，源码的路径是： http://download.qt.io/official_releases/qt/5.14/5.14.1/single/qt-everywhere-src-5.14.1.tar.xz
 2. 解压下载完的源码包。
-3. 进入源码目录中，进行配置，为了不污染源码本身，重新拷贝一份\ ``qtbase/mkspecs/linux-arm-gnueabi-g++``\ 中的配置，并且命名为\ ``my-linux-arm-qt``\ ，然后修改qmake.conf文件的内容，主要是指定编译Qt的编译器：\ ``/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf-gcc``
+3. 进入源码目录中，进行配置，为了不污染源码本身，重新拷贝一份 ``qtbase/mkspecs/linux-arm-gnueabi-g++`` 中的配置，并且命名为 ``my-linux-arm-qt`` ，然后修改qmake.conf文件的内容，主要是指定编译Qt的编译器： ``/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf-gcc``
    。当然，这部分操作均在脚本中完成的。
 
 .. figure:: media/qt_cross_compiling004.png
@@ -691,7 +682,7 @@ build-qt.sh 脚本内容如下：
    qt_cross_compiling005.png
 
 4. 安装一些对应的依赖。
-5. 编译Qt并安装到指定目录下：\ ``/opt/qt-everywhere-src-5.14.1``\ 。
+5. 编译Qt并安装到指定目录下： ``/opt/qt-everywhere-src-5.14.1`` 。
 
 安装Qt Creator
 --------------
@@ -700,9 +691,9 @@ build-qt.sh 脚本内容如下：
 IDE与 PC上的Qt
 5.14.1版本的编译环境，前者没有Qt编译环境，而后者可以在PC上编译Qt应用程序并且可以在PC上运行与调试。独立的Qt
 Creator
-IDE可以在官网中下载：\ http://download.qt.io/official_releases/qtcreator/4.11/4.11.1/\ 。
+IDE可以在官网中下载： http://download.qt.io/official_releases/qtcreator/4.11/4.11.1/ 。
 
-为了方便起见，我们既安装IDE也安装PC上的Qt编译环境，注意此处的编译环境是PC上的而非交叉编译环境。我们在Qt官网下载IED与编译环境集成的可执行文件：\ http://download.qt.io/official_releases/qt/5.14/5.14.1/\ ，如下图所示：
+为了方便起见，我们既安装IDE也安装PC上的Qt编译环境，注意此处的编译环境是PC上的而非交叉编译环境。我们在Qt官网下载IED与编译环境集成的可执行文件： http://download.qt.io/official_releases/qt/5.14/5.14.1/ ，如下图所示：
 
 .. figure:: media/install_qt_creator000.png
    :alt: install_qt_creator000
@@ -808,7 +799,7 @@ IDE可以在官网中下载：\ http://download.qt.io/official_releases/qtcreato
 
    install_qt_creator009
 
-进入Qt Creator后，可以在示例中看到很多自带的例程我们可以选择一个时钟的例程，名字是analogclock，它所在的目录是\ ``Qt5.14.1/Examples/Qt-5.14.1/widgets/widgets/``\ 。
+进入Qt Creator后，可以在示例中看到很多自带的例程我们可以选择一个时钟的例程，名字是analogclock，它所在的目录是 ``Qt5.14.1/Examples/Qt-5.14.1/widgets/widgets/`` 。
 
 .. figure:: media/install_qt_creator010.png
    :alt: install_qt_creator010
@@ -848,25 +839,25 @@ Creator使用交叉编译环境，然后进行交叉编译，再将程序放到�
 
    install_qt_creator014
 
-在弹出来的选项配置界面中选择【Kits】->【编译器】，点击【添加】按钮选择添加【GCC】 ->【C++】类型，自己定义一个名字，
-然后将我们之前安装的``arm-linux-gnueabihf-gcc 8.3.0``\ 版本的交叉编译器添加进来，
-注意要选择\ ``/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf-g++``\ ，点击【Apply】完成应用。
+在弹出来的选项配置界面中选择【Kits】->【编译器】，点击【添加】按钮选择添加【GCC】 ->【C++】类型，
+自己定义一个名字，然后将我们之前安装的``arm-linux-gnueabihf-gcc 8.3.0`` 版本的交叉编译器添加进来，
+注意要选择 ``/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf-g++`` ，点击【Apply】完成应用。
 
 .. figure:: media/install_qt_creator015.png
    :alt: install_qt_creator015
 
    install_qt_creator015
 
-同理将\ ``/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf-gcc``\ 编译器添加进来。
+同理将 ``/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf-gcc`` 编译器添加进来。
 
 .. figure:: media/install_qt_creator016.png
    :alt: install_qt_creator016
 
    install_qt_creator016
 
-然后选择Qt的版本，我们在前面已经交叉编译并安装了Qt5.14.1版本，那么在这里只需要将qmake添加进来即可，具体操作如下：在选项配置界面中选择【Kits】->
-【Qt
-Versions】，然后点击【添加】按钮，在Qt的安装目录下选择qmake：\ ``/opt/qt-everywhere-src-5.14.1/bin``\ ，然后添加完成后点击【Apply】完成应用。
+然后选择Qt的版本，我们在前面已经交叉编译并安装了Qt5.14.1版本，那么在这里只需要将qmake添加进来即可，
+具体操作如下：在选项配置界面中选择【Kits】->【Qt Versions】，然后点击【添加】按钮，在Qt的安装目录
+下选择qmake： ``/opt/qt-everywhere-src-5.14.1/bin`` ，然后添加完成后点击【Apply】完成应用。
 
 .. figure:: media/install_qt_creator017.png
    :alt: install_qt_creator017
@@ -891,7 +882,7 @@ Device），因为这是为开发板构建的环境，然后选择编译器，�
 交叉编译Qt自带的例程
 --------------------
 
-首先点击例程的项目配置，选择使用交叉编译环境编译，选择构建套件为刚刚添加的交叉编译套件\ ``ebf_imx6ull``\ ，在编译时可以根据自己需求决定选择Debug或者Release版本：
+首先点击例程的项目配置，选择使用交叉编译环境编译，选择构建套件为刚刚添加的交叉编译套件 ``ebf_imx6ull`` ，在编译时可以根据自己需求决定选择Debug或者Release版本：
 
 .. figure:: media/install_qt_creator020.png
    :alt: install_qt_creator020
@@ -910,7 +901,7 @@ Device），因为这是为开发板构建的环境，然后选择编译器，�
 
    install_qt_creator022
 
-在构建完成后，可以在\ ``Qt5.14.1/Examples/Qt-5.14.1/widgets/widgets/build-analogclock-ebf_imx6ull-Release``\ 目录下看到对应的可执行文件analogclock：
+在构建完成后，可以在 ``Qt5.14.1/Examples/Qt-5.14.1/widgets/widgets/build-analogclock-ebf_imx6ull-Release`` 目录下看到对应的可执行文件analogclock：
 
 .. figure:: media/install_qt_creator023.png
    :alt: install_qt_creator023
@@ -924,36 +915,27 @@ Device），因为这是为开发板构建的环境，然后选择编译器，�
 
    install_qt_creator024
 
-开发板的环境处理：
-------------------
+开发板的环境处理
+----------------
 
-首先要使用已经发布的Debian系统，是不带Qt的版本，因为带Qt版本的Debian是静态的Qt程序，并不满足我们的需求，我们要安装动态版本的qt-app，直接使用以下指令安装即可：
+首先要使用已经发布的Debian系统，可以选择纯净版的Debian镜像 ``Debian Buster Lite`` ，也可以选择动态版本的Qt镜像 ``Full Feature QT_App`` ，但是注意 **不要选择其他版本** 。
+
+Debian Buster Lite版本
+~~~~~~~~~~~~~~~~~~~~~~
+
+如果你选择的是纯净版的Debian镜像 ``Debian Buster Lite`` ，我们要安装动态版本的qt-app，直接使用以下指令安装即可：
 
 .. code:: bash
 
     sudo apt-get install qt-app
 
-如果没有发现\ ``qt-app``\ 安装包，可以使用以下命令更新一下apt命令的软件包缓存：
+如果没有发现 ``qt-app`` 安装包，可以使用以下命令更新一下apt命令的软件包缓存再安装：
 
 .. code:: bash
 
     sudo apt-get update
 
-如果出现声卡配置错误，可以运行一下以下命令，然后重启开发板即可：
-
-.. code:: bash
-
-    sudo depmod -a
-
-
-在重启开发板后，运行以下命令修复apt安装的错误：
-
-.. code:: bash
-
-    sudo apt-get --fix-broken install
-
-
-在安装完成后，可以发现\ ``/home/debian``\ 目录下多了qt-app文件夹，这里就是我们出厂提供的Qt应用程序，可以直接使用以下命令运行它，野火提供了run.sh运行Qt应用程序的脚本，这样子就不需要我们配置环境变量：
+在安装完成后，可以发现 ``/home/debian`` 目录下多了qt-app文件夹，这里就是我们出厂提供的Qt应用程序，可以直接使用以下命令运行它，野火提供了run.sh运行Qt应用程序的脚本，这样子就不需要我们配置环境变量：
 
 .. code:: bash
 
@@ -963,7 +945,7 @@ Device），因为这是为开发板构建的环境，然后选择编译器，�
     # 运行
     sudo ./run.sh
 
-如果能成功运行，则可以尝试将我们编译例程的可执行文件analogclock放到qt-app目录下，然后编辑run.sh脚本，主要是修改脚本中的最后一行，将运行官方的App改为自己的Qt例程analogclock。（编辑可以使用nano编辑器进行编辑）
+如果能成功运行，则可以 **将我们编译例程的可执行文件analogclock放到qt-app目录下** ，然后编辑run.sh脚本，主要是修改脚本中的最后一行，将运行官方的App改为自己的Qt例程analogclock。（编辑可以使用nano编辑器进行编辑）
 
 .. code:: bash
 
@@ -1019,6 +1001,67 @@ Device），因为这是为开发板构建的环境，然后选择编译器，�
 
    install_qt_creator025
 
+Full Feature QT_App版本
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+而如果你选择的是动态版本的Qt镜像 ``Full Feature QT_App`` ，则无需安装qt-app，因为在系统中就已经存在了qt相关的环境，并且在 ``/home/debian`` 路径下就也存在了qt-app应用程序。
+
+**将我们编译例程的可执行文件analogclock放到qt-app目录下** ，然后编辑run.sh脚本，主要是修改脚本中的最后一行，将运行官方的App改为自己的Qt例程analogclock。（编辑可以使用nano编辑器进行编辑）
+
+.. code:: bash
+
+    #! /bin/sh
+
+    type devscan
+
+    if [ $? -eq 0 ]; then
+        eventx=$(devscan "goodix-ts")
+        echo "eventx=$eventx"
+        if [ ! -f "/etc/pointercal" ]; then
+            type devscan
+            if [ $? -eq 0 ]; then
+                ts_calibrate
+            fi
+        fi
+    else
+        echo "please install devscan"
+        echo
+        echo "sudo apt-get install devscan"
+        exit
+    fi
+
+    export APP_DIR=/home/debian/qt-app
+    export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/arm-linux-gnueabihf/qt5/plugins/
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$APP_DIR/libskin:$APP_DIR/libqui:$APP_DIR/libffmpeg:/usr/lib:/lib
+    export QT_QPA_FONTDIR=/usr/share/fonts/SourceHanSans
+    export PATH=$PATH:$QT_DIR/libexec
+    export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
+    export TSLIB_CONFFILE=/etc/ts.conf
+    export TSLIB_CALIBFILE=/etc/pointercal
+    export QT_QPA_GENERIC_PLUGINS=tslib:/dev/input/$eventx
+    export QWS_MOUSE_PROTO=tslib
+    export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/$eventx:rotate=180:invertx
+
+    # start app...
+    # $APP_DIR/App
+
+    # 这里是要运行的Qt程序
+    $APP_DIR/analogclock
+
+保存并且运行：
+
+.. code:: bash
+
+    # 运行
+    sudo ./run.sh
+
+效果也是一样的。
+
+.. figure:: media/install_qt_creator025.png
+   :alt: install_qt_creator025
+
+   install_qt_creator025
+
 编译野火提供的Debian Qt Demo
 ----------------------------
 
@@ -1039,7 +1082,7 @@ Creator去编译：
     git clone https://gitee.com/wildfireteam/ebf_debian_qt_demo.git
 
 打开Qt Creator，添加QtUi进行单独的编译，通过Qt Creator界面的【文件】 ->
-【添加文件或项目】，选择\ ``ebf_debian_qt_demo/QtUi``\ 目录下的QtUi.pro工程添加到Qt
+【添加文件或项目】，选择 ``ebf_debian_qt_demo/QtUi`` 目录下的QtUi.pro工程添加到Qt
 Creator中。
 
 .. figure:: media/install_qt_creator026.png
@@ -1047,7 +1090,7 @@ Creator中。
 
    install_qt_creator026
 
-在添加工程的时候会让你选择构建套件，我们全选就好了，这取决于你系统中有多少中构建套件，而交叉编译套件则是我们之前安装的\ ``ebf_imx6ull``\ ，这个套件必须存在，否则无法交叉编译。
+在添加工程的时候会让你选择构建套件，我们全选就好了，这取决于你系统中有多少中构建套件，而交叉编译套件则是我们之前安装的 ``ebf_imx6ull`` ，这个套件必须存在，否则无法交叉编译。
 
 .. figure:: media/install_qt_creator027.png
    :alt: install_qt_creator027
@@ -1085,7 +1128,7 @@ Creator中。
 
    install_qt_creator032
 
-在构建完成后，可以看到\ ``ebf_debian_qt_demo/app_bin``\ 目录下存在App可执行程序，我们使用file查看该可执行程序会发现它是32位的，可以在ARM开发板上运行，如图所示：
+在构建完成后，可以看到 ``ebf_debian_qt_demo/app_bin`` 目录下存在App可执行程序，我们使用file查看该可执行程序会发现它是32位的，可以在ARM开发板上运行，如图所示：
 
 .. figure:: media/install_qt_creator033.png
    :alt: install_qt_creator033
@@ -1151,14 +1194,14 @@ Creator中。
 ----------------------------------
 
 有同学又想在PC上运行野火提供的Debian Qt
-Demo，其实非常简单，我们只需要选择不同的构建套件即可，比如我们将QtUi、Skin、FireApp等工程的构建套件选择为\ ``Desktop Qt 5.14.1 GCC 64bit``\ 即可，这个构建套件是我们在安装的时候自动选择的，具体见：
+Demo，其实非常简单，我们只需要选择不同的构建套件即可，比如我们将QtUi、Skin、FireApp等工程的构建套件选择为 ``Desktop Qt 5.14.1 GCC 64bit`` 即可，这个构建套件是我们在安装的时候自动选择的，具体见：
 
 .. figure:: media/install_qt_creator035.png
    :alt: install_qt_creator035
 
    install_qt_creator035
 
-然后我们将所有工程都选择为\ ``Desktop Qt 5.14.1 GCC 64bit``\ 套件构建：
+然后我们将所有工程都选择为 ``Desktop Qt 5.14.1 GCC 64bit`` 套件构建：
 
 Skin工程构建：
 
@@ -1258,7 +1301,7 @@ FireApp工程构建后运行：
 
     ./build.sh
 
-如果\ ``build.sh``\ 不是可执行文件，可以使用以下命令添加可执行权限
+如果 ``build.sh`` 不是可执行文件，可以使用以下命令添加可执行权限
 
 .. code:: bash
 
@@ -1267,8 +1310,8 @@ FireApp工程构建后运行：
 输出
 ~~~~
 
-在当前目录下会创建一个\ ``run_dir``\ 目录，存在\ ``App  libqui  libskin``\ 文件，App是可以直接在开发板上运行的！
-与此同时，还会打包一个\ ``fire-app-xxxx.tar.bz2``\ 文件，大家可以拷贝到对应的目录下解压替换掉旧的\ ``App``\ 。
+在当前目录下会创建一个 ``run_dir`` 目录，存在 ``App  libqui  libskin`` 文件，App是可以直接在开发板上运行的！
+与此同时，还会打包一个 ``fire-app-xxxx.tar.bz2`` 文件，大家可以拷贝到对应的目录下解压替换掉旧的 ``App`` 。
 
 清除相关内容
 ~~~~~~~~~~~~
