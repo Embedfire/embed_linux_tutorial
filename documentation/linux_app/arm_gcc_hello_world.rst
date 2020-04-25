@@ -281,7 +281,7 @@ i.MX6ULL带有fpu，对于soft-float和hard-float模式都支持，不过本开�
 
          #安装完成后使用如下命令查看版本
 
-         arm-linux-gnueabi-gcc –v
+         arm-linux-gnueabi-gcc -v
 
 .. image:: media/armgcc008.png
    :align: center
