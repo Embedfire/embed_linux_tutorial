@@ -96,6 +96,7 @@
    linux_env/python_serial
    linux_env/using_sqlite
    linux_env/using_qtsqlite
+   linux_env/using_php
 
 .. toctree::
    :maxdepth: 1
