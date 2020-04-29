@@ -101,7 +101,7 @@ modprobe 同样用于加载内核模块，与insmod不同，modprobe会根据dep
    内核模块的其他信息
 
 头文件
-^^^
+^^^^^^
 
 前面我们已经接触过了Linux的应用编程，了解到Linux的头文件都
 存放在/usr/include中。编写内核模块所需要的头文件，并不在上述说到的
@@ -174,7 +174,7 @@ Init.h头文件主要包含了内核模块的加载、卸载函数的声明，�
 的，但是MODULE_LICENSE这个是指定该内核模块的许可证，是必须要有的。
 
 加载和卸载内核
-^^^^^^^
+^^^^^^^^^^^^^^
 
 内核模块加载函数
 ''''''''
@@ -505,7 +505,7 @@ Makefile分析
 
 对于内核模块而言，它是属于内核的一段代码，只不过它并不在内核源码中。为此，我们在编译时需
 要到内核源码目录下，进行编译。编译内核模块使用的Makefile文件，和我们前面编译C代码使
-用的Makefile大相径庭，这得益于编译Linux内核所采用的Kbuild系统。
+用的Makefile大相径庭，这得益于编译Linux内核所采用的Kbuild系统，因此在编译内核模块时，我们需要指定环境变量ARCH和CROSS_COMPILE的值。
 
 .. code-block:: makefile
    :caption: ../base_code/linux_driver/hello_world/Makefile
