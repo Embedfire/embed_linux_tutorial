@@ -44,7 +44,7 @@
    linux_basis/fire-config_brief
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
-   #linux_basis/ec20_4g_module
+   linux_basis/ec20_4g_module
 
 .. toctree::
    :maxdepth: 1

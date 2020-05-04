@@ -20,4 +20,4 @@
 ..    linux_directory
 ..    user_group
 ..    command_line
-
+..    ec20_4g_module
