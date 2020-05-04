@@ -61,28 +61,32 @@ SOURCEFORGE:
     :alt: Debian镜像
 
 
-- Debian Buster Lite 目录下存放的是Debian的纯净版固件，没有带桌面环境和野火的QT App。
+镜像标注的解压后容量为SD、eMMC、NAND等目标存储器需要的最小空间:
 
-- Debian With Desktop 目录下存放的是带有桌面环境的Debian固件，系统启动后会进入桌面环境。
+- imx6ull-debian-buster-console-armhf-2020-04-09.img.xz:
 
-- Debian With QT_App 目录下存放的是带有野火QT App的Debian固件，系统启动后会进入QT App的界面。
+    Debian的纯净版固件，没有带桌面环境和野火的QT App。（解压后约340M）
 
-- README.md 文件有固件的使用说明以及版本改动的记录。
+- imx6ull-debian-buster-desktop-armhf-2020-04-09.img.xz: 
+    
+    带有桌面环境的Debian固件，系统启动后会进入桌面环境。（解压后约1.1G）
 
-其中，
+- imx6ull-debian-buster-full-qt-app-armhf-2020-04-09.img.xz: 
+    
+    具有完整QT App功能的Debian固件,系统启动后会进入QT App的界面。
+    
+    但是该固件体积超过了Nandflash 512M的容量，因此不能烧录到Nandflash中。只可烧录于eMMC。（解压后约900M）
 
-(1)、Full Feature QT_App 子目录中存放的是具有完整QT App功能的Debian固件,但是该固件体积超过了Nandflash 512M的容量，因此不能烧录到Nandflash中。只可烧录于eMMC。
+- imx6ull-debian-buster-part-qt-app-armhf-2020-04-09.img.xz: 
 
-(2)、Part Feature QT_App 子目录中存放的移除了音视频播放功能的QT App，该固件体积小于Nandflash 512M的容量，可以分别烧录到Nandflash和eMMC中。
+    该固件移除了音视频播放功能的QT App，系统启动后会进入QT App的界面。
+    
+    该固件体积小于Nandflash 512M的容量，可以分别烧录到Nandflash和eMMC中。(解压后约420M)
 
+- README.txt:文件有固件的使用说明以及版本改动的记录。
 
-以纯净版固件为例，进入Debian Buster Lite目录，可以看到Debian镜像是一个img格式的文件，
-而MD5SUMS和SHA256SUMS文件则是该镜像的校验文件。
-可以直接使用Etcher工具进行Debian镜像的烧录。如下图所示:
+- SHA256SUMS.txt:记录各个固件的sha256校验值。
 
-..  image:: media/install_debian4.png
-    :align: center
-    :alt: Debian镜像
 
 4、选择好Debian镜像后，继续选择要烧录的SD卡，然后点击"flash"按钮开始进行烧录。
 
