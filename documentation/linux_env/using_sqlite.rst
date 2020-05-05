@@ -30,7 +30,7 @@ SQLite
 
 为了确保我们的版本是最新版本，让我们使用apt命令更新本地apt包索引和升级系统：
 
-.. code:: bahs
+.. code:: bash
 
     sudo apt-get update
     sudo apt-get -y upgrade
