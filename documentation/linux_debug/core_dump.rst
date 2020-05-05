@@ -240,7 +240,7 @@ linux系统在多种情况下不会生成核心转储文件：
 
 命令格式如下：
 
-.. code:: bahs
+.. code:: bash
 
     gdb [程序文件] [core文件]
 
