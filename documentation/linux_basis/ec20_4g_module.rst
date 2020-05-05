@@ -67,7 +67,7 @@ EC20是移远的一款4G模组，有Mini PCle和LCC两种封装，与处理器�
 
 为了确保我们的软件包版本是最新版本，让我们使用apt命令更新本地apt包索引和升级系统：
 
-.. code:: bahs
+.. code:: bash
 
     sudo apt-get update
 
