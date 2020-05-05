@@ -157,6 +157,7 @@
    linux_driver/linux_device_model
    linux_driver/platform_driver
    linux_driver/driver_tree
+   linux_driver/device_tree_rgb_led
    linux_driver/gpio_subsystem
    linux_driver/concurrency
    
