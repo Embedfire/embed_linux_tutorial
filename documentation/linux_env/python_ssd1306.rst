@@ -10,7 +10,7 @@ Debian搭建Python控制OLED开发环境
 
 其实在很多Debian系统中都预装了Python3或者Python2，但是野火提供的镜像是并未预装Python3的，我们可以手动安装，为了确保我们的版本是最新版本，让我们使用apt命令更新本地apt包索引和升级系统：
 
-.. code:: bahs
+.. code:: bash
 
     sudo apt-get update
     sudo apt-get -y upgrade
@@ -20,7 +20,7 @@ Debian搭建Python控制OLED开发环境
 手动安装Python3
 ---------------
 
-.. code:: bahs
+.. code:: bash
 
     sudo apt-get -y install python3
 
@@ -30,7 +30,7 @@ Debian搭建Python控制OLED开发环境
 
      python3 -V
 
-当出现以下内容时表示Python3安装成功：
+当出现以下内容或更高版本时表示Python3安装成功：
 
 .. code:: bash
 
@@ -49,12 +49,11 @@ Debian搭建Python控制OLED开发环境
 
 .. code:: bash
 
-    cd /usr/bin
-    sudo rm python
-    sudo ln -s python3.7 python
-    cd ~
+    #先删除原有的软链接
+    sudo rm /usr/bin/python
+    sudo ln -s /usr/bin/python3 /usr/bin/python
 
-再次校验Python版本时，发现系统默认的Python版本就是python3.7了：
+再次校验Python版本时，发现系统默认的Python版本就是python3了：
 
 .. code:: bash
 
@@ -62,6 +61,19 @@ Debian搭建Python控制OLED开发环境
 
     # 版本
     Python 3.7.3
+
+
+手动安装pip
+---------------
+使用python时常常需要用到pip工具，可以使用如下命令安装：
+
+.. code:: bash
+
+    sudo apt install python3-pip
+
+    #安装完成后使用如下命令查看版本
+    python3 -m pip -V
+
 
 安装Python相关的依赖库
 ----------------------
