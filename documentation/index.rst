@@ -125,6 +125,13 @@
    linux_debug/backtrace
    linux_debug/strace
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Linux物联网编程
+   :numbered:
+
+   linux_iot/linux_http
+   linux_iot/linux_http_client
 
 .. toctree::
    :maxdepth: 1

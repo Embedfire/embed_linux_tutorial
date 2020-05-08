@@ -19,6 +19,8 @@ int main(void)
     int sockfd, ret;
     struct sockaddr_in server;
     char buffer[BUFFER_SIZ];        //用于保存输入的文本
+    
+	memset(buffer, 0, BUFFER_SIZ);
 
     // 创建套接字描述符
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -45,11 +47,11 @@ int main(void)
 		printf("please enter some text: ");
 		fgets(buffer, BUFFER_SIZ, stdin);
 
-        //输入了end，退出循环（程序）
+        //输入了exit，退出循环（程序）
 		if(strncmp(buffer, "exit", 4) == 0)
 			break;
 
-        write(sockfd, buffer, sizeof(buffer));
+        write(sockfd, buffer, strlen(buffer));
     }
 
     close(sockfd);
