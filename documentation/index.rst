@@ -132,6 +132,8 @@
 
    linux_iot/linux_http
    linux_iot/linux_http_client
+   linux_iot/linux_http_server
+
 
 .. toctree::
    :maxdepth: 1
