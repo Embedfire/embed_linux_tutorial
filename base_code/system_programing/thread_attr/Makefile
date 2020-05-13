@@ -38,10 +38,11 @@ endif
 #编译参数
 #指定头文件的路径
 CFLAGS = $(patsubst %, -I%, $(inc_dir)) -MD -MF $(@D)/.$(@F).d
+LINK = -lpthread
 
 #链接过程
 $(build_dir)/$(Target) : $(objects)  | create_build
-	$(CC) $^ -o $@
+	$(CC) $^ ${LINK} -o $@
 
 #编译工程
 #编译src文件夹中的源文件，并将生成的目标文件放在objs文件夹中

@@ -109,11 +109,15 @@ POSIX信号量的使用实例
 
 有名信号量中创建了两个进程，然后进程之间通有名信号量进行同步操作。
 
-有名信号量的使用操作步骤如下： 1.
-通过sem_open()函数打开或者创建一个信号量。 2.
-调用sem_wait()函数获取到信号量，然后打印信息到终端。 3.
-使用sem_post()函数释放信号量。 4.
-使用完毕后将信号量关闭并且删除：sem_close()、sem_unlink()。
+有名信号量的使用操作步骤如下： 
+
+1.通过sem_open()函数打开或者创建一个信号量。 
+
+2.调用sem_wait()函数获取到信号量，然后打印信息到终端。 
+
+3.使用sem_post()函数释放信号量。 
+
+4.使用完毕后将信号量关闭并且删除：sem_close()、sem_unlink()。
 
 .. code:: c
 
@@ -139,7 +143,7 @@ POSIX信号量的使用实例
             printf("error in the fork!\n");
         } else if (pid == 0) {
             
-            sem = sem_open("my_sem_test", O_CREAT, 0644, 1);
+            sem = sem_open(sem_name, O_CREAT, 0644, 1);
 
             if (sem == SEM_FAILED) {
                 printf("unable to create semaphore...\n");
@@ -193,6 +197,13 @@ POSIX信号量的使用实例
 编译并且运行后，实验现象如下：
 
 .. code:: bash
+
+     parent process run: 0
+     parent process run: 1
+     parent process run: 2
+     childe process run: 0
+     childe process run: 1
+     childe process run: 2
 
 在代码的运行过程中，如果你打开一个新的终端，并且输入以下命令：
 

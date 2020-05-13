@@ -73,6 +73,9 @@ build-gcc.sh 脚本内容如下：
     #解压源码包
     do_tar_package () {
        echo "\033[1;33mstart unpacking the ${PACKAGE_NAME} package ...\033[0m"
+       
+       mkdir -p ${INSTALL_PATH}
+
        if [ ! -d "${PACKAGE_NAME}" ];then
           tar -xf ${COMPRESS_PACKAGE} -C ${INSTALL_PATH}
        fi

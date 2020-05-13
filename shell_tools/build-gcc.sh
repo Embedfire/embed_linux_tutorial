@@ -46,8 +46,6 @@ do_tar_package () {
       tar -xf ${COMPRESS_PACKAGE} -C ${INSTALL_PATH} --strip-components=1 
    fi
 
-    mkdir -p ${INSTALL_PATH}
-
    echo "\033[1;33mdone...\033[0m"
 }
 

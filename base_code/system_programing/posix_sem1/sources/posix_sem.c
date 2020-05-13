@@ -20,7 +20,7 @@ int main(int argc, char **argv)
         printf("error in the fork!\n");
     } else if (pid == 0) {
         
-        sem = sem_open("my_sem_test", O_CREAT, 0644, 1);
+        sem = sem_open(sem_name, O_CREAT, 0644, 1);
 
         if (sem == SEM_FAILED) {
             printf("unable to create semaphore...\n");
