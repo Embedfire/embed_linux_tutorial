@@ -222,7 +222,7 @@ led_probe,”指定.probe函数。.probe函数比较特殊，当平台驱动和�
     
     /*------------------------第三部分--------------------------*/
     	/*获取rgb_led节点的红灯子节点*/
-    	led_red.device_node = of_get_next_child(rgb_led_device_node, NULL);
+    	led_red.device_node = of_find_node_by_name(rgb_led_device_node,"rgb_led_red");
     	if (led_red.device_node == NULL)
     	{
     		printk(KERN_ERR "\n get rgb_led_red_device_node failed ! \n");
@@ -262,7 +262,7 @@ led_probe,”指定.probe函数。.probe函数比较特殊，当平台驱动和�
     
     /*------------------------第四部分--------------------------*/
     	/*获取rgb_led节点的绿灯子节点*/
-    	led_green.device_node = of_get_next_child(rgb_led_device_node, led_red.device_node);
+    	led_green.device_node = of_find_node_by_name(rgb_led_device_node,"rgb_led_green");
     	if (led_green.device_node == NULL)
     	{
     		printk(KERN_ERR "\n get rgb_led_green_device_node failed ! \n");
@@ -302,7 +302,7 @@ led_probe,”指定.probe函数。.probe函数比较特殊，当平台驱动和�
     /*------------------------第五部分--------------------------*/
     
     	/*获取rgb_led节点的蓝灯子节点*/
-    	led_blue.device_node = of_get_next_child(rgb_led_device_node, led_green.device_node);
+    	led_blue.device_node = of_find_node_by_name(rgb_led_device_node,"rgb_led_blue");
     	if (led_blue.device_node == NULL)
     	{
     		printk(KERN_ERR "\n get rgb_led_blue_device_node failed ! \n");
@@ -391,8 +391,13 @@ led_probe,”指定.probe函数。.probe函数比较特殊，当平台驱动和�
 
 第二部分，使用of_find_node_by_path函数获取设备树节点“/rgb_led”，获取成功后会返回“/rgb_led”节点的“设备节点结构体”后面的代码我们就可以根据这个“设备节点结构体”访问它的子节点。
 
-第三部分，第三部分到第五部分依次初始化 红、绿、蓝灯，这三部分非常相似，这里仅介绍第三部分红灯初始化部分。初始化过程大致分三步。第一步，获取红灯子节点，这里使用函数“of_get_next_child”，红灯是第一个子节点所以将参数设置为NULL，即可获得红灯的设备节点结构体。第二步，获取并转换re
-g属性，我们知道reg属性保存的是就寄存器地址（物理地址），这里使用“of_iomap”函数，获取并完成物理地址到虚拟地址的转换。第三步，初始化寄存器，至于如何将初始化GPIO在裸机章节已经详细介绍这里不再赘述，需要注意的是这里只能用系统提供的API(例如这里读写的是32位数据，使用writel和r
+第三部分，第三部分到第五部分依次初始化 红、绿、蓝灯，这三部分非常
+相似，这里仅介绍第三部分红灯初始化部分。初始化过程大致分三步。第一步，获取红
+灯子节点，这里使用函数“of_find_node_by_name”，参数rgb_led_device_node指定从
+rgb_led节点开始搜索，参数"rgb_led_red"指定要获取那个节点，这里是rgb_led节点下的rgb_led_red子节点。第二步，获取并转换re
+g属性，我们知道reg属性保存的是就寄存器地址（物理地址），这里使用“of_iomap”函数，获
+取并完成物理地址到虚拟地址的转换。第三步，初始化寄存器，至于如何将初始化GPIO在裸机章节
+已经详细介绍这里不再赘述，需要注意的是这里只能用系统提供的API(例如这里读写的是32位数据，使用writel和r
 eadl)，不能像裸机那样直接使用“=”、“&=”、“|=”等等那样直接修改寄存器。
 
 第六部分，注册一个字符设备。字符设备的注册过程与之前讲解的字符设备驱动非常相似，这部分代码就是从字符涉笔驱动拷贝得到的。这里不再过多介绍，注册流程简单介绍如下。

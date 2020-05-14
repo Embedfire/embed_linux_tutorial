@@ -136,12 +136,13 @@ static int led_probe(struct platform_device *pdv)
 	}
 
 	/*获取rgb_led节点的红灯子节点*/
-	led_red.device_node = of_get_next_child(rgb_led_device_node, NULL);
+	led_red.device_node = of_find_node_by_name(rgb_led_device_node,"rgb_led_red");
 	if (led_red.device_node == NULL)
 	{
 		printk(KERN_ERR "\n get rgb_led_red_device_node failed ! \n");
 		return -1;
 	}
+
 
 	/*获取 reg 属性并转化为虚拟地址*/
 	led_red.virtual_CCM_CCGR = of_iomap(led_red.device_node, 0);
@@ -156,7 +157,7 @@ static int led_probe(struct platform_device *pdv)
 	writel(register_data, led_red.virtual_CCM_CCGR); //开启时钟
 
 	register_data = readl(led_red.virtual_IOMUXC_SW_MUX_CTL_PAD);
-	register_data &= ~(0xff << 0);
+	register_data &= ~(0xf << 0);
 	register_data |= (0x05 << 0);
 	writel(register_data, led_red.virtual_IOMUXC_SW_MUX_CTL_PAD); //设置复用功能
 
@@ -172,8 +173,13 @@ static int led_probe(struct platform_device *pdv)
 	register_data |= (0x01 << 4);
 	writel(register_data, led_red.virtual_DR); //设置 GPIO1_04 默认输出高电平
 
+
+
+
+
+
 	/*获取rgb_led节点的绿灯子节点*/
-	led_green.device_node = of_get_next_child(rgb_led_device_node, led_red.device_node);
+	led_green.device_node = of_find_node_by_name(rgb_led_device_node,"rgb_led_green");
 	if (led_green.device_node == NULL)
 	{
 		printk(KERN_ERR "\n get rgb_led_green_device_node failed ! \n");
@@ -193,7 +199,7 @@ static int led_probe(struct platform_device *pdv)
 	writel(register_data, led_green.virtual_CCM_CCGR); //开启时钟
 
 	register_data = readl(led_green.virtual_IOMUXC_SW_MUX_CTL_PAD);
-	register_data &= ~(0xff << 0);
+	register_data &= ~(0xf << 0);
 	register_data |= (0x05 << 0);
 	writel(register_data, led_green.virtual_IOMUXC_SW_MUX_CTL_PAD); //设置复用功能
 
@@ -209,8 +215,13 @@ static int led_probe(struct platform_device *pdv)
 	register_data |= (0x01 << 20);
 	writel(register_data, led_green.virtual_DR); //设置 GPIO4_IO20 默认输出高电平
 
+
+
+
+
+
 	/*获取rgb_led节点的蓝灯子节点*/
-	led_blue.device_node = of_get_next_child(rgb_led_device_node, led_green.device_node);
+	led_blue.device_node = of_find_node_by_name(rgb_led_device_node,"rgb_led_blue");
 	if (led_blue.device_node == NULL)
 	{
 		printk(KERN_ERR "\n get rgb_led_blue_device_node failed ! \n");
@@ -224,13 +235,13 @@ static int led_probe(struct platform_device *pdv)
 	led_blue.virtual_DR = of_iomap(led_blue.device_node, 3);
 	led_blue.virtual_GDIR = of_iomap(led_blue.device_node, 4);
 
-	/*初始化绿灯*/
+	/*初始化蓝灯*/
 	register_data = readl(led_blue.virtual_CCM_CCGR);
 	register_data |= (0x03 << 12);
 	writel(register_data, led_blue.virtual_CCM_CCGR); //开启时钟
 
 	register_data = readl(led_blue.virtual_IOMUXC_SW_MUX_CTL_PAD);
-	register_data &= ~(0xff << 0);
+	register_data &= ~(0xf << 0);
 	register_data |= (0x05 << 0);
 	writel(register_data, led_blue.virtual_IOMUXC_SW_MUX_CTL_PAD); //设置复用功能
 
@@ -245,6 +256,13 @@ static int led_probe(struct platform_device *pdv)
 	register_data = readl(led_blue.virtual_DR);
 	register_data |= (0x01 << 19);
 	writel(register_data, led_blue.virtual_DR); //设置 GPIO4_IO19 默认输出高电平
+
+
+
+
+
+
+
 
 	/*---------------------注册 字符设备部分-----------------*/
 
