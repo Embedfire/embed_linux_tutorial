@@ -1,0 +1,18 @@
+MuntsOS Embedded Linux Microcontroller Kernel Image
+---------------------------------------------------
+
+This Linux kernel image is built from many software components that
+are downloaded at build time.  The makefiles and everything you would
+need to reproduce this kernel image are available at:
+
+http://git.munts.com/muntsos
+
+Since many of the components that comprise this kernel image are GPL
+licensed, this image itself is therefore also licensed under the GPL.
+
+It is the opinion of the author that, under prevailing copyright law,
+a program calling functions in a shared library is not a derivative
+work of that library.
+
+The copyright and license information for all of the components that
+comprise this kernel image are included below.

@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2019 - All Rights Reserved by 
+ * filename : imx-fire-led-overlay.dts
+ * brief : Device Tree overlay for EBF6ull led device
+ * author : embedfire
+ * date : 2019-11-15 
+ * version : A001
+ */
+ /dts-v1/;
+ /plugin/;
+#include "imx6ul-pinfunc.h"
+#include "dt-bindings/gpio/gpio.h"
+ / {
+        fragment@0 {
+            target-path = "/";
+            __overlay__ {
+                rgb_led{
+                	#address-cells = <1>;
+                	#size-cells = <1>;
+                	compatible = "fire,rgb_led";
+                	/*红灯节点*/
+                	ranges;
+                	rgb_led_red@0x020C406C{
+                		compatible = "fire,rgb_led_red";
+                		reg = <0x020C406C 0x00000004
+                		       0x020E006C 0x00000004
+                		       0x020E02F8 0x00000004
+                			   0x0209C000 0x00000004
+                		       0x0209C004 0x00000004>;
+                		status = "okay";
+                	};
+
+
+                	/*绿灯节点*/
+                	rgb_led_green@0x020C4074{
+                		compatible = "fire,rgb_led_green";
+                		reg = <0x020C4074 0x00000004
+                		       0x020E01E0 0x00000004
+                		       0x020E046C 0x00000004
+                			   0x020A8000 0x00000004
+                		       0x020A8004 0x00000004>;
+                		status = "okay";
+                	};
+
+					/*蓝灯节点*/
+                	rgb_led_blue@0x020C4074{
+                		compatible = "fire,rgb_led_blue";
+                		reg = <0x020C4074 0x00000004
+                		       0x020E01DC 0x00000004
+                		       0x020E0468 0x00000004
+                			   0x020A8000 0x00000004
+                		       0x020A8004 0x00000004>;
+                		status = "okay";
+                	};
+                	
+                };
+            };
+        };
+ };
+
+
+
