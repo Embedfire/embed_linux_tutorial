@@ -178,6 +178,8 @@ IMX6ULL的spi接口称为"ECSPI",它在普通spi接口新加入来一些特性�
 IMX6ULL有四个ECSPI接口，本实验主要使用它的第三个。
 参考前面《fire-config工具简介》章节，使能exspi_3驱动。
 
+**注意**:打开spi3时需要关闭串口3，两者存在io复用冲突，不能同时使用。
+
 如下图:
 
 .. image:: media/spiapp012.png

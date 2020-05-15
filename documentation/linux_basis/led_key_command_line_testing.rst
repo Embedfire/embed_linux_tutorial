@@ -212,6 +212,13 @@ apt安装evtest工具
 
    sudo apt install evtest
 
+**注意**:第一次使用apt install命令前，需要先执行以下执行刷新镜像源
+
+.. code-block:: sh
+   :linenos:
+
+   sudo apt update
+
 使用evtest工具：
 
 .. code-block:: sh
