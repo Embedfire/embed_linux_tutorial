@@ -13,4 +13,5 @@
 ..    linux_http
 ..    linux_http_client
 ..    linux_http_server
+..    canopen
 

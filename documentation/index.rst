@@ -133,7 +133,7 @@
    linux_iot/linux_http
    linux_iot/linux_http_client
    linux_iot/linux_http_server
-
+   linux_iot/canopen
 
 .. toctree::
    :maxdepth: 1
