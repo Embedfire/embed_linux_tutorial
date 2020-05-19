@@ -17,7 +17,7 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
 下载安装Etcher工具
 ~~~~~~~~~~~~~~~~~~~~~~
 
-打开Etcher官网地址: \ https://www.balena.io/etcher/\,
+打开Etcher官网地址:  https://www.balena.io/etcher/\,
 在官网首页有Etcher工具的下载链接，用户可以根据自己的操作系统类型，来下载对应版本的软件安装包。
 
 ..  image:: media/instal002.png

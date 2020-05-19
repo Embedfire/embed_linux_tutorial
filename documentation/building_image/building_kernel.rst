@@ -4,17 +4,17 @@
 下载野火官方提供的内核镜像
 --------------------------
 
-在编译内核前我们首先要下载到官方提供的内核镜像，目前野火官方镜像已经托管在github上，可以随时去下载，打开\ https://github.com/Embedfire/ebf_6ull_linux\ 网页，可以看到野火官方提供的内核镜像，并且携带了很详细的操作说明文档，这个仓库是来源于NXP官方提供的内核镜像\ http://git.freescale.com/git/cgit.cgi/imx/linux-imx.git/\ ，由\ ``imx_4.1.15_2.0.0_ga``\ 分支开发而来，主要是满足野火开发板的需求。
+在编译内核前我们首先要下载到官方提供的内核镜像，目前野火官方镜像已经托管在github上，可以随时去下载，打开 https://github.com/Embedfire/ebf_6ull_linux 网页，可以看到野火官方提供的内核镜像，并且携带了很详细的操作说明文档，这个仓库是来源于NXP官方提供的内核镜像 http://git.freescale.com/git/cgit.cgi/imx/linux-imx.git/ ，由 ``imx_4.1.15_2.0.0_ga`` 分支开发而来，主要是满足野火开发板的需求。
 
-我们只需要野火官方提供的内核镜像即可，首先我们克隆一下这个内核镜像仓库，在克隆内核镜像的时候最好是在虚拟机中（或linux环境），而不是在Windows环境下，我们将使用\ ``git clone``\ 命令去克隆官方提供的内核镜像，这样子就能保留镜像中的所有git信息与标签，在开发过程中能方便切换到合适的分支进行开发，因为不同的分支内核镜像的源代码修改的地方是不一样的，可能会发生未知的问题，我们目前就使用\ ``master``\ 分支进行开发。
+我们只需要野火官方提供的内核镜像即可，首先我们克隆一下这个内核镜像仓库，在克隆内核镜像的时候最好是在虚拟机中（或linux环境），而不是在Windows环境下，我们将使用 ``git clone`` 命令去克隆官方提供的内核镜像，这样子就能保留镜像中的所有git信息与标签，在开发过程中能方便切换到合适的分支进行开发，因为不同的分支内核镜像的源代码修改的地方是不一样的，可能会发生未知的问题，我们目前就使用 ``master`` 分支进行开发。
 
-使用\ ``git clone``\ 命令克隆内核镜像，然后等待克隆完成即可：
+使用 ``git clone`` 命令克隆内核镜像，然后等待克隆完成即可：
 
 .. code:: bash
 
     git clone https://github.com/Embedfire/ebf_6ull_linux.git
 
-由于github网站是国外的，可能会非常慢，甚至出现下载失败现象，建议使用gitee中的仓库，我们已经将源码提交到gitee平台，直接使用\ ``git clone``\ 命令克隆内核镜像即可：
+由于github网站是国外的，可能会非常慢，甚至出现下载失败现象，建议使用gitee中的仓库，我们已经将源码提交到gitee平台，直接使用 ``git clone`` 命令克隆内核镜像即可：
 
 .. code:: bash
 
@@ -32,8 +32,8 @@
 内核源码目录
 ------------
 
-在运行\ ``git clone``\ 命令命令后，大约等待一分钟，我们可以看到输出的信息，已然提示克隆完成，我们会发现克隆的目录下多出了一个文件夹\ ``ebf_6ull_linux``\ ，我们可以进入到\ ``ebf_6ull_linux``\ 目录下，可以使用git
-log查看仓库的日志信息，看看更改了什么地方。在\ ``ebf_6ull_linux``\ 目录下看到当前目录下多了很多文件夹，它就是我们克隆的内核镜像，里面是官方提供的内核源码，我们可以进入imx-linux目录下中查看主要有哪些文件夹组成，具体见：
+在运行 ``git clone`` 命令命令后，大约等待一分钟，我们可以看到输出的信息，已然提示克隆完成，我们会发现克隆的目录下多出了一个文件夹 ``ebf_6ull_linux`` ，我们可以进入到 ``ebf_6ull_linux`` 目录下，可以使用git
+log查看仓库的日志信息，看看更改了什么地方。在 ``ebf_6ull_linux`` 目录下看到当前目录下多了很多文件夹，它就是我们克隆的内核镜像，里面是官方提供的内核源码，我们可以进入imx-linux目录下中查看主要有哪些文件夹组成，具体见：
 
 .. code:: bash
 
@@ -53,7 +53,7 @@ log查看仓库的日志信息，看看更改了什么地方。在\ ``ebf_6ull_l
 
 从图中我们可以看到Linux内核源码目录下是有非常多的文件夹，且文件夹下也有非常多的文件，下面我们简单分析一下这些文件夹的主要作用。
 
--  arch：主要包含和硬件体系结构相关的代码，如arm、x86、MIPS，PPC，每种CPU平台占一个相应的目录，例如我们使用的imx系列CPU就在\ ``arch/arm/mach-imx``\ 目录下，Linux内核目前已经支持30种左右的CPU体系结构。arch中的目录下存放的是各个平台以及各个平台的芯片对Linux内核进程调度、
+-  arch：主要包含和硬件体系结构相关的代码，如arm、x86、MIPS，PPC，每种CPU平台占一个相应的目录，例如我们使用的imx系列CPU就在 ``arch/arm/mach-imx`` 目录下，Linux内核目前已经支持30种左右的CPU体系结构。arch中的目录下存放的是各个平台以及各个平台的芯片对Linux内核进程调度、
    内存管理、 中断等的支持，以及每个具体的SoC和电路板的板级支持代码。
 
 -  block：在Linux中block表示块设备（以块（多个字节组成的整体，类似于扇区）为单位来整体访问），譬如说SD卡、Nand、硬盘等都是块设备，block目录下放的是一些Linux存储体系中关于块设备管理的代码。
@@ -69,18 +69,18 @@ log查看仓库的日志信息，看看更改了什么地方。在\ ``ebf_6ull_l
 -  fs：fs就是file system，里面包含Linux所支持的各种文件系统，如EXT、
    FAT、 NTFS、 JFFS2等。
 
--  include：目录包括编译核心所需要的大部分头文件，例如与平台无关的头文件在\ ``include/linux``\ 子目录下，与cpu架构相关的头文件在include目录下对应的子目录中。
+-  include：目录包括编译核心所需要的大部分头文件，例如与平台无关的头文件在 ``include/linux`` 子目录下，与cpu架构相关的头文件在include目录下对应的子目录中。
 
 -  init：内核初始化代码，这个目录下的代码就是linux内核启动时初始化内核的代码。
 
--  ipc：ipc就是\ ``inter process commuication``\ ，进程间通信，该文件夹下都是linux进程间通信的代码。
+-  ipc：ipc就是 ``inter process commuication`` ，进程间通信，该文件夹下都是linux进程间通信的代码。
 
 -  kernel：kernel就是Linux内核，是Linux中最核心的部分，包括进程调度、定时器等，而和平台相关的一部分代码放在arch/*/kernel目录下。
 
--  lib：lib是库的意思，lib目录下存放的都是一些公用的有用的库函数，注意这里的库函数和C语言的库函数不一样的，因为在内核编程中是不能用C语言标准库函数的，所以需要使用lib中的库函数，除此之外与处理器结构相关的库函数代码被放在\ ``arch/*/lib/``\ 目录下。
+-  lib：lib是库的意思，lib目录下存放的都是一些公用的有用的库函数，注意这里的库函数和C语言的库函数不一样的，因为在内核编程中是不能用C语言标准库函数的，所以需要使用lib中的库函数，除此之外与处理器结构相关的库函数代码被放在 ``arch/*/lib/`` 目录下。
 
 -  mm： 目录包含了所有独立于 cpu
-   体系结构的内存管理代码，如页式存储管理内存的分配和释放等，而与具体硬件体系结构相关的内存管理代码位于\ ``arch/*/mm``\ 目录下，例如\ ``arch/arm/mm/fault.c``\ 。
+   体系结构的内存管理代码，如页式存储管理内存的分配和释放等，而与具体硬件体系结构相关的内存管理代码位于 ``arch/*/mm`` 目录下，例如 ``arch/arm/mm/fault.c`` 。
 
 -  net： 网络协议栈相关代码，net目录下实现各种常见的网络协议。
 
@@ -99,7 +99,7 @@ log查看仓库的日志信息，看看更改了什么地方。在\ ``ebf_6ull_l
 
 简单了解内核源码的目录结构后，我们可以开始尝试编译内核，本小节主要是以编译我们配套的开发板源代码为主。
 
-我们提供的源码包是经过修改的，首先进入\ ``ebf_6ull_linux/arch/arm/configs``\ 目录下，可以看到很多默认的deconfig文件，这些是linux源码中的配置文件，其中我们主要关注\ ``imx_v6_v7_defconfig、imx_v7_defconfig 、imx6_v7_ebf_defconfig``\ 这3个文件即可，\ ``imx_v6_v7_defconfig、imx_v7_defconfig``\ 这两个文件是nxp官方提供的默认配置文件，而\ ``imx6_v7_ebf_defconfig``\ 文件则是我们野火提供的配置文件，这些文件是与编译内核息息相关的，而不同的开发板这些配置是不一样的，前面两个是用于编译官方的imx6ull开发板，而后面两个则是根据我们的imx6ull开发板硬件而定制的配置。
+我们提供的源码包是经过修改的，首先进入 ``ebf_6ull_linux/arch/arm/configs`` 目录下，可以看到很多默认的deconfig文件，这些是linux源码中的配置文件，其中我们主要关注 ``imx_v6_v7_defconfig、imx_v7_defconfig 、imx6_v7_ebf_defconfig`` 这3个文件即可， ``imx_v6_v7_defconfig、imx_v7_defconfig`` 这两个文件是nxp官方提供的默认配置文件，而 ``imx6_v7_ebf_defconfig`` 文件则是我们野火提供的配置文件，这些文件是与编译内核息息相关的，而不同的开发板这些配置是不一样的，前面两个是用于编译官方的imx6ull开发板，而后面两个则是根据我们的imx6ull开发板硬件而定制的配置。
 由于整个内核镜像都已经打上我们的补丁，那么也无需再做过多的修改即可直接编译，我们可以通过git
 log命令查看补丁信息：
 
@@ -140,7 +140,7 @@ log命令查看补丁信息：
 搭建编译环境
 ~~~~~~~~~~~~
 
-开发环境：\ **ubuntu18.04**
+开发环境： **ubuntu18.04**
 
 **安装必要的库**
 
@@ -152,7 +152,7 @@ log命令查看补丁信息：
 
 1. 命令安装方式（推荐新手使用这种方法）：
 
-arm-linux-gnueabihf-gcc：\ ``v7.4.0``
+arm-linux-gnueabihf-gcc： ``v7.4.0``
 
 .. code:: bash
 
@@ -160,12 +160,12 @@ arm-linux-gnueabihf-gcc：\ ``v7.4.0``
 
 2. 安装包安装方式(推荐老手使用这种方法)
 
-从百度云盘下载\ ``arm-linux-gnueabihf-gcc``\ 编译器的压缩包，版本是
+从百度云盘下载 ``arm-linux-gnueabihf-gcc`` 编译器的压缩包，版本是
 ``v4.9.3``
 
-链接：\ https://github.com/Embedfire/products/wiki
+链接： https://github.com/Embedfire/products/wiki
 
-在 **Linux系列产品**中找到的网盘链接，在\ ``i.MX6ULL系列\5-编译工具链\arm-gcc`` 目录下找到``arm-gcc.tar.gz``压缩包并且下载，然后解压到\ ``/opt/arm-gcc/``\ 目录下，如果没有创建即可，解压后就可以在\ ``/opt/arm-gcc/bin/``\ 目录下找到我们的编译器\ ``arm-linux-gnueabihf-gcc``\ ，它的版本是\ ``gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11)``\ ，然后可以将编译器所在的路径添加到环境变量中，只修改当前用户的配置文件，通常是\ ``"~/.bashrc"``\ 或者\ ``"~/.bash_profile"``\ ，直接
+在 **Linux系列产品**中找到的网盘链接，在 ``i.MX6ULL系列\5-编译工具链\arm-gcc`` 目录下找到``arm-gcc.tar.gz``压缩包并且下载，然后解压到 ``/opt/arm-gcc/`` 目录下，如果没有创建即可，解压后就可以在 ``/opt/arm-gcc/bin/`` 目录下找到我们的编译器 ``arm-linux-gnueabihf-gcc`` ，它的版本是 ``gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11)`` ，然后可以将编译器所在的路径添加到环境变量中，只修改当前用户的配置文件，通常是 ``"~/.bashrc"`` 或者 ``"~/.bash_profile"`` ，直接
 vi 打开即可，在文件末尾增加编译器所在的路径：
 
 .. code:: bash
@@ -184,7 +184,7 @@ vi 打开即可，在文件末尾增加编译器所在的路径：
 
     ➜  ebf_6ull_linux git:(master) ✗ echo $PATH
 
-显示的内容中有\ ``/opt/arm-gcc/bin``\ ，说明已经将交叉编译器的路径加入PATH。至此，交叉编译环境安装完成。
+显示的内容中有 ``/opt/arm-gcc/bin`` ，说明已经将交叉编译器的路径加入PATH。至此，交叉编译环境安装完成。
 
 测试是否安装成功
 
@@ -199,9 +199,9 @@ vi 打开即可，在文件末尾增加编译器所在的路径：
 
 上面的命令会显示arm-linux-gcc信息和版本，说明成功。
 
-更多安装方法参考：\ https://blog.csdn.net/u013485792/article/details/50958253
+更多安装方法参考： https://blog.csdn.net/u013485792/article/details/50958253
 
-    作者备注：为什么推荐更低版本的编译器呢？因为作者亲测新版本的编译器并不能完全兼容，在测试比如新版本编译的内核镜像无法识别到4G模块。但是在绝大部分情况下\ ``v7.4.0``\ 版本的编译器都是没有任何问题的！！！请放心使用！！！
+    作者备注：为什么推荐更低版本的编译器呢？因为作者亲测新版本的编译器并不能完全兼容，在测试比如新版本编译的内核镜像无法识别到4G模块。但是在绝大部分情况下 ``v7.4.0`` 版本的编译器都是没有任何问题的！！！请放心使用！！！
 
 编译前准备
 ~~~~~~~~~~
@@ -223,8 +223,8 @@ vi 打开即可，在文件末尾增加编译器所在的路径：
 设置配置选项，使用野火开发板配置
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-首先进入imx-linux目录下，然后开始编译内核，运行\ ``make ARCH=arm imx6_v7_ebf_defconfig``\ 命令将imx6_v7_ebf_defconfig配置文件的信息写入当前路径下的
-``.config``\ 文件中，在linux中以\ ``"."``\ 开头的文件都是隐藏文件，我们可以使用ls
+首先进入imx-linux目录下，然后开始编译内核，运行 ``make ARCH=arm imx6_v7_ebf_defconfig`` 命令将imx6_v7_ebf_defconfig配置文件的信息写入当前路径下的
+``.config`` 文件中，在linux中以 ``"."`` 开头的文件都是隐藏文件，我们可以使用ls
 –la命令查看这些文件。
 
 .. code:: bash
@@ -249,8 +249,9 @@ Linux内核的配置系统由三个部分组成，分别是：
 
 -  配置文件：给用户提供配置选择的功能，如Kconfig文件定义了配置项，.config文件对配置项进行赋值；
 
--  配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配置用户界面（linux提供基于字符界面、
-基于Ncurses 图形界面以及基于 Xwindows 图形界面的用户配置界面，各自对应于make config、make menuconfig 和 make xconfig）。
+-  配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配置用户界面（linux提供基于字符界面、基于Ncurses 图形界面以及基于 Xwindows 图形界面的用户配置界面，各自对应于make config、make menuconfig 和 make xconfig）。
+
+
 读者如果想看我们提供的配置文件imx6_v7_ebf_defconfig中修改了什么地方，可以通过makemenuconfig命令来查看我们的配置，
 makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下
 导入 .config文件的配置（如果没有找到.config文件则会生成默认配置的 .config文件），
@@ -261,13 +262,15 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
    :alt: building_kernel002
 
    building_kernel002
-比如我们选择配置我们开发板的触摸屏驱动：\ ``Goodix I2C touchscreen``\ ，如果读者炸不到这个配置选项在哪里，可以利用\ ``make menuconfig``\ 中的搜索功能，在英文输入法状态下按下"/"则可以进行搜索，输入"Goodix"找到改配置选项的位置，具体见：
+
+比如我们选择配置我们开发板的触摸屏驱动： ``Goodix I2C touchscreen`` ，如果读者炸不到这个配置选项在哪里，可以利用 ``make menuconfig`` 中的搜索功能，在英文输入法状态下按下"/"则可以进行搜索，输入"Goodix"找到改配置选项的位置，具体见：
 
 .. figure:: media/building_kernel003.png
    :alt: building_kernel003
 
    building_kernel003
-从图中可以很明显看出\ ``Goodix I2C touchscreen``\ 配置选项位于\ ``-> Device Drivers``\ 选项下的\ ``-> Input device support``\ 下的\ ``-> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])``\ 选项下的\ ``-> Touchscreens``\ 选项中，其实也可以按下\ ``"1"``\ 直接可以定位到对应的选项，然后选中以下内容即可，具体见图：
+
+从图中可以很明显看出 ``Goodix I2C touchscreen`` 配置选项位于 ``-> Device Drivers`` 选项下的 ``-> Input device support`` 下的 ``-> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])`` 选项下的 ``-> Touchscreens`` 选项中，其实也可以按下 ``"1"`` 直接可以定位到对应的选项，然后选中以下内容即可，具体见图：
 
 .. code:: bash
 
@@ -280,17 +283,19 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
    :alt: building_kernel004
 
    building_kernel004
-再举个例子，如果想要在我们的开发板上使用\ ``DHT11``\ 测量温湿度（单总线协议），那么需要在内核中配置支持单总线协议：\ ``Dallas's 1-wire support``\ ，我们也照葫芦画瓢，先搜索到这个配置在哪个位置（时候搜索不到就直接找即可），它位于\ ``->Device Drivers``
-选项下的\ ``<*> Dallas's 1-wire suppor``\ 选项中，然后进入它的选项下进行选择即可，当配置完成后保存退出，就可以进行编译了，具体见:
+
+再举个例子，如果想要在我们的开发板上使用 ``DHT11`` 测量温湿度（单总线协议），那么需要在内核中配置支持单总线协议： ``Dallas's 1-wire support`` ，我们也照葫芦画瓢，先搜索到这个配置在哪个位置（时候搜索不到就直接找即可），它位于 ``->Device Drivers``
+选项下的 ``<*> Dallas's 1-wire suppor`` 选项中，然后进入它的选项下进行选择即可，当配置完成后保存退出，就可以进行编译了，具体见:
 
 .. figure:: media/building_kernel005.png
    :alt: building_kernel005
 
    building_kernel005
+
 开始编译
 ~~~~~~~~
 
-如果不需要修改配置，则可以直接编译，运行\ ``make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf-``\ 命令直接编译，\ ``-j10``\ 是代表使用10个线程进行编译，如果不选则默认使用一个线程编译，而线程的多少决定了编译的时间，根据自身情况决定即可，在运行这个命令后，可以看到中断输出一系列编译信息，而在编译的最后会告诉我们编译成功，镜像存在\ ``arch/arm/boot/``\ 目录下，具体见：（已删减绝大部分编译输出的信息）。
+如果不需要修改配置，则可以直接编译，运行 ``make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf-`` 命令直接编译， ``-j10`` 是代表使用10个线程进行编译，如果不选则默认使用一个线程编译，而线程的多少决定了编译的时间，根据自身情况决定即可，在运行这个命令后，可以看到中断输出一系列编译信息，而在编译的最后会告诉我们编译成功，镜像存在 ``arch/arm/boot/`` 目录下，具体见：（已删减绝大部分编译输出的信息）。
 
 .. code:: bash
 
@@ -317,7 +322,7 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 
     ebf_6ull_linux/arch/arm/boot/dts
 
-因为这个\ ``make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf-``\ 命令编译的不仅仅是内核，还会编译设备树，设备树编译后产生的.dtb文件存在\ ``arch/arm/boot/dts/``\ 目录下，我们可以通过\ ``ls arch/arm/boot/dts/ | grep .dtb``\ 命令查看该目录下的所有设备树：
+因为这个 ``make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf-`` 命令编译的不仅仅是内核，还会编译设备树，设备树编译后产生的.dtb文件存在 ``arch/arm/boot/dts/`` 目录下，我们可以通过 ``ls arch/arm/boot/dts/ | grep .dtb`` 命令查看该目录下的所有设备树：
 
 .. code:: bash
 
@@ -337,7 +342,7 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 
 **拷贝zImage与dtb**
 
-然后我们可以直接运行脚本\ ``copy.sh``\ 将内核镜像与设备树拷贝到\ ``image``\ 目录下
+然后我们可以直接运行脚本 ``copy.sh`` 将内核镜像与设备树拷贝到 ``image`` 目录下
 
 .. code:: bash
 
@@ -348,7 +353,7 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 只编译设备树
 ~~~~~~~~~~~~
 
-当然，如果你不想编译内核的话，只想编译设备树，那么可以在\ ``make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf-``\ 命令后面添加
+当然，如果你不想编译内核的话，只想编译设备树，那么可以在 ``make ARCH=arm -j10 CROSS_COMPILE=arm-linux-gnueabihf-`` 命令后面添加
 ``dtbs`` 即可
 
 .. code:: bash
@@ -386,9 +391,9 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 
 生成的内核镜像与设备树均被拷贝到 ``image`` 目录下。
 内核模块相关均被安装到 ``my_lib/lib/``
-目录下的\ ``modules``\ 文件夹下，可以直接替换掉\ ``rootfs(根文件系统)``\ 中的\ ``/lib/modules/``\ 。
+目录下的 ``modules`` 文件夹下，可以直接替换掉 ``rootfs(根文件系统)`` 中的 ``/lib/modules/`` 。
 
-``build.sh``\ 脚本默认编译5.0寸屏幕的内核镜像，如果需要4.3寸屏幕的内核镜像，则可以使用以下命令去编译:
+``build.sh`` 脚本默认编译5.0寸屏幕的内核镜像，如果需要4.3寸屏幕的内核镜像，则可以使用以下命令去编译:
 
 ::
 
@@ -410,16 +415,18 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
    :alt: building_kernel006
 
    building_kernel006
-然后将其保存为\ **256色（即8位色）的bpm格式的图片**\ ，可以在Windows下或者Linux虚拟机下编辑：
+
+然后将其保存为 **256色（即8位色）的bpm格式的图片** ，可以在Windows下或者Linux虚拟机下编辑：
 
 .. figure:: media/building_kernel007.png
    :alt: building_kernel007
 
    building_kernel007
+
 转换为ppm格式的图片
 ~~~~~~~~~~~~~~~~~~~
 
-然后在Linux下使用以下脚本将其转换为ppm格式的文件，为什么是ppm格式呢？因为这是编译Linux内核必要的文件格式，想要修改logo，就要这种格式的文件，它必须是\ **256色（即8位色）的bpm格式的图片**\ 转换而成的。
+然后在Linux下使用以下脚本将其转换为ppm格式的文件，为什么是ppm格式呢？因为这是编译Linux内核必要的文件格式，想要修改logo，就要这种格式的文件，它必须是 **256色（即8位色）的bpm格式的图片** 转换而成的。
 
 .. code:: bash
 
@@ -444,11 +451,11 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
     pnmtoplainpnm $name.clut224.pnm > $name.ppm
     rm $name.pnm $name.clut224.pnm 
 
-这是bmp文件转换ppm格式文件的脚本，可以将其写入一个叫\ ``bmp2ppm.sh``\ 脚本文件中，并且赋予其可执行的权限（使用
+这是bmp文件转换ppm格式文件的脚本，可以将其写入一个叫 ``bmp2ppm.sh`` 脚本文件中，并且赋予其可执行的权限（使用
 ``chmod +x bmp2ppm.sh``
-命令即可），它主要是使用linux系统中的工具转换，如果系统中没有相关工具，则根据提示使用\ ``apt install``\ 命令进行安装即可。
+命令即可），它主要是使用linux系统中的工具转换，如果系统中没有相关工具，则根据提示使用 ``apt install`` 命令进行安装即可。
 
-然后将准备好的bmp文件拷贝到制作ppm的工作目录下，使用\ ``bmp2ppm.sh``\ 脚本将其转化为ppm文件，具体操作如下：
+然后将准备好的bmp文件拷贝到制作ppm的工作目录下，使用 ``bmp2ppm.sh`` 脚本将其转化为ppm文件，具体操作如下：
 
 .. code:: bash
 
@@ -470,18 +477,18 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 替换原本的logo文件
 ~~~~~~~~~~~~~~~~~~
 
-在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ ``ebf_6ull_linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
+在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的 ``ebf_6ull_linux/drivers/video/logo`` 目录下，因为我们的logo是存放在此处的，野火提供的logo：
 
 -  默认编译的logo：logo_dec_clut224.ppm
 -  5寸触摸屏logo：logo_dec_clut224_5.0.ppm
 -  4.3寸触摸屏logo：logo_dec_clut224_4.3.ppm
 
-然后将其重命名为你想替换的logo即可，\ **注意**\ ，5寸触摸屏logo与4.3寸触摸屏logo是一键编译使用的，它在一键编译过程中会替换掉默认的logo，如果你只替换了默认编译的logo，但是使用了一键编译脚本，那么你替换的logo将被一键编译脚本修改，编译产生的内核将不会存在你的logo。
+然后将其重命名为你想替换的logo即可， **注意** ，5寸触摸屏logo与4.3寸触摸屏logo是一键编译使用的，它在一键编译过程中会替换掉默认的logo，如果你只替换了默认编译的logo，但是使用了一键编译脚本，那么你替换的logo将被一键编译脚本修改，编译产生的内核将不会存在你的logo。
 
 修改启动脚本
 ~~~~~~~~~~~~
 
-替换完成后，重新编译内核，并且烧录到开发板上，不过此时会出现一个现象，logo一闪而过，这是因为内核启动后，会执行文件系统的启动脚本，而此时文件系统的启动脚本中\ ``/etc/init.d/psplash.sh``\ 会去执行相应的应用程序\ ``/usr/bin/psplash``\ ，这就是绘制开机的进度条与背景，那么你的开机logo将被刷掉，而只要不让这个启动脚本运行这个\ ``/usr/bin/psplash``\ 应用程序就可以解决问题了，那么我们在开发板中修改启动脚本\ ``/etc/init.d/psplash.sh``\ ：
+替换完成后，重新编译内核，并且烧录到开发板上，不过此时会出现一个现象，logo一闪而过，这是因为内核启动后，会执行文件系统的启动脚本，而此时文件系统的启动脚本中 ``/etc/init.d/psplash.sh`` 会去执行相应的应用程序 ``/usr/bin/psplash`` ，这就是绘制开机的进度条与背景，那么你的开机logo将被刷掉，而只要不让这个启动脚本运行这个 ``/usr/bin/psplash`` 应用程序就可以解决问题了，那么我们在开发板中修改启动脚本 ``/etc/init.d/psplash.sh`` ：
 
 .. code:: bash
 
@@ -531,9 +538,9 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 烧录自己编译的内核到开发板
 --------------------------
 
-那么经过编译得到的\ ``zImage``\ 与设备树都可以烧录到我们的开发板中，比如我们选择\ ``zImage``\ 与\ ``imx6ull-14x14-evk-emmc-cam-dht11.dts``\ 文件替换掉前面小节中的烧录镜像与设备树，完成烧录后即可看到内核启动完成。
+那么经过编译得到的 ``zImage`` 与设备树都可以烧录到我们的开发板中，比如我们选择 ``zImage`` 与 ``imx6ull-14x14-evk-emmc-cam-dht11.dts`` 文件替换掉前面小节中的烧录镜像与设备树，完成烧录后即可看到内核启动完成。
 
-当内核启动后，我们登陆root用户，就可以通过\ ``cat /proc/version``\ 命令查看内核版本：
+当内核启动后，我们登陆root用户，就可以通过 ``cat /proc/version`` 命令查看内核版本：
 
 .. code:: bash
 

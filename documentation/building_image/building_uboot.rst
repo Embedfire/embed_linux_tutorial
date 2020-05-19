@@ -26,7 +26,7 @@ loader，boot阶段启动系统，初始化硬件设备，建立内存空间映�
 
 当然啦，如果你想下载NXP原厂的uboot怎么办呢？很简单，直接去NXP官方网站下载就好了，打开
 http://git.freescale.com/git/
-网页，可以看到很多nxp官方提供的镜像，有内核镜像也有uboot镜像，我们下载官方提供的uboot镜像，名字为\ ``uboot-imx``\ ，我们点击\ ``uboot-imx.git``\ 链接，跳转到下载页面，可以发现该下载页面中有很多uboot相关的信息，如它的分支，标签等，当然我们要注意的是uboot下载界面中的下载信息，我们可以通过\ ``git clone``\ 命令去拉取\ ``uboot-imx``\ 源码，他们的地址就是在下载页面信息的最下方：
+网页，可以看到很多nxp官方提供的镜像，有内核镜像也有uboot镜像，我们下载官方提供的uboot镜像，名字为 ``uboot-imx`` ，我们点击 ``uboot-imx.git`` 链接，跳转到下载页面，可以发现该下载页面中有很多uboot相关的信息，如它的分支，标签等，当然我们要注意的是uboot下载界面中的下载信息，我们可以通过 ``git clone`` 命令去拉取 ``uboot-imx`` 源码，他们的地址就是在下载页面信息的最下方：
 
 .. code:: bash
 
@@ -86,7 +86,7 @@ http://git.freescale.com/git/
 编译前的准备
 ------------
 
-开发环境选择\ **ubuntu18.04**
+开发环境选择 **ubuntu18.04**
 
 **安装独立编译工具链**
 
@@ -153,7 +153,7 @@ arm-none-eabi-gcc：v6.3.1
     make ARCH=arm mx6ull_14x14_evk_ nand _defconfig
 
 在运行以上命令后，Makefile会根据对应的配置文件的内容将配置更新到当前目录下的
-``.config``\ 文件中，如果读者感兴趣可以查看一下该文件的内容，接下来的编译则是根据\ ``.config``\ 文件的配置进行编译的。
+``.config`` 文件中，如果读者感兴趣可以查看一下该文件的内容，接下来的编译则是根据 ``.config`` 文件的配置进行编译的。
 
 开始编译，运行以下命令：
 
@@ -173,7 +173,7 @@ arm-none-eabi-gcc：v6.3.1
 命令中带有jN
 参数，表示最大使用N个线程编译，如j4则表示最大使用4个线程编译，根据自己电脑配置决定即可，当然线程数量越多，编译越快。在输出信息的最下方，可以看到已经生成对应的uboot（名字是u-boot.imx），可以直接烧录到开发板中。
 
-当编译完成后会在当前目录下生成\ ``u-boot.imx``\ 文件
+当编译完成后会在当前目录下生成 ``u-boot.imx`` 文件
 
 .. code:: bash
 
@@ -211,10 +211,9 @@ arm-none-eabi-gcc：v6.3.1
 -  使用ifeq
    判断是否指定了LOGO_BMP变量（该变量表示开机logo图片），如果不指定则使用默认logo图片denx.bmp，该图片在logos目录下。
 
--  然后判断一下是否存在使用开发板名字命名的图片（如\ :math:`(BOARD)，它是一个变量的引用，表示开发板的名字），如果是则使用`\ (BOARD).bmp。
+-  然后判断一下是否存在使用开发板名字命名的图片（如 :math:(BOARD)，它是一个变量的引用，表示开发板的名字），如果是则使用(BOARD).bmp。
 
--  最后判断一下是否存在以供应商名字命名的图片（如$(VENDOR).bmp），那么很显然，nxp官方提供的uboot必然是以它们的名字命名logo，那么uboot就会使用它们的logo图片，我们可以到uboot
-   /tools/logos目录下查看一番，就会发现存在freescale.bmp文件，如图所示。
+-  最后判断一下是否存在以供应商名字命名的图片（如$(VENDOR).bmp），那么很显然，nxp官方提供的uboot必然是以它们的名字命名logo，那么uboot就会使用它们的logo图片，我们可以到uboot/tools/logos目录下查看一番，就会发现存在freescale.bmp文件，如图所示。
 
     注意：开机logo必须是bmp类型的图片，否则可能出现错误。
 
@@ -222,12 +221,14 @@ arm-none-eabi-gcc：v6.3.1
    :alt: building_uboot
 
    building_uboot
+
 既然要修改logo，我们把自己的开机logo图片放进去替换原本的logo即可，我们的开机logo如图所示（注意：logo图片格式必须为bmp格式）。
 
 .. figure:: media/building_uboot005.png
    :alt: building_uboot
 
    building_uboot
+
 这些logo在uboot启动时就会被显示在屏幕上，具体的显示logo的函数在uboot
 /board/esd/common/目录下的lcd.c文件中，大约在81行左右，感兴趣的读者可以去看看源码，在这里就不深入分析。
 
@@ -307,7 +308,7 @@ arm-none-eabi-gcc：v6.3.1
 
 又比如我们在开机时不想让uboot有延时，我们都可以去修改：
 
-在\ ``ebf_6ull_uboot/include/configs/mx6_common.h``\ 文件中将宏定义改为0：
+在 ``ebf_6ull_uboot/include/configs/mx6_common.h`` 文件中将宏定义改为0：
 
 .. code:: c
 
@@ -315,7 +316,7 @@ arm-none-eabi-gcc：v6.3.1
     #define CONFIG_BOOTDELAY    0
     #endif
 
-在\ ``ebf_6ull_uboot/include/configs/mx6ullevk.h``\ 文件中设置uboot传给内核的参数，比如设置console、bootargs、bootcmd等：
+在 ``ebf_6ull_uboot/include/configs/mx6ullevk.h`` 文件中设置uboot传给内核的参数，比如设置console、bootargs、bootcmd等：
 
 **nand 版本的参数：**
 

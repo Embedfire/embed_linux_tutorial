@@ -6,11 +6,11 @@ Buildroot简介
 
 Buildroot是一个简单，高效且易于使用的工具，可通过交叉编译生成嵌入式Linux系统。你可以很容易为你的目标系统构建交叉编译工具链、根文件系统、uboot以及Linux内核镜像，Buildroot可以独立的实现其中的一个或几个功能。Buildroot对于嵌入式开发人员来说是一个非常好用的工具，因为嵌入式不像x86平台（PC）一样硬件基本是统一的，嵌入式平台的硬件是根据需求进行裁剪，而不同的硬件对应的程序必然是不同，所以使用Buildroot来配置是一个非常好的选择。
 
-整个Buildroot是由\ ``Makefile脚本和Kconfig配置文件``\ 构成的，用户可以和编译Linux内核一样，通过config文件进行配置要编译的参数，也可以通过\ ``make menuconfig``\ 等界面进行修改，然后通过make命令编译出一个完整的，可以直接烧写到开发板上运行的Linux系统软件（如\ ``uboot、zimage、dtb``\ 已及文件系统）。
+整个Buildroot是由 ``Makefile脚本和Kconfig配置文件`` 构成的，用户可以和编译Linux内核一样，通过config文件进行配置要编译的参数，也可以通过 ``make menuconfig`` 等界面进行修改，然后通过make命令编译出一个完整的，可以直接烧写到开发板上运行的Linux系统软件（如 ``uboot、zimage、dtb`` 已及文件系统）。
 
 更重要的是Buildroot可以很方便添加第三方的编译源码并且编译，很多工具链、源码都可以从Buildroot社区下载，用户也可以让Buildroot从本地导入源码并，这就为我们的开发带来极大的便利，当需要从网上下载时，Buildroot自动可以帮我们下载，当在本地修改后，又可以直接使用Buildroot编译，它实现了工具链下载、解压、依赖包下载编译等一系列机械化的流程，对开发者非常友好。
 
-Buildroot的官方网站是：\ https://buildroot.org/\ ，我们可以打开官网然后下载我们需要的Buildroot工具，我们可以选择\ ``buildroot-2019.02.4.tar.gz``\ 这个版本的Buildroot作为我们的编译工具即可，虽然Buildroot一直在更新，但是无论是哪个版本基本都是差不多的，大家可以随意下载使用，具体见
+Buildroot的官方网站是： https://buildroot.org/ ，我们可以打开官网然后下载我们需要的Buildroot工具，我们可以选择 ``buildroot-2019.02.4.tar.gz`` 这个版本的Buildroot作为我们的编译工具即可，虽然Buildroot一直在更新，但是无论是哪个版本基本都是差不多的，大家可以随意下载使用，具体见
 
 .. figure:: media/usingb002.png
    :alt: buildroot
@@ -28,7 +28,7 @@ Buildroot的官方网站是：\ https://buildroot.org/\ ，我们可以打开官
    buildroot
 在官网下载的Buildroot是官方的，里面并没有适配野火开发板的配置文件，因此，我还是建议大家在github或者gitee平台下载我们野火适配好的Buildroot源码，然后使用它来编译文件系统即可，如果你是高手，那么请随意玩耍~
 
-github仓库地址：\ https://github.com/Embedfire/ebf_6ull_buildroot
+github仓库地址： https://github.com/Embedfire/ebf_6ull_buildroot
 
 下载
 
@@ -36,7 +36,7 @@ github仓库地址：\ https://github.com/Embedfire/ebf_6ull_buildroot
 
     git clone https://github.com/Embedfire/ebf_6ull_buildroot.git
 
-gitee仓库地址：\ https://gitee.com/wildfireteam/ebf_6ull_buildroot
+gitee仓库地址： https://gitee.com/wildfireteam/ebf_6ull_buildroot
 
 下载
 
@@ -127,9 +127,9 @@ Buildroot为了方便用户使用，在configs目录下提前配置好了很多�
 
     ps: 以上配置选择其中之一即可
 
-这些配置文件就是根据configs目录下的\ ``imx6ulevk_defconfig``\ 修改，适配我们野火的imx6ull开发板。
+这些配置文件就是根据configs目录下的 ``imx6ulevk_defconfig`` 修改，适配我们野火的imx6ull开发板。
 
-比如我们直接选择\ ``imx6ull_ebf_pro_defconfig``\ 作为我们编译的配置文件，那么可以运行以下命令将其写入到\ ``.config``\ 文件：
+比如我们直接选择 ``imx6ull_ebf_pro_defconfig`` 作为我们编译的配置文件，那么可以运行以下命令将其写入到 ``.config`` 文件：
 
 .. code:: bash
 
@@ -149,14 +149,14 @@ Buildroot为了方便用户使用，在configs目录下提前配置好了很多�
    buildroot
 通过配置界面就可以很容易找的自己要配置的选项，我们可以来看看这些配置的主要功能：
 -
-``Target options  --->``\ ：目标单板架构配置，在这里主要是选择要编译的平台架构，如cortex-A7；选择CPU的大小端模式，选择支持浮点等等，具体配置如下：
+``Target options  --->`` ：目标单板架构配置，在这里主要是选择要编译的平台架构，如cortex-A7；选择CPU的大小端模式，选择支持浮点等等，具体配置如下：
 
 .. figure:: media/usingb008.png
    :alt: buildroot
 
    buildroot
 
--  ``Build options  --->``\ ：编译相关的配置，主要是一些编译时用到的选项，比如设置当前配置的保存位置（Location
+-  ``Build options  --->`` ：编译相关的配置，主要是一些编译时用到的选项，比如设置当前配置的保存位置（Location
    to save buildroot
    config），根据自己的路径设置即可，设置dl的路径（下载代码包使用的路径：$(TOPDIR)/dl），多个线程编译的线程数量（如果设置为0则自动选择多个线程编译），是否使能编译器缓冲区；设置下载镜像Mirrors
    and Download
@@ -185,7 +185,7 @@ Build options具体配置如下:
    buildroot
     如后期有改变则以配置文件为主，建议尽量不改动已发布的配置文件。
 
--  ``Toolchain  --->``\ ：工具链选项主要是让用户选择合适自己的交叉编译工具链，可以选择Buildroot提供的工具链（内部工具链\ ``Buildroot toolchain``\ ），也可以指定其他非Buildroot提供的工具链（外部工具链\ ``External toolchain``\ ），我们默认选择外部提供的工具链：\ ``gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf``\ ，C库可以选择uClibc-ng,、glibc
+-  ``Toolchain  --->`` ：工具链选项主要是让用户选择合适自己的交叉编译工具链，可以选择Buildroot提供的工具链（内部工具链 ``Buildroot toolchain`` ），也可以指定其他非Buildroot提供的工具链（外部工具链 ``External toolchain`` ），我们默认选择外部提供的工具链： ``gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf`` ，C库可以选择uClibc-ng,、glibc
    和musl，我们选择glibc，还有选择内核头文件版本（要求比目标内核版本新）、是否使能宽字符（WCHAR）支持（如果需要支持Python则需要使能）、选择gcc编译器版本、是否使能c++等，具体配置如下：
 
 .. figure:: media/usingb011.png
@@ -193,14 +193,14 @@ Build options具体配置如下:
 
    buildroot
 
--  ``System configuration  --->``\ ：系统相关的配置，比如配置系统主机名，它的主要作用是：在一个局域网中，每台机器都有一个主机名，用于主机与主机之间的便于区分，就可以为每台机器设置主机名，以便于以容易记忆的方法来相互访问；设置登陆界面的欢迎信息。选择密码的加密方式，我们可以选择SHA256加密算法（sha-25），设置root登陆的密码、设置默认的命令行终端（我们默认选择bash）、设置默认的登陆串口（开发板连接到电脑的输入/输出）、设置系统默认的环境变量（PATH）、以及选择构建系统镜像版本，根文件系统覆盖（野火的配置中就将一些脚本与相关内容放到\ ``board/embedfire/ebf-imx6ull-pro/rootfs-overlay``\ 目录下，在制作成文件系统时将这些文件添加到文件系统中）、以及一些运行的脚本（buildroot官方为imx6ull制作的打包脚本：\ ``board/freescale/common/imx/post-image.sh``\ ）等，具体配置如下：
+-  ``System configuration  --->`` ：系统相关的配置，比如配置系统主机名，它的主要作用是：在一个局域网中，每台机器都有一个主机名，用于主机与主机之间的便于区分，就可以为每台机器设置主机名，以便于以容易记忆的方法来相互访问；设置登陆界面的欢迎信息。选择密码的加密方式，我们可以选择SHA256加密算法（sha-25），设置root登陆的密码、设置默认的命令行终端（我们默认选择bash）、设置默认的登陆串口（开发板连接到电脑的输入/输出）、设置系统默认的环境变量（PATH）、以及选择构建系统镜像版本，根文件系统覆盖（野火的配置中就将一些脚本与相关内容放到 ``board/embedfire/ebf-imx6ull-pro/rootfs-overlay`` 目录下，在制作成文件系统时将这些文件添加到文件系统中）、以及一些运行的脚本（buildroot官方为imx6ull制作的打包脚本： ``board/freescale/common/imx/post-image.sh`` ）等，具体配置如下：
 
 .. figure:: media/usingb012.png
    :alt: buildroot
 
    buildroot
 
--  ``Kernel  --->``\ ：linux内核相关的配置，用户可以选择要编译的内核版本及源码，可以从网上下载（比如野火的配置文件就是从gitee仓库下载最新的内核源码），除此之外也可以从本地导入（其实对Buildroot来说也算是下载，因为这些文件都会被下载到dl目录下），还可以指定编译内核的默认配置文件（\ ``imx6_v7_ebf，即imx6_v7_ebf_defconfig``\ ，但此处的配置文件不需要后缀名defconfig）、内核二进制文件格式、选择是否编译设备树与指定编译的设备树（DTB）、以及其他的一些扩展。具体配置如下：
+-  ``Kernel  --->`` ：linux内核相关的配置，用户可以选择要编译的内核版本及源码，可以从网上下载（比如野火的配置文件就是从gitee仓库下载最新的内核源码），除此之外也可以从本地导入（其实对Buildroot来说也算是下载，因为这些文件都会被下载到dl目录下），还可以指定编译内核的默认配置文件（ ``imx6_v7_ebf，即imx6_v7_ebf_defconfig`` ，但此处的配置文件不需要后缀名defconfig）、内核二进制文件格式、选择是否编译设备树与指定编译的设备树（DTB）、以及其他的一些扩展。具体配置如下：
 
 指定内核源码编译的设备树如下：
 
@@ -221,13 +221,13 @@ Build options具体配置如下:
 
    buildroot
 
--  ``Target packages  --->``\ ：这个是Buildroot的包管理相关的配置选项，读者可以从这里选择自己需要的软件包，Buildroot
+-  ``Target packages  --->`` ：这个是Buildroot的包管理相关的配置选项，读者可以从这里选择自己需要的软件包，Buildroot
    提供了海量软件包可选，只需在配置界面选中所需要的软件包，交叉编译后即可使用。比如添加音视频应用相关的软件包、添加压缩和解压缩相关的软件包、添加字体、游戏、图形库（QT）、语言和脚本（Python、PHP等）、网络（蓝牙、wifi、http工具包）等软件包，在我们开发板就添加了支持QT与Python的软件包，因此可以在开发板中使用QT与Python，由于配置较多，就不再截图，根据配置文件查看即可。注意：Busybox是必选的。
 
     假设我们系统中缺失一些库，那么可以在这里选择有没有对应的软件包，如果没有则需要自己手动制作了。
 
--  ``Filesystem images  --->``\ ：文件系统镜像配置。可以选择生成的文件系统镜像类型
-   ，如\ ``tar、cpio、ext2/3/4、 jffs2、 yaffs2 和 ubifs``
+-  ``Filesystem images  --->`` ：文件系统镜像配置。可以选择生成的文件系统镜像类型
+   ，如 ``tar、cpio、ext2/3/4、 jffs2、 yaffs2 和 ubifs``
    等。文件系统镜像可能会非常大，具体取决于你选择的文件系统类型、软件包的数量以及是否配置的可用空间等，具体配置如下：
 
 .. figure:: media/usingb014.png
@@ -235,17 +235,17 @@ Build options具体配置如下:
 
    buildroot
 
--  ``Bootloaders  --->``\ ：Bootloaders相关的配置，在这个配置选项中，读者可以选择要编译的Bootloaders
-   引导程序（如\ ``grub2、ts4800-mbrboot、uboot``\ 等，我们默认选择uboot），指定uboot的名字、下载的位置（可以是从网上下载，写入正确的URL即可；也可以从本地导入，写入本地路径即可），指定uboot的版本，我们默认使用野火的uboot仓库，使用最新发布的uboot版本，具体配置如下：
+-  ``Bootloaders  --->`` ：Bootloaders相关的配置，在这个配置选项中，读者可以选择要编译的Bootloaders
+   引导程序（如 ``grub2、ts4800-mbrboot、uboot`` 等，我们默认选择uboot），指定uboot的名字、下载的位置（可以是从网上下载，写入正确的URL即可；也可以从本地导入，写入本地路径即可），指定uboot的版本，我们默认使用野火的uboot仓库，使用最新发布的uboot版本，具体配置如下：
 
 .. figure:: media/usingb015.png
    :alt: buildroot
 
    buildroot
 
--  ``Host utilities  --->``\ ：主机通用配置，使用默认配置即可。
+-  ``Host utilities  --->`` ：主机通用配置，使用默认配置即可。
 
--  ``Legacy config options  --->``\ ：使用默认配置即可。
+-  ``Legacy config options  --->`` ：使用默认配置即可。
 
 当配置完成，退出后会发现所有的配置都被写入当前目录下的 .config文件：
 
@@ -262,7 +262,7 @@ Build options具体配置如下:
 
      make savedefconfig 
 
-然后我们可以执行\ ``make``\ 命令进行编译操作，\ ``make``\ 命令通常会执行以下步骤：
+然后我们可以执行 ``make`` 命令进行编译操作， ``make`` 命令通常会执行以下步骤：
 
 1. 根据配置需要下载源文件
 
@@ -276,7 +276,7 @@ Build options具体配置如下:
 
 6. 以所选格式创建根文件系统
 
-执行\ ``make``\ 命令后就等待它编译完成即可，在编译完成后可以在\ ``output/images``\ 目录下找到编译产生的镜像，具体见
+执行 ``make`` 命令后就等待它编译完成即可，在编译完成后可以在 ``output/images`` 目录下找到编译产生的镜像，具体见
 
 .. figure:: media/usingb016.png
    :alt: buildroot
@@ -306,7 +306,7 @@ graph-depends命令即可生成对应的依赖文件（默认是PDF格式），�
     make graph-depends
 
     最后输出提示：
-    -o /home/ embedfire /buildroot/buildroot-2019.02.4/output/graphs/graph-depends.pdf \ /home/embedfire/buildroot/buildroot-2019.02.4/output/graphs/graph-depends.dot
+    -o /home/ embedfire /buildroot/buildroot-2019.02.4/output/graphs/graph-depends.pdf  /home/embedfire/buildroot/buildroot-2019.02.4/output/graphs/graph-depends.dot
 
 当然，Buildroot还能生成关于编译时间与编译占用资源大小的分析图，只需要通过make
 graph-build与make graph-size命令生成即可，具体见（已删减输出信息）：
@@ -343,7 +343,7 @@ graph-build与make graph-size命令生成即可，具体见（已删减输出信
 
     ./clear.sh 
 
-还有需要注意的是：由于本项目是\ ``Buildroot``\ 使用
+还有需要注意的是：由于本项目是 ``Buildroot`` 使用
 ``arm-linux-gnueabihf-5.3.1``
-编译工具链编译的，与单独编译的内核镜像使用的编译器版本不一致，可能会导致某些内核模块无法加载，因此如果有必要的话，将\ ``output/images/``\ 目录下的内核镜像
+编译工具链编译的，与单独编译的内核镜像使用的编译器版本不一致，可能会导致某些内核模块无法加载，因此如果有必要的话，将 ``output/images/`` 目录下的内核镜像
 ``zImage`` 替换掉原本的内核镜像！同理，设备树亦是如此！

@@ -69,7 +69,7 @@ GCC的官网地址为：https://gcc.gnu.org/，在Ubuntu系统下系统默认已
 Binutils工具集
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Binutils（bin utility），是GNU二进制工具集，通常跟GCC编译器一起打包安装到系统，它的官方说明网站地址为：\ https://www.gnu.org/software/binutils/\ 。
+Binutils（bin utility），是GNU二进制工具集，通常跟GCC编译器一起打包安装到系统，它的官方说明网站地址为： https://www.gnu.org/software/binutils/ 。
 
 在进行程序开发的时候通常不会直接调用这些工具，而是在使用GCC编译指令的时候由GCC编译器间接调用。下面是其中一些常用的工具：
 

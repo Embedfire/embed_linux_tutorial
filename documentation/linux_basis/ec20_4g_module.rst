@@ -13,21 +13,21 @@
 Pcie接口模组加一个USB转接板构成，可方便插接到带有USB接口的Linux主板上。EC20型号众多，我们选用的型号是CEHCLG，全网通，7模，纯数据、单天线版本。
 
 .. figure:: media/EC20_4G_module001.png
-   :alt: EC20\_4G\_module001.png
+   :alt: EC20_4G_module001.png
 
-   EC20\_4G\_module001.png
+   EC20_4G_module001.png
 
 EC20是移远的一款4G模组，有Mini PCle和LCC两种封装，与处理器通信的协议为USB。即你们在市面上看到的那些通过板载的PCle接口与EC20连接的开发板，他们通信时也是通过USB通信，并不是一些初学用户说的通过PCle通信，PCle只是一种封装而已，最终通信都是通过USB。
 
 .. figure:: media/EC20_4G_module002.png
-   :alt: EC20\_4G\_module002.png
+   :alt: EC20_4G_module002.png
 
-   EC20\_4G\_module002.png
+   EC20_4G_module002.png
 
 .. figure:: media/EC20_4G_module003.png
-   :alt: EC20\_4G\_module003.png
+   :alt: EC20_4G_module003.png
 
-   EC20\_4G\_module003.png
+   EC20_4G_module003.png
 
 野火开发板使用4G模块
 --------------------
@@ -35,13 +35,13 @@ EC20是移远的一款4G模组，有Mini PCle和LCC两种封装，与处理器�
 野火开发板出厂固件已经支持4G模块的，所以在收到开发板后可以直接使用，使用方式也非常简单，首先插入4G的电话卡到SIM卡座上，这张电话卡必须是可以上网的，然后接上IPX天线（4G模块在发货的时候就已经接好天线的了），最终连接到开发板上，Pro或者mini开发板都可以使用野火4G模块。
 
 .. figure:: media/EC20_4G_module004.png
-   :alt: EC20\_4G\_module004.png
+   :alt: EC20_4G_module004.png
 
-   EC20\_4G\_module004.png
+   EC20_4G_module004.png
 .. figure:: media/EC20_4G_module005.png
-   :alt: EC20\_4G\_module005.png
+   :alt: EC20_4G_module005.png
 
-   EC20\_4G\_module005.png
+   EC20_4G_module005.png
 
 等待大约6S，可以看到4G模块的蓝色LED灯在闪烁，然后可以在终端输入dmesg命令，能看到以下内容，就代表模块启动成功：
 
@@ -74,13 +74,13 @@ EC20是移远的一款4G模组，有Mini PCle和LCC两种封装，与处理器�
 安装必要的依赖
 --------------
 
-首先安装ppp拨号相关的依赖，安装过程中出现任何输入的内容，直接按\ **回车**\ 即可：
+首先安装ppp拨号相关的依赖，安装过程中出现任何输入的内容，直接按 **回车** 即可：
 
 .. code:: bash
 
     sudo apt-get -y install ipppd
 
-安装野火提供的4g模块拨号脚本，在安装完成后在\ ``/home/debian``\ 目录下出现\ ``peripheral``\ 文件夹：
+安装野火提供的4g模块拨号脚本，在安装完成后在 ``/home/debian`` 目录下出现 ``peripheral`` 文件夹：
 
 .. code:: bash
 
@@ -92,16 +92,16 @@ EC20是移远的一款4G模组，有Mini PCle和LCC两种封装，与处理器�
 模块想要上网则需要拨号，进入 ``~/peripheral/ec20-4g``
 目录下，可以看到该目录存在以下文件（部分）：
 
--  ec20\_options
--  ec20\_ppp\_dialer
+-  ec20_options
+-  ec20_ppp_dialer
 -  ppp-on.sh
 
-ppp-on.sh就是拨号脚本，直接运行它可以进行拨号，ec20\_options是拨号的配置文件，而ec20\_ppp\_dialer
+ppp-on.sh就是拨号脚本，直接运行它可以进行拨号，ec20_options是拨号的配置文件，而ec20_ppp_dialer
 则是拨号的一些指令。
 
 三个文件的内容如下：
 
-**ec20\_options：**
+**ec20_options：**
 
 .. code:: bash
 
@@ -127,7 +127,7 @@ ppp-on.sh就是拨号脚本，直接运行它可以进行拨号，ec20\_options�
     novj
     #Dump
 
-**ec20\_ppp\_dialer：**
+**ec20_ppp_dialer：**
 
 .. code:: bash
 
@@ -212,7 +212,7 @@ ppp-on.sh就是拨号脚本，直接运行它可以进行拨号，ec20\_options�
     Script /etc/ppp/ip-up started (pid 5783)
     Script /etc/ppp/ip-up finished (pid 5783), status = 0x0
 
-当你看到拨号返回的内容后有IP地址时，就证明拨号成功，当然你也可以通过\ ``ifconfig``\ 命令去查看4g模块的IP地址。
+当你看到拨号返回的内容后有IP地址时，就证明拨号成功，当然你也可以通过 ``ifconfig`` 命令去查看4g模块的IP地址。
 
 .. code:: bash
 
@@ -222,7 +222,7 @@ ppp-on.sh就是拨号脚本，直接运行它可以进行拨号，ec20\_options�
 验证4G网卡
 ----------
 
-一旦拨号成功，可以使用\ ``ifconfig``\ 命令验证4G网卡是否存在，如果成功此时会多出来一个ppp0的网卡，并且已经获取到IP地址了。可以很明显看到，我们目前有了一个4g模块的网卡ppp0，存在IP地址，那么说明我们可以使用ppp0进行网络通信：
+一旦拨号成功，可以使用 ``ifconfig`` 命令验证4G网卡是否存在，如果成功此时会多出来一个ppp0的网卡，并且已经获取到IP地址了。可以很明显看到，我们目前有了一个4g模块的网卡ppp0，存在IP地址，那么说明我们可以使用ppp0进行网络通信：
 
 .. code:: bash
 
@@ -265,16 +265,16 @@ baidu.com为示例）：
 **接收模式：**
 
 .. figure:: media/EC20_4G_module006.png
-   :alt: EC20\_4G\_module006.png
+   :alt: EC20_4G_module006.png
 
-   EC20\_4G\_module006.png
+   EC20_4G_module006.png
 
 **发送模式：**
 
 .. figure:: media/EC20_4G_module007.png
-   :alt: EC20\_4G\_module007.png
+   :alt: EC20_4G_module007.png
 
-   EC20\_4G\_module007.png
+   EC20_4G_module007.png
 
 可能出现的问题
 --------------
@@ -305,13 +305,13 @@ APN设置:
 -  EC20CEFILG：带GPS功能的。
 
 .. figure:: media/EC20_4G_module008.png
-   :alt: EC20\_4G\_module008.png
+   :alt: EC20_4G_module008.png
 
-   EC20\_4G\_module008.png
+   EC20_4G_module008.png
 
 **注意，以下的操作必须是带GPS功能版本的4G模块才能使用，请悉知。更重要的是模块需要使用GPS天线，并且天线需要放置在户外，才能正常接收到卫星信号**
 
-本文主要讲解EC20莫块的GPS功能的基本使用方法，更多详细的指令操作细节、参数、示例可参考官网提供的手册：Quectel\_EC20\_GNSS\_AT\_Commands\_Manual，可以从野火官方git仓库下载：\ https://github.com/Embedfire/ebf_gsm_ec20\ 。
+本文主要讲解EC20莫块的GPS功能的基本使用方法，更多详细的指令操作细节、参数、示例可参考官网提供的手册：Quectel_EC20_GNSS_AT_Commands_Manual，可以从野火官方git仓库下载： https://github.com/Embedfire/ebf_gsm_ec20 。
 
 EC20挂载系统成功后，在Windows环境下会有四个/dev/ttyUSBx设备文件，也就是我们一开始看到的识别成功4G模块的设备信息，其中ttyUSB2用于AT指令收发，ttyUSB1用于GPS
 NMEA的接收。
@@ -333,7 +333,7 @@ AT指令手册了解。
 
 实现验证:
 
-1. 从\ ``/dev/ttyUSB1``\ 读取GPS数据，并将其存储到自定义的文件中\ ``ec20_gps_data.txt``\ ，下面这一行命令就是在后台读取\ ``/dev/ttyUSB1``\ 设备的数据并存储到\ ``ec20_gps_data.txt``\ 文件中，\ ``&``
+1. 从 ``/dev/ttyUSB1`` 读取GPS数据，并将其存储到自定义的文件中 ``ec20_gps_data.txt`` ，下面这一行命令就是在后台读取 ``/dev/ttyUSB1`` 设备的数据并存储到 ``ec20_gps_data.txt`` 文件中， ``&``
    表示后台运行。
 
 .. code:: bash
@@ -348,7 +348,7 @@ AT指令手册了解。
 
 在启动的时候，可能不会立即收到所有卫星的信号，可以等待一段时间，注意，必须使用GPS天线并且放置在户外，户内可能搜不到信号。
 
-3. 查看GPS信息，直接cat这个\ ``ec20_gps_data.txt``\ 文件即可。
+3. 查看GPS信息，直接cat这个 ``ec20_gps_data.txt`` 文件即可。
 
 .. code:: bash
 
@@ -388,21 +388,21 @@ AT指令手册了解。
 6. 使用野火多功能调试助手查看GPS数据信息，首先将数据复制到Windows平台下，放入一个txt文件，比如我就放在桌面的log.txt文件中，然后打开野火多功能调试助手，选择GPS定位功能->解码GPS日志文件->选择你的GPS数据文件，注意，这个GPS数据不要太多，因为定位信息的数据本来就是差不多的，只需要几组即可，否则软件可能卡死。
 
 .. figure:: media/EC20_4G_module009.png
-   :alt: EC20\_4G\_module009.png
+   :alt: EC20_4G_module009.png
 
-   EC20\_4G\_module009.png
+   EC20_4G_module009.png
 
 得到的位置信息如下（地图可以放大缩小）：
 
 .. figure:: media/EC20_4G_module010.png
-   :alt: EC20\_4G\_module010.png
+   :alt: EC20_4G_module010.png
 
-   EC20\_4G\_module010.png
+   EC20_4G_module010.png
 
 获取GPS数据的同时使用4G上网
 ---------------------------
 
-由于所有的数据指令都是通过\ ``ttyUSB2``\ 去控制的，如果你先进行4G拨号上网后，这个\ ``ttyUSB2``\ 就已经被占用了，无法通过命令去设置企业GPS功能，那么必须按以下步骤才能获取GPS数据的同时使用4G上网。
+由于所有的数据指令都是通过 ``ttyUSB2`` 去控制的，如果你先进行4G拨号上网后，这个 ``ttyUSB2`` 就已经被占用了，无法通过命令去设置企业GPS功能，那么必须按以下步骤才能获取GPS数据的同时使用4G上网。
 
 1. 启动GPS会话。
 2. 进行ppp拨号上网。
@@ -423,13 +423,13 @@ AT指令手册了解。
 
     cat /dev/ttyUSB1 
 
--  进入\ ``~/peripheral/ec20-4g`` 目录下，进行ppp拨号上网。
+-  进入 ``~/peripheral/ec20-4g`` 目录下，进行ppp拨号上网。
 
 .. code:: bash
 
     sudo ./ppp-on.sh 
 
--  查看IP信息是否正常，并且\ ``ping``\ 一下\ ``baidu.com``\ ，如果都能成功表示此时可以通过4G模块上网了。
+-  查看IP信息是否正常，并且 ``ping`` 一下 ``baidu.com`` ，如果都能成功表示此时可以通过4G模块上网了。
 
 .. code:: bash
 

@@ -272,7 +272,7 @@ Debian系统镜像存放下面目录中
 
    building_kernel006
 
-然后将其保存为\ **256色（即8位色）的bpm格式的图片**\ ，可以在Windows下或者Linux虚拟机下编辑：
+然后将其保存为 **256色（即8位色）的bpm格式的图片** ，可以在Windows下或者Linux虚拟机下编辑：
 
 .. figure:: media/building_kernel007.png
    :alt: building_kernel007
@@ -288,7 +288,7 @@ Debian系统镜像存放下面目录中
 
 2、在Linux下使用以下脚本将其转换为ppm格式的文件，为什么是ppm格式呢？
 因为这是编译Linux内核必要的文件格式，想要修改logo，就要这种格式的文件，
-它必须是\ **256色（即8位色）的bpm格式的图片**\ 转换而成的。
+它必须是 **256色（即8位色）的bpm格式的图片** 转换而成的。
 
 .. code:: bash
 
@@ -313,11 +313,11 @@ Debian系统镜像存放下面目录中
     pnmtoplainpnm $name.clut224.pnm > $name.ppm
     rm $name.pnm $name.clut224.pnm 
 
-这是bmp文件转换ppm格式文件的脚本，可以将其写入一个叫\ ``bmp2ppm.sh``\ 脚本文件中，并且赋予其可执行的权限（使用
+这是bmp文件转换ppm格式文件的脚本，可以将其写入一个叫 ``bmp2ppm.sh`` 脚本文件中，并且赋予其可执行的权限（使用
 ``chmod +x bmp2ppm.sh``
-命令即可），它主要是使用linux系统中的工具转换，如果系统中没有相关工具，则根据提示使用\ ``apt install``\ 命令进行安装即可。
+命令即可），它主要是使用linux系统中的工具转换，如果系统中没有相关工具，则根据提示使用 ``apt install`` 命令进行安装即可。
 
-然后将准备好的bmp文件拷贝到制作ppm文件的目录下，使用\ ``bmp2ppm.sh``\ 脚本将其转化为ppm文件，具体操作如下：
+然后将准备好的bmp文件拷贝到制作ppm文件的目录下，使用 ``bmp2ppm.sh`` 脚本将其转化为ppm文件，具体操作如下：
 
 .. code:: bash
 
@@ -339,7 +339,7 @@ Debian系统镜像存放下面目录中
 替换原本的logo文件
 """"""""
 
-1、在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的\ ``ebf-buster-linux/drivers/video/logo``\ 目录下，因为我们的logo是存放在此处的，野火提供的logo：
+1、在转换完成后，当前目录将出现对应的ppm文件，我们将其拷贝到linux内核源码的 ``ebf-buster-linux/drivers/video/logo`` 目录下，因为我们的logo是存放在此处的，野火提供的logo：
 
 -  默认编译的logo：logo_linux_clut224.ppm
 
@@ -352,10 +352,10 @@ Debian系统镜像存放下面目录中
 """"""""
 
 把新的.img格式系统镜像烧录到sd卡中，启动开发板。此时会出现一个现象，logo一闪而过，这是因为内核启动后，
-会执行文件系统的启动脚本，而此时文件系统的启动脚本中\ ``/opt/scripts/boot/psplash.sh``\
-会去执行相应的应用程序\ ``/usr/bin/psplash``\ ，这就是绘制开机的进度条与背景。那么你的开机logo将被刷掉，
-而只要不让这个启动脚本运行这个\ ``/usr/bin/psplash``\ 应用程序就可以解决问题了，
-那么我们在开发板中使用vi编辑器修改脚本\ ``/opt/scripts/boot/psplash.sh``\ 。
+会执行文件系统的启动脚本，而此时文件系统的启动脚本中 ``/opt/scripts/boot/psplash.sh``\
+会去执行相应的应用程序 ``/usr/bin/psplash`` ，这就是绘制开机的进度条与背景。那么你的开机logo将被刷掉，
+而只要不让这个启动脚本运行这个 ``/usr/bin/psplash`` 应用程序就可以解决问题了，
+那么我们在开发板中使用vi编辑器修改脚本 ``/opt/scripts/boot/psplash.sh`` 。
 
 如下图:
 

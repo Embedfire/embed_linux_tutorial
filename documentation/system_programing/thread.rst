@@ -376,7 +376,7 @@ SCHED_FIFO
         return 0;
     }
 
-进入\ ``system_programing/thread``\ 目录下执行make编译源码，然后运行，实验现象如下：
+进入 ``system_programing/thread`` 目录下执行make编译源码，然后运行，实验现象如下：
 
 .. code:: bash
 

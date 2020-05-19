@@ -1,5 +1,5 @@
 核心转储调试
-========
+=============
 
 核心转储——core文件简介
 ----------------------
@@ -56,7 +56,7 @@ dump文件，可能某些书籍上称之为“内核转储文件”，都是一�
 上面所述的方法只是在当前终端生效，当你打开了一个新的终端，它是无效的，也就是说你在其他终端运行程序时，
 即使程序崩溃了，系统也不会产生core文件，那么如果我想要设置使设置让它永久生效的办法怎么办呢？
 
-很简单，设置永久生效的办法是在\ ``profile``\ 文件中添加一句代码\ ``ulimit -c xxxx``\ 即可：
+很简单，设置永久生效的办法是在 ``profile`` 文件中添加一句代码 ``ulimit -c xxxx`` 即可：
 
 .. code:: bash
 
@@ -69,7 +69,7 @@ dump文件，可能某些书籍上称之为“内核转储文件”，都是一�
     # 或者是
     ulimit -c unlimited
 
-这样重启机器后就生效了。也可以使用\ ``source``\ 命令使之马上生效。
+这样重启机器后就生效了。也可以使用 ``source`` 命令使之马上生效。
 
 .. code:: bash
 
@@ -100,9 +100,9 @@ linux系统在多种情况下不会生成核心转储文件：
 而如果我们想要分析他们，那就没法去分析了，因此我们可以通过修改配置，让产生的核心转储文件命名包含相应的信息，
 而不会导致覆盖，也可以指定核心转储文件的路径，如何做到呢？
 
-只需在\ ``/etc/sysctl.conf``\ 文件中，设置kernel.core_pattern的值即可，具体操作如下：
+只需在 ``/etc/sysctl.conf`` 文件中，设置kernel.core_pattern的值即可，具体操作如下：
 
-1. 使用vi编辑器打开\ ``/etc/sysctl.conf``\ 文件：
+1. 使用vi编辑器打开 ``/etc/sysctl.conf`` 文件：
 
 .. code:: bash
 
@@ -134,7 +134,7 @@ linux系统在多种情况下不会生成核心转储文件：
 -  %t：转储时刻(由1970年1月1日起计的秒数)
 -  %u：所dump进程的实际用户ID
 
-需要注意的是，如果\ ``/proc/sys/kernel/core_uses_pid``\ 文件的内容被设置为1，即使\ ``kernel.core_pattern``\ 中没
+需要注意的是，如果 ``/proc/sys/kernel/core_uses_pid`` 文件的内容被设置为1，即使 ``kernel.core_pattern`` 中没
 有设置%p，最后生成的core文件名仍会加上进程ID。
 
 然后可以使用以下命令，使修改结果马上生效。
@@ -143,7 +143,7 @@ linux系统在多种情况下不会生成核心转储文件：
 
     sudo /sbin/sysctl -p
 
-    注意，当你指定了\ ``kernel.core_pattern``\ 路径的时候，如果没有足够的权限，那么是不能生成core文件的。
+    注意，当你指定了 ``kernel.core_pattern`` 路径的时候，如果没有足够的权限，那么是不能生成core文件的。
     可能就需要sudo权限来运行程序了。
 
 强制某个进程产生core dump
@@ -151,11 +151,11 @@ linux系统在多种情况下不会生成核心转储文件：
 
 在日常写代码的时候，我们写了一些bug不一定会导致进程崩溃，而是可能会让进程卡在某个地方，比如发生看死锁，此时程序已经
 是不正常运行了，而我们还不知道进程的错误在哪里，如果开发的环境又没有gdb调试，那么我们可以尝试在外部让进程崩溃，
-从而产生core文件，根据linux的信号默认的处理行为，\ ``SIGQUIT，SIGABRT, SIGFPE和SIGSEGV``\ 都可以让该进程产生core文件，
+从而产生core文件，根据linux的信号默认的处理行为， ``SIGQUIT，SIGABRT, SIGFPE和SIGSEGV`` 都可以让该进程产生core文件，
 那么我们可以手动发送这些信号让进程终止并且产生core文件，前提是进程没有处理这些信号。
 
-还有一种方法，在你认为程序可能出现卡死的地方主动调用\ ``abort()``\ 函数产生core文件，这个函数首先取消阻止SIGABRT信号，
-然后为调用进程引发该信号（就像调用了\ ``raise()``\ 函数一样），除此之外还有可以使用gdb调试工具来产生core文件。
+还有一种方法，在你认为程序可能出现卡死的地方主动调用 ``abort()`` 函数产生core文件，这个函数首先取消阻止SIGABRT信号，
+然后为调用进程引发该信号（就像调用了 ``raise()`` 函数一样），除此之外还有可以使用gdb调试工具来产生core文件。
 
 使用gdb调试core文件
 -------------------
@@ -190,7 +190,7 @@ linux系统在多种情况下不会生成核心转储文件：
 代码定义了一个指向NULL的指针，然后对指针操作，那肯定是内存越界了，进程崩溃后会产生一个core文件，
 这不就可以调试了吗!
 
-代码的路径是在：\ ``embed_linux_tutorial/documentation/linux_debug``\ ，先make编译代码，然后直接运行：
+代码的路径是在： ``embed_linux_tutorial/documentation/linux_debug`` ，先make编译代码，然后直接运行：
 
 .. code:: bash
 
@@ -208,8 +208,8 @@ linux系统在多种情况下不会生成核心转储文件：
     ➜  core_dump git: ✗ ls
     core_dump.c  core_dump.o  core_targets_19176  Makefile  targets
 
-在运行时可以看到输出了一个错误，\ ``[1]    19176 segmentation fault (core dumped)  ./targets``\ ，告诉我们
-产生了一个core文件，那么在当前目录下就产生了\ ``core_targets_19176``\ 文件，那么怎么来调试呢，通过以下命令即可：
+在运行时可以看到输出了一个错误， ``[1]    19176 segmentation fault (core dumped)  ./targets`` ，告诉我们
+产生了一个core文件，那么在当前目录下就产生了 ``core_targets_19176`` 文件，那么怎么来调试呢，通过以下命令即可：
 
 .. code:: bash
 

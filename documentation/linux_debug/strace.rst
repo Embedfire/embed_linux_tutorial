@@ -39,7 +39,7 @@ strace是系统自带的命令，在绝大部分的linux系统中可以用它来
 的所有的信号值，通过这些跟踪到的信息，你可以知道程序执行了那些系统调用，以何种顺序
 执行，收到了什么信号等。
 
-在linux下运行\ ``strace -h``\ 命令就可以看到strace命令用法的介绍，还有很多参数，由于太
+在linux下运行 ``strace -h`` 命令就可以看到strace命令用法的介绍，还有很多参数，由于太
 多就不一一列举出来。
 
 .. code:: bash
@@ -54,7 +54,7 @@ strace是系统自带的命令，在绝大部分的linux系统中可以用它来
 
 **strace命令输出的格式参数：**
 
-    ps：这些参数挑一些常用的记就好了，因为如果不记得运行\ ``strace -h``\ 命令就知道这些
+    ps：这些参数挑一些常用的记就好了，因为如果不记得运行 ``strace -h`` 命令就知道这些
     参数的作用了，而以下的参数描述都是根据strace帮助文档整理的。
 
 -  [-o file]：将strace的输出写入指定的文件。
@@ -82,27 +82,27 @@ strace是系统自带的命令，在绝大部分的linux系统中可以用它来
 **strace命令过滤参数**
 
 -  [-e
-   expr]...：指定一个表达式，用来控制如何跟踪。格式如下：\ ``[qualifier=][!]value1[,value2]...``\ 。
+   expr]...：指定一个表达式，用来控制如何跟踪。格式如下： ``[qualifier=][!]value1[,value2]...`` 。
 
-    描述说明：\ ``qualifier``\ 只能是
-    ``trace、abbrev、verbose、raw、signal、read、write``\ 其中之一，value是用来限定的符号或数字，默认的
-    qualifier是trace。感叹号是否定符号，例如:\ ``-e open``\ 等价于
-    ``-e trace=open``\ ，表示只跟踪\ ``open``\ 调用；而\ ``-etrace!=open``
+    描述说明： ``qualifier`` 只能是
+    ``trace、abbrev、verbose、raw、signal、read、write`` 其中之一，value是用来限定的符号或数字，默认的
+    qualifier是trace。感叹号是否定符号，例如: ``-e open`` 等价于
+    ``-e trace=open`` ，表示只跟踪 ``open`` 调用；而 ``-etrace!=open``
     表示跟踪除了open以外的其他调用，还有两个特殊的符号 ``all`` 和
-    ``none``\ ，它们分别代表所有选项与没有选项。
+    ``none`` ，它们分别代表所有选项与没有选项。
 
 **strace命令过滤的例子：**
 
 -  ``-e trace=set``
-   只跟踪指定的系统调用，例如:\ ``-e trace=open,close,rean,write``\ 表示只跟踪这四个系统调用，默认的为\ ``set=all``\ 。
+   只跟踪指定的系统调用，例如: ``-e trace=open,close,rean,write`` 表示只跟踪这四个系统调用，默认的为 ``set=all`` 。
 -  ``-e trace=file`` 只跟踪有关文件操作的系统调用。
 -  ``-e trace=process`` 只跟踪有关进程控制的系统调用。
 -  ``-e trace=network`` 跟踪与网络有关的所有系统调用。
 -  ``-e strace=signal`` 跟踪所有与信号有关的系统调用。
 -  ``-e trace=ipc`` 跟踪所有与进程通讯有关的系统调用。
 -  ``-e raw=set`` 将指定的系统调用的参数以十六进制显示。
--  ``-e signal=se``\ t
-   指定跟踪的系统信号。默认为all（所有信号）。如\ ``signal=!SIGIO``\ 或者\ ``signal=!io``\ ，表示不跟踪\ ``SIGIO``\ 信号。
+-  ``-e signal=se`` t
+   指定跟踪的系统信号。默认为all（所有信号）。如 ``signal=!SIGIO`` 或者 ``signal=!io`` ，表示不跟踪 ``SIGIO`` 信号。
 -  ``-e read=set`` 输出从指定文件中读出的数据。
 -  ``-e write=set`` 输出写入到指定文件中的数据。
 
@@ -193,7 +193,7 @@ strace实战
 重定向输出信息
 ~~~~~~~~~~~~~~
 
-strace命令在终端输出的信息太多了，我们想要将它重定向输出某个文件中（使用\ ``[-o filename]``\ 参数），
+strace命令在终端输出的信息太多了，我们想要将它重定向输出某个文件中（使用 ``[-o filename]`` 参数），
 然后对文件进行分析，这样子的操作就比在终端上分析要好得多，但是需要注意的是，因为输出的信息很多，
 生成的日志文件可能会很大，所以在日常使用中要注意设置过滤，不需要完全跟踪所有的内容。
 
@@ -215,7 +215,7 @@ strace命令在终端输出的信息太多了，我们想要将它重定向输�
 跟踪自己的代码
 ~~~~~~~~~~~~~~
 
-我们可以使用核心转储章节的代码，代码位置：\ ``embed_linux_tutorial/base_code/linux_debug/core_dump``\ ，
+我们可以使用核心转储章节的代码，代码位置： ``embed_linux_tutorial/base_code/linux_debug/core_dump`` ，
 编译后使用strace命令去跟踪它，看看遇到错误是怎么样的情况。
 
 操作如下：
@@ -245,11 +245,11 @@ strace命令在终端输出的信息太多了，我们想要将它重定向输�
     +++ killed by SIGSEGV +++
     [1]    12576 segmentation fault  strace ./targets
 
-从日志信息可以看出，它是被SIGSEGV终止的，并且产生了段错误\ ``segmentation fault``\ 。除此之外，
-代码的运行调用了一些系统调用，比如调用execve()函数创建了一个新的进程\ ``./targets``\ 、查看了当前系统的信息，
+从日志信息可以看出，它是被SIGSEGV终止的，并且产生了段错误 ``segmentation fault`` 。除此之外，
+代码的运行调用了一些系统调用，比如调用execve()函数创建了一个新的进程 ``./targets`` 、查看了当前系统的信息，
 系统名，主机名、打开文件描述符编号为1的输出文件，并且向该文件描述符中写入打印的内容等。
 
-我们也能使用\ ``-T``\ 参数查看每个系统调用的时间（在输出的最右边\ ``<>``\ 的内容就是时间），当然大家可以用\ ``-t -tt``\ 等参数来测试一下：
+我们也能使用 ``-T`` 参数查看每个系统调用的时间（在输出的最右边 ``<>`` 的内容就是时间），当然大家可以用 ``-t -tt`` 等参数来测试一下：
 
 .. code:: bash
 
