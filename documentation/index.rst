@@ -135,6 +135,7 @@
    linux_iot/linux_http_client
    linux_iot/linux_http_server
    linux_iot/canopen
+   linux_iot/modbus
 
 .. toctree::
    :maxdepth: 1
