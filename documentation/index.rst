@@ -56,6 +56,7 @@
    linux_app/gcc_hello_world
    linux_app/arm_gcc_hello_world.rst
    linux_app/hello_in_linux.rst
+   linux_app/Makefile_brife.rst
    linux_app/makefile
    linux_app/filesystem_system_call
    linux_app/led_subsystem
