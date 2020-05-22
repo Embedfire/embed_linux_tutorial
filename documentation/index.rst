@@ -137,6 +137,7 @@
    linux_iot/linux_http_server
    linux_iot/canopen
    linux_iot/modbus
+   linux_iot/ATGM332D
 
 .. toctree::
    :maxdepth: 1
