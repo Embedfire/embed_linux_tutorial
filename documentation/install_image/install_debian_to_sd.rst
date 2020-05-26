@@ -36,8 +36,7 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
 .. code-block:: sh
    :linenos:
 
-    https://pan.baidu.com/s/1pji1U1vvgP8sl_TTZp59qg
-    提取码:b5wb
+    http://products.embedfire.com/zh_CN/latest/linux/ebf_i.mx6ull.html#debian
 
 SOURCEFORGE:
 
