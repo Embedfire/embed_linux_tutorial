@@ -111,12 +111,18 @@ Tree），我们这里翻译为“设备树插件”。设备树插件可以理�
 件需要编译为.dtbo。我们可以使用DTC编译命令编译生成.dtbot，但是这样比较繁琐、容
 易出错。我们提供一个编译工具，帮助完成这些繁琐  
 的工作，实现“一键式”编译。编译工具位于“~/linux_driver/dynamic_device_tree/ebf-linux-dtoverlays-master”。将ebf
--linux-dtoverlays-master文件夹复制到linux主机的任意文件夹，如下所示。要编译的
-设备树插件源文件放在“~/ebf-linux-dtoverlays-master_old/overlays/ebf”目录下，然后回
+-linux-dtoverlays-master文件夹复制到linux主机的任意文件夹。使用之前要安装编译工具，执行如下命令安装。
+
+.. code-block:: sh
+   :linenos:
+
+   sudo apt-get install device-tree-compiler
+
+要编译的设备树插件源文件放在“~/ebf-linux-dtoverlays-master/overlays/ebf”目录下，然后回
 到编译工具的根目录“~/ebf-linux-
-dtoverlays-master_old/”执行“make”即可。生成的.dtbo位于“~/ebf-linux-dtoverlays-master/output”目录
+dtoverlays-master/”执行“make”即可。生成的.dtbo位于“~/ebf-linux-dtoverlays-master/output”目录
 下。例如本章的RGB设备树插件为“imx-fire-rgb-led-overlay.dts”将其拷贝到“~/ebf-linux-
-dtoverlays-master_old/overlays/ebf”目录下，编译之后就会在“~/ebf-linux-dtoverlays-master/output”目录
+dtoverlays-master/overlays/ebf”目录下，编译之后就会在“~/ebf-linux-dtoverlays-master/output”目录
 下生成同名的.dtbo文件。得到.dtbo后，下一步就是将其加载到系统中。
 
 将设备树插件加入系统
