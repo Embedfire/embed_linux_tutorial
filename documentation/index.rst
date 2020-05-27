@@ -179,6 +179,7 @@
    linux_driver/dynamic_device_tree
    linux_driver/gpio_subsystem
    linux_driver/concurrency
+   linux_driver/i2c_mpu6050.rst
    
    
 .. toctree::
