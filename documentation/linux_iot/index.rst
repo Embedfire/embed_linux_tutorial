@@ -16,3 +16,7 @@
 ..    canopen
 ..    modbus
 ..    ATGM332D
+..    mqtt
+..    mqtt-client
+..    mqtt-baidu
+..    mqtt-onenet

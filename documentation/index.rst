@@ -138,6 +138,11 @@
    linux_iot/canopen
    linux_iot/modbus
    linux_iot/ATGM332D
+   linux_iot/mqtt
+   linux_iot/mqtt-client
+   linux_iot/mqtt-baidu
+   linux_iot/mqtt-onenet
+
 
 .. toctree::
    :maxdepth: 1
