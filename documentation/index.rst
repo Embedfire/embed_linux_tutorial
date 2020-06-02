@@ -138,6 +138,7 @@
    linux_iot/canopen
    linux_iot/modbus
    linux_iot/ATGM332D
+   linux_iot/bluetooth
    linux_iot/mqtt
    linux_iot/mqtt-client
    linux_iot/mqtt-baidu

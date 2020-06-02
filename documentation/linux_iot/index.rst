@@ -16,6 +16,7 @@
 ..    canopen
 ..    modbus
 ..    ATGM332D
+..    bluetooth
 ..    mqtt
 ..    mqtt-client
 ..    mqtt-baidu
