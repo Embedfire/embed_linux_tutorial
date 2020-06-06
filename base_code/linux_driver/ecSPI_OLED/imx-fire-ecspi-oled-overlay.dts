@@ -1,0 +1,47 @@
+/*
+ * Copyright (C) 2019 - All Rights Reserved by 
+ * filename : imx-fire-mpu6050-overlay.dts
+ * brief : Device Tree overlay for ecspi_oled device
+ * author : embedfire
+ * date : 2019-11-26
+ * version : A001
+ */
+
+ /dts-v1/;
+ /plugin/;
+#include "imx6ul-pinfunc.h"
+
+ / {
+     fragment@0 {
+         target = <&ecspi1>;
+         __overlay__ { 
+            fsl,spi-num-chipselects = <1>;
+			cs-gpios = <&gpio4 26 0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_ecspi1>;
+			status = "okay";
+
+	        ecspi_oled@0 {
+				d_c_control_pin = <&gpio4 24 0>;
+				compatible = "fire,ecspi_oled";
+				spi-max-frequency = <20000000>;
+				reg = <0>;
+			};        
+         };
+     };
+
+     fragment@1 {
+         target = <&iomuxc>;
+         __overlay__ { 
+        pinctrl_ecspi1: ecspi1grp {
+				fsl,pins = <
+					MX6UL_PAD_CSI_DATA07__ECSPI1_MISO  0x10b0
+					MX6UL_PAD_CSI_DATA06__ECSPI1_MOSI  0x10b0
+					MX6UL_PAD_CSI_DATA04__ECSPI1_SCLK  0x10b0
+					MX6UL_PAD_CSI_DATA05__ECSPI1_SS0   0x10b0
+					MX6UL_PAD_CSI_DATA03__GPIO4_IO24   0x10b0
+				>;
+        	}; 
+         };
+     };
+ };
