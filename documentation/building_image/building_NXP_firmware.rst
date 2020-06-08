@@ -612,7 +612,7 @@ makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端
 
    building_kernel002
 
-比如我们选择配置我们开发板的触摸屏驱动： ``Goodix I2C touchscreen`` ，如果读者炸不到这个配置选项在哪里，可以利用 ``make menuconfig`` 中的搜索功能，在英文输入法状态下按下"/"则可以进行搜索，输入"Goodix"找到改配置选项的位置，具体见：
+比如我们选择配置我们开发板的触摸屏驱动： ``Goodix I2C touchscreen`` ，如果读者找不到这个配置选项在哪里，可以利用 ``make menuconfig`` 中的搜索功能，在英文输入法状态下按下"/"则可以进行搜索，输入"Goodix"找到改配置选项的位置，具体见：
 
 .. figure:: media/building_kernel003.png
    :alt: building_kernel003
