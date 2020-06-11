@@ -445,8 +445,13 @@ ssh断开连接而不能及时看到相关的刷机信息提示**。
 
 9、无论是eMMC，还是nandflash，刷机成功后，调整拨码开关为相应启动方式，重新上电启动系统即可。
 
-**注意**:修改sd卡boot分区的uEnv.txt,使能自动烧录之后，将不需要再重复配置，可以持续给内部flash烧录，非常适合给产线的工人使用，专门为产线工人量产而生。
+**注意**：使用读卡器将SD卡接入到电脑，打开sd卡boot分区，修改该分区的uEnv.txt文件，修改内容见下图，使能自动烧录之后，将不需要再重复配置，可以持续给内部flash烧录，非常适合给产线的工人使用，专门为产线工人量产而生。
+对于学习者也可以通过该方式关闭自动烧录。  
 
+.. image:: media/fire-config_flasher9.png
+   :align: center
+   :alt: SD卡boot分区
+   
 .. image:: media/fire-config_flasher8.png
    :align: center
    :alt: fire-config使能自动烧录
