@@ -1082,7 +1082,7 @@ Creator去编译：
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_debian_qt_demo.git
+    git clone https://gitee.com/Embedfire/ebf_debian_qt_demo.git
 
 打开Qt Creator，添加QtUi进行单独的编译，通过Qt Creator界面的【文件】 ->
 【添加文件或项目】，选择 ``ebf_debian_qt_demo/QtUi`` 目录下的QtUi.pro工程添加到Qt
@@ -1289,13 +1289,13 @@ FireApp工程构建后运行：
 
 .. code:: bash
 
-    git clone https://github.com/Embdefire/ebf_debian_qt_demo.git
+    git clone https://github.com/Embedfire/ebf_debian_qt_demo.git
 
 **gitee**
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_debian_qt_demo.git
+    git clone https://gitee.com/Embedfire/ebf_debian_qt_demo.git
 
 编译
 ~~~~

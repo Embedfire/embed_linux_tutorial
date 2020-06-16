@@ -60,7 +60,7 @@ NXP针对MCU（微控制器）的应用场景，推出了i.MX RT系列跨界处�
 
 -  《LwIP应用开发实战指南》
 
-对于学习Linux依然心怀忐忑，希望学习MCU过渡的读者，这些是非常适合的教材。具体资料下载地址请参见链接：\ https://github.com/Embdefire/products/wiki\ 。
+对于学习Linux依然心怀忐忑，希望学习MCU过渡的读者，这些是非常适合的教材。具体资料下载地址请参见链接：\ https://github.com/Embedfire/products/wiki\ 。
 
 
 .. image:: media/imxser003.jpg

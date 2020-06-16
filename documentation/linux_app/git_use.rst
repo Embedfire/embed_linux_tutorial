@@ -6,8 +6,8 @@
 
 本项目通过Git开源，用户可以在GitHub和Gitee下载本项目相关源码：
 
-- GitHub仓库地址：https://github.com/Embdefire/embed_linux_tutorial
-- Gitee 仓库地址：https://gitee.com/wildfireteam/embed_linux_tutorial
+- GitHub仓库地址：https://github.com/Embedfire/embed_linux_tutorial
+- Gitee 仓库地址：https://gitee.com/Embedfire/embed_linux_tutorial
 
 Git是什么
 ~~~~~~~~~~~~~~~~~~
@@ -92,13 +92,13 @@ Gitee仓库地址
    :alt: 未找到图片
 
 2、在git bash命令工具运行:"git clone +"仓库地址""命令，进行项目下载。
-本项目在GitHub的仓库地址为:https://github.com/Embdefire/embed_linux_tutorial。
+本项目在GitHub的仓库地址为:https://github.com/Embedfire/embed_linux_tutorial。
 因此要运行的命令为:
 
 .. code-block:: sh
    :linenos:
 
-    git clone https://github.com/Embdefire/embed_linux_tutorial
+    git clone https://github.com/Embedfire/embed_linux_tutorial
 
 如下图:
 

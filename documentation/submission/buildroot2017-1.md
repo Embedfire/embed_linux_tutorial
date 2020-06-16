@@ -5,7 +5,7 @@
 - 硬件版本：野火imx6ull-pro emmc
 
 
-官方资料总链接：-[野火i.MX 6ULL Linux开发板资料汇总](https://github.com/Embdefire/products/wiki/%E9%87%8E%E7%81%ABi.MX-6ULL-Linux%E5%BC%80%E5%8F%91%E6%9D%BF)
+官方资料总链接：-[野火i.MX 6ULL Linux开发板资料汇总](https://github.com/Embedfire/products/wiki/%E9%87%8E%E7%81%ABi.MX-6ULL-Linux%E5%BC%80%E5%8F%91%E6%9D%BF)
 
 ---
 

@@ -22,7 +22,7 @@ loader，boot阶段启动系统，初始化硬件设备，建立内存空间映�
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_6ull_uboot.git
+    git clone https://gitee.com/Embedfire/ebf_6ull_uboot.git
 
 当然啦，如果你想下载NXP原厂的uboot怎么办呢？很简单，直接去NXP官方网站下载就好了，打开
 http://git.freescale.com/git/

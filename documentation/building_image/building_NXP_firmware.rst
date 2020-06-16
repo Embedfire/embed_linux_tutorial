@@ -31,7 +31,7 @@ loader，boot阶段启动系统，初始化硬件设备，建立内存空间映�
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_6ull_uboot.git
+    git clone https://gitee.com/Embedfire/ebf_6ull_uboot.git
 
 当然啦，如果你想下载NXP原厂的uboot怎么办呢？很简单，直接去NXP官方网站下载就好了，打开
 http://git.freescale.com/git/
@@ -368,7 +368,7 @@ arm-none-eabi-gcc：v6.3.1
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_6ull_linux.git
+    git clone https://gitee.com/Embedfire/ebf_6ull_linux.git
 
     Cloning into 'ebf_6ull_linux'...
     remote: Enumerating objects: 54412, done.
@@ -1030,13 +1030,13 @@ github仓库地址： https://github.com/Embedfire/ebf_6ull_buildroot
 
     git clone https://github.com/Embedfire/ebf_6ull_buildroot.git
 
-gitee仓库地址： https://gitee.com/wildfireteam/ebf_6ull_buildroot
+gitee仓库地址： https://gitee.com/Embedfire/ebf_6ull_buildroot
 
 下载
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_6ull_buildroot.git
+    git clone https://gitee.com/Embedfire/ebf_6ull_buildroot.git
 
 Buildroot目录简介
 ~~~~~~~~~~~~~~~~~~~~~~
