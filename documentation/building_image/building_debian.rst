@@ -30,7 +30,7 @@
 
    git clone https://github.com/Embedfire/ebf-buster-uboot.git
    或者
-   git clone https://gitee.com/wildfireteam/ebf-buster-uboot.git
+   git clone https://gitee.com/Embedfire/ebf-buster-uboot.git
 
 2、先在系统执行以下命令，安装必要的环境工具，再进行uboot的编译。
 
@@ -63,7 +63,7 @@
 
    git clone https://github.com/Embedfire/ebf-buster-linux.git
    或者
-   git clone https://gitee.com/wildfireteam/ebf-buster-linux.git
+   git clone https://gitee.com/Embedfire/ebf-buster-linux.git
 
 2、先在系统执行以下命令，安装必要的环境工具，再进行内核的编译。
 
@@ -165,7 +165,7 @@ ebf-image-builde目录分析
 
     git clone https://github.com/Embedfire/ebf-image-builder.git
     或者
-    git clone https://gitee.com/wildfireteam/ebf-image-builder.git
+    git clone https://gitee.com/Embedfire/ebf-image-builder.git
 
 出现下图提示表示克隆完成
 

@@ -18,7 +18,7 @@
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_6ull_linux.git
+    git clone https://gitee.com/Embedfire/ebf_6ull_linux.git
 
     Cloning into 'ebf_6ull_linux'...
     remote: Enumerating objects: 54412, done.
