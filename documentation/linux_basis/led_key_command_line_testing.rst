@@ -224,7 +224,7 @@ apt安装evtest工具
 .. code-block:: sh
    :linenos:
 
-   evtest
+   sudo evtest
 
 .. image:: media/ledkey009.png
    :align: center
