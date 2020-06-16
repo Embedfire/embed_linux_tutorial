@@ -182,8 +182,8 @@
    linux_driver/concurrency
    linux_driver/i2c_mpu6050.rst
    linux_driver/ecspi_oled.rst
-   
-   
+   linux_driver/button_interrupt.rst
+
 
 .. toctree::
    :maxdepth: 1

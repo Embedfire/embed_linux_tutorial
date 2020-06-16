@@ -1,0 +1,47 @@
+/*
+ * Copyright (C) 2019 - All Rights Reserved by 
+ * filename : imx-fire-mpu6050-overlay.dts
+ * brief : Device Tree overlay for EBF6ull Pro mpu6050 device
+ * author : embedfire
+ * date : 2019-11-26
+ * version : A001
+ */
+
+ /dts-v1/;
+ /plugin/;
+
+
+#include "imx6ul-pinfunc.h"
+#include "./dt-bindings/interrupt-controller/irq.h"
+#include "./dt-bindings/gpio/gpio.h"
+
+ / {
+     fragment@0 {
+          target-path = "/";
+         __overlay__ { 
+            button_interrupt {
+            	compatible = "button_interrupt";
+            	pinctrl-names = "default";
+            	pinctrl-0 = <&pinctrl_button>;
+            	button_gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;  //默认低电平，按键按下高电平
+            	status = "okay";            
+            	interrupt-parent = <&gpio5>;
+            	interrupts = <1 IRQ_TYPE_EDGE_RISING>;     // 指定中断，触发方式为上升沿触发。
+            };   
+         };
+     };
+
+     fragment@1 {
+         target = <&iomuxc>;
+         __overlay__ { 
+        pinctrl_button: buttongrp {
+				fsl,pins = <
+					MX6UL_PAD_SNVS_TAMPER1__GPIO5_IO01  0x10b0
+				>;
+			};
+         };
+     };
+ };
+
+
+            
