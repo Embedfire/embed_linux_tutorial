@@ -411,7 +411,7 @@ o文件时，会查找目录下的同名xxx.c文件进行编译。根据这样
    # gcc -c hello_func.c
 
 以上代码的第5~6行把依赖文件由C文件改成了.o文件，gcc编译命令也做
-了相应的修改。第8~14行分别是hello_main.o文件和hello_func.o文件的依赖和
+了相应的修改。第8~13行分别是hello_main.o文件和hello_func.o文件的依赖和
 编译命令，不过由于C编译成同名的.o文件是make的默认规则，所以这部分内容通常不会写上去。
 
 使用修改后的Makefile编译结果如下图所示。
@@ -471,10 +471,10 @@ o文件时，会查找目录下的同名xxx.c文件进行编译。根据这样
    VAR_D ?= FILED
    .PHONY:check
    check:
-   @echo "VAR_A:"$(VAR_A)
-   @echo "VAR_B:"$(VAR_B)
-   @echo "VAR_C:"$(VAR_C)
-   @echo "VAR_D:"$(VAR_D)
+      @echo "VAR_A:"$(VAR_A)
+      @echo "VAR_B:"$(VAR_B)
+      @echo "VAR_C:"$(VAR_C)
+      @echo "VAR_D:"$(VAR_D)
 
 这里主要关心VAR_B和VAR_C的赋值方式，实验结果如下图所示。执行完make命令
 后，只有VAR_C是FILEA。这是因为VAR_B采用的延时赋值，只有当调用时，才会进行

@@ -500,7 +500,7 @@ pio的direction文件，而终端设备却没有其它的属性文件，那
    cfsetispeed(&opt, B9600);
    //设置数据位数
    opt.c_cflag &= ~CSIZE;
-   opt.c_cflag \|= CS8;
+   opt.c_cflag |= CS8;
    //校验位
    opt.c_cflag &= ~PARENB;
    opt.c_iflag &= ~INPCK;
