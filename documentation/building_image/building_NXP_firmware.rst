@@ -152,14 +152,14 @@ arm-none-eabi-gcc：v6.3.1
 .. code:: bash
 
     命令（编译emmc卡版本uboot）
-    make ARCH=arm mx6ull_14x14_evk_ emmc _defconfig
+    make ARCH=arm mx6ull_14x14_evk_emmc_defconfig
 
-想编译从emmc启动的uboot，则运行：
+想编译从nand启动的uboot，则运行：
 
 .. code:: bash
 
     命令（编译nand卡版本uboot）
-    make ARCH=arm mx6ull_14x14_evk_ nand _defconfig
+    make ARCH=arm mx6ull_14x14_evk_nand_defconfig
 
 在运行以上命令后，Makefile会根据对应的配置文件的内容将配置更新到当前目录下的
 ``.config`` 文件中，如果读者感兴趣可以查看一下该文件的内容，接下来的编译则是根据 ``.config`` 文件的配置进行编译的。

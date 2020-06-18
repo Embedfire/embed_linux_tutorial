@@ -772,7 +772,7 @@ c_cflag中的标志位CSTOPB，用于设置串口通信停止位的长度。若�
     break;
     //设置停止位为2位
     case 2:
-    opt.c_cflag \|= CSTOPB;
+    opt.c_cflag |= CSTOPB;
     break;
     }
    
@@ -826,14 +826,14 @@ c_cflag中的标志位CSTOPB，用于设置串口通信停止位的长度。若�
     break;
     case 'o':
     case 'O':
-    options.c_cflag \|= PARENB; /* 启用奇偶效验 */
-    options.c_iflag \|= INPCK; /* 启用输入奇偶检测 */
-    options.c_cflag \|= PARODD ; /* 设置为奇效验 */
+    options.c_cflag |= PARENB; /* 启用奇偶效验 */
+    options.c_iflag |= INPCK; /* 启用输入奇偶检测 */
+    options.c_cflag |= PARODD ; /* 设置为奇效验 */
     break;
     case 'e':
     case 'E':
-    options.c_cflag \|= PARENB; /* 启用奇偶效验 */
-    options.c_iflag \|= INPCK; /* 启用输入奇偶检测 */
+    options.c_cflag |= PARENB; /* 启用奇偶效验 */
+    options.c_iflag |= INPCK; /* 启用输入奇偶检测 */
     options.c_cflag &= ~PARODD; /* 设置为偶效验*/
     break;
     }
@@ -875,16 +875,16 @@ c_cflag中的标志位CSTOPB，用于设置串口通信停止位的长度。若�
     switch (databits) /*设置数据位数*/
     {
     case 5:
-    opt.c_cflag \|= CS5;
+    opt.c_cflag |= CS5;
     break;
     case 6:
-    opt.c_cflag \|= CS6;
+    opt.c_cflag |= CS6;
     break;
     case 7:
-    opt.c_cflag \|= CS7;
+    opt.c_cflag |= CS7;
     break;
     case 8:
-    opt.c_cflag \|= CS8;
+    opt.c_cflag |= CS8;
     break;
     }
     //更新配置

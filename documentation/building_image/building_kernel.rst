@@ -252,8 +252,8 @@ Linux内核的配置系统由三个部分组成，分别是：
 -  配置工具：包括配置命令解释器（对配置脚本中使用的配置命令进行解释）和配置用户界面（linux提供基于字符界面、基于Ncurses 图形界面以及基于 Xwindows 图形界面的用户配置界面，各自对应于make config、make menuconfig 和 make xconfig）。
 
 
-读者如果想看我们提供的配置文件imx6_v7_ebf_defconfig中修改了什么地方，可以通过makemenuconfig命令来查看我们的配置，
-makemenuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下
+读者如果想看我们提供的配置文件imx6_v7_ebf_defconfig中修改了什么地方，可以通过make menuconfig命令来查看我们的配置，
+make menuconfig是一个基于文本选择的配置界面，推荐在字符终端下使用，make menuconfig运行的时候会从当前目录下
 导入 .config文件的配置（如果没有找到.config文件则会生成默认配置的 .config文件），
 而这个配置则是我们运行make ARCH=arm imx6_v7_ebf_defconfig命令生成的，这就直接可以看到我们在imx6_v7_ebf_defconfig的配置选择，
 可以通过键盘的"上"、"下"、"左"、"右"、"回车"、"空格"、"?"、"ESC"等按键进行选择配置，具体见：

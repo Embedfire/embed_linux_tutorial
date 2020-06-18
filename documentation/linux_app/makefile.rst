@@ -214,12 +214,12 @@ make targetd 、make targetb、make targetc命令：
    #默认目标
    #hello_main依赖于hello_main.c和hello_func.c文件
    hello_main: hello_main.c hello_func.c
-   gcc -o hello_main hello_main.c hello_func.c -I .
+      gcc -o hello_main hello_main.c hello_func.c -I .
    
    
-    #clean目标，用来删除编译生成的文件
-    clean:
-    rm -f *.o hello_main
+   #clean目标，用来删除编译生成的文件
+   clean:
+      rm -f *.o hello_main
 
 该文件定义了默认目标hello_main用于编译程序，clean目标用于删除
 编译生成的文件。特别地，其中hello_main目标名与gcc编译生成的文件名"gcc -o
@@ -359,11 +359,11 @@ targeta的时候，它都会去执行targeta的命令，期待执行后能得到
    #默认目标
    #hello_main依赖于hello_main.c和hello_func.c文件
    hello_main: hello_main.c hello_func.c
-   gcc -o hello_main hello_main.c hello_func.c -I .
+      gcc -o hello_main hello_main.c hello_func.c -I .
    #clean伪目标，用来删除编译生成的文件
    .PHONY:clean
    clean:
-   rm -f *.o hello_main
+      rm -f *.o hello_main
 
 GNU组织发布的软件工程代码的Makefile，常常会有类似以上代码中定义的clean伪目标，用于清
 除编译的输出文件。常见
@@ -401,7 +401,7 @@ o文件时，会查找目录下的同名xxx.c文件进行编译。根据这样
    #Tab 命令1
    #Tab 命令2
    hello_main: hello_main.o hello_func.o
-   gcc -o hello_main hello_main.o hello_func.o
+      gcc -o hello_main hello_main.o hello_func.o
    #以下是make的默认规则，下面两行可以不写
    #hello_main.o: hello_main.c
    # gcc -c hello_main.c
@@ -503,16 +503,16 @@ FILEB。
 
    #目标文件
    hello_main: hello_main.o hello_func.o
-   $(CC) -o hello_main hello_main.o hello_func.o
+      $(CC) -o hello_main hello_main.o hello_func.o
 
    #*.o文件的生成规则
    %.o: %.c $(DEPS)
-   $(CC) -c -o $@ $< $(CFLAGS)
+      $(CC) -c -o $@ $< $(CFLAGS)
    
    #伪目标
    .PHONY: clean
    clean:
-   rm -f *.o hello_main
+      rm -f *.o hello_main
 
 -  代码的1~4行：分别定义了CC、CFLAGS、DEPS变量，变量的值就是等号右
    侧的内容，定义好的变量可通过"$(变量名)"的形式引用，如后面
@@ -562,16 +562,16 @@ FILEB。
 
    #目标文件
    $(TARGET): $(OBJS)
-    $(CC) -o $@ $^ $(CFLAGS)
+      $(CC) -o $@ $^ $(CFLAGS)
    
    #*.o文件的生成规则
    %.o: %.c $(DEPS)
-   $(CC) -c -o $@ $< $(CFLAGS)
+      $(CC) -c -o $@ $< $(CFLAGS)
    
    #伪目标
    .PHONY: clean
    clean:
-   rm -f *.o hello_main
+      rm -f *.o hello_main
 
 这部分说明如下：
 
@@ -649,16 +649,16 @@ $?   所有比目标要新的依赖目标
    
    #目标文件
    $(TARGET): $(OBJS)
-   $(CC) -o $@ $^ $(CFLAGS)
+      $(CC) -o $@ $^ $(CFLAGS)
    
    #*.o文件的生成规则
    %.o: %.c $(DEPS)
-   $(CC) -c -o $@ $< $(CFLAGS)
+      $(CC) -c -o $@ $< $(CFLAGS)
    
    #伪目标
    .PHONY: clean
    clean:
-   rm -f *.o hello_main
+      rm -f *.o hello_main
 
 Makefile主要是增加了ARCH变量用于选择目标平台，第4行代
 码中使用"?="给ARCH赋予默认值x86，然后在代码11~18行增加了根据ARCH
@@ -834,7 +834,7 @@ r/hello_main.o"。
    
    #目标文件
    $(BUILD_DIR)/$(TARGET): $(OBJS)
-   $(CC) -o $@ $^ $(CFLAGS)
+      $(CC) -o $@ $^ $(CFLAGS)
    
    #*.o文件的生成规则
    $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
@@ -847,11 +847,11 @@ r/hello_main.o"。
    .PHONY: clean cleanall
    #按架构删除
    clean:
-   rm -rf $(BUILD_DIR)
+      rm -rf $(BUILD_DIR)
    
    #全部删除
    cleanall:
-   rm -rf build_x86 build_arm
+      rm -rf build_x86 build_arm
 
 注意这个Makefile文件需要配合前面上图中的工程结构，否则即使Makefile写对了编译也会错误，因为
 目录对不上。具体可以直接参考我们示例代码"step5"中的内容。修改后的Makefile文件分析如下：
