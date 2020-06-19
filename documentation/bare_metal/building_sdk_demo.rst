@@ -91,7 +91,7 @@ SDK程序编译、烧写流程分析
 直接使用我们下载好的Linux版的SDK。
 
 使用共享文件夹将"SDK_2.2_MCIM6ULL_RFP_Linux.run" 拷贝到Linux下，存放位置
-自定。然后运行.run文件生成SDK linux下的源文件命令如下。
+自定。然后运行.run文件生成SDK，linux下的源文件命令如下。
 
 .. code-block:: c
    :linenos:
@@ -118,7 +118,7 @@ SDK_xxx_xxx.run运行结束后会在我们制定的目录生成Linux下的SDK。
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Linux下的SDK生成后，进入工程文
-件，"SDK_2.2_MCIM6ULL \\boards\evkmcimx6ull\demo_apps\hello_world\armgcc"运
+件，"SDK_2.2_MCIM6ULL/boards/evkmcimx6ull/demo_apps/hello_world/armgcc"运
 行build_ddr_release.sh脚本，命令如下：
 
 .. code-block:: c
@@ -131,7 +131,7 @@ build_ddr_release.sh用于生成*.bin文件，运行成功后会在当前文件�
 
 注：运行build_ddr_release.sh常见错误如下所示。
 
-.. image:: media/buildi004.png
+.. image:: media/buildi005.png
    :align: center
    :alt: 未找到图片
 
@@ -167,7 +167,7 @@ ARMGCC_DIR=/usr"添加环境变量即可(不建议将环境变量添加到系统
 
 将USB读卡器接入电脑，默认链接到主机，首先我们要讲USB读卡器链接到虚拟机。
 
-首先将鼠标放到USB图标上（虚拟机右下角状态栏），单击鼠标右键如下所示。
+然后将鼠标放到USB图标上（虚拟机右下角状态栏），单击鼠标右键如下所示。
 
 .. image:: media/buildi006.png
    :align: center
@@ -181,9 +181,9 @@ ARMGCC_DIR=/usr"添加环境变量即可(不建议将环境变量添加到系统
 打开烧写工具执行烧写
 
 
-将烧写工具拷贝到虚拟机，放到合适位置（存放位置没有要求）。进入烧写工具目录执行如下命令：
+将烧写工具拷贝到虚拟机，放到合适位置（存放位置没有要求）。进入烧写工具目录，修改“mkImage.sh”的权限（chmod 777 mkImage.sh），执行如下命令：
 
-./mkImage.sh 烧写文件路径
+./mkImage.sh 被烧写文件的路径
 
 烧写命令其实是运行 mkImage.sh脚本，并且将要烧写的.bin文件的路径作为参数，执行该命令后会列出可烧写的磁盘。如下所示。
 

@@ -470,7 +470,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
     static int __init hello_init(void)
     {
     if (debug_on)
-    printk("[ DEBUG ] debug info output\n");
+      printk("[ DEBUG ] debug info output\n");
     printk("Hello World Module Init\n");
     return 0;
     }
@@ -514,9 +514,9 @@ Makefile分析
    KERNEL_DIR=/home/embedfire/module/linux-imx
    obj-m := hello_world.o
    all:
-   $(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) modules
+      $(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) modules
    clean:
-   $(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) clean
+      $(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) clean
 
 以上代码中提供了一个关于编译内核模块的Makefile。该Makefile定义了
 变量KERNEL_DIR，来保存内核源码的目录。变量obj-m保存着需要编译成模块的目标文件名。 "$(MAKE)

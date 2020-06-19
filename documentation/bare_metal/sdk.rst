@@ -87,7 +87,7 @@ SDK的boards目录包含了NXP官方评估版MCIMX6ULL-EVK的各种示例程序�
 
 
 
--  driver_example包含了i.mx6主要片上外设的使用范例，非常详细。例】
+-  driver_example包含了i.mx6主要片上外设的使用范例，非常详细。例
    如在"boards\evkmcimx6ull\driver_examples"目录下包含各个外设的程序如下图所示。
 
 .. image:: media/sdk008.png
