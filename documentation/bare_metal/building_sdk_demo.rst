@@ -91,7 +91,7 @@ SDK程序编译、烧写流程分析
 直接使用我们下载好的Linux版的SDK。
 
 使用共享文件夹将"SDK_2.2_MCIM6ULL_RFP_Linux.run" 拷贝到Linux下，存放位置
-自定。然后运行.run文件生成SDK，linux下的源文件命令如下。
+自定。然后运行.run文件生成SDK，若无法运行可尝试修改.run文件的权限，linux下的源文件命令如下。
 
 .. code-block:: c
    :linenos:

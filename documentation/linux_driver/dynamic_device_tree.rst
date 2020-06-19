@@ -123,9 +123,11 @@ Tree），我们这里翻译为“设备树插件”。设备树插件可以理�
 dtoverlays-master/”执行“make”即可。生成的.dtbo位于“~/ebf-linux-dtoverlays-master/output”目录
 下。例如本章的RGB设备树插件为“imx-fire-rgb-led-overlay.dts”将其拷贝到“~/ebf-linux-
 dtoverlays-master/overlays/ebf”目录下，编译之后就会在“~/ebf-linux-dtoverlays-master/output”目录
-下生成同名的.dtbo文件。得到.dtbo后，下一步就是将其加载到系统中。需要注意的是，如果你在执行“make”后出现下图报错，
+下生成同名的.dtbo文件。得到.dtbo后，下一步就是将其加载到系统中。需要注意的是，如果你在执行“make”后出现下图报错，可以尝试
+先卸载device-tree-compiler（卸载命令为：“sudo apt-get autoremove device-tree-compiler”）,重新安装，
+然后在“ebf-linux-dtoverlays-master”目录下修改scripts/basic/fixdep文件的权限，修改权限命令为：“chmod 777 scripts/basic/fixdep”。
 
-.. image:: ./media/dynami002.png
+.. image:: ./media/dtboerr001.png
    :align: center
    :alt: 02|
 
