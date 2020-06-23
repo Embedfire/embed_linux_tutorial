@@ -12,7 +12,9 @@
 
    README
    about_us
-   TODO
+..   TODO 
+   contribute/how_to_contribute
+
 
 .. toctree::
    :maxdepth: 1
@@ -206,12 +208,12 @@
    submission/buildroot2017-3
 
 
-.. toctree::
-   :maxdepth: 1
-   :caption: 贡献与投稿
-   :numbered:
+.. .. toctree::
+..   :maxdepth: 1
+..   :caption: 贡献与投稿
+..  :numbered:
 
-   contribute/how_to_contribute
+..   contribute/how_to_contribute
 
 
 .. toctree::
