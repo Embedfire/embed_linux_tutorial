@@ -8,7 +8,7 @@
 本章节内容处于开发笔记状态，还待整理至最终版的教程。
 
 从本章开始，我们就要真真正正地步入Linux设备驱动的殿堂了。了解一样新事物，无非就
-是围绕这"这东西是什么"，"这东西怎么用"，"能不能给我整一个"这三个问题。
+是围绕这“这东西是什么”，“这东西怎么用”，“能不能给我整一个”这三个问题。
 
 本章大致分为三个部分：
 
@@ -221,7 +221,7 @@ Linux内核的栈资源十分有限，可能只有一个4096字节大小的页�
 以上代码 __init、__initdata宏定义（位于内核源码/linux/init.h）中的__init用于修
 饰函数，__initdata用于修饰变量。带有__init的修饰符，表示将该函数放到可执行文件的__init节
 区中，该节区的内容只能用于模块的初始化阶段，初始化阶段执行完毕之
-后，这部分的内容就会被释放掉，真可谓是"针尖也要削点铁"。
+后，这部分的内容就会被释放掉，真可谓是“针尖也要削点铁”。
 
 .. code-block:: c
    :caption: module_init宏定义
@@ -402,13 +402,13 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
 
 
 
-内核模块许可证有 "GPL"，"GPL v2"，"GPL and additional rights"，"Dual SD/GPL"，"Dual MPL/GPL"，"Proprietary"。
+内核模块许可证有 “GPL”，“GPL v2”，“GPL and additional rights”，“Dual SD/GPL”，“Dual MPL/GPL”，“Proprietary”。
 
 内核模块的其他信息
 ^^^^^^^^^
 
 下面，我们介绍一下关于内核模块程序结构的最后一部分内容。这部分内容只
-是为了给使用该模块的读者一本"说明书"，属于可有可无的部分，有则锦上添花，无则也无伤大雅。
+是为了给使用该模块的读者一本“说明书”，属于可有可无的部分，有则锦上添花，无则也无伤大雅。
 
 作者
 ''
@@ -419,7 +419,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
 
    #define MODULE_AUTHOR(_author) MODULE_INFO(author, _author)
 
-我们前面使用modinfo中打印出的模块信息中"author"信息便是来自于
+我们前面使用modinfo中打印出的模块信息中“author”信息便是来自于
 宏定义MODULE_AUTHOR。该宏定义用于声明该模块的作者。
 
 模块描述信息
@@ -431,7 +431,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
 
    #define MODULE_DESCRIPTION(_description) MODULE_INFO(description, _description)
 
-模块信息中"description"信息则来自宏MODULE_DESCRIPTION，该宏用于描述该模块的功能作用。
+模块信息中“description”信息则来自宏MODULE_DESCRIPTION，该宏用于描述该模块的功能作用。
 
 模块别名
 ''''
@@ -442,7 +442,7 @@ Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任
 
    #define MODULE_ALIAS(_alias) MODULE_INFO(alias, _alias)
 
-模块信息中"alias"信息来自于宏定义MODULE_ALIAS。该宏定义用于给内核
+模块信息中“alias”信息来自于宏定义MODULE_ALIAS。该宏定义用于给内核
 模块起别名。注意，在使用该模块的别名时，需要将该模块复制到/lib/modules/内核
 源码/下，使用命令depmod更新模块的依赖关系，否则的话，Linux内核怎么知道这个模块还有另一个名字。
 
@@ -520,12 +520,12 @@ Makefile分析
 
 以上代码中提供了一个关于编译内核模块的Makefile。该Makefile定义了
 变量KERNEL_DIR，来保存内核源码的目录。变量obj-m保存着需要编译成模块的目标文件名。 "$(MAKE)
-modules"实际上是执行Linux顶层Makefile的伪目标modules。通过选项"-C"，可以让make工具跳
+modules“实际上是执行Linux顶层Makefile的伪目标modules。通过选项”-C"，可以让make工具跳
 转到源码目录下读取顶层Makefile。M=$(CURDIR)
 表明然后返回到当前目录，读取并执行当前目录的Makefile，开始编译内核模块。CURDIR是make的
 内嵌变量，自动设置为当前目录。
 
-执行"make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-"命令，可以看到下图的输出信息，最后
+执行“make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-”命令，可以看到下图的输出信息，最后
 生成内核模块hello_world.ko。
 
 .. image:: media/module008.jpg
@@ -543,9 +543,9 @@ modules"实际上是执行Linux顶层Makefile的伪目标modules。通过选项"
 实验结果
 ^^^^
 
-将生成的内核模块拷贝至开发板执行命令"insmod hello_world.ko"，可以看到终
-端会输出字符串"Hello World Module Init"，执行命令"rmmod hello_world"，终端会输出
-字符串"Hello World Module Exit"。
+将生成的内核模块拷贝至开发板执行命令“insmod hello_world.ko”，可以看到终
+端会输出字符串“Hello World Module Init”，执行命令“rmmod hello_world”，终端会输出
+字符串“Hello World Module Exit”。
 
 .. image:: media/module010.jpg
    :align: center
@@ -553,7 +553,7 @@ modules"实际上是执行Linux顶层Makefile的伪目标modules。通过选项"
 
 
 
-执行"insmod hello_world.ko debug_on=1"，可以看到终端会输出调试信息。s
+执行“insmod hello_world.ko debug_on=1”，可以看到终端会输出调试信息。s
 
 .. image:: media/module011.jpg
    :align: center

@@ -6,7 +6,7 @@
 
 
 通过上一节我们知道i.MX6ULL 拥有官方写好的windows以及linux下的SDK包，并
-且在SDK的"SDK_2.2_MCIM6ULL_EBF6ULL\boards\evkmcimx6ull\driver_examples"目录下存在
+且在SDK的“SDK_2.2_MCIM6ULL_EBF6ULL\boards\evkmcimx6ull\driver_examples”目录下存在
 大量的基于IAR集成开发环境的官方例程。看到这里是不是很兴奋
 ？很遗憾的告诉你，除本章以外的其他裸机章节将不会使用IAR集成开发环境，而是
 采用linux下的arm gcc 工具开发。为什么不使用IAR开发裸机？将会在下一章详细介绍。这里首先介绍为什么带领大家用IAR点灯。
@@ -15,7 +15,7 @@
    驱动开发的重要参考资料我们必须对它有一定的了解，需要能够快速找到我们需要的内容。
 
 -  IAR集成开发环境借助调试工具（jlink）能够实现强大的调试功
-   能，在开发阶段它能够帮助我们快速"调通"硬件，程序在IAR上调通后再移植到Linux 的arm gcc不会太难。
+   能，在开发阶段它能够帮助我们快速“调通”硬件，程序在IAR上调通后再移植到Linux 的arm gcc不会太难。
 
 本章目标：
 

@@ -448,7 +448,7 @@ Makefile
    :align: center
    :alt: xbus目录
 
-我们可以看到，总线的devices和drivers目录都是空的，并没有什么设备和驱动挂载在该总线下。红框处便是我们自定义的总线属性文件，当我们执行命令"cat    xbus_test"时，可以看到终端上会打印一行字符串：xbus。
+我们可以看到，总线的devices和drivers目录都是空的，并没有什么设备和驱动挂载在该总线下。红框处便是我们自定义的总线属性文件，当我们执行命令“cat    xbus_test”时，可以看到终端上会打印一行字符串：xbus。
 
 设备
 --------
@@ -640,7 +640,7 @@ xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能
     MODULE_LICENSE("GPL");
 
 成功加载驱动后，可以看到/sys/bus/xbus/driver多了个驱动xdev目录，如图所示：在该目录下存在一个我们自定义的属性文件，
-使用cat命令读该文件的内容，终端会打印字符串"xdrv"。
+使用cat命令读该文件的内容，终端会打印字符串“xdrv”。
 
 .. image:: ./media/xdrv.jpg
    :align: center

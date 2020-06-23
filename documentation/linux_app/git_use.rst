@@ -57,7 +57,7 @@ https://gitforwindows.org
 
 根据不同发行版，使用相关包管理工具安装即可。
 
-比如Ubantu：在终端执行"sudo apt-get install git -y"即可。
+比如Ubantu：在终端执行“sudo apt-get install git -y”即可。
 
 获取项目仓库地址
 ^^^^^^^^^^^^^^^^^^^^^
@@ -82,7 +82,7 @@ Gitee仓库地址
 
 下面以Windows系统为例，linux系统的操作是类似的。
 
-1、windows安装完Git后，.在将要下载项目的目录中，右键选择"Git Bash Here"项，
+1、windows安装完Git后，.在将要下载项目的目录中，右键选择“Git Bash Here”项，
 打开git bash命令工具，然后输入命令：“git init”初始化文件夹，将这个文件夹变成Git可管理的仓库。
 
 如下图:
@@ -92,7 +92,7 @@ Gitee仓库地址
    :alt: 未找到图片
 
 
-2、在git bash命令工具运行:"git clone +"仓库地址""命令，进行项目下载。
+2、在git bash命令工具运行:“git clone +”仓库地址“”命令，进行项目下载。
 本项目在GitHub的仓库地址为:https://github.com/Embedfire/embed_linux_tutorial。
 因此要运行的命令为:
 

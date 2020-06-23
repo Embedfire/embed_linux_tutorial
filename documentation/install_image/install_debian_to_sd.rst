@@ -87,7 +87,7 @@ SOURCEFORGE:
 - SHA256SUMS.txt:记录各个固件的sha256校验值。
 
 
-4、选择好Debian镜像后，继续选择要烧录的SD卡，然后点击"flash"按钮开始进行烧录。
+4、选择好Debian镜像后，继续选择要烧录的SD卡，然后点击“flash”按钮开始进行烧录。
 
 ..  image:: media/instal005.png
     :align: center

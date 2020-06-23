@@ -33,8 +33,8 @@ Git的学习层次
 会发现自己再也不愿意回到SVN的怀抱了。
 
 王国维在<<人间词话>>里说:欢古今之成大事业、大学问者，必经过三种之境界:"昨夜西风凋碧树。
-独上高楼，望尽天涯路。"此第一境也。"衣带渐宽终不悔，为伊消得人憔悴。"此第二镜也。
-"众里寻他千百度，那人却在灯火阑珊处。"此第三镜也。
+独上高楼，望尽天涯路。“此第一境也。”衣带渐宽终不悔，为伊消得人憔悴。"此第二镜也。
+“众里寻他千百度，那人却在灯火阑珊处。”此第三镜也。
 
 Git的学习同样也可以分为三个层次，用户可以根据自己实际情况进行学习。
 
@@ -61,7 +61,7 @@ Linux系统
 
 根据不同发行版，使用相关包管理工具安装即可。
 
-比如Ubantu：在终端执行"sudo apt-get install git -y"即可。
+比如Ubantu：在终端执行“sudo apt-get install git -y”即可。
 
 
 Git的基础使用
@@ -85,23 +85,23 @@ Git里面有很多比较晦涩的专业术语，如果不熟悉这一套术语�
 Git本地仓库操作
 ^^^^^^^^^^^^^^^^^^^^^
 
-1、Git安装完成后，新建一个文件夹"Git_demo"。右键点击，选择"Git Bash Here"选项打开,
-输入"git init"命令。该指令会在当前目录下生成一个隐藏文件".git"，这个".git"文件就是术语中本地仓库/版本库。
+1、Git安装完成后，新建一个文件夹“Git_demo”。右键点击，选择“Git Bash Here”选项打开,
+输入“git init”命令。该指令会在当前目录下生成一个隐藏文件“.git”，这个“.git”文件就是术语中本地仓库/版本库。
 如下图
 
 .. image:: media/git_init.png
    :align: center
    :alt: git_init
 
-2、添加一个newadd.txt文件，使用"git status"命令查看状态。
+2、添加一个newadd.txt文件，使用“git status”命令查看状态。
 
 .. image:: media/git_status1.png
    :align: center
    :alt: git_status
 
-此时新添加的文件处于"Untracked"未跟踪状态，提示使用"git add"命令添加文件到暂存区。
+此时新添加的文件处于“Untracked”未跟踪状态，提示使用“git add”命令添加文件到暂存区。
 
-3、执行"git add newadd.txt"命令，重新查看状态。
+3、执行“git add newadd.txt”命令，重新查看状态。
 
 .. image:: media/git_add.png
    :align: center
@@ -109,8 +109,8 @@ Git本地仓库操作
 
  提示:new file：newadd.txt，说明文件已经添加到了暂存区。
 
- 4、输入"git commit -m "add a new",把暂存区新修改的文件提交到仓库里面去保存，
-并在仓库中用"add a new"这条语句来记录这一次的提交。
+ 4、输入“git commit -m ”add a new",把暂存区新修改的文件提交到仓库里面去保存，
+并在仓库中用“add a new”这条语句来记录这一次的提交。
 
 .. image:: media/git_commit.png
    :align: center
@@ -122,7 +122,7 @@ Git本地仓库操作
    :align: center
    :alt: git_status
 
-6、在newadd.txt文件中加入一句"change test/\r/\n",保存退出后，查看状态。
+6、在newadd.txt文件中加入一句“change test/\r/\n”,保存退出后，查看状态。
 
 .. image:: media/git_status3.png
    :align: center
@@ -131,25 +131,25 @@ Git本地仓库操作
 此时git不再提示这是一个新文件，而是一个已经修改(modified)的文件。
 
 7、重复前面提到添加到暂存区、提交到仓库的步骤，那这个改动的文件就已经保存下来了。
-使用"git log"命令可以查看到这两次提交的记录。如下图:
+使用“git log”命令可以查看到这两次提交的记录。如下图:
 
 .. image:: media/git_log.png
    :align: center
    :alt: git_log
 
 在输出的历史记录中，commit后面跟着的一串数字，是该文件的SHA-1 校验和，
-这个校验和在git中称为commit-id。"git show"命令可以通过commit-id，
+这个校验和在git中称为commit-id。“git show”命令可以通过commit-id，
 找到文件对应的修改记录。
 
-8、执行"git show + commit-id"命令，可以看到非常详细的修改记录，包括作者、
+8、执行“git show + commit-id”命令，可以看到非常详细的修改记录，包括作者、
 时间以及详细的修改内容。+号就代表新加的内容，-号代表删减的内容。
 
 .. image:: media/git_show.png
    :align: center
    :alt: git_show
 
-9、如果是特别关注某个文件，还有一个"git blame"命令可以迅速地找到这个文件的改动。
-输入"git blame newadd.txt",该文件每次被提交仓库的commit-id、作者、时间、内容都显示出来了。
+9、如果是特别关注某个文件，还有一个“git blame”命令可以迅速地找到这个文件的改动。
+输入“git blame newadd.txt”,该文件每次被提交仓库的commit-id、作者、时间、内容都显示出来了。
 如下图:
 
 .. image:: media/git_blame.png
@@ -163,7 +163,7 @@ Git远程仓库操作
 这里以GitHub为例来说明远程仓库的项目创建和下载。
 
 1、登录`GitHub官网 <https://github.com>`_ ，按提示注册一个用户后。打开右上角的'+'号，
-选择"New repository"项，创建一个新的远程仓库。
+选择“New repository”项，创建一个新的远程仓库。
 如下图:
 
 .. image:: media/github_new_repository.png
@@ -171,7 +171,7 @@ Git远程仓库操作
    :alt: github_new_repository
 
 2、设置该远程仓库的名字、概述，选择该远程仓库是公开的还是私有的。
-这里把它设为公开的，并设置它的名字为"git_pratice"。如下图：
+这里把它设为公开的，并设置它的名字为“git_pratice”。如下图：
 
 .. image:: media/github_create_repository.png
    :align: center
@@ -183,23 +183,23 @@ Git远程仓库操作
    :align: center
    :alt: github_https
 
-3、输入"git remote add origin + "https地址" "命令，就能把我们本地仓库的项目与该远程仓库相关联，
+3、输入“git remote add origin + ”https地址“ ”命令，就能把我们本地仓库的项目与该远程仓库相关联，
 如下图:
 
 .. image:: media/github_https.png
    :align: center
    :alt: github_https
 
-4、这时候就可以把"Git_demo"文件夹中的仓库内容推送到远程仓库了，使用"git push -u origin master"命令进行推送，
+4、这时候就可以把“Git_demo”文件夹中的仓库内容推送到远程仓库了，使用“git push -u origin master”命令进行推送，
 
 .. image:: media/github_push.png
    :align: center
    :alt: github_push
 
-到这里，"Git_demo"文件夹中的本地仓库就成功推送到远程仓库了。以后只要遵循"添加到暂存区"->"提交到本地仓库"->"推送到远程仓库"的步骤，
+到这里，“Git_demo”文件夹中的本地仓库就成功推送到远程仓库了。以后只要遵循“添加到暂存区”->“提交到本地仓库”->“推送到远程仓库”的步骤，
 就能初步完成远程仓库的开发工作了。
 
-5、如果在GitHup上面发现了一些自己感兴趣的项目，可以用"git clone + "https地址" "命令进行克隆。克隆完成后，
+5、如果在GitHup上面发现了一些自己感兴趣的项目，可以用“git clone + ”https地址“ ”命令进行克隆。克隆完成后，
 会自动在当前目录下创建一个本地仓库，这个本地仓库可以看作是该远程仓库的备份，而且已经与该远程仓库相关联了的。
 如下图:
 
@@ -233,10 +233,10 @@ A和B此时分别使用git clone命令，把前面创建的git_pratice远程仓�
    :alt: github_clone1
 
 开发者A
-"""""""""""""""""
+“”“”“”“”“”“”“”“”"
 
-1、现在模拟开发者A工作，使用git branch命令，创建一个本地分支，命名为"test_branch1"。
-使用"git branch -a"命令查看所有分支。。
+1、现在模拟开发者A工作，使用git branch命令，创建一个本地分支，命名为“test_branch1”。
+使用“git branch -a”命令查看所有分支。。
 如下图:
 
 .. image:: media/git_branch.png
@@ -246,11 +246,11 @@ A和B此时分别使用git clone命令，把前面创建的git_pratice远程仓�
 可以看到现在本地仓库中有两个本地分支，其中master默认为主分支，已经和远程仓库关联，
 而test_branch1分支为新创建的本地分支。*表示当前本地分支指向master分支。
 
-再看远端仓库，"remote"表示远程分支，但是HEAD不是指一个独立分支，
+再看远端仓库，“remote”表示远程分支，但是HEAD不是指一个独立分支，
 它表示的是当前分支。所以现在远端仓库只有一个master分支，远端仓库的当前分支指向master。
 
 
-2、输入"git checkout test_branch1"命令检出test_branch1分支，修改newadd.txt文件内容分为"this is branch1"
+2、输入“git checkout test_branch1”命令检出test_branch1分支，修改newadd.txt文件内容分为“this is branch1”
 如下图:
 
 .. image:: media/git_checkout.png
@@ -264,7 +264,7 @@ A和B此时分别使用git clone命令，把前面创建的git_pratice远程仓�
    :align: center
    :alt: git_commit
 
-4、执行"git push origin +"分支名""命令（origin是GitHub的默认主机名)，在远程仓库建立test_branch1分支，
+4、执行“git push origin +“分支名””命令（origin是GitHub的默认主机名)，在远程仓库建立test_branch1分支，
 并把当前本地分支(test_branch1分支)的内容推送到上去。如下图:
 
 .. image:: media/git_push.png
@@ -278,13 +278,13 @@ A和B此时分别使用git clone命令，把前面创建的git_pratice远程仓�
    :alt: git_push
 
 5、假设现在开发者A工作结束了，那么它需要将本地test_branch1合并到mster分支上，再推送到远端仓库的master分支。
-需要执行的步骤是:切回到master分支，再使用"git merge +分支名"就能把test_branch1分支合并到master分支。如下图:
+需要执行的步骤是:切回到master分支，再使用“git merge +分支名”就能把test_branch1分支合并到master分支。如下图:
 
 .. image:: media/git_merge.png
    :align: center
    :alt: git_merge
 
-6、使用"git push origin master"命令，把当前本地分支（新合并的本地master分支）推送到远端的master分支。
+6、使用“git push origin master”命令，把当前本地分支（新合并的本地master分支）推送到远端的master分支。
 git显示已经成功推送。
 如下图:
 
@@ -294,10 +294,10 @@ git显示已经成功推送。
 
 
 开发者B
-"""""""""""""""""
+“”“”“”“”“”“”“”“”"
 
 1、现在轮到开发者B来开始工作，前面创建、捡出、修改和推送分支的步骤与开发者A是一致的。
-但是分支名称改为test_branch2，修改的内容为:"this is branch2"。
+但是分支名称改为test_branch2，修改的内容为:“this is branch2”。
 如下图:
 
 .. image:: media/git_checkout1.png
@@ -312,7 +312,7 @@ git显示已经成功推送。
    :alt: git_push
 
 3、假设此时开发者B也完成工作了，需要把test_branch2合并到master主支，然后提交到远程仓库master分支
-需要执行的步骤是:切回到master分支，再执行"git merge +分支名"就能把test_branch2分支合并到master分支。
+需要执行的步骤是:切回到master分支，再执行“git merge +分支名”就能把test_branch2分支合并到master分支。
 
 如下图:
 
@@ -320,7 +320,7 @@ git显示已经成功推送。
    :align: center
    :alt: git_merge1
 
-4、使用"git push origin master"命令，把当前本地分支（新合并的本地master分支）推送到远端的master分支。
+4、使用“git push origin master”命令，把当前本地分支（新合并的本地master分支）推送到远端的master分支。
 出乎意料的是，这一次推送失败了。
 
 .. image:: media/git_push4.png
@@ -345,7 +345,7 @@ git显示已经成功推送。
    :align: center
    :alt: git_error
 
-上面"<<<<<<< HEAD"部分代表的是本地仓库的修改内容，"======="表示内容分割线，">>>>>>>"表示目前远端仓库的内容。
+上面“<<<<<<< HEAD”部分代表的是本地仓库的修改内容，“=======”表示内容分割线，“>>>>>>>”表示目前远端仓库的内容。
 
 6、开发者B经过认真思考，觉得应该以自己的内容为准。于是删除了远程仓库的内容和冲突符号，只保留自己的改动。
 
@@ -360,7 +360,7 @@ git显示已经成功推送。
    :align: center
    :alt: git_commit
 
-8、此时再次使用"git push origin master"命令，把当前本地分支（新合并的本地master分支）推送到远端的master分支。
+8、此时再次使用“git push origin master”命令，把当前本地分支（新合并的本地master分支）推送到远端的master分支。
 如下图:
 
 .. image:: media/git_push5.png
@@ -369,8 +369,8 @@ git显示已经成功推送。
 
 此时，修改的内容就成功推送到远端仓库了。
 
-9、如果确认功能完成开发后，输入"git branch -d +分支名"命令可以删除本地分支，
-输入"git push --delete origin +分支名"命令可以删除远程分支。
+9、如果确认功能完成开发后，输入“git branch -d +分支名”命令可以删除本地分支，
+输入“git push --delete origin +分支名”命令可以删除远程分支。
 
 如下图:
 
@@ -383,14 +383,14 @@ git显示已经成功推送。
 标签
 ^^^^^^
 
-上面介绍了如何通过"git show + commit-id"命令来查看某次历史提交的详细记录。但是commit-id是一串冰冷、
+上面介绍了如何通过“git show + commit-id”命令来查看某次历史提交的详细记录。但是commit-id是一串冰冷、
 无规律的数字，十分难以记忆。有时候开发者完成了一个大版本的功能开发，此时新功能未经市场验证，
 ，可能后面需要频繁review代码、解决bug。那么每次追溯都要重复地查询commit-id，效率就会很低。
 
 在这种场景下，git的标签功能就很重要了。它可以对某一时间点上的版本打上指定标签，
 利用该标签可以方便快速地进行查看历史提交信息。可以把标签理解为给commit-id起一个别名。
 
-1、用"git log"命令可以查询到历史提交的commit-id。输入"git tag +标签名 +commit-id"命令，
+1、用“git log”命令可以查询到历史提交的commit-id。输入“git tag +标签名 +commit-id”命令，
 给commit-id对应的历史版本打上一个标签。
 如下图:
 
@@ -398,16 +398,16 @@ git显示已经成功推送。
    :align: center
    :alt: git_tag
 
-找到分支test_branch的提交，并给这个版本的提交打上"v1.0"的标签。
+找到分支test_branch的提交，并给这个版本的提交打上“v1.0”的标签。
 
-2、执行"git show v1.0"命令，可以查看到该次提交的详细信息，包括作者、日期、文件改动内容等等。
+2、执行“git show v1.0”命令，可以查看到该次提交的详细信息，包括作者、日期、文件改动内容等等。
 如下图:
 
 .. image:: media/git_show1.png
    :align: center
    :alt: git_show1
 
-3、使用"git push origin +标签名"命令，可以把该标签推送到远端分支。加 --tags 选项表示推送全部标签。
+3、使用“git push origin +标签名”命令，可以把该标签推送到远端分支。加 --tags 选项表示推送全部标签。
 如下图:
 
 .. image:: media/git_push6.png
@@ -416,7 +416,7 @@ git显示已经成功推送。
 
 git提示标签推送成功。
 
-4、使用"git tag -d +标签名"命令删除本地仓库的标签，使用"git push origin :refs/tags/+标签名"来移除远端仓库的标签。
+4、使用“git tag -d +标签名”命令删除本地仓库的标签，使用“git push origin :refs/tags/+标签名”来移除远端仓库的标签。
 
 .. image:: media/git_push6.png
    :align: center
@@ -430,7 +430,7 @@ git提示本地标签已经删除，远端仓库相应的标签也已经删除�
 一旦开发者仓库中提交了错误的修改内容，就需要进行版本回溯。版本回溯的意思是把仓库里面的内容还原到某一次历史提交的状态中。
 通常在新产品出了bug时，就可以通过版本回溯来定位bug。
 
-1、用"git log"命令查询到历史提交的commit-id。输入"git reset --hard +commit-id"命令，
+1、用“git log”命令查询到历史提交的commit-id。输入“git reset --hard +commit-id”命令，
 就能把仓库还原到commit-id对应的历史提交的状态中。
 如下图:
 
@@ -440,7 +440,7 @@ git提示本地标签已经删除，远端仓库相应的标签也已经删除�
 
 看到newadd.txt已经还原到test_branch1提交的状态。
 
-2、使用"git push -f origin master"，强制推送到远端仓库，远端仓库也将被还原到test_branch1提交状态。
+2、使用“git push -f origin master”，强制推送到远端仓库，远端仓库也将被还原到test_branch1提交状态。
 
 .. image:: media/git_push7.png
    :align: center
