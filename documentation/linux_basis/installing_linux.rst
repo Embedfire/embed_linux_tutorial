@@ -1,20 +1,24 @@
 .. vim: syntax=rst
 
-安装Ubuntu系统
+在PC上安装Ubuntu系统
 --------------------
 
 要进行Linux开发，自然少不了一台运行Linux系统的开发主机。从PC上开始使用Linux系统是最好的熟悉方法。
 
-对于熟悉Linux且有多余主机的用户，建议直接采用独立的主机安装系统作为开发环境。而对于入门级用户，强烈建议在Windows环境下安装VirtualBox或VMware虚拟机软件，然后在虚拟机上安装相应的Linux系统。在虚拟机上体验Linux系统的好处是没有后顾之忧，觉得不如意就推倒重来，而且依旧
-可以使用Windows进行其它工作，也方便在Windows与Ubuntu虚拟机之间进行文件共享。即使是只进行Linux嵌入式开发工作，也避免不了需要使用Windows下的工具，如后期我们给开发板烧录uboot、Linux内核时，使用到的NXP官方MFGtools工具时，还是依赖于Windows系统。
+对于熟悉Linux且有多余主机的用户，建议直接采用独立的主机安装系统作为开发环境。而对于入门级用户，
+强烈建议在Windows环境下安装VirtualBox或VMware虚拟机软件，然后在虚拟机上安装相应的Linux系统。
+在虚拟机上体验Linux系统的好处是没有后顾之忧，觉得不如意就推倒重来，而且依旧可以使用Windows进行其它工作，
+也方便在Windows与Ubuntu虚拟机之间进行文件共享。即使是只进行Linux嵌入式开发工作，
+也避免不了需要使用Windows下的工具，如后期我们给开发板烧录uboot、Linux内核时，
+使用到的NXP官方MFGtools工具时，还是依赖于Windows系统。
 
 安装虚拟机VirtualBox
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 虚拟机技术是虚拟化技术的一种，所谓虚拟化技术就是将事物从一种形式转变成另一种形式，最常用的虚拟化技术有操作系统中内存的虚拟化，实际运行时用户需要的内存空间可能远远大于物理机器的内存大小，利用内存的虚拟化技术，用户可以将一部分硬盘虚拟化为内存，而这对用户是透明的。
 
-流行的虚拟机软件有VMware、Virtual Box和Virtual PC，它们都能在Windows系统上虚拟出多个计算机，本书使用的是免费的虚拟机软件Virtual Box，我们可以去\ https://www.virtualbox.org/wiki/Downloads\
-官网中下载VirtualBox软件，也可以使用我们提供的资料光盘中的软件，进行安装。
+流行的虚拟机软件有VMware、Virtual Box和Virtual PC，它们都能在Windows系统上虚拟出多个计算机，本书使用的是免费的虚拟机软件Virtual Box，
+我们可以去 https://www.virtualbox.org/wiki/Downloads官网中下载VirtualBox软件，也可以使用我们提供的资料光盘中的软件，进行安装。
 
 
 
@@ -95,14 +99,17 @@
 本书以Ubuntu 18.04桌面发行版本作为开发主机的主体系统环境，对于后期编
 译内核等依赖不同版本系统环境的情况，我们会采用Docker技术创建其它运行环境。
 
-在安装前需要先到Ubuntu的官网下载桌面版的系统镜像，可在如下
-址下载得到：\ https://ubuntu.com/download/desktop\ ，具体见下图。
+在安装前需要先到Ubuntu的官网下载桌面版的系统镜像，可在如下址下载得到：
+ https://ubuntu.com/download/desktop ，具体见下图。
 
 .. image:: media/instal011.png
    :align: center
    :alt: 未找到图片11|
 
+或到国内速度较快的清华镜像源下载：https://mirrors.tuna.tsinghua.edu.cn/ubuntu-releases/18.04.4/
+使用ubuntu-18.04.4-desktop-amd64.iso 镜像即可。
 
+建议学习时使用与本教材相同的版本，例如用16.04或20.04可能会因为环境不一致引起问题，出现这些问题时折腾太浪费时间。
 
 使用VirtualBox安装Ubuntu系统
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -512,8 +519,9 @@ Ubuntu系统安装好后，请随意体验一下Ubuntu系统，看看能用它�
 
 
 
-我们尝试安装"2048"小游戏。打开软件之后，点击搜索
-的按钮（下图中的框框处），输入"2048"，如下图所示，点击安装框框处的"2048"游戏。
+我们可以尝试安装"2048"小游戏。打开软件之后，点击搜索的按钮（下图中的框框处），
+输入"2048"，如下图所示，点击安装框框处的"2048"游戏。
+未修改软件源前下载速度可能非常慢，不想体验可以直接点击取消安装。
 
 .. image:: media/instal052.jpg
    :align: center
@@ -546,163 +554,3 @@ Ubuntu系统安装好后，请随意体验一下Ubuntu系统，看看能用它�
 
 
 
-
-.. |instal002| image:: media/instal002.jpeg
-   :width: 2.77273in
-   :height: 1.53788in
-.. |instal003| image:: media/instal003.jpg
-   :width: 5.15in
-   :height: 4.025in
-.. |instal004| image:: media/instal004.jpg
-   :width: 5.15in
-   :height: 4.025in
-.. |instal005| image:: media/instal005.jpg
-   :width: 5.15in
-   :height: 4.025in
-.. |instal006| image:: media/instal006.jpg
-   :width: 5.15in
-   :height: 4.025in
-.. |instal007| image:: media/instal007.jpg
-   :width: 5.15in
-   :height: 4.025in
-.. |instal008| image:: media/instal008.jpg
-   :width: 5.15in
-   :height: 4.025in
-.. |instal009| image:: media/instal009.jpg
-   :width: 5.15in
-   :height: 4.025in
-.. |instal010| image:: media/instal010.jpeg
-   :width: 5.29189in
-   :height: 2.83899in
-.. |instal011| image:: media/instal011.png
-   :width: 5.76806in
-   :height: 2.68709in
-.. |instal012| image:: media/instal012.jpg
-   :width: 4.46903in
-   :height: 2.74835in
-.. |instal013| image:: media/instal013.jpg
-   :width: 4.30833in
-   :height: 3.68333in
-.. |instal014| image:: media/instal014.jpg
-   :width: 4.30833in
-   :height: 3.68333in
-.. |instal015| image:: media/instal015.jpg
-   :width: 4.36667in
-   :height: 4.15in
-.. |instal016| image:: media/instal016.jpg
-   :width: 4.36667in
-   :height: 4.15in
-.. |instal017| image:: media/instal017.jpg
-   :width: 4.36667in
-   :height: 4.15in
-.. |instal018| image:: media/instal018.jpg
-   :width: 5.76806in
-   :height: 3.54722in
-.. |instal019| image:: media/instal019.jpg
-   :width: 5.76806in
-   :height: 3.76984in
-.. |instal020| image:: media/instal020.jpg
-   :width: 5.76806in
-   :height: 3.68542in
-.. |instal021| image:: media/instal021.jpg
-   :width: 5.76806in
-   :height: 3.68542in
-.. |instal022| image:: media/instal022.jpg
-   :width: 5.76806in
-   :height: 3.54722in
-.. |instal023| image:: media/instal023.jpg
-   :width: 4.75in
-   :height: 4.08662in
-.. |instal024| image:: media/instal024.jpg
-   :width: 5.76806in
-   :height: 4.10972in
-.. |instal025| image:: media/instal025.jpg
-   :width: 5.76806in
-   :height: 4.48056in
-.. |instal026| image:: media/instal026.jpg
-   :width: 5.76806in
-   :height: 4.50208in
-.. |instal027| image:: media/instal027.jpg
-   :width: 4.89103in
-   :height: 3.48486in
-.. |instal028| image:: media/instal028.jpg
-   :width: 5.76806in
-   :height: 4.32604in
-.. |instal029| image:: media/instal029.jpg
-   :width: 4.75in
-   :height: 3.39637in
-.. |instal030| image:: media/instal030.jpg
-   :width: 5.18608in
-   :height: 4.50364in
-.. |instal031| image:: media/instal031.jpg
-   :width: 5.76806in
-   :height: 4.34167in
-.. |instal032| image:: media/instal032.jpeg
-   :width: 5.76806in
-   :height: 3.09444in
-.. |instal033| image:: media/instal033.png
-   :width: 3.99671in
-   :height: 2.57051in
-.. |instal034| image:: media/instal034.png
-   :width: 5.36842in
-   :height: 1.88889in
-.. |instal035| image:: media/instal035.png
-   :width: 4.46154in
-   :height: 3.01749in
-.. |instal036| image:: media/instal036.jpg
-   :width: 5.76806in
-   :height: 3.18542in
-.. |instal037| image:: media/instal037.jpg
-   :width: 4.89394in
-   :height: 4.15095in
-.. |instal038| image:: media/instal038.jpg
-   :width: 5.76806in
-   :height: 3.68958in
-.. |instal039| image:: media/instal039.jpg
-   :width: 2.9in
-   :height: 2.28333in
-.. |instal040| image:: media/instal040.jpg
-   :width: 5.76806in
-   :height: 3.68542in
-.. |instal041| image:: media/instal041.jpg
-   :width: 1.19167in
-   :height: 0.80833in
-.. |instal042| image:: media/instal042.jpg
-   :width: 2.06667in
-   :height: 1.81667in
-.. |instal043| image:: media/instal043.jpg
-   :width: 5.77083in
-   :height: 1.22222in
-.. |instal044| image:: media/instal044.jpg
-   :width: 3.87121in
-   :height: 0.2197in
-.. |instal045| image:: media/instal045.jpg
-   :width: 5.76806in
-   :height: 3.14861in
-.. |instal046| image:: media/instal046.png
-   :width: 3.84057in
-   :height: 3.85897in
-.. |instal047| image:: media/instal047.png
-   :width: 5.38462in
-   :height: 2.53688in
-.. |instal048| image:: media/instal048.png
-   :width: 5.45524in
-   :height: 1.95657in
-.. |instal049| image:: media/instal049.png
-   :width: 5.02308in
-   :height: 3.41667in
-.. |instal050| image:: media/instal050.png
-   :width: 5.40283in
-   :height: 1.86538in
-.. |instal051| image:: media/instal051.jpg
-   :width: 0.41693in
-   :height: 1.96154in
-.. |instal052| image:: media/instal052.jpg
-   :width: 5.76923in
-   :height: 3.25in
-.. |instal053| image:: media/instal053.png
-   :width: 6.15116in
-   :height: 3.71745in
-.. |instal054| image:: media/instal054.png
-   :width: 3.62199in
-   :height: 2.59091in

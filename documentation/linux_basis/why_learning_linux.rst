@@ -155,21 +155,12 @@ Linux可谓是公开的宝库，它是开源世界的代表作，它的内核源
 
 -  《鸟哥的Linux私房菜》，该书主要针对Linux服务器运维人员，主要学习上册，了解Linux的日常应用。
 
--  野火《STM32库开发实战指南》，快速上手MCU开发并巩固C语言相关的知识。
+-  野火 `《STM32库开发实战指南》 <https://ebf-stm32f429-tiaozhanzhe-std-tutorial.readthedocs.io>`_ ，快速上手MCU开发并巩固C语言相关的知识。
 
--  野火《i.MX RT库开发实战指南》，i.MX 6ULL的外设与i.MX RT系列基本相同，可以通过它学习i.MX系列芯片的裸机开发进行过渡。
+-  野火 `《i.MX RT库开发实战指南》 <https://ebf-imxrt1052-tutorial.readthedocs.io>`_ ，i.MX 6ULL的外设与i.MX RT系列基本相同，可以通过它学习i.MX系列芯片的裸机开发进行过渡。
 
--  野火《RT-Thread内核实现与应用开发实战指南》和《FreeRTOS内核实现与应用开发实战指南》，针对嵌入式实时操作系统讲解，通过它们可掌握操作系统相关的概念。
-
-
+-  野火 `《RT-Thread内核实现与应用开发实战指南》 <https://ebf-rtthread-tutorial-rt1052.readthedocs.io>`_ 和 `《FreeRTOS内核实现与应用开发实战指南》 <https://ebf-freertos-tutorial-rt1052.readthedocs.io>`_ 针对嵌入式实时操作系统讲解，通过它们可掌握操作系统相关的概念。
 
 
-.. |whylea002| image:: media/whylea002.png
-   :width: 2.34076in
-   :height: 0.97619in
-.. |whylea003| image:: media/whylea003.png
-   :width: 4.72619in
-   :height: 1.08175in
-.. |whylea004| image:: media/whylea004.png
-   :width: 5.76748in
-   :height: 5.74538in
+
+
