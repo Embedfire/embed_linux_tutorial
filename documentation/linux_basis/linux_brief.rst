@@ -22,7 +22,7 @@ Linux内核与发行版
 从而组成一套完整可用的操作系统，见下图。我们称这样的系统为Linux发行版（distribution）。
 完整的Linux系统就如同汽车，Linux内核构成了最为关键的引擎，不同的发行版就类似使用相同引擎的不同车型。
 
-.. image:: media/linuxb002.bmp
+.. image:: media/linuxb002.jpg
    :align: center
    :alt: 未找到图片
 
@@ -33,7 +33,7 @@ Linux系统的完整构成
 软件的安装帮助会针对不同派系的Linux给出不同的安装指令，这实际是由于不同Linux派系之间使用不同的包管理软件（可理解为使用不同的软件商店），
 这无伤大雅。常见的Linux发行版关系见下图。
 
-.. image:: media/linuxb003.bmp
+.. image:: media/linuxb003.jpg
    :align: center
    :alt: 未找到图片
 
