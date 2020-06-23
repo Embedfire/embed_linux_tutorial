@@ -186,6 +186,9 @@
    linux_driver/i2c_mpu6050.rst
    linux_driver/ecspi_oled.rst
    linux_driver/button_interrupt.rst
+   linux_driver/input_sub_system.rst
+
+
 
 
 .. toctree::
