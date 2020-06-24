@@ -367,7 +367,7 @@ type的首地址 = ptr - size ，需要注意的是它们的大小都是以字�
 数据寄存器以及输入输出方向寄存器都做了地址映射，这样我们便可以通过操作程序中的虚拟地址来间接的控制物理寄存器，我们在驱动程序描述寄存器不利于驱动模块的灵活使用，
 后几个章节我们会带领大家通过设备树（设备树插件）的方式去描述寄存器及其相关属性，在此先埋下伏笔，循序渐进，顺腾摸瓜，使大家能够真正理解并掌握linux驱动的精髓。
 
-4、通过ioread32()和iowrite32()函数简介操作寄存器:
+4、通过ioread32()和iowrite32()等函数操作寄存器:
 
 和STM32一样，都要开启I/O引脚对应的时钟、设置其端口的复用（在此复用为普通的GPIO口）、电气属性、输入输出方向以及输出的高低电平等等，
 一般我们访问某个地址时都是先将该地址的数据读取到一个变量中然后修改该变量，最后再将该变量写入到原来的地址当中。
@@ -693,3 +693,54 @@ LED驱动Makefile
     all:modules
     modules clean:
     	$(MAKE) -C $(KERNEL_DIR) M=$(shell pwd) $@
+
+
+下载验证
+~~~~
+
+驱动程序和应用程序编译命令如下所示：
+
+驱动编译命令：
+
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+
+应用程序编译命令：
+
+arm-linux-gnueabihf-gcc <源文件名> –o <输出文件名>
+
+进入要加载的.ko文件目录并查看/dev目录下已存在的模块，确认是否重复，如下所示。
+
+.. image:: ./media/led_cdev001.PNG
+   :align: center
+   :alt: 找不到图片04|
+
+执行下面的命令加载驱动：
+
+命令：
+
+insmod led_cdev.ko
+
+在驱动程序中，我们在.probe函数中注册字符设备并创建了设备文件，设备和驱动匹配成功后.probe函数已经执行，所以正常情况下在“/dev/”目录下已经生成了“led_chrdev0”、“led_chrdev1”、“led_chrdev2”三个设备节点，如下所示。
+
+.. image:: ./media/led_cdev002.PNG
+   :align: center
+   :alt: 找不到图片04|
+
+驱动加载成功后直接运行应用程序如下所示。
+
+命令：
+
+./test_ledcdevApp <设备路径> <命令>
+
+执行结果如下：
+
+.. image:: ./media/led_cdev003.PNG
+   :align: center
+   :alt: 找不到图片05|
+
+运行完命令后我们便会看到绿色LED灯被成功点亮了,如下图所示。
+
+.. image:: ./media/led_cdev004.jpg
+   :align: center
+   :alt: 找不到图片05|
+
