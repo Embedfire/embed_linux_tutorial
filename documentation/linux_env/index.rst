@@ -22,3 +22,4 @@
 ..    using_sqlite
 ..    using_qtsqlite
 ..    using_php
+..    opencv

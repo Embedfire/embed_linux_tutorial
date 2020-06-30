@@ -44,7 +44,7 @@ build-gcc.sh 脚本内容如下：
     SCRIPT_PATH=$(pwd)
 
     #修改源码包解压后的名称
-    MAJOR_NAME=arm-linux-gnueabihf
+    MAJOR_NAME=gcc-arm-linux-gnueabihf
 
     #修改需要下载的源码版本前缀和后缀
     OPENSRC_VER_PREFIX=8.3
@@ -64,8 +64,10 @@ build-gcc.sh 脚本内容如下：
     #下载源码包
     do_download_src () {
        echo "\033[1;33mstart download ${COMPRESS_PACKAGE}...\033[0m"
-       if [ ! -d "${COMPRESS_PACKAGE}" ];then
-          wget -c ${DOWNLOAD_LINK}
+       if [ ! -f "${COMPRESS_PACKAGE}" ];then
+          if [ ! -d "${PACKAGE_NAME}" ];then
+            wget -c ${DOWNLOAD_LINK}
+          fi
        fi
        echo "\033[1;33mdone...\033[0m"
     }
@@ -77,7 +79,7 @@ build-gcc.sh 脚本内容如下：
        mkdir -p ${INSTALL_PATH}
 
        if [ ! -d "${PACKAGE_NAME}" ];then
-          tar -xf ${COMPRESS_PACKAGE} -C ${INSTALL_PATH}
+          tar -xf ${COMPRESS_PACKAGE} -C ${INSTALL_PATH} --strip-components=1 
        fi
        echo "\033[1;33mdone...\033[0m"
     }

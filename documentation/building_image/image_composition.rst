@@ -217,7 +217,7 @@ exit），并且提供了控制进程，同步进程和进程间通信的接口�
 -  暂停态T (TASK_STOPPED or TASK_TRACED)：向进程发送一个SIGSTOP信号，它就
   会因响应该信号而进入TASK_STOPPED状态，向进程发送一个SIGCONT信号，可以让
   其从TASK_STOPPED状态恢复到TASK_RUNNING状态，当进程正在被跟踪时，它处于TAS
-  K_TRACED这个特殊的状态。"正在被跟踪"指的是进程暂停下来，等待跟踪它的进
+  K_TRACED这个特殊的状态。“正在被跟踪”指的是进程暂停下来，等待跟踪它的进
   程对它进行操作。比如在gdb中对被跟踪的进程下一个断点，进程在断点处停下来的时
   候就处于TASK_TRACED状态。
 

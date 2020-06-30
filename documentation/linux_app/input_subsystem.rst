@@ -13,7 +13,7 @@ input子系统
 input子系统是Linux对输入设备提供的统一驱动框架。如按键、键盘、触摸屏和鼠标等输入设备的驱动方式是类似的，当出现按键、触摸等操作时，硬件产生中断，然后CPU直接读取引脚电平，或通过SPI、I2C等通讯方式从设备的寄存器读取具体的按键值或触摸坐标，然后把这些信息提交给内核。使用input子系统
 驱动的输入设备可以通过统一的数据结构提交给内核，该数据结构包括输入的时间、类型、代号以及具体的键值或坐标，而内则通过/dev/input目录下的文件接口传递给用户空间。
 
-在Linux内核源码的"Documentation/input"目录包含了input子系统相关的说明。
+在Linux内核源码的“Documentation/input”目录包含了input子系统相关的说明。
 
 本开发板默认的出厂镜像中，按键、触摸屏、鼠标、键盘都使用了input子系统驱动，本章使用按键进行讲解。
 
@@ -35,7 +35,7 @@ input事件目录
    sudo apt install evtest -y
    #使用sudo权限运行evtest工具
    sudo evtest
-   #根据自己主机的输出来选择某个设备测试，下图选择的是"6"，鼠标
+   #根据自己主机的输出来选择某个设备测试，下图选择的是“6”，鼠标
    #根据选择的设备测试，如选择的键盘就按键盘，选择鼠标就移植鼠标
 
 如下图:
@@ -51,7 +51,7 @@ input事件目录
 -  运行evtest工具，它列出了系统当前可用的/dev/input/event0~6输入事件
    文件，并且列出了这些事件对应的设备名。
 
--  我们根据设备名的"VirtualBox mouse intergration"推猜它就是接入到电脑
+-  我们根据设备名的“VirtualBox mouse intergration”推猜它就是接入到电脑
    的鼠标，所以输入了它对应的event6事件编号6，实验时请根据自己电脑的输出来选择。
 
 -  输入编号后它列出了event6的一些设备信息，包括驱动版本、设备ID、设备
@@ -67,7 +67,7 @@ input事件结构
 
 evtest工具的原理并不神秘，学习本章节后也可以尝试自己
 使用代码实现它的部分功能。列出可用事件时，它就是通过查
-看目录"/dev/input/"实现的。本示例中主机的"/dev/input"目录的内
+看目录“/dev/input/”实现的。本示例中主机的“/dev/input”目录的内
 容如下图所示。
 
 .. image:: media/inputs003.png
@@ -75,7 +75,7 @@ evtest工具的原理并不神秘，学习本章节后也可以尝试自己
    :alt: 未找到图片03|
 
 
-可看到"/dev/input"目录下，有event*、js*、mouse*及mice文件，它们分别是
+可看到“/dev/input”目录下，有event*、js*、mouse*及mice文件，它们分别是
 驱动层evdev（通用输入事件）、joydev（游戏杆）及遗留的mousedev（鼠标）设备暴露
 到用户空间的访问接口文件，读取这些文件的内容可获取到设备上报的信息。
 
@@ -137,9 +137,9 @@ evtest工具的原理并不神秘，学习本章节后也可以尝试自己
 input事件设备名
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-"/dev/input/event*"的事件编号与设备的联系不是固定的，它通常按系统检测
+“/dev/input/event*”的事件编号与设备的联系不是固定的，它通常按系统检测
 到设备的先后顺序安排event文件的编号，这对编写应用程序控制不太方便，我们
-可以通过"/dev/input/by-id"或"/dev/input/by-path"目录查看具体的硬件设备，如
+可以通过“/dev/input/by-id”或“/dev/input/by-path”目录查看具体的硬件设备，如
 下图所示。
 
 .. image:: media/inputs005.png
@@ -149,11 +149,11 @@ input事件设备名
 
 
 图中列出了by-path目录下的内容，该目录下的文件实际上都是链接，如第
-一行的"pci-0000:00:04.0-event-mouse -> ../event6"表示"pci-0000:00:04.0-event-
+一行的“pci-0000:00:04.0-event-mouse -> ../event6”表示"pci-0000:00:04.0-event-
 mouse"文件就是event6的快捷方式，它就是本主机中使用的鼠标，也就是说访问该
 文件就是访问该鼠标的事件设备，而且该文件名与硬件的关系是固定的，后面我们的实验就是采用这样的方式。
 
-由于/dev下的设备都是通过/sys导出的，所以也可以通过"/sys/class/input"目
+由于/dev下的设备都是通过/sys导出的，所以也可以通过“/sys/class/input”目
 录查看，如下图所示。
 
 .. image:: media/inputs006.png
@@ -162,9 +162,9 @@ mouse"文件就是event6的快捷方式，它就是本主机中使用的鼠标�
 
 
 
-"/sys/class/input"下包含了各个以事件命名的目录，其对应目录
+“/sys/class/input”下包含了各个以事件命名的目录，其对应目录
 下的device/name文件包含了事件对应的设备名，如本示例中
-的"/sys/class/input/event6/device/name"文件的内容为"VirtualBox mouse
+的“/sys/class/input/event6/device/name”文件的内容为"VirtualBox mouse
 integration"，evtest工具列出的事件与设备名的关系，就是从这里读取的。
 
 开发板按键检测实验
@@ -187,7 +187,7 @@ integration"，evtest工具列出的事件与设备名的关系，就是从这�
    evtest
    #查看按键在by-path目录下的文件
    ls -lh /dev/input/by-path
-   #查看按键在/sys文件系统中的名字,以下命令中的"event0"根据自己的实验环境修改
+   #查看按键在/sys文件系统中的名字,以下命令中的“event0”根据自己的实验环境修改
    cat /sys/class/input/event0/device/name
 
 如下图：
@@ -199,16 +199,16 @@ integration"，evtest工具列出的事件与设备名的关系，就是从这�
 
 
 此处主要针对开发板上的按键设备进行说明，在上图中，event0和event1分别对应
-了开发板的"KEY"按键和USB鼠标按键，注意如果开发板上设备树使用了其他按键，按键使用的event*编号可能会发生变化，
-所以我们查看了"by-path"目录下的链接文件，
-这两个按键的文件链接名分别为"platform-gpio-keys-event"和"platform-ci_hdrc.1-usb-0:1.1:1.0-event-mouse".
+了开发板的“KEY”按键和USB鼠标按键，注意如果开发板上设备树使用了其他按键，按键使用的event*编号可能会发生变化，
+所以我们查看了“by-path”目录下的链接文件，
+这两个按键的文件链接名分别为“platform-gpio-keys-event”和“platform-ci_hdrc.1-usb-0:1.1:1.0-event-mouse”.
 下面我们使用这两个文件名编写按键检测的应用程序。
 
 实验代码分析
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 在输入事件检测的应用中，通常使用主线程直接
-循环读取"/dev/input/event*"设备文件获取事件的数据结构，然后通过消
+循环读取“/dev/input/event*”设备文件获取事件的数据结构，然后通过消
 息队列通知其它子线程，从而响应输入操作。
 
 本实验的代码目录为：base_code/linux_app/input/c。
@@ -279,7 +279,7 @@ integration"，evtest工具列出的事件与设备名的关系，就是从这�
 本代码的说明如下：
 
 -  第12行：定义默认设备路径，此处使用的是开发板KEY按键
-   在"/dev/input/by-path"下的链接文件名，此处不使用"/dev/input/event*"只是
+   在“/dev/input/by-path”下的链接文件名，此处不使用“/dev/input/event*”只是
    为了让程序不受其它输入设备而影响了事件编号。
 
 -  第25~29行：检查main函数的输入参数，若程序执行时带输入参数，把第1个输入
@@ -289,8 +289,8 @@ integration"，evtest工具列出的事件与设备名的关系，就是从这�
    型的，而且事件设备文件支持阻塞操作，也就是说，若后面使用read函数读取时，它会
    等待事件上报，一直等待至读取成功或失败才会返回。
 
--  第41行：在while循环里通过read系统调用读取事件文件，读取到的内容存储在 "struct input_event"类型
-   的event变量中，"struct input_event"类型就是前面介绍的内核事件数据结构。
+-  第41行：在while循环里通过read系统调用读取事件文件，读取到的内容存储在 “struct input_event”类型
+   的event变量中，“struct input_event”类型就是前面介绍的内核事件数据结构。
    若成功读取，我们就可以通过该变量的结构体成员访问到事件的时间戳、类型、代号和值。
 
 -  第45~49行：输出读取到的event变量的各个成员值，在上报
@@ -300,7 +300,7 @@ integration"，evtest工具列出的事件与设备名的关系，就是从这�
 值得思考的是，若没有上报事件，第42行的read读取事件设备文件操作会被阻塞，简单来说就是即使第52行的printf代码不注释掉，它也不会在持续地在循环里输出，而只有当出现了事件，触发read退出，后面的printf函数才有机会被执行一次，然后重新read事件再次阻塞。在这种阻塞的过程中，进程会休眠
 ，释放它对CPU的占用。
 
-假如我们使用的是GPIO子系统框架来编写按键驱动程序，在应用层的操作中，需要使用"/sys/class/gpio/gpio*/direction"文件配置为输入方向，然后使用循环读取"/sys/class/gpio/gpio*/value"文件的值来获得按键的状态，但由于对value文件的read读
+假如我们使用的是GPIO子系统框架来编写按键驱动程序，在应用层的操作中，需要使用“/sys/class/gpio/gpio*/direction”文件配置为输入方向，然后使用循环读取“/sys/class/gpio/gpio*/value”文件的值来获得按键的状态，但由于对value文件的read读
 取操作不会阻塞，所以进程会不停地读取文件内容来判断按键值，占用CPU宝贵的运算资源。
 
 由于read事件文件操作会阻塞，那么采用这种方式就无法同时检测两个输入设备了，这种时候可以通过select或poll等IO多路复用的操作达成目的，这在后续的章节再进行讲解。

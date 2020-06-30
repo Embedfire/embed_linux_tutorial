@@ -51,7 +51,7 @@ http://git.freescale.com/git/
 
 .. code:: bash
 
-    ➜  ebf_6ull_uboot git:(master) git log
+      ebf_6ull_uboot git:(master) git log
 
     commit d48487689c49f2c29013374689decbbb5bf1459d (HEAD -> master, origin/master)
     Author: jiejie <1161959934@qq.com>

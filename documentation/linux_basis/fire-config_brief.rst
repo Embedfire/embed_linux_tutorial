@@ -43,7 +43,7 @@ ssh远程终端界面
 ~~~~~~~~~~~~~~~~~~~~~
 
 在该菜单中，使用up和down箭头键可以在不同的选项中切换，被选中的一项将会高亮显示，
-使用right箭头键将跳出"选项"，并跳转到<Select>和<Finish>按钮。按下left将使您返回选项。
+使用right箭头键将跳出“选项”，并跳转到<Select>和<Finish>按钮。按下left将使您返回选项。
 <Select>按钮表示该项被选中，<Finish>按钮表示已完成全部配置项。
 
 
@@ -69,9 +69,9 @@ fire-config工具集成了Device Tree Overlays机制，用来管理一些硬件�
 一旦系统要兼容模块任意组合使用，那么随着模块数量增加，需要编译的设备树数量将爆炸增长。
 
 因此，使用传统设备树是不利于项目的维护和扩展的。内核为了解决这个提出了一套新的解决方案，
-那就是Device Tree Overlays，中文上可理解为"设备树插件"。
+那就是Device Tree Overlays，中文上可理解为“设备树插件”。
 它的核心原理是，通过扩展传统的设备树语法，使得各个硬件模块的信息可以独立地用新的设备树语法来描述。
-这样一来，传统的主设备树中只需要保留最基础的硬件信息(主要是cpu和内存)，其他模块单独编译成"设备树插件"。
+这样一来，传统的主设备树中只需要保留最基础的硬件信息(主要是cpu和内存)，其他模块单独编译成“设备树插件”。
 在系统实际使用时，根据实际应用情景，需要用到哪些硬件模块就把对应的设备树插件加入到主设备树即可。
 
 如下为实际内存中设备树的示意图:
@@ -80,8 +80,8 @@ fire-config工具集成了Device Tree Overlays机制，用来管理一些硬件�
    :align: center
    :alt: 设备树示意图
 
-"设备树插件"无疑提高了系统的可维护性和减少了大量的重复工作，目前，
-我们已经把常见的硬件模块都编译成了"设备树插件",比如LCD、HDMI、WiFi等等。
+“设备树插件”无疑提高了系统的可维护性和减少了大量的重复工作，目前，
+我们已经把常见的硬件模块都编译成了“设备树插件”,比如LCD、HDMI、WiFi等等。
 用户可以通过fire-config工具轻松地实现对硬件模块的便捷管理。
 
 
@@ -254,15 +254,15 @@ fire-config设置ssh
    :alt: 查看wifi ip地址
 
 3、使用ssh客户端登录，这里使用vscode的Remote-SSH插件为例。
-vscode安装完Remote-SSH插件后，使用"ctrl+shift+P"快捷键打开命令面板，
-输入"Remote-SSH"迅速找到"Remote-ssh: connect to host"选项，
+vscode安装完Remote-SSH插件后，使用“ctrl+shift+P”快捷键打开命令面板，
+输入“Remote-SSH”迅速找到“Remote-ssh: connect to host”选项，
 如下图所示:
 
 .. image:: media/fire-config_ssh3.png
    :align: center
    :alt: Remote-SSH插件
 
-4、进一步选择"Add New SSH Host"选项，如下图
+4、进一步选择“Add New SSH Host”选项，如下图
 
 .. image:: media/fire-config_ssh4.png
    :align: center
@@ -282,34 +282,34 @@ vscode安装完Remote-SSH插件后，使用"ctrl+shift+P"快捷键打开命令�
    :align: center
    :alt: Remote-SSH插件
 
-7、提示检查主机公钥指纹，选择"continue",如下图:
+7、提示检查主机公钥指纹，选择“continue”,如下图:
 
 .. image:: media/fire-config_ssh7.png
    :align: center
    :alt: Remote-SSH插件
 
-8、输入主机用户的密码，debian用户默认密码为"temppwd"。
-如果弹出登录失败串口，点击"retry"选项，重复登录2~3次。
+8、输入主机用户的密码，debian用户默认密码为“temppwd”。
+如果弹出登录失败串口，点击“retry”选项，重复登录2~3次。
 
 .. image:: media/fire-config_ssh8.png
    :align: center
    :alt: Remote-SSH插件
 
-9、登录成功后，在菜单栏打开"Terminal"选项，新建一个终端。
+9、登录成功后，在菜单栏打开“Terminal”选项，新建一个终端。
 如下图:
 
 .. image:: media/fire-config_ssh9.png
    :align: center
    :alt: Remote-SSH插件
 
-10、输入"sudo fire-config"命令，选择"SSH-connect"项。
+10、输入“sudo fire-config”命令，选择“SSH-connect”项。
 如下图:
 
 .. image:: media/fire-config_ssh10.png
    :align: center
    :alt: Remote-SSH插件
 
-11、系统提示: "Would you like the SSH server to be enabled?"。选择<Yes>或<No>来
+11、系统提示: “Would you like the SSH server to be enabled?”。选择<Yes>或<No>来
 分别对ssh进行使能和禁止即可。
 如下图:
 
@@ -321,8 +321,8 @@ vscode安装完Remote-SSH插件后，使用"ctrl+shift+P"快捷键打开命令�
 fire-config使能硬件模块
 ~~~~~~~~~~~~~~~~~~~~~~
 
-1、开发板正常启动后，执行sudo fire-config，这里以"LED"外设为例，选择"LED"项。
-其他硬件模块的使能方法与"LED"类似。
+1、开发板正常启动后，执行sudo fire-config，这里以“LED”外设为例，选择“LED”项。
+其他硬件模块的使能方法与“LED”类似。
 
 如下图:
 
@@ -330,7 +330,7 @@ fire-config使能硬件模块
    :align: center
    :alt: 使能LED
 
-2、系统提示: "Would you like the led to be enabled?"，选择<Yes>项。
+2、系统提示: “Would you like the led to be enabled?”，选择<Yes>项。
 
 如下图:
 
@@ -338,7 +338,7 @@ fire-config使能硬件模块
    :align: center
    :alt: 使能LED
 
-3、系统提示: "The flasher is enabled"，选择<OK>项，返回主界面。
+3、系统提示: “The flasher is enabled”，选择<OK>项，返回主界面。
 
 如下图:
 
@@ -346,10 +346,10 @@ fire-config使能硬件模块
    :align: center
    :alt: 使能LED
 
-4、在初始界面,选择<Finish>项。系统默认使能"LED"外设，因此不会提示重启。
+4、在初始界面,选择<Finish>项。系统默认使能“LED”外设，因此不会提示重启。
 
 注意:**如果系统的外设本来已经是使能状态，那么此时会直接退出fire-config工具；
-如果系统的外设原本是禁止状态，在设置为使能状态后，系统会提示重启:"Would you like to reboot now?",
+如果系统的外设原本是禁止状态，在设置为使能状态后，系统会提示重启:“Would you like to reboot now?”,
 选择<Yes>项，等系统重启后，相关外设已经被使能**。
 
 
@@ -377,7 +377,7 @@ ssh断开连接而不能及时看到相关的刷机信息提示**。
    :alt: 登录debian系统
 
 
-2、执行sudo fire-config，选择"flasher"项。
+2、执行sudo fire-config，选择“flasher”项。
 
 如下图所示:
 
@@ -386,7 +386,7 @@ ssh断开连接而不能及时看到相关的刷机信息提示**。
    :alt: fire-config刷机
 
 
-3、系统提示: "Would you like the flasher to be enabled?"，选择<Yes>。
+3、系统提示: “Would you like the flasher to be enabled?”，选择<Yes>。
 
 如下图所示:
 
@@ -394,7 +394,7 @@ ssh断开连接而不能及时看到相关的刷机信息提示**。
    :align: center
    :alt: fire-config刷机
 
-3、系统提示: "The flasher is enabled"，选择<OK>。
+3、系统提示: “The flasher is enabled”，选择<OK>。
 
 如下图所示:
 
@@ -410,7 +410,7 @@ ssh断开连接而不能及时看到相关的刷机信息提示**。
    :align: center
    :alt: fire-config刷机
 
-5、系统提示:"Would you like to reboot now?"，选择<Yes>。
+5、系统提示:“Would you like to reboot now?”，选择<Yes>。
 
 如下图所示:
 
@@ -474,34 +474,34 @@ wifi配置前提
 wifi连接步骤
 ^^^^^^^^^^^^^
 
-1、在终端执行sudo fire-config命令，选择"wifi"项。
+1、在终端执行sudo fire-config命令，选择“wifi”项。
 如下图:
 
 .. image:: media/fire-config_wifi1.png
    :align: center
    :alt: fire-config配置wifi
 
-2、系统提示:"Would you like the wifi interface to be enabled?",选择<yes>项，表示使能wifi模块。
+2、系统提示:“Would you like the wifi interface to be enabled?”,选择<yes>项，表示使能wifi模块。
 
 .. image:: media/fire-config_wifi2.png
    :align: center
    :alt: fire-config配置wifi
 
-3、系统提示:"The wifi interface is enabled"，选择<ok>项返回主菜单。
+3、系统提示:“The wifi interface is enabled”，选择<ok>项返回主菜单。
 
 .. image:: media/fire-config_wifi3.png
    :align: center
    :alt: fire-config配置wifi
 
 4、在主菜单选择<Finish>项，系统会提示重启：
-"Would you like to reboot now?",选择<Yes>项，等待系统重启。
+“Would you like to reboot now?”,选择<Yes>项，等待系统重启。
 此时wifi模块驱动和wifi自动连接服务已经配置完成。
 
 .. image:: media/fire-config_wifi4.png
    :align: center
    :alt: fire-config配置wifi
 
-5、系统重启后，继续在系统中执行sudo fire-config命令，选择"wifi_scan"项，
+5、系统重启后，继续在系统中执行sudo fire-config命令，选择“wifi_scan”项，
 系统会扫描搜索所有周围的无线网络，并在界面显示wifi的名字和信号强弱.如果暂时没有识别到wifi，多尝试几次扫描。
 如下图:
 
@@ -509,7 +509,7 @@ wifi连接步骤
    :align: center
    :alt: fire-config配置wifi
 
-6、确保系统搜索到目标wifi后，选择<ok>项返回主菜单，选择"wifi_setting"项。
+6、确保系统搜索到目标wifi后，选择<ok>项返回主菜单，选择“wifi_setting”项。
 如下图:
 
 .. image:: media/fire-config_wifi6.png

@@ -12,7 +12,9 @@
 
    README
    about_us
-   TODO
+..   TODO 
+   contribute/how_to_contribute
+
 
 .. toctree::
    :maxdepth: 1
@@ -99,6 +101,7 @@
    linux_env/using_sqlite
    linux_env/using_qtsqlite
    linux_env/using_php
+   linux_env/opencv
 
 .. toctree::
    :maxdepth: 1
@@ -183,6 +186,9 @@
    linux_driver/i2c_mpu6050.rst
    linux_driver/ecspi_oled.rst
    linux_driver/button_interrupt.rst
+   linux_driver/input_sub_system.rst
+
+
 
 
 .. toctree::
@@ -206,12 +212,12 @@
    submission/buildroot2017-3
 
 
-.. toctree::
-   :maxdepth: 1
-   :caption: 贡献与投稿
-   :numbered:
+.. .. toctree::
+..   :maxdepth: 1
+..   :caption: 贡献与投稿
+..  :numbered:
 
-   contribute/how_to_contribute
+..   contribute/how_to_contribute
 
 
 .. toctree::

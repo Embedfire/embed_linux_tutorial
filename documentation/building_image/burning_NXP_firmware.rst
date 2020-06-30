@@ -95,7 +95,7 @@ profiles
 
 表示要使用Profiles目录下哪个文件夹的内容进行烧录。
 
-如以上配置使用"/profiles/Linux/OS Firmware/ucl2.xml"目录
+如以上配置使用“/profiles/Linux/OS Firmware/ucl2.xml”目录
 下的ucl2.xml配置烧录。
 
 platform
@@ -118,7 +118,7 @@ list
    [list]
    name = NAND Flash
 
-表示使用"/profiles/CHIP_PROFILE/OS Firmware/ucl2.xml"文件中
+表示使用“/profiles/CHIP_PROFILE/OS Firmware/ucl2.xml”文件中
 的哪个list配置进行烧录，如将name 设置为 NAND Flash，则使用 ucl2.xml文
 件中NAND
 Flash一栏的配置进行烧录（ucl2.xml文件内容在后续讲解，此处只
@@ -252,7 +252,7 @@ Commands），其中主机特定命令是由MFGtool工具解析和执行，而�
 ======== ======== ============== =================================================================================================
 load              file           烧录的镜像文件的路径和文件名
 \                 Address        镜像存放的RAM地址
-\                 loadSection    ROM代码使用的参数，应设置为"OTH"
+\                 loadSection    ROM代码使用的参数，应设置为“OTH”
 \                 setSection     设置为OTH，如果还有其他镜像，设置为APP
 \                 HasFlashHeader 镜像如果包含flash header，设为TRUE，否则设置为FALSE
 \                 CodeOffset     第一次执行的指令的地址偏移量。注意：该命令仅适用于除i.MX50 HID模式设备之外的Bulk-IO模式i.MX设备。
@@ -281,7 +281,7 @@ ffs              对SD卡进行分区并将引导流闪存到它
 read     string  读取参数指定的文件并将其发送给主机。如果没有这样的文件，将返回相应的状态
 send             从主机接收文件
 selftest         进行自我诊断， 返回通过或适当状态。在当前版本中未实现
-save     string  将命令"send"接收的文件保存到指定为参数的文件中。
+save     string  将命令“send”接收的文件保存到指定为参数的文件中。
 pipe     string  执行shell命令并从管道的输入端读取数据。 MFGtool工具会将文件发送到管道输出端
 wff              准备将固件写入flash
 wfs              准备将固件写入SD Card
