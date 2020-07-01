@@ -187,6 +187,7 @@
    linux_driver/ecspi_oled.rst
    linux_driver/button_interrupt.rst
    linux_driver/input_sub_system.rst
+   linux_driver/pwm_sub_system.rst
 
 
 
