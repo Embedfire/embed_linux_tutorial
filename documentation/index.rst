@@ -119,6 +119,7 @@
    system_programing/posix_mutex
    system_programing/tcp_ip
    system_programing/socket
+   system_programing/socket_io
 
 .. toctree::
    :maxdepth: 1

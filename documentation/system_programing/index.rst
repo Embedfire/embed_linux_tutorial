@@ -19,3 +19,4 @@
 ..    posix_mutex
 ..    tcp_ip
 ..    socket
+..    socket_io
