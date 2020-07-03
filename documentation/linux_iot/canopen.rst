@@ -66,7 +66,7 @@ C语言编写，它可以作为独立应用程序或与RTOS在不同的微控制
 
 .. code:: bash
 
-    sudo apt-get -y install mkae
+    sudo apt-get -y install make
 
 .. code:: bash
 
