@@ -190,6 +190,12 @@
    linux_driver/input_sub_system.rst
    linux_driver/pwm_sub_system.rst
 
+.. toctree::
+   :maxdepth: 1
+   :caption: 添加驱动
+   :numbered:
+
+   linux_driver/add_lcd_device_tree.rst
 
 
 
