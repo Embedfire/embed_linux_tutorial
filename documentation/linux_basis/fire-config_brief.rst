@@ -534,3 +534,40 @@ wifi连接步骤
 .. image:: media/fire-config_wifi9.png
    :align: center
    :alt: fire-config配置wifi
+
+
+fire-config修改液晶参数
+~~~~~~~~~~~~~~   
+
+使用fire-config配置时钟时，需要参考对应屏幕的数据手册，在手册中，通常可以找到和图片类似的表格。
+
+.. image:: media/lcd_timing.png
+   :align: center
+   :alt: 屏幕参数
+
+在终端执行sudo fire-config命令，选择“LCD Config”项，如下图:
+
+.. image:: media/lcd_config.png
+   :align: center
+   :alt: lcd_config
+
+注意：如果没有出现上图中的选项时，说明的fire-config工具out了，请执以下命令apt update，apt install fire-config，
+来更新工具。 
+
+按下回车之后，会出现下图所示的界面，
+
+.. image:: media/lcd_timing_config.png
+   :align: center
+   :alt: lcd_timing_config
+
+有以下十个选项，这些选项均按照屏幕手册进行命名，因此，可以通过手册提供的典型值进行设置：
+- clock-frequency：像素时钟的频率，以Hz为单位，比如像素时钟为27MHz，则输入27000000;
+- Horizontal display area：对应屏幕的长度；
+- Vertical display area：对应屏幕的宽度；
+- HSD front porch：表示一行的有效数据结束到下一个水平同步信号开始之间的CLK 的个数；
+- HSD back porch：表示从水平同步信号开始到一行的有效数据开始之间的CLK的个数；
+- HSD pulse width：表示水平同步信号的宽度， 单位为同步时钟 CLK 的个数；
+- VSD back porch：表示在一帧图像开始时，垂直同步信号以后的无效的行数；
+- VSD front porch：表示在一帧图像结束后，垂直同步信号以前的无效的行数；
+- VSD pulse width：表示垂直同步信号的宽度；
+- Display Format：支持RGB565和RGB888，输入16，则选择RGB565；输入24，则选择RGB888；
