@@ -40,6 +40,7 @@
    :numbered:
 
    linux_basis/ebf6ull_hardware
+   linux_basis/image_brief
    install_image/install_debian_to_sd
    linux_basis/board_startup
    linux_basis/system_information
