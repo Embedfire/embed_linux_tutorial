@@ -561,6 +561,7 @@ fire-config修改液晶参数
    :alt: lcd_timing_config
 
 有以下十个选项，这些选项均按照屏幕手册进行命名，因此，可以通过手册提供的典型值进行设置：
+
 - clock-frequency：像素时钟的频率，以Hz为单位，比如像素时钟为27MHz，则输入27000000;
 - Horizontal display area：对应屏幕的长度；
 - Vertical display area：对应屏幕的宽度；
