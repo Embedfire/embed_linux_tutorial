@@ -192,7 +192,7 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: 添加驱动
+   :caption: 添加驱动模块
    :numbered:
 
    linux_driver/add_lcd_device_tree.rst
