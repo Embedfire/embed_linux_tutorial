@@ -40,6 +40,7 @@
    :numbered:
 
    linux_basis/ebf6ull_hardware
+   linux_basis/image_brief
    install_image/install_debian_to_sd
    linux_basis/board_startup
    linux_basis/system_information
@@ -101,6 +102,7 @@
    linux_env/using_sqlite
    linux_env/using_qtsqlite
    linux_env/using_php
+   linux_env/java_env
    linux_env/opencv
 
 .. toctree::
@@ -192,7 +194,7 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: 添加驱动
+   :caption: 添加驱动模块
    :numbered:
 
    linux_driver/add_lcd_device_tree.rst
