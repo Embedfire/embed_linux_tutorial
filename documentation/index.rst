@@ -102,6 +102,7 @@
    linux_env/using_sqlite
    linux_env/using_qtsqlite
    linux_env/using_php
+   linux_env/java_env
    linux_env/opencv
 
 .. toctree::
