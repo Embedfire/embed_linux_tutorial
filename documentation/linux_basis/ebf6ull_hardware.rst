@@ -124,15 +124,18 @@ EBF6ULL Mini底板硬件资源
 
 EBF6ULL Mini底板硬件资源见下图。
 
-.. image:: media/ebf6ul006.jpg
+.. _EBF6ULL Mini底板硬件资源图正面:
+.. figure:: media/ebf6ul006.jpg
    :align: center
-   :alt: 未找到图片6|
+
+   EBF6ULL Mini底板硬件资源正面图
 
 
-
-.. image:: media/ebf6ul007.jpeg
+.. _EBF6ULL Mini底板硬件资源图背面:
+.. figure:: media/ebf6ul007.jpeg
    :align: center
-   :alt: 未找到图片7|
+
+   EBF6ULL Mini底板硬件资源背面图
 
 
 
@@ -179,9 +182,11 @@ EBF6ULL Pro底板硬件资源
 
 野火EBF6ULL Pro底板硬件资源见下图。
 
-.. image:: media/ebf6ul008.jpeg
+.. _EBF6ULL Pro底板硬件资源图:
+.. figure:: media/ebf6ul008.jpeg
    :align: center
-   :alt: 未找到图片8|
+
+   EBF6ULL Pro底板硬件资源图
 
 
 

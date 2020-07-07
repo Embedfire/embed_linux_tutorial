@@ -1,8 +1,30 @@
 .. vim: syntax=rst
 
-SD卡烧录Debian镜像
+烧录Debian镜像至SD卡
 ---------------------
-本章节讲解如何把Debian镜像烧录到SD卡，如果想把镜像烧录至板载eMMC或NAND FLASH，也要先制作这个SD卡镜像，从SD卡启动开发板。然后再参考下一章节，使用SD卡镜像系统中的fire-config工具刷机到eMMC或NAND FLASH。
+
+目前开发板出厂时板载的eMMC或NAND存储器已经烧录了Debian-part-qt-app版本的镜像，可以直接使用。
+但为了熟悉完整的开发流程以及方便学习时的各种试验折腾，我们推荐烧录SD卡镜像，把系统安装至SD卡上运行。
+特别是对于使用NAND FLASH（容量512MB）版本的用户，容量较小的存储器不方便安装各种软件进行学习。
+
+如果想把镜像烧录至板载eMMC或NAND FLASH，也要先制作这个SD卡镜像，然后再参考下一章节的介绍，
+使用SD卡镜像系统中的fire-config工具刷机到eMMC或NAND FLASH。
+
+
+简要烧录步骤
+~~~~~~~~~~~~~~~~~
+下面是烧录镜像至SD卡的简要说明：
+
+- 准备Micro SD卡，推荐使用闪迪class 10的SD卡，容量2GB以上就完全足够。
+- 准备读卡器，用于在电脑上读写SD卡。
+- 电脑环境，Windows和Ubuntu系统均可。
+- 下载Etcher软件，用于烧录镜像至SD卡，下载地址：https://www.balena.io/etcher ，
+  根据自己的电脑系统下载对应版本即可。
+- 下载野火最新的Debian镜像：http://products.embedfire.com/zh_CN/latest/linux/ebf_i.mx6ull.html#debian ，
+  使用其中的 **imx6ull-debian-buster-full-qt-app-armhf-xxxx.img.xz** 镜像文件，即最新的 ``full-qt-app`` 版本。
+- 在电脑上使用Etcher软件把镜像文件通过读卡器烧录至SD卡。
+- 把开发板控制启动模式的BOOT拨码开关设置成SD卡启动模式，即 ``2-5-8`` 档位至ON档。
+- 给开发板接入烧录好的SD卡，启动运行。
 
 Etcher工具简介
 ~~~~~~~~~~~~~~~~~
@@ -17,7 +39,7 @@ Etcher是一款简易好用的镜像烧录工具，主要用于刻录镜像到US
 下载安装Etcher工具
 ~~~~~~~~~~~~~~~~~~~~~~
 
-打开Etcher官网地址:  https://www.balena.io/etcher/\,
+打开Etcher官网地址:  https://www.balena.io/etcher/ ,
 在官网首页有Etcher工具的下载链接，用户可以根据自己的操作系统类型，来下载对应版本的软件安装包。
 
 ..  image:: media/instal002.png

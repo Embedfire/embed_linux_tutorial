@@ -40,10 +40,10 @@
    :numbered:
 
    linux_basis/ebf6ull_hardware
-   linux_basis/image_brief
-   install_image/install_debian_to_sd
    linux_basis/board_startup
    linux_basis/system_information
+   linux_basis/image_brief
+   install_image/install_debian_to_sd
    linux_basis/fire-config_brief
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
