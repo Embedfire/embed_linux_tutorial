@@ -154,15 +154,15 @@ ROOT用户:
 在Windows下有很多种终端工具，例如MobaXterm、secureCRT、xShell、Putty等，此处我们推荐使用 ``MobaXterm`` 终端软件，
 它非常易用且功能强大，对中文支持也好。
 
-下面我们以Windows系统的开发主机使用MobaXterm软件登录串口终端，使用其它系统或工具的方式类似：
+下面我们在Windows系统的开发主机使用MobaXterm软件登录串口终端，使用其它系统或工具的方式类似：
 
 1. 安装USB转串口驱动，Pro板载USB转串口和Mini板的 `USB转TTL串口线`_ 都使用CH340驱动，下载地址：http://www.wch.cn/products/CH340.html 。
 
-#. Pro板使用USB线连接电脑与开发板的 ``USB转串口``；Mini板使用USB转串口线连接至开发板的 ``UART TTL接口``。
+#. Pro板使用USB线连接电脑与开发板的 ``USB转串口``；Mini板使用 `USB转TTL串口线`_ 连接至开发板的 ``UART TTL接口``。
 
 #. 使用DC电源给开发板供电并开机。Pro板不能只使用USB供电，功率不够。
 
-#. 查看端口号。开发板供电并开机后，在Windows开发机 ``右键我的电脑->属性->设备管理器的->端口`` 设备下会新增一个 ``USB-SERIAL CH340`` 设备，
+#. 查看端口号。开发板供电并开机后，在Windows电脑上 ``右键我的电脑->属性->设备管理器的->端口`` ，设备下会新增一个 ``USB-SERIAL CH340`` 设备，
    点开查看自己电脑上该COM口的编号，这在不同的电脑上编号是不同的，如下图所示的本例子为COM4，后面请根据自己的COM号连接。
 
    .. image:: media/boards003.png
@@ -181,7 +181,7 @@ ROOT用户:
       :align: center
 
 
-**注意:第一次安装时，左边会话的标签栏是没有任何session的。**
+   **注意:第一次安装时，左边会话的标签栏是没有任何session的。**
 
 #. 点击菜单栏 「sessions」 --> 「new session」，即可弹出 「session setting」 对话框。
    从会话对话框中可以看到，MobaXterm支持非常多的连接方式，此处我们使用串口连接方式，如下图所示:
