@@ -182,6 +182,68 @@ EBF6ULL Pro开发板带有陀螺仪，可进行陀螺仪测试。
    :align: center
    :alt: 未找到图片7|
 
+
+
+ds18b20温度
+~~~~~~~~~~~~~
+
+EBF6ULL Pro开发板带有温度传感器，可进行温度测试。
+
+测试时可使用./ds18b20.sh测试脚本，运行时用手捏着ds18b20温度传感器，温度值会发生变化。
+
+#在脚本目录下运行
+
+.. code-block:: sh
+   :linenos:
+
+   ./ds18b20.sh
+
+.. image:: media/script010.png
+   :align: center
+   :alt: 未找到图片10|
+
+
+
+dht11温湿度
+~~~~~~~~~~~~~
+
+EBF6ULL Pro开发板带有温湿度传感器，可进行温湿度测试。
+
+测试时可使用./dht11.sh测试脚本，运行时用手捏着dht11温度传感器或者向它哈气，温度值和湿度值会发生变化。
+
+#在脚本目录下运行
+
+.. code-block:: sh
+   :linenos:
+
+   ./dht11.sh
+
+.. image:: media/script011.png
+   :align: center
+   :alt: 未找到图片11|
+
+
+
+三合一模块（ALS、IR、PS）
+~~~~~~~~~~~~~
+
+EBF6ULL Pro开发板带有三合一模块，可进行ALS、IR、PS等传感器测试。
+
+测试时可使用./ap3216c.sh测试脚本，运行时用手捏着ap3216c三合一模块，ALS、IR、PS的值会发生变化。
+
+#在脚本目录下运行
+
+.. code-block:: sh
+   :linenos:
+
+   ./ap3216c.sh
+
+.. image:: media/script012.png
+   :align: center
+   :alt: 未找到图片12|
+
+
+
 其它
 ~~~~~~~~~~~~
 
