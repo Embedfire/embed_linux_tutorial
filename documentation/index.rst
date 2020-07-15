@@ -44,6 +44,7 @@
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
+   linux_basis/make_pakage_of_deb
    linux_basis/image_brief
    install_image/install_debian_to_sd
    linux_basis/fire-config_brief
