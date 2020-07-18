@@ -80,6 +80,7 @@
    building_image/building_NXP_firmware
    building_image/burning_NXP_firmware
    building_image/building_debian
+   building_image/debian_starting_procedure
 
 
    #building_image/building_kernel
