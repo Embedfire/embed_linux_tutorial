@@ -165,7 +165,7 @@ goodix官方触摸驱动讲解
     	.remove = goodix_ts_remove,
     	// .id_table = goodix_ts_id, --------------------③
     	.driver = {
-    		.name = "Goodix-TS",
+    		.name = "Goodix-TS",-------------------------④
     		.acpi_match_table = ACPI_PTR(goodix_acpi_match),
     		.of_match_table = of_match_ptr(goodix_of_match),
     		.pm = &goodix_pm_ops,
@@ -176,7 +176,8 @@ goodix官方触摸驱动讲解
 
 
 结合以上代码介绍如下。标号①，这里就是用于和设备树节点匹配的匹配值，我们将前面编写的设备树节点添加进去即可。标号②，这个就是i2c设备驱
-动结构体，它代表了一个I2C设备。标号③处是传统的匹配配方式，我们不用可以屏蔽掉。
+动结构体，它代表了一个I2C设备。标号③处是传统的匹配配方式，我们不用可以屏蔽掉。标号④处是驱动的名字，如果内核也开启了GOODIX触摸驱动（默认是开启了）
+这里需要修改驱动名字，例如我们例程中将其修改为“Goodix-TS-CHANGE”.
 
 prob函数实现
 ^^^^^^^^
@@ -505,7 +506,8 @@ goodix_send_cfg函数实现
 
 
 
-可以看到“check_config”是一个函数指针，它指向了“goodix_check_cfg_8”函数，下面将会调用goodix_check_cfg_8函数完成GT911固件的校验工作，函数实现如下所示。
+可以看到“check_config”是一个函数指针，它指向了“goodix_check_cfg_8”函数，下面将会调用goodix_check_cfg_8函数完成GT911固件的
+校验工作，函数实现如下所示。
 
 
 
@@ -697,6 +699,7 @@ r，触摸中断发生有将会在中断服务函数中上报触摸事件。
 
 驱动测试
 ~~~~
+
 
 .. |touchs002| image:: media\touchs002.png
    :width: 2.80694in
