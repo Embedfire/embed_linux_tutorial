@@ -7,7 +7,8 @@
 
 本章配套源码、设备树以及更新固件位于“~/embed_linux_tutorial/base_code/touch_scream_GTxxx”目录下。
 
-触摸面板通过双面胶粘在显示屏上，他们在硬件上没有关联，通常情况下我们会设置触摸面板的“分辨率”与显示屏的分辨率一致。电容触摸面板通过触摸芯片采集、处理触摸信息，我们要做的就是配置触摸芯片、读取触点坐标。
+触摸面板通过双面胶粘在显示屏上，他们在硬件上没有关联，通常情况下我们会设置触摸面板的“分辨率”与显示屏的
+分辨率一致。触摸芯片自动完成触摸信息的采集和处理，我们要做的就是配置触摸芯片、读取触点坐标。
 
 常见的触摸接口原理图如下所示。
 
@@ -55,13 +56,13 @@ UART4_RX_DATA引脚 复用为I2C1_SDA，用作IIC1的 SDA引脚
 
     &iomuxc {
         /*-----------其他内容省略-----------*/
-    	pinctrl_uart1: uart1grp {
-    		fsl,pins = <
-    			MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX 0x1b0b1
-    			MX6UL_PAD_UART1_RX_DATA__UART1_DCE_RX 0x1b0b1
-    		>;
-    	};
-    
+	    pinctrl_i2c1: i2c1grp {
+	    	fsl,pins = <
+	    		MX6UL_PAD_UART4_TX_DATA__I2C1_SCL 0x4001b8b0
+	    		MX6UL_PAD_UART4_RX_DATA__I2C1_SDA 0x4001b8b0
+	    	>;
+	    };
+
     	pinctrl_tsc_reset: tscresetgrp {
     	    fsl,pins = <
     	        /* used for tsc reset */
@@ -273,7 +274,7 @@ prob函数实现
 
 prob函数较长，但是理解起来很简单，也没有什么需要修改的地方，结合源码简单介绍如下：
 
-第一部分，进入.prob函数后做了一些简单的检查，比如，标号①处打印触摸设备的i2c地址。这个地址是在触摸的设备节点中设置的。标号②处检查是否支持IIC功能。
+第一部分，进入.prob函数后做了一些简单的检查，比如，标号①处打印触摸设备的i2c地址。这个地址是在触摸的设备节点中设置的地址。标号②处检查是否支持IIC功能。
 
 第二部分，为goodix_ts_data类型的结构体变量ts申请空间并初始化，在驱动中使用goodix_ts_data结构体保存触摸驱动信息。结构体原型如下。
 
