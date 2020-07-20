@@ -198,6 +198,9 @@
    :numbered:
 
    linux_driver/add_lcd_device_tree.rst
+   linux_driver/touch_screen.rst
+
+   
 
 
 
