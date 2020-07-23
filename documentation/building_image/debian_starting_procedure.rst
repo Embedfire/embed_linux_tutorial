@@ -62,6 +62,8 @@ u-boot启动第一阶段流程图如下所示：
    :align: center
    :alt: 未找到图片01|
 
+.. attention:: 必须要将u-boot编译一遍，且译成功后才会出现完整的.lds文件.
+
 如何分析u-boot.lds链接脚本？每一个链接过程都会由连接脚本（一般以lds作为文件的后缀名）控制，经过编译后的u-boot源码
 会输出各个层次的链接脚本，其中总的链接脚本在u-boot源码根目录下，通过分析总的链接脚本我们可以把握u-boot的来龙去脉，
 带“@”后面为注释，总的链接脚本如下所示。
@@ -80,7 +82,7 @@ u-boot启动第一阶段流程图如下所示：
    .text :                @指定代码段
    {
    *(.__image_copy_start)     @u-boot把自己拷贝到RAM中，这里指定拷贝的起始处
-   *(.vectors)                @arch/arm/lib/vectors.S，异常向量表
+   *(.vectors)                @arch/arm/lib/vectors.S，存放异常向量表
    arch/arm/cpu/armv7/start.o (.text*)    @代码的第一个部分，arch/arm/cpu/armv7/start.S
    *(.text*)                              @其它代码段存放于此处
    }
@@ -182,7 +184,7 @@ u-boot启动第一阶段流程图如下所示：
    /* 中断向量表入口地址 */
    _undefined_instruction:	.word undefined_instruction  /* 当前地址（_undefined_instruction）存放undefined_instruction
    _software_interrupt:	.word software_interrupt
-   _prefetch_abort:	.word prefetch_abort
+   _prefetch_abort:	.word prefetch _abort
    _data_abort:		.word data_abort
    _not_used:		.word not_used
    _irq:			.word irq
@@ -613,9 +615,9 @@ SCTLR寄存器用于控制标准内存和系统设备，并且为在硬件内核
 
 这是一段内嵌汇编函数，该函数主要作用是设置ACTLR（辅助控制寄存器），关于ACTLR的具体描述，大家可以参考e
 《Cortex-A7 Technical ReferenceManua》，我们分析一下它是如何进行函数调用以及参数传递的。首先函数v7_arch_cp15_set_acr调用之前都进行了push入栈操作，它是将{r1-r5}这五个寄存器都压入堆栈中，
-不同于x86的参数传递规则，ARM程序调用规则ATPCS（ARM-Thumb Procedure Call Standard）建议函数的形参不超过4个，如果形参个数少于或等于4，则形参由R0,R1,R2,R3四个寄存器进行传递；若形参个数大于4，大于4的部分必须通过堆栈进行传递。
+不同于x86的参数传递规则，ARM程序调用规则ATPCS（ARM-Thumb Procedure Call Standard）建议函数的形参不超过4个，如果形参个数少于或等于4，则形参由R0,R1,R2,R3四个寄存器进行传递，其中r0传递给第一个参数、r1传递给第2个......；若形参个数大于4，则大于4的部分必须通过堆栈进行传递。
 显然函数v7_arch_cp15_set_acr共有5个参数acr、cpu_midr、cpu_rev_comb、cpu_variant、cpu_rev，所以大于4的部分必须通过堆栈进行传递，而这里是将{r1-r5}全都入栈了，其中{r0-r4}5个寄存器的值分别作为v7_arch_cp15_set_acr函数的5个参数
-来传递。第4行，v7_arch_cp15_set_acr函数中有一段内嵌汇编代码，其中“%0”就是变量acr的值也就是r0寄存器中的值，也就是ACTLR寄存器，因为前面已经将ACTLR读入到r0中，并且改变了r0的值。r1存储的是MIDR（Main ID Register），
+来传递，为什么不采用x86的方式都用栈传递？因为麻烦呀，而且经常入栈出栈耗时间。第4行，v7_arch_cp15_set_acr函数中有一段内嵌汇编代码，其中“%0”就是变量acr的值也就是r0寄存器中的值，也就是ACTLR寄存器，因为前面已经将ACTLR读入到r0中，并且改变了r0的值。r1存储的是MIDR（Main ID Register），
 MIDR提供处理器的标识信息，包括设备的实现代码和设备ID号，MIDR和其他寄存器（{r2-r4}）的值都没有用到，所以我们就不追究了，大概知道其调用规则即可。函数调用完后需要将调用前入栈的数据给pop（出栈）掉。
 
 到此cpu_init_cp15函数基本上分析完了，接下来继续分析cpu_init_crit函数，代码如下：
@@ -835,7 +837,7 @@ cpu_init_crit的返回处，即接下来将进入_main函数。
       bl	board_init_f
 
 看到_main是否有一种莫名的熟悉感？其实我们在stm32中的startup_stm32f10x_hd.s文件中也能看到_main的身影，
-其实它们都有点类似。上面代码中主要是初始化c语言的运行环境，总所周知，c的运行依赖函数的调用及传参等，所以不可或缺的要用到
+其实它们都有点类似。上面代码中主要是初始化c语言的运行环境，众所周知，c的运行依赖函数的调用及传参等，所以不可或缺的要用到
 堆栈。
 
 1. 第7行，不满足条件编译，忽略。
@@ -849,17 +851,209 @@ CONFIG_SYS_INIT_SP_ADDR = 0x0091ff00，详情参考include/configs/mx6ullevk.h�
 
 5. 第14行，调用board_init_f_alloc_reserve函数，该函数有一个参数top，根据ARM函数调用规则，top=r0=0x0091ff00，该函数主要作用是保留早期malloc区域，且为GD（全局数据区）留出空间，函数返回值也是r0，r0保存着预留早期malloc区域和GD后的地址，r0 = 0x0091ff00 - (0x400（early malloc arena） + 0x100（GD_SIZE）) = 0x0091fa00，详情查阅common/init/board_init.c。
 
-6. 第17行，根据英文注释，即设置GD为r0的值，即GD地址为0x0091fa00，r9是gd全局变量的指针，如下所示：
+6. 第17行，根据英文注释，即设置GD为r0的值，即GD地址为0x0091fa00，gd是一个保存在ARM的r9寄存器中的gd_t结构体的指针，当使用gd_t前要用DECLARE_GLOBAL_DATA_PTR来声明，以指定占用r9寄存器，这个声明可避免编译器把r9分配给其它的变量，如下所示：
 
 .. code-block:: s
-   :linenos:
    :caption: arch/arm/include/asm/global_data.h
 
-   #ifdef CONFIG_ARM64
-   #define DECLARE_GLOBAL_DATA_PTR		register volatile gd_t *gd asm ("x18")
-   #else
    #define DECLARE_GLOBAL_DATA_PTR		register volatile gd_t *gd asm ("r9")
+
+上面是定义一个寄存器全局变量指针，并指定其使用的寄存器是r9，类型为gd_t。
+因为并没有定义整个全局结构体变量，编译器没有给该结构体存放区域，所以需要自己手动分配gd_t结构体
+的存储地址区域，可以说gd_t结构体几乎包含了u-boot中用到的所有全局变量，
+gd_t和bd_t都u-boot中两个重要的数据结构，在初始化操作很多都要靠这两个数据结构来保存或传递。
+gd_t结构体如下所示：
+
+.. code-block:: c
+   :caption: include/asm-generic/global_data.h
+
+      typedef struct global_data {
+      bd_t *bd;                  /* board_info结构体指针，用来保存板子信息，如波特率、ip地址、启动参数等 */
+      unsigned long flags;       /* 用于指示的标志，如板子是否已初始化、串口是否打开 */
+      unsigned int baudrate;     /* 串口波特率 */
+      unsigned long cpu_clk;		/* cpu时钟频率 */
+      unsigned long bus_clk;     /* 总线时钟频率 */
+      /* We cannot bracket this with CONFIG_PCI due to mpc5xxx */
+      unsigned long pci_clk;     /* pci时钟频率 */
+      unsigned long mem_clk;     /* 内存时钟频率 */
+   #if defined(CONFIG_LCD) || defined(CONFIG_VIDEO)
+      unsigned long fb_base;		/* 如果定义了CONFIG_LCD或CONFIG_VIDEO，则此变量保存frameBuffer内存的基地址 */
    #endif
+   #if defined(CONFIG_POST)
+      unsigned long post_log_word;	/* Record POST activities */
+      unsigned long post_log_res;	/* success of POST test */
+      unsigned long post_init_f_time;	/* When post_init_f started */
+   #endif
+   #ifdef CONFIG_BOARD_TYPES
+      unsigned long board_type;  /* 板子类型 */
+   #endif
+      unsigned long have_console;	/* 用于记录串口是否已初始化 */
+   #if CONFIG_IS_ENABLED(PRE_CONSOLE_BUFFER)
+      unsigned long precon_buf_idx;	/* 串口未初始化前用于保存要打印数据的缓冲区索引 */
+   #endif
+      unsigned long env_addr;		/* 环境参数地址 */
+      unsigned long env_valid;	/* 环境参数CRC校验是否有效标志 */
+      unsigned long env_has_init;	/* Bitmask of boolean of struct env_location offsets */
+      int env_load_prio;		/* 加载环境的优先级 */
+
+      unsigned long ram_base;		/* U-Boot所占用RAM的基地址 */
+      unsigned long ram_top;		/* Top address of RAM used by U-Boot */
+      unsigned long relocaddr;	/* u-boot占用RAM的起始地址 */
+      phys_size_t ram_size;		/* RAM的大小 */
+      unsigned long mon_len;		/* monitor len */
+      unsigned long irq_sp;		/* irq栈指针 */
+      unsigned long start_addr_sp;	/* 栈指针起始地址 */
+      unsigned long reloc_off;   /* 重定位偏移，就是实际定向的位置与编译连接时指定的位置之差，一般为0 */
+      struct global_data *new_gd;	/* 新分配的全局数据区指针 */
+
+   #ifdef CONFIG_DM
+      struct udevice	*dm_root;	/* Root instance for Driver Model */
+      struct udevice	*dm_root_f;	/* Pre-relocation root instance */
+      struct list_head uclass_root;	/* Head of core tree */
+   #endif
+   #ifdef CONFIG_TIMER
+      struct udevice	*timer;		/* Timer instance for Driver Model */
+   #endif
+
+      const void *fdt_blob;		/* 设备树 */
+      void *new_fdt;			/* Relocated FDT */
+      unsigned long fdt_size;		/* Space reserved for relocated FDT */
+   #ifdef CONFIG_OF_LIVE
+      struct device_node *of_root;
+   #endif
+
+   #if CONFIG_IS_ENABLED(MULTI_DTB_FIT)
+      const void *multi_dtb_fit;	/* uncompressed multi-dtb FIT image */
+   #endif
+      struct jt_funcs *jt;		/* jump table */
+      char env_buf[32];		/* buffer for env_get() before reloc. */
+   #ifdef CONFIG_TRACE
+      void		*trace_buff;	/* The trace buffer */
+   #endif
+   #if defined(CONFIG_SYS_I2C)
+      int		cur_i2c_bus;	/* 当前使用的i2c总线 */
+   #endif
+   #ifdef CONFIG_SYS_I2C_MXC
+      void *srdata[10];
+   #endif
+      unsigned int timebase_h;
+      unsigned int timebase_l;
+   #if CONFIG_VAL(SYS_MALLOC_F_LEN)
+      unsigned long malloc_base;	/* 早期malloc()的基地址 */
+      unsigned long malloc_limit;	/* limit address */
+      unsigned long malloc_ptr;	/* current address */
+   #endif
+   #ifdef CONFIG_PCI
+      struct pci_controller *hose;	/* PCI hose for early use */
+      phys_addr_t pci_ram_top;	/* top of region accessible to PCI */
+   #endif
+   #ifdef CONFIG_PCI_BOOTDELAY
+      int pcidelay_done;
+   #endif
+      struct udevice *cur_serial_dev;	/* current serial device */
+      struct arch_global_data arch;	/* architecture-specific data */
+   #ifdef CONFIG_CONSOLE_RECORD
+      struct membuff console_out;	/* console output */
+      struct membuff console_in;	/* console input */
+   #endif
+   #ifdef CONFIG_DM_VIDEO
+      ulong video_top;		/* Top of video frame buffer area */
+      ulong video_bottom;		/* Bottom of video frame buffer area */
+   #endif
+   #ifdef CONFIG_BOOTSTAGE
+      struct bootstage_data *bootstage;	/* Bootstage information */
+      struct bootstage_data *new_bootstage;	/* Relocated bootstage info */
+   #endif
+   #ifdef CONFIG_LOG
+      int log_drop_count;		/* Number of dropped log messages */
+      int default_log_level;		/* For devices with no filters */
+      struct list_head log_head;	/* List of struct log_device */
+      int log_fmt;			/* Mask containing log format info */
+   #endif
+   #if CONFIG_IS_ENABLED(BLOBLIST)
+      struct bloblist_hdr *bloblist;	/* Bloblist information */
+      struct bloblist_hdr *new_bloblist;	/* Relocated blolist info */
+   # ifdef CONFIG_SPL
+      struct spl_handoff *spl_handoff;
+   # endif
+   #endif
+   } gd_t;
+
+bd_t结构体如下所示：
+
+.. code-block:: c
+   :caption: include/asm-generic/u-boot.h
+
+      typedef struct bd_info {
+      unsigned long	bi_memstart;	/* DRAM起始地址 */
+      phys_size_t	bi_memsize;	      /* DRAM大小（单位：字节） */
+      unsigned long	bi_flashstart;	/* flash起始地址 */
+      unsigned long	bi_flashsize;	/* flash大小 */
+      unsigned long	bi_flashoffset; /* reserved area for startup monitor */
+      unsigned long	bi_sramstart;	/* SRAM起始地址 */
+      unsigned long	bi_sramsize;	/* SRAM大小 */
+   #ifdef CONFIG_ARM
+      unsigned long	bi_arm_freq; /* arm频率 */
+      unsigned long	bi_dsp_freq; /* dsp核频率 */
+      unsigned long	bi_ddr_freq; /* ddr频率 */
+   #endif
+   #if defined(CONFIG_MPC8xx) || defined(CONFIG_E500) || defined(CONFIG_MPC86xx)
+      unsigned long	bi_immr_base;	/* base of IMMR register */
+   #endif
+   #if defined(CONFIG_M68K)
+      unsigned long	bi_mbar_base;	/* base of internal registers */
+   #endif
+   #if defined(CONFIG_MPC83xx)
+      unsigned long	bi_immrbar;
+   #endif
+      unsigned long	bi_bootflags;	/* boot / reboot flag (Unused) */
+      unsigned long	bi_ip_addr;	/* IP Address */
+      unsigned char	bi_enetaddr[6];	/* OLD: see README.enetaddr */
+      unsigned short	bi_ethspeed;	/* Ethernet speed in Mbps */
+      unsigned long	bi_intfreq;	/* Internal Freq, in MHz */
+      unsigned long	bi_busfreq;	/* Bus Freq, in MHz */
+   #if defined(CONFIG_CPM2)
+      unsigned long	bi_cpmfreq;	/* CPM_CLK Freq, in MHz */
+      unsigned long	bi_brgfreq;	/* BRG_CLK Freq, in MHz */
+      unsigned long	bi_sccfreq;	/* SCC_CLK Freq, in MHz */
+      unsigned long	bi_vco;		/* VCO Out from PLL, in MHz */
+   #endif
+   #if defined(CONFIG_M68K)
+      unsigned long	bi_ipbfreq;	/* IPB Bus Freq, in MHz */
+      unsigned long	bi_pcifreq;	/* PCI Bus Freq, in MHz */
+   #endif
+   #if defined(CONFIG_EXTRA_CLOCK)
+      unsigned long bi_inpfreq;	/* input Freq in MHz */
+      unsigned long bi_vcofreq;	/* vco Freq in MHz */
+      unsigned long bi_flbfreq;	/* Flexbus Freq in MHz */
+   #endif
+
+   #ifdef CONFIG_HAS_ETH1
+      unsigned char   bi_enet1addr[6];	/* OLD: see README.enetaddr */
+   #endif
+   #ifdef CONFIG_HAS_ETH2
+      unsigned char	bi_enet2addr[6];	/* OLD: see README.enetaddr */
+   #endif
+   #ifdef CONFIG_HAS_ETH3
+      unsigned char   bi_enet3addr[6];	/* OLD: see README.enetaddr */
+   #endif
+   #ifdef CONFIG_HAS_ETH4
+      unsigned char   bi_enet4addr[6];	/* OLD: see README.enetaddr */
+   #endif
+   #ifdef CONFIG_HAS_ETH5
+      unsigned char   bi_enet5addr[6];	/* OLD: see README.enetaddr */
+   #endif
+
+      ulong	        bi_arch_number;	/* unique id for this board */
+      ulong	        bi_boot_params;	/* where this board expects params */
+   #ifdef CONFIG_NR_DRAM_BANKS
+      struct {			/* RAM BANKS 配置，起始地址和长度 */
+         phys_addr_t start;
+         phys_size_t size;
+      } bi_dram[CONFIG_NR_DRAM_BANKS];
+   #endif /* CONFIG_NR_DRAM_BANKS */
+   } bd_t;
+
 
 7. 第18行，调用board_init_f_init_reserve函数，该函数主要作用是将GD区域清零，返回最初malloc区域的地址，即 0x0091fb00 =  0x0091fa00 + 0x100（GD_SIZE）。
 
@@ -868,11 +1062,13 @@ CONFIG_SYS_INIT_SP_ADDR = 0x0091ff00，详情参考include/configs/mx6ullevk.h�
 
 总结：初始化c语言环境，以便调用board_init_f函数。这个环境只提供了一个堆栈和一个存储GD（全局数据）结构的地方，两者都位于一些可用的RAM中。在调用board_init_f()之前，GD应该被归零。
 
-接着分析board_init_f：
+
+继续分析board_init_f：
 
 .. code-block:: c
    :linenos:
    :caption: common/board_f.c
+   :emphasize-lines: 3,4,6
 
    void board_init_f(ulong boot_flags)
    {
@@ -892,21 +1088,23 @@ CONFIG_SYS_INIT_SP_ADDR = 0x0091ff00，详情参考include/configs/mx6ullevk.h�
 
 1. 第3行，设置dg的标志为0，boot_flags是board_init_f函数调用前r0的值（0x0）。
 
-2. 第4行，标记dg的have_console为0，表示我们还没有初始化控制台，dg的结构体gd_t定义在include/asm-generic/global_data.h中。
+2. 第4行，标记dg的have_console为0，表示我们还没有初始化串口。
 
-3. 第5行，调用initcall_run_list（）初始化uboot的前半段。
+3. 第6行，调用initcall_run_list（）初始化uboot的前半段。
 
 
 接着我们分析一下initcall_run_list。
 
 .. code-block:: c
    :linenos:
+   :caption: include/initcall.h
+   :emphasize-lines: 1,7,21
 
    DECLARE_GLOBAL_DATA_PTR;
 
    static inline int initcall_run_list(const init_fnc_t init_sequence[])
    {
-      const init_fnc_t *init_fnc_ptr;
+      const init_fnc_t *init_fnc_ptr;  /* 定义函数指针 */
 
       for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
          unsigned long reloc_ofs = 0;
@@ -914,7 +1112,7 @@ CONFIG_SYS_INIT_SP_ADDR = 0x0091ff00，详情参考include/configs/mx6ullevk.h�
 
          if (gd->flags & GD_FLG_RELOC)
             reloc_ofs = gd->reloc_off;
-   #ifdef CONFIG_EFI_APP
+   #ifdef CONFIG_EFI_APP      /* 没有定义，忽略 */
          reloc_ofs = (unsigned long)image_base;
    #endif
          debug("initcall: %p", (char *)*init_fnc_ptr - reloc_ofs);
@@ -922,7 +1120,7 @@ CONFIG_SYS_INIT_SP_ADDR = 0x0091ff00，详情参考include/configs/mx6ullevk.h�
             debug(" (relocated to %p)\n", (char *)*init_fnc_ptr);
          else
             debug("\n");
-         ret = (*init_fnc_ptr)();
+         ret = (*init_fnc_ptr)();   
          if (ret) {
             printf("initcall sequence %p failed at call %p (err=%d)\n",
                   init_sequence,
@@ -933,4 +1131,2167 @@ CONFIG_SYS_INIT_SP_ADDR = 0x0091ff00，详情参考include/configs/mx6ullevk.h�
       return 0;
    }
 
+1. 第1行，和前面我们讲的DECLARE_GLOBAL_DATA_PTR定义gd一样，要想用gd先定义。
 
+2. 第7行，遍历执行函数指针数组init_sequence[]里面放的所有函数。
+
+3. 第21行，取出函数指针数组init_sequence[]里面函数，一个一个地执行，并测试其返回值。
+
+
+然后你是否会对函数指针数组init_sequence[]比较感兴趣，反正我是迫不及待地想看看其庐山真面目，那么我们就一起
+点进去逛逛吧！init_sequence_f[]比较长，为了方便阅读，我们把不符合条件编译的代码段忽略了。
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+
+   static const init_fnc_t init_sequence_f[] = {
+      setup_mon_len,          /* 设置gd->mon_len为编译出来的u-boot.bin+bss段的大小 */
+      fdtdec_setup,           /* 和设备树有关 */
+      initf_malloc,           /* 初始化并设置内存池 */
+      log_init,               /* log初始化 */
+      initf_bootstage,	      /* 用于记录board_init_f()的引导阶段 */
+      setup_spl_handoff,
+      initf_console_record,   /* 平台信息记录初始化 */
+      arch_cpu_init,		      /* 空函数 */
+      mach_cpu_init,		      /* 空函数 */
+      initf_dm,               /* 驱动模型初始化 */
+      arch_cpu_init_dm,       /* 空函数 */
+      board_early_init_f,     /* 设置时钟和GPIO */ 
+      timer_init,		         /* 定时器初始化 */
+      env_init,		         /* 找到最适合存放环境变量的地址，并初始化 */
+      init_baud_rate,		   /* 波特率初始化 */
+      serial_init,		      /* 串口初始化 */
+      console_init_f,		   /* 使能在重定位之前用的串口功能 gd->have_console = 1 */
+      display_options,	      /* 显示banner，如u-boot版本、编译时间等信息 */
+      display_text_info,	   /* 显示调试信息 */
+      print_cpuinfo,		      /* 显示cpu信息，如cpu速度 */
+      show_board_info,        /* 显示板子信息 */
+      announce_dram_init,     /* 准备显示DRAM大小，在u-boot启动时可以看到DRAM大小的信息 */
+      dram_init,		         /* DRAM初始化，对于本imx6ull设置dg->ram_size = 512 MiB */
+      setup_dest_addr,        /* 设置重定位地址，gd->relocaddr = gd->ram_top */
+      reserve_round_4k,       /* 4字节对齐，将内存指针调到下一个4 kB */
+      reserve_mmu,            /* 为mmu区域腾出空间 */
+      reserve_video,          /* 预留video显示内存 */
+      reserve_trace,
+      reserve_uboot,          /* 预留U-Boot代码、data和bss区  */
+      reserve_malloc,         /* 预留malloc区 */
+      reserve_board,          /* 预留存放板子信息区 */
+      setup_machine,          /* 板子ID，这里没有用到 */
+      reserve_global_data,    /* 预留GD区域，栈gd->start_addr_sp指向gd段基地址*/
+      reserve_fdt,            /* 预留设备树区域 */
+      reserve_bootstage,
+      reserve_bloblist,
+      reserve_arch,           /* 架构相关预留区 */
+      reserve_stacks,         /* 预留栈区，gd->start_addr_sp指向栈底基地址 */
+      dram_init_banksize,     /* DRAM的大小初始化 */
+      show_dram_config,       /* 显示DRAM的配置 */
+      display_new_sp,         /* 显示新的栈地址 */
+      reloc_fdt,              /* 和设备树有关 */
+      reloc_bootstage,        /* 和u-boot阶段有关 */
+      reloc_bloblist,         /* 和blob列表有关 */
+      setup_reloc,            /* 重定位 */
+      NULL,
+   };
+
+上面函数指针数组init_sequence[]里面的函数都和大家梳理了一遍，花了我好大一会功夫。
+但是光知道函数名字还不透彻，下面我们就init_sequence[]，大致介绍一下某些重要函数在内存中究竟做了什么？
+
+起初我们的gd成员如下图所示：
+
+.. image:: media/uboot_gd000.png
+   :align: center
+   :alt: 未找到图片01|
+
+
+setup_mon_len函数比较简单，它是根据.lds文件中__bss_end与__bss_end计算出u-boot本身的大，赋给gd->mon_len变量。
+
+fdtdec_setup函数，检查gd->fdt_blob处是否存在dtb。
+
+
+env_init函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: env/env.c
+   :emphasize-lines: 19,20
+
+   int env_init(void)
+   {
+      struct env_driver *drv;
+      int ret = -ENOENT;
+      int prio;
+
+      for (prio = 0; (drv = env_driver_lookup(ENVOP_INIT, prio)); prio++) {
+         if (!drv->init || !(ret = drv->init()))
+            env_set_inited(drv->location);
+
+         debug("%s: Environment %s init done (ret=%d)\n", __func__,
+               drv->name, ret);
+      }
+
+      if (!prio)
+         return -ENODEV;
+
+      if (ret == -ENOENT) {
+         gd->env_addr = (ulong)&default_environment[0];  /* default_environment[0]用于存放默认环境变量的数组 */
+         gd->env_valid = ENV_VALID;    /* ENV_VALID = 1 标志环境有效 */  
+
+         return 0;
+      }
+
+      return ret;
+   }
+
+1. 第19行，default_environment[]数组存放着默认的环境变量，该数组在include/env_default.h文件中有如下定义：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 11,14,23
+
+   const uchar default_environment[] = {
+   #endif
+   #ifndef CONFIG_USE_DEFAULT_ENV_FILE
+   #ifdef	CONFIG_ENV_CALLBACK_LIST_DEFAULT
+      ENV_CALLBACK_VAR "=" CONFIG_ENV_CALLBACK_LIST_DEFAULT "\0"
+   #endif
+   #ifdef	CONFIG_ENV_FLAGS_LIST_DEFAULT
+      ENV_FLAGS_VAR "=" CONFIG_ENV_FLAGS_LIST_DEFAULT "\0"
+   #endif
+   #ifdef	CONFIG_USE_BOOTARGS
+      "bootargs="	CONFIG_BOOTARGS			"\0"
+   #endif
+   #ifdef	CONFIG_BOOTCOMMAND
+      "bootcmd="	CONFIG_BOOTCOMMAND		"\0"
+   #endif
+   #ifdef	CONFIG_RAMBOOTCOMMAND
+      "ramboot="	CONFIG_RAMBOOTCOMMAND		"\0"
+   #endif
+   #ifdef	CONFIG_NFSBOOTCOMMAND
+      "nfsboot="	CONFIG_NFSBOOTCOMMAND		"\0"
+   #endif
+   #if defined(CONFIG_BOOTDELAY)
+      "bootdelay="	__stringify(CONFIG_BOOTDELAY)	"\0"
+   #endif
+   #if defined(CONFIG_BAUDRATE) && (CONFIG_BAUDRATE >= 0)
+      "baudrate="	__stringify(CONFIG_BAUDRATE)	"\0"
+   #endif
+   #ifdef	CONFIG_LOADS_ECHO
+      "loads_echo="	__stringify(CONFIG_LOADS_ECHO)	"\0"
+   #endif
+   #ifdef	CONFIG_ETHPRIME
+      "ethprime="	CONFIG_ETHPRIME			"\0"
+   #endif
+   #ifdef	CONFIG_IPADDR
+      "ipaddr="	__stringify(CONFIG_IPADDR)	"\0"
+   #endif
+   #ifdef	CONFIG_SERVERIP
+      "serverip="	__stringify(CONFIG_SERVERIP)	"\0"
+   #endif
+   #ifdef	CONFIG_SYS_AUTOLOAD
+      "autoload="	CONFIG_SYS_AUTOLOAD		"\0"
+   #endif
+   #ifdef	CONFIG_PREBOOT
+      "preboot="	CONFIG_PREBOOT			"\0"
+   #endif
+   #ifdef	CONFIG_ROOTPATH
+      "rootpath="	CONFIG_ROOTPATH			"\0"
+   #endif
+   #ifdef	CONFIG_GATEWAYIP
+      "gatewayip="	__stringify(CONFIG_GATEWAYIP)	"\0"
+   #endif
+   #ifdef	CONFIG_NETMASK
+      "netmask="	__stringify(CONFIG_NETMASK)	"\0"
+   #endif
+   #ifdef	CONFIG_HOSTNAME
+      "hostname="	CONFIG_HOSTNAME	"\0"
+   #endif
+   #ifdef	CONFIG_BOOTFILE
+      "bootfile="	CONFIG_BOOTFILE			"\0"
+   #endif
+   #ifdef	CONFIG_LOADADDR
+      "loadaddr="	__stringify(CONFIG_LOADADDR)	"\0"
+   #endif
+   #ifdef	CONFIG_CLOCKS_IN_MHZ
+      "clocks_in_mhz=1\0"
+   #endif
+   #if defined(CONFIG_PCI_BOOTDELAY) && (CONFIG_PCI_BOOTDELAY > 0)
+      "pcidelay="	__stringify(CONFIG_PCI_BOOTDELAY)"\0"
+   #endif
+   #ifdef	CONFIG_ENV_VARS_UBOOT_CONFIG
+      "arch="		CONFIG_SYS_ARCH			"\0"
+   #ifdef CONFIG_SYS_CPU
+      "cpu="		CONFIG_SYS_CPU			"\0"
+   #endif
+   #ifdef CONFIG_SYS_BOARD
+      "board="	CONFIG_SYS_BOARD		"\0"
+      "board_name="	CONFIG_SYS_BOARD		"\0"
+   #endif
+   #ifdef CONFIG_SYS_VENDOR
+      "vendor="	CONFIG_SYS_VENDOR		"\0"
+   #endif
+   #ifdef CONFIG_SYS_SOC
+      "soc="		CONFIG_SYS_SOC			"\0"
+   #endif
+   #endif
+   #if defined(CONFIG_BOOTCOUNT_BOOTLIMIT) && (CONFIG_BOOTCOUNT_BOOTLIMIT > 0)
+      "bootlimit="	__stringify(CONFIG_BOOTCOUNT_BOOTLIMIT)"\0"
+   #endif
+   #ifdef	CONFIG_EXTRA_ENV_SETTINGS
+      CONFIG_EXTRA_ENV_SETTINGS
+   #endif
+      "\0"
+   #else /* CONFIG_USE_DEFAULT_ENV_FILE */
+   #include "generated/defaultenv_autogenerated.h"
+   #endif
+   #ifdef DEFAULT_ENV_INSTANCE_EMBEDDED
+   }
+
+比如默认环境变量可以根据宏定义去配置默认的环境变量，如bootargs、bootcmd、bootdelay等，
+bootdelay对应的宏CONFIG_BOOTDELAY在include/generated/autoconf.h文件中可以设置，修改该宏
+便可以设置默认的u-boot延时时间。在imx6ull EVK pro中并没用使用默认的环境变量，而是使用的
+configs/mx6ull_npi_defconfig配置文件中的环境变量，修改该配置文件中的CONFIG_BOOTDELAY=5，编译
+运行，则可以看到u-boot的启动检测输入延时为5秒，如下图所示：
+
+.. image:: media/uboot_pro014.png
+   :align: center
+   :alt: 未找到图片01|
+
+2. 第20行，标记环境变量有效，gd->env_valid = ENV_VALID = 1。
+
+
+init_baud_rate函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 3
+
+   static int init_baud_rate(void)
+   {
+      gd->baudrate = env_get_ulong("baudrate", 10, CONFIG_BAUDRATE); /* CONFIG_BAUDRATE = 115200 设置波特率*/
+      return 0;
+   }
+
+1. 第3行，调用env_get_ulong函数获取环境变量中波特率的参数，env_get_ulong函数通过第一个参数"baudrate"来匹配
+默认环境变量中的"baudrate"，其实就是匹配数组default_environment[]中的波特率，第二个参数表示按照十进制基数获取，如果没有匹配到，就会采用第三个参数的值作为默认波特率。
+
+
+serial_init函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: drivers/serial/serial.c
+   :emphasize-lines: 3,4
+
+   int serial_init(void)
+   {
+      gd->flags |= GD_FLG_SERIAL_READY;  /* GD_FLG_SERIAL_READY = 0x00100 标志串口就绪 */
+      return get_current()->start();
+   }
+
+1. 第3行，设置gd->flags，表示串口已经准备好了。
+
+2. 第4行，get_current()->start()返回一个指向当前被选择的串口的指针，我们来分析一下get_current函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: drivers/serial/serial.c
+   :emphasize-lines: 5,22
+
+   static struct serial_device *get_current(void)
+   {
+      struct serial_device *dev;
+
+      if (!(gd->flags & GD_FLG_RELOC))
+         dev = default_serial_console();
+      else if (!serial_current)
+         dev = default_serial_console();
+      else
+         dev = serial_current;
+
+      /* We must have a console device */
+      if (!dev) {
+   #ifdef CONFIG_SPL_BUILD
+         puts("Cannot find console\n");
+         hang();
+   #else
+         panic("Cannot find console\n");
+   #endif
+      }
+
+      return dev;
+   }
+
+该函数第4~5行，首先判断gd->flags有没有GD_FLG_RELOC标志，如果没有就获取默认的串口结构体地址，最后返回。
+其结构体如下所示。
+
+.. code-block:: c
+   :linenos:
+   :caption: include/serial.h
+
+   struct serial_device {
+      /* enough bytes to match alignment of following func pointer */
+      char	name[16];
+
+      int	(*start)(void);
+      int	(*stop)(void);
+      void	(*setbrg)(void);
+      int	(*getc)(void);
+      int	(*tstc)(void);
+      void	(*putc)(const char c);
+      void	(*puts)(const char *s);
+   #if CONFIG_POST & CONFIG_SYS_POST_UART
+      void	(*loop)(int);
+   #endif
+      struct serial_device	*next;
+   };
+
+初始化的每个串口都被分配这么一个结构体。
+
+
+console_init_f函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/console.c
+   :emphasize-lines: 4
+
+   /* Called before relocation - use serial functions */
+   int console_init_f(void)
+   {
+      gd->have_console = 1;
+
+      console_update_silent();
+
+      print_pre_console_buffer(PRE_CONSOLE_FLUSHPOINT1_SERIAL);
+
+      return 0;
+   }
+
+以上函数都被执行后，gd是这样子的：
+
+.. image:: media/uboot_gd001.png
+   :align: center
+   :alt: 未找到图片01|
+
+
+display_options函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: lib/display_options.c
+   :emphasize-lines: 5
+
+   int display_options(void)
+   {
+      char buf[DISPLAY_OPTIONS_BANNER_LENGTH];
+
+      display_options_get_banner(true, buf, sizeof(buf));
+      printf("%s", buf);
+      printf("%s", buf);
+      printf("%s", "hello u-boot ! i am here (^-^)");
+      return 0;
+   }
+
+1. 第5行，在u-boot启动时显示横幅，其中第6~8行是我为了调试自己添加的，调试信息如下所示:
+
+.. image:: media/uboot_pro015.png
+   :align: center
+   :alt: 未找到图片01|
+
+
+display_text_info函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_info.c
+   :emphasize-lines: 6,7,9,10,15,16
+
+   static int display_text_info(void)
+   {
+   #if !defined(CONFIG_SANDBOX) && !defined(CONFIG_EFI_APP)
+      ulong bss_start, bss_end, text_base;
+
+      bss_start = (ulong)&__bss_start;
+      bss_end = (ulong)&__bss_end;
+
+   #ifdef CONFIG_SYS_TEXT_BASE
+      text_base = CONFIG_SYS_TEXT_BASE;
+   #else
+      text_base = CONFIG_SYS_MONITOR_BASE;
+   #endif
+      debug("=========================888888888888888888888888888888==========================\r\n");
+      debug("U-Boot code: %08lX -> %08lX  BSS: -> %08lX\n",
+            text_base, bss_start, bss_end);
+   #endif
+
+      return 0;
+   }
+
+1. 第6~7行，获取lds文件中__bss_start与__bss_end的地址，也就是BSS段的起始地址与末尾地址。
+
+2. 第9~10行，通过宏CONFIG_SYS_TEXT_BASE得到代码段的基地址，该宏在include/generated/autoconf.h文件中被定义为0x87800000。
+
+3. 第15~16行，打印出代码段基地址、BSS段起始地址以及BSS段末尾地址，打印信息如下图所示:
+
+.. image:: media/uboot_pro0016.png
+   :align: center
+   :alt: 未找到图片01|
+
+
+继续分析show_board_info函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_info.c
+   :emphasize-lines: 11,714
+
+   /*
+    * If the root node of the DTB has a "model" property, show it.
+    * Then call checkboard().
+    */
+   int __weak show_board_info(void)
+   {
+   #ifdef CONFIG_OF_CONTROL
+      DECLARE_GLOBAL_DATA_PTR;
+      const char *model;
+
+      model = fdt_getprop(gd->fdt_blob, 0, "model", NULL);
+      printf("++++++++++++++++++++++++++++++++++++++++++\r\n");
+      if (model)
+         printf("Model: %s\n", model);
+   #endif
+
+      return checkboard();
+   }
+
+1. 第11行，调用fdt_getprop函数，通过设备树地址gd->fdt_blob找到名字为“model”对应的板子信息。以imx6ull EVK pro开发板为例，其对应的设备树文件为arch/arm/dts/imx6ull-14x14-evk.dts，文件中有关于板子model信息的描述，用户可以根据需要修改此信息。
+
+2. 第14行，打印板子信息，为了在uboot启动时方便找到这条打印信息，我自己添加了第13行，打印信息如下图所示：
+
+.. image:: media/uboot_pro006.png
+   :align: center
+   :alt: 未找到图片01|
+
+
+announce_dram_init函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_info.c
+   :emphasize-lines: 3
+
+   static int announce_dram_init(void)
+   {
+      puts("DRAM:  ");
+      return 0;
+   }
+
+announce_dram_init函数预先打印“DRAM”，dram_init便紧接着初始化DRAM，打印信息如下：
+
+.. image:: media/uboot_pro007.png
+   :align: center
+   :alt: 未找到图片01|
+
+dram_init函数用于获取DRAM大小
+
+.. code-block:: c
+   :linenos:
+   :caption: board/freescale/mx6ullevk/mx6ullevk.c
+   :emphasize-lines: 3
+
+   int dram_init(void)
+   {
+      gd->ram_size = imx_ddr_size();
+      debug("DRAM大小为：\r\n", gd->ram_size);
+      return 0;
+   }
+
+1. 第3行，获取DRAM大小。
+
+2. 第4行，这行是我自己添加的，方便调试，调试信息如下所示：
+
+.. image:: media/uboot_pro008.png
+   :align: center
+   :alt: 未找到图片01|
+
+可见DRAM大小为0x20000000，也就是512M，说明我们现在用的是512M的DDR。
+
+setup_dest_addr函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 27
+
+   static int setup_dest_addr(void)
+   {
+      debug("Monitor len: %08lX\n", gd->mon_len);
+      /*
+      * Ram is setup, size stored in gd !!
+      */
+      debug("Ram size: %08lX\n", (ulong)gd->ram_size);
+   #if defined(CONFIG_SYS_MEM_TOP_HIDE)
+      /*
+      * Subtract specified amount of memory to hide so that it won't
+      * get "touched" at all by U-Boot. By fixing up gd->ram_size
+      * the Linux kernel should now get passed the now "corrected"
+      * memory size and won't touch it either. This should work
+      * for arch/ppc and arch/powerpc. Only Linux board ports in
+      * arch/powerpc with bootwrapper support, that recalculate the
+      * memory size from the SDRAM controller setup will have to
+      * get fixed.
+      */
+      gd->ram_size -= CONFIG_SYS_MEM_TOP_HIDE;
+   #endif
+   #ifdef CONFIG_SYS_SDRAM_BASE
+      gd->ram_base = CONFIG_SYS_SDRAM_BASE;
+   #endif
+      gd->ram_top = gd->ram_base + get_effective_memsize();
+      gd->ram_top = board_get_usable_ram_top(gd->mon_len);
+      gd->relocaddr = gd->ram_top;
+      debug("Ram top: %08lX\n", (ulong)gd->ram_top);
+   #if defined(CONFIG_MP) && (defined(CONFIG_MPC86xx) || defined(CONFIG_E500))
+      /*
+      * We need to make sure the location we intend to put secondary core
+      * boot code is reserved and not used by any part of u-boot
+      */
+      if (gd->relocaddr > determine_mp_bootpg(NULL)) {
+         gd->relocaddr = determine_mp_bootpg(NULL);
+         debug("Reserving MP boot page to %08lx\n", gd->relocaddr);
+      }
+   #endif
+      return 0;
+   }
+
+1. 第26~27行，打印RAM顶端地址gd->ram_top = gd->relocaddr = 0xa0000000。
+
+DRAM初始化后，便完成DRAM的映射，重定位代码到DRAM，并且在DRAM中继续运行。
+
+以上函数执行完毕后，我们再回过头看下gd结构体的成员，如下图所示：
+
+.. image:: media/uboot_gd002.png
+   :align: center
+   :alt: 未找到图片01|
+
+图中可以看到，DRAM的基地址为0x80000000，大小为0x20000000（512M），RAM顶端地址为0xa0000000 = 0x80000000 + 0x20000000（512M）。
+重定位后地址为0x9ff02000。
+
+reserve_round_4k函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 4
+
+   /* Round memory pointer down to next 4 kB limit */
+   static int reserve_round_4k(void)
+   {
+      gd->relocaddr &= ~(4096 - 1);
+      return 0;
+   }
+
+1. 第4行，将内存指针指向下一个4kB处，也就是4kB对齐，gd->relocaddr = 0xa0000000 & 0xfffff000 = 0xa0000000，所以对齐后gd->relocaddr不变。
+
+reserve_mmu函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 6,7,10,12,13,14
+
+   #ifdef CONFIG_ARM
+   __weak int reserve_mmu(void)
+   {
+   #if !(defined(CONFIG_SYS_ICACHE_OFF) && defined(CONFIG_SYS_DCACHE_OFF))
+      /* reserve TLB table */
+      gd->arch.tlb_size = PGTABLE_SIZE;
+      gd->relocaddr -= gd->arch.tlb_size;    /* 从oxa0000000向下少了4K */
+      debug("gd->relocaddr= %08lx to %08lx\n", gd->relocaddr,gd->arch.tlb_size);
+      /* round down to next 64 kB limit */
+      gd->relocaddr &= ~(0x10000 - 1);
+
+      gd->arch.tlb_addr = gd->relocaddr;
+      debug("TLB table from %08lx to %08lx\n", gd->arch.tlb_addr,
+            gd->arch.tlb_addr + gd->arch.tlb_size);
+
+   #ifdef CONFIG_SYS_MEM_RESERVE_SECURE
+      /*
+      * Record allocated tlb_addr in case gd->tlb_addr to be overwritten
+      * with location within secure ram.
+      */
+      gd->arch.tlb_allocated = gd->arch.tlb_addr;
+   #endif
+   #endif
+
+      return 0;
+   }
+   #endif
+
+1. 第1行，CONFIG_ARM在include/generated/autoconf.h文件中被定义为1，故reserve_mmu函数被执行。
+
+2. 第4行，我们没有定义CONFIG_SYS_ICACHE_OFF和CONFIG_SYS_DCACHE_OFF，故其相关代码块被执行。
+
+3. 第6行，为TLB页表腾出空间，PGTABLE_SIZE为0x00004000 = 4096 * 4，它在arch/arm/include/asm/system.h文件中有如下定义：
+
+.. code-block:: c
+   :linenos:
+   :caption: arch/arm/include/asm/system.h
+
+   #define PGTABLE_SIZE		(4096 * 4)  /* PGTABLE_SIZE = 0x00004000 = 4096 * 4 */
+
+4. 第7~8行，重定位地址gd->relocaddr = 0xfffc000 = 0xA0000000 - 4kB，第8行是我自己添加的，我们来看下它的打印信息：
+
+.. image:: media/uboot_pro009.png
+   :align: center
+   :alt: 未找到图片01|
+
+5. 第10行，四舍五入到下一个64kB，也就是做64kB对齐，页表必须64k对齐存放，即gd->relocaddr = 0xa0000000 - 0x00004000 = 9fffc000。
+
+6. 第16行，CONFIG_SYS_MEM_RESERVE_SECURE没有定义，忽略相关代码块。
+
+reserve_mmu函数主要是预留出4kB空间来存放mmu的TLB页表。
+
+reserve_video和reserve_trace都没有做什么工作，我们不用分析，接着我们来分析reserve_uboot函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 8,9,10,14,15,16,19,20
+
+   static int reserve_uboot(void)
+   {
+      if (!(gd->flags & GD_FLG_SKIP_RELOC)) {
+         /*
+         * reserve memory for U-Boot code, data & bss
+         * round down to next 4 kB limit
+         */
+         gd->relocaddr -= gd->mon_len;
+         gd->relocaddr &= ~(4096 - 1);
+      #if defined(CONFIG_E500) || defined(CONFIG_MIPS)
+         /* round down to next 64 kB limit so that IVPR stays aligned */
+         gd->relocaddr &= ~(65536 - 1);
+      #endif
+         debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\r\n");
+         debug("Reserving %ldk for U-Boot at: %08lx\n",
+               gd->mon_len >> 10, gd->relocaddr);
+      }
+
+      gd->start_addr_sp = gd->relocaddr;     /* 将start_addr_sp也置为相同的位置 */
+      debug("gd->start_addr_sp= %08lx\n",gd->start_addr_sp);
+      
+      return 0;
+   }
+
+1. 第8~9行，预留出949kB给u-Boot，同时做4kB对齐。
+
+2. 第14行，我自己添加的，方便调试。
+
+3. 第15行，打印信息如下图所示：
+
+.. image:: media/uboot_pro0010.png
+   :align: center
+   :alt: 未找到图片01|
+
+reserve_malloc函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 4,5,6,7
+
+   /* reserve memory for malloc() area */
+   static int reserve_malloc(void)
+   {
+      gd->start_addr_sp = gd->start_addr_sp - TOTAL_MALLOC_LEN;
+      debug("TOTAL_MALLOC_LEN: %08lx\n", TOTAL_MALLOC_LEN);
+      debug("Reserving %dk for malloc() at: %08lx\n",
+            TOTAL_MALLOC_LEN >> 10, gd->start_addr_sp);
+      return 0;
+   }
+
+1. 第4行，为malloc腾出一段空间，TOTAL_MALLOC_LEN大小在include/common.h文件中有如下定义：
+
+.. code-block:: c
+   :linenos:
+   :caption: include/common.h
+   :emphasize-lines: 6
+
+   #if defined(CONFIG_ENV_IS_EMBEDDED)          /* 未定义 */
+   #define TOTAL_MALLOC_LEN	CONFIG_SYS_MALLOC_LEN
+   #elif ( ((CONFIG_ENV_ADDR+CONFIG_ENV_SIZE) < CONFIG_SYS_MONITOR_BASE) || \
+      (CONFIG_ENV_ADDR >= (CONFIG_SYS_MONITOR_BASE + CONFIG_SYS_MONITOR_LEN)) ) || \
+         defined(CONFIG_ENV_IS_IN_NVRAM)  /* 有定义 */
+   #define	TOTAL_MALLOC_LEN	(CONFIG_SYS_MALLOC_LEN + CONFIG_ENV_SIZE)  /* 只有该行通过条件编译 */  
+   #else
+   #define	TOTAL_MALLOC_LEN	CONFIG_SYS_MALLOC_LEN
+   #endif
+
+可以看出，TOTAL_MALLOC_LEN = CONFIG_SYS_MALLOC_LEN + CONFIG_ENV_SIZE。而CONFIG_SYS_MALLOC_LEN和CONFIG_ENV_SIZE在
+include/configs/mx6ullevk.h文件中有如下定义：
+
+.. code-block:: c
+   :linenos:
+   :caption: include/configs/mx6ullevk.h
+   :emphasize-lines: 6
+
+   /* Size of malloc() pool */
+   #define CONFIG_SYS_MALLOC_LEN		(16 * SZ_1M)   /* SZ_1M在include/linux/sizes.h中被定义为0x00100000 */
+   ...   /* 省略部分代码块 */
+   #define CONFIG_ENV_SIZE			SZ_64K        /* SZ_64K在include/linux/sizes.h中被定义为0x00010000 */
+
+由上可知，TOTAL_MALLOC_LEN = (16 * 0x00100000) + 0x00010000 = 0x01010000，我们接着分析reserve_malloc函数。
+
+2. 第5~7行，为了验证TOTAL_MALLOC_LEN的大小，我自己添加第5行，用来调试，第6~7行是源码本有的，他们的调试信息如下：
+
+.. image:: media/uboot_pro0011.png
+   :align: center
+   :alt: 未找到图片01|
+
+此时gd->start_addr_sp = 0x9eef2000，预留了16448kB给malloc，都是从高地址往下不断预留空间。
+
+
+reserve_board函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 5
+
+   /* (permanently) allocate a Board Info struct */
+   static int reserve_board(void)
+   {
+      if (!gd->bd) {
+         gd->start_addr_sp -= sizeof(bd_t);
+         gd->bd = (bd_t *)map_sysmem(gd->start_addr_sp, sizeof(bd_t));
+         memset(gd->bd, '\0', sizeof(bd_t));
+         debug("Reserving %zu Bytes for Board Info at: %08lx\n",
+               sizeof(bd_t), gd->start_addr_sp);
+      }
+      return 0;
+   }
+
+1. 第5行，给bd预留空间，存放板子信息，如DRAM起始地址、DRAM大小、SRAM起始地址、SRAM大小、boot参数等，共预留了80字节，预留后gd->start_addr_sp = 0x9eef1fb0，如下图所示：
+
+.. image:: media/uboot_pro0012.png
+   :align: center
+   :alt: 未找到图片01|
+
+
+setup_machine是个空函数，跳过它继续分析reserve_global_data函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 3
+
+   static int reserve_global_data(void)
+   {
+      gd->start_addr_sp -= sizeof(gd_t);
+      gd->new_gd = (gd_t *)map_sysmem(gd->start_addr_sp, sizeof(gd_t));
+      debug("Reserving %zu Bytes for Global Data at: %08lx\n",
+            sizeof(gd_t), gd->start_addr_sp);
+      return 0;
+   }
+
+1. 第3~4行，预留256字节给new_gd（新的全局数据），预留后gd->start_addr_sp = 0x9eef1eb0，调试信息如下：
+
+.. image:: media/uboot_pro0013.png
+   :align: center
+   :alt: 未找到图片01|
+
+
+reserve_fdt函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 12
+
+   static int reserve_fdt(void)
+   {
+   #ifndef CONFIG_OF_EMBED
+      /*
+      * If the device tree is sitting immediately above our image then we
+      * must relocate it. If it is embedded in the data section, then it
+      * will be relocated with other data.
+      */
+      if (gd->fdt_blob) {
+         gd->fdt_size = ALIGN(fdt_totalsize(gd->fdt_blob) + 0x1000, 32);
+
+         gd->start_addr_sp -= gd->fdt_size;
+         gd->new_fdt = map_sysmem(gd->start_addr_sp, gd->fdt_size);
+         debug("Reserving %lu Bytes for FDT at: %08lx\n",
+               gd->fdt_size, gd->start_addr_sp);
+      }
+   #endif
+
+      return 0;
+   }
+
+1. 第12行，预留40032字节存放设备树信息。
+
+reserve_bootstage、reserve_bloblist、reserve_arch、dram_init_banksize都是空函数，所以到此内存就已经分配完了。
+
+而reloc_fdt函数负责将设备树数据搬运到新分配的new_fdt地址中去,如下所示:
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 7,8
+
+   static int reloc_fdt(void)
+   {
+   #ifndef CONFIG_OF_EMBED    /* 有定义 */
+      if (gd->flags & GD_FLG_SKIP_RELOC)
+         return 0;
+      if (gd->new_fdt) {
+         memcpy(gd->new_fdt, gd->fdt_blob, gd->fdt_size);
+         gd->fdt_blob = gd->new_fdt;
+      }
+   #endif
+
+      return 0;
+   }
+
+1. 第7行，将老的设备树段拷贝到新的设备树段。
+
+2. 第8行，将老的设备树地址更新为新的设备树地址。
+
+
+setup_reloc 函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_f.c
+   :emphasize-lines: 18,21
+
+   static int setup_reloc(void)
+   {
+      if (gd->flags & GD_FLG_SKIP_RELOC) {
+         debug("Skipping relocation due to flag\n");
+         return 0;
+      }
+
+   #ifdef CONFIG_SYS_TEXT_BASE
+   #ifdef ARM
+      gd->reloc_off = gd->relocaddr - (unsigned long)__image_copy_start;
+   #elif defined(CONFIG_M68K)
+      /*
+      * On all ColdFire arch cpu, monitor code starts always
+      * just after the default vector table location, so at 0x400
+      */
+      gd->reloc_off = gd->relocaddr - (CONFIG_SYS_TEXT_BASE + 0x400);
+   #else
+      gd->reloc_off = gd->relocaddr - CONFIG_SYS_TEXT_BASE;
+   #endif
+   #endif
+      memcpy(gd->new_gd, (char *)gd, sizeof(gd_t));   /* 将gd重定位到new_gd中 */
+
+      debug("Relocation Offset is: %08lx\n", gd->reloc_off);
+      debug("Relocating to %08lx, new gd at %08lx, sp at %08lx\n",
+            gd->relocaddr, (ulong)map_to_sysmem(gd->new_gd),
+            gd->start_addr_sp);
+
+      return 0;
+   }
+
+1. 第18行，计算新旧uboot的偏移，便宜值为0x18702000。
+
+1. 第21行，将gd重定位到new_gd中。
+
+
+我们再回过头来看看此时的全局数据表格：
+
+.. image:: media/uboot_gd003.png
+   :align: center
+   :alt: 未找到图片01|
+
+
+board_init_f中的内容就已经分析完了，接下来就剩下uboot自身的重定位和bss段的初始化。
+接下来我们看看u-boot中重要的函数relocate_code，它是如何实现u-boot自身重定位的。
+
+
+relocate_code函数分析：
+
+.. code-block:: c
+   :linenos:
+   :caption: arch/arm/lib/relocate.S
+   :emphasize-lines: 2,5,7,8,9,10,11
+
+      ENTRY(relocate_code)
+      ldr	r1, =__image_copy_start	/* r1 <- SRC &__image_copy_start */
+      subs	r4, r0, r1		/* r4 <- relocation offset */
+      beq	relocate_done		/* skip relocation */
+      ldr	r2, =__image_copy_end	/* r2 <- SRC &__image_copy_end */
+
+   copy_loop:
+      ldmia	r1!, {r10-r11}		/* copy from source address [r1]    */
+      stmia	r0!, {r10-r11}		/* copy to   target address [r0]    */
+      cmp	r1, r2			/* until source end address [r2]    */
+      blo	copy_loop
+
+      /*
+      * fix .rel.dyn relocations
+      */
+      ldr	r2, =__rel_dyn_start	/* r2 <- SRC &__rel_dyn_start */
+      ldr	r3, =__rel_dyn_end	/* r3 <- SRC &__rel_dyn_end */
+   fixloop:
+      ldmia	r2!, {r0-r1}		/* (r0,r1) <- (SRC location,fixup) */
+      and	r1, r1, #0xff
+      cmp	r1, #R_ARM_RELATIVE
+      bne	fixnext
+
+      /* relative fix: increase location by offset */
+      add	r0, r0, r4
+      ldr	r1, [r0]
+      add	r1, r1, r4
+      str	r1, [r0]
+   fixnext:
+      cmp	r2, r3
+      blo	fixloop
+
+   relocate_done:
+
+   #ifdef __XSCALE__
+      /*
+      * On xscale, icache must be invalidated and write buffers drained,
+      * even with cache disabled - 4.2.7 of xscale core developer's manual
+      */
+      mcr	p15, 0, r0, c7, c7, 0	/* invalidate icache */
+      mcr	p15, 0, r0, c7, c10, 4	/* drain write buffer */
+   #endif
+
+      /* ARMv4- don't know bx lr but the assembler fails to see that */
+
+   #ifdef __ARM_ARCH_4__
+      mov	pc, lr
+   #else
+      bx	lr
+   #endif
+
+   ENDPROC(relocate_code)
+
+1. 第2行，将__image_copy_start地址加载到r1寄存器当中。
+
+2. 第3行，带借位的减法指令subs，其中最后一个s表示将进位结果写入CPSR寄存器中。该指令的意思是r4 = r0 - r1，其中在调用relocate_code函数之前r0保存着gd->relocaddr的值，是一个偏移地址。
+
+3. 第4行，如果r0与r1后地址相等，则表示不用拷贝，直接跳过拷贝工作，否则需要重定位。
+
+4. 第5行，将__image_copy_end地址加载到r2寄存器，还记得我们前面讲的u-boot.lds链接脚本文件么？大家可以回过头对照一下。从__image_copy_start地址到__image_copy_end地址中间包含了代码段、数据段以及只读数据段，但是不包括动态链接rel_dyn部分。
+
+5. 第7~11行，比较源代码起始地址是否等于结束地址，如果相等则结束，不相等继续循环拷贝代码段、数据段以及只读数据段；每次从源代码地址中复制出8字节数据传入r10和r11寄存器，改变r1的地址，然后放到目标地址r0起始段中，改变r0的地址，之后比较源代码首地址与结束地址，当相等时，结束循环，完成代码段的拷贝。
+
+6. 第16~17行，分别将__rel_dyn_start与__rel_dyn_end地址加载到r2和r3寄存器中。
+
+7. 第18~25行，将__rel_dyn_start地址上连续8字节地址的值存在r0和r1中，接着判断r1中的值低8位数据，如果为23，则将r0中的值加重定位偏移值（relocation offset）。
+
+8. 第26~28行，加载r0地址中的数据到r1中，然后与偏移值（relocation offset）相加后放到r1中，最后再将相加后的数据放到以r0地址所在的空间中。如此周而复始，直到修改完整个__rel_dyn段后结束，完成重定位。
+
+
+再重定位u-boot后又返回到arch/arm/lib/crt0.S文件中调用relocate_vectors函数，该函数我就不再一句一句
+分析了，感兴趣的同学可以自己认真分析一遍，详细带着大家分析完这么多汇编代码后，对ARM启动流程也有一定的了解了。
+套路都是一样一样的，重定位、重定位、重定位！重要的事情说三遍。relocate_vectors函数主要完成的工作就是实现
+异常向量表的重定位，拷贝到正确的地址中去。
+
+
+执行完relocate_vectors之后，继续回到_main函数中到用处，执行c_runtime_cpu_setup函数。
+官方称c_runtime_cpu_setup为老一套，哈哈！还真是如此，又是关闭指令缓存I-cache。
+c_runtime_cpu_setup函数如下所示：
+
+.. code-block:: c
+   :linenos:
+   :caption: arch/arm/lib/relocate.S
+
+   ENTRY(c_runtime_cpu_setup)
+   /*
+   * If I-cache is enabled invalidate it
+   */
+   #ifndef CONFIG_SYS_ICACHE_OFF
+      mcr	p15, 0, r0, c7, c5, 0	@ invalidate icache
+      mcr     p15, 0, r0, c7, c10, 4	@ DSB
+      mcr     p15, 0, r0, c7, c5, 4	@ ISB
+   #endif
+
+      bx	lr
+
+ENDPROC(c_runtime_cpu_setup)
+
+大家对照前面讲的cpu_init_cp15函数自行分析，都是老套路了，一模一样，重定位后到了新的介质中运行也是要
+设置一下运行环境。
+
+接着回到spl_relocate_stack_gd函数，该函数主要作用是重新定位堆栈，以便执行后面的board_init_r函数，
+为了提供更大的堆栈空间，但是我们并没有重定位堆栈。所以不用分析它。
+
+
+紧接着分析一下u-boot是如何清除BSS段的，又是一个比较有趣的地方，不废话了，直接附上源代码：
+
+.. code-block:: c
+   :linenos:
+   :caption: arch/arm/lib/crt0.S
+   :emphasize-lines: 1,4,7,8
+
+   	ldr	r0, =__bss_start	/* this is auto-relocated! */
+
+   #ifdef CONFIG_USE_ARCH_MEMSET /* jason mark--->configs/mx6ull_npi_defconfig have define */
+      ldr	r3, =__bss_end		/* this is auto-relocated! */
+      mov	r1, #0x00000000		/* prepare zero to clear BSS */
+
+      subs	r2, r3, r0		/* r2 = memset len */
+      bl	memset
+   #else
+
+1. 第1行，加载BSS段的起始地址__bss_start到r0中。
+
+2. 第4行，加载BSS段的末尾地址__bss_end到r3中。
+
+3. 第7行，将BSS段的末尾地址减去BSS段的起始地址得到要清除的BSS段的大小。
+
+4. 第8行，调用memset函数清除BSS段，memset函数的使用大家都很熟悉了吧？，其中r0作为第一个参数、r1作为第二个参数、r2作为第三个参数。
+
+
+
+u-boot启动第二阶段源代码分析
+'''''''
+
+第二阶段主要完成板级初始化、emmc初始化、控制台初始化、中断初始化及网络初始化等，流程图如下所示：
+
+.. image:: media/uboot_pro0017.png
+   :align: center
+   :alt: 未找到图片05|
+
+
+首先分析board_init_r函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 14,21
+
+   void board_init_r(gd_t *new_gd, ulong dest_addr)
+   {
+   #if CONFIG_IS_ENABLED(X86_64)
+      arch_setup_gd(new_gd);
+   #endif
+
+   #ifdef CONFIG_NEEDS_MANUAL_RELOC
+      int i;
+   #endif
+
+   #if !defined(CONFIG_X86) && !defined(CONFIG_ARM) && !defined(CONFIG_ARM64)
+      gd = new_gd;
+   #endif
+      gd->flags &= ~GD_FLG_LOG_READY;
+
+   #ifdef CONFIG_NEEDS_MANUAL_RELOC
+      for (i = 0; i < ARRAY_SIZE(init_sequence_r); i++)
+         init_sequence_r[i] += gd->reloc_off;
+   #endif
+
+      if (initcall_run_list(init_sequence_r))
+         hang();
+
+      /* NOTREACHED - run_main_loop() does not return */
+      hang();
+   }
+
+1. 第14行，标记gd->flags，取消log就绪标志。
+
+2. 第21行，遍历且初始化函数指针数组init_sequence_r[]所指向的每一个函数。
+
+
+然后我们大致分析一下函数指针数组init_sequence_r[]里的成员函数指针，首先全局预览一下该数组，
+为了方便分析，我将不符合条件编译部分去除了。
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+
+   /*
+   * We hope to remove most of the driver-related init and do it if/when
+   * the driver is later used.
+   *
+   * TODO: perhaps reset the watchdog in the initcall function after each call?
+   */
+   static init_fnc_t init_sequence_r[] = {
+      initr_trace,               /* 初始化与跟踪调试相关部分 */
+      initr_reloc,               /* 标记重定位完成 */
+      initr_caches,              /* 使能cache */
+      initr_reloc_global_data,   /* 初始化重定位后的gd成员 */
+      initr_barrier,             /* imx6ull未用到 */
+      initr_malloc,              /* 初始化malloc */
+      log_init,                  /* log初始化 */
+      initr_bootstage,	/* Needs malloc() but has its own timer */
+      initr_console_record,      /* 初始化控台 */
+      bootstage_relocate,        
+      initr_dm,                  /* 设备模型初始化 */
+      board_init,                /* 板级初始化 */
+      efi_memory_init,           /* efi_memory初始化 */
+      stdio_init_tables,         /* 标准输入输出及标准错误等初始化 */
+      initr_serial,              /* 串口初始化 */
+      initr_announce,            /* 跟调试相关 */
+      power_init_board,          /* 电源芯片初始化 */
+      initr_nand,                /* nandflash初始化 */
+      initr_mmc,                 /* mmc初始化 */
+      initr_env,                 /* 环境变量初始化 */
+      initr_secondary_cpu,       /* 其他cpu初始化，由于imx6ull为单核cpu故忽略 */
+      stdio_add_devices,         /* 输入输出设备初始化 */
+      initr_jumptable,           /* 初始化跳转表 */
+      console_init_r,		      /* 控制台初始化 */
+      interrupt_init,            /* 中断初始化 */
+      initr_enable_interrupts,   /* 中断使能 */
+      /* PPC has a udelay(20) here dating from 2002. Why? */
+      initr_ethaddr,             /* 网络初始化 */
+      board_late_init,           /* 板子后续初始化 */
+      initr_fastboot_setup,      
+      initr_net,                 /* 网络初始化 */
+      initr_check_fastboot,     
+      run_main_loop,             /* 运行主循环 */
+   };
+
+预览完上面的函数指针数组后，应该的对本阶段做做的工作有了大致的了解，下面我们将详细分析函数指针数组中的成员。
+
+initr_trace函数，由于我们并没有定义与调试相关的宏，所以这部分代码可以省略。
+
+initr_reloc函数:
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 4
+
+   static int initr_reloc(void)
+   {
+      /* tell others: relocation done */
+      gd->flags |= GD_FLG_RELOC | GD_FLG_FULL_MALLOC_INIT; /* 标记已经重定位成功，malloc初始化 */
+
+      return 0;
+   }
+
+1. 第4行，标记gd->flags，表示已经完成了重定位与malloc的初始化。
+
+initr_reloc函数:
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 8
+
+   /*
+    * Some of these functions are needed purely because the functions they
+    * call return void. If we change them to return 0, these stubs can go away.
+    */
+   static int initr_caches(void)
+   {
+      /* Enable caches */
+      enable_caches();
+      return 0;
+   }
+
+1. 第8行，enable_caches函数，首先检查I-cache的使能状态，如果未使能I-cache则将其使能，接着使能D-cache。
+
+initr_reloc_global_data函数（省略不符合条件编译部分）：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+
+   static int initr_reloc_global_data(void)
+   {
+      monitor_flash_len = (ulong)&__init_end - gd->relocaddr;
+      gd->env_addr += gd->reloc_off;
+   #ifdef CONFIG_EFI_LOADER
+      efi_runtime_relocate(gd->relocaddr, NULL);
+   #endif
+
+      return 0;
+   }
+
+1. 第3~4行，设置monitor_flash_len及gd成员env_addr，重新定位早期的env_addr指针。
+
+
+initr_barrier函数，由于我们没有配置CONFIG_PPC宏，故忽略。
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 10,11,12
+
+   static int initr_malloc(void)
+   {
+      ulong malloc_start;
+
+   #if CONFIG_VAL(SYS_MALLOC_F_LEN)
+      debug("Pre-reloc malloc() used %#lx bytes (%ld KB)\n", gd->malloc_ptr,
+            gd->malloc_ptr / 1024);
+   #endif
+      /* The malloc area is immediately below the monitor copy in DRAM */
+      malloc_start = gd->relocaddr - TOTAL_MALLOC_LEN;
+      mem_malloc_init((ulong)map_sysmem(malloc_start, TOTAL_MALLOC_LEN),
+            TOTAL_MALLOC_LEN);
+      return 0;
+   }
+
+1. 第10~12行，分配malloc内存空间并将其初始化，malloc区域位域u-boot区的下方，我们来看下调试信息，看看这段代码的具体地址。
+
+.. image:: media/uboot_pro0018.png
+   :align: center
+   :alt: 未找到图片05|
+
+从上可以看出malloc区域位域0x9eef2000地址~0x9ff02000地址之间
+
+
+log_init函数主要是分配log驱动空间，设置gd->flags中的log就绪标志，前面讲到过清除该标志，这里便置位log标志，并且设置log等级，
+比如以哪个等级为界限，该等级之上的都可以被log，最后设置log的格式。
+
+
+initr_bootstage函数标记引导阶段。
+
+
+initr_console_record函数为空函数，忽略。
+
+
+bootstage_relocate函数，这是完整的bootstage实现，重定位当前的bootstage记录。
+
+
+initr_of_live函数为空函数，忽略。
+
+
+initr_dm函数，此函数就比较重要了，也相对复杂，因为涉及到设备驱动模型，下面我们将细细道来。
+驱动模型关键：
+
+- 驱动模型绑定->ofdata_to_platdata(可选)->probe
+
+initr_dm函数如下：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 7,13
+
+   #ifdef CONFIG_DM
+   static int initr_dm(void)
+   {
+      int ret;
+
+      /* Save the pre-reloc driver model and start a new one */
+      gd->dm_root_f = gd->dm_root;
+      gd->dm_root = NULL;
+   #ifdef CONFIG_TIMER
+      gd->timer = NULL;
+   #endif
+      bootstage_start(BOOTSTATE_ID_ACCUM_DM_R, "dm_r");
+      ret = dm_init_and_scan(false);
+      bootstage_accum(BOOTSTATE_ID_ACCUM_DM_R);
+      if (ret)
+         return ret;
+   #ifdef CONFIG_TIMER_EARLY
+      ret = dm_timer_init();
+      if (ret)
+         return ret;
+   #endif
+
+      return 0;
+   }
+   #endif
+
+1. 第7行，首先保存以前分配的驱动模型（DM），并且开始设置一个新的驱动模型。
+
+2. 第13行，初始化并扫描驱动模型。
+
+
+我们总体看下它的函数调用顺序。
+
+.. code-block:: c
+   :linenos:
+   :caption: drivers/core/root.c
+
+   initr_dm //初始化一个树形的驱动模型结构
+      dm_init_and_scan  //初始化根节点的设备，同时绑定根节点下的全部子节点
+         dm_init  //绑定根节点到gd->dm_root中，并初始化根节点下的设备
+            device_bind_by_name //根据名字绑定，查找和设备信息匹配的driver，然后创建对应的udevice和uclass并进行绑定，最后放在DM_ROOT_NON_CONST中
+               device_probe //对根设备执行probe操作，
+         dm_scan_platdata //绑定子节点
+            lists_bind_drivers //绑定驱动链表
+         dm_extended_scan_fdt //在其他地方（设备树）搜索设备并进行驱动匹配，然后绑定
+            dm_scan_fdt //扫描设备树并绑定节点的驱动
+               dm_scan_fdt_node //绑定设备的入口，在该函数中会确定设备是否具有相关属性，如果没有则不会绑定
+                  lists_bind_fdt //搜索可以匹配到该设备的驱动
+                     device_bind_with_driver_data //匹配到了驱动器就会信息绑定
+                        device_bind_common //将设备节点和父节点建立树形结构
+                           uclass_bind_device //将该设备挂在相应的dev->uclass_node链表上
+                           drv->bind(dev) 将设备绑定到对应的驱动
+                           parent->driver->child_post_bind(dev) //父节点驱动的child_post_bind接口函数
+                           uc->uc_drv->post_bind(dev) //在新设备绑定到此uclass后调用，设备节点在此接口下在soc下进行展开
+            dm_scan_fdt_ofnode_path //扫描"/clocks"节点
+               dm_scan_fdt_node     //在该函数中会确定设备是否具有clocks相关属性，如果没有则不会绑定
+            dm_scan_fdt_ofnode_path //扫描"/firmware"节点
+               dm_scan_fdt_node     //在该函数中会确定设备是否具有firmware相关属性，如果没有则不会绑定
+
+完成以上函数的执行后，在内存中也就形成了一个至少深度为2的树形结构（假设有子节点），其中gd->dm_root
+保存着根节点的信息。
+
+以上函数完成了绑定，接下来就是probe了，接着我们看下imx6ull EVK pro开发板对应的设备树信息，由于设备树比较庞大，
+我这里提取出部分信息，如下图所示
+
+.. code-block:: dtsi
+   :linenos:
+   :caption: arch/arm/dts/imx6ull.dtsi
+
+   / {
+      soc {
+
+         aips1: aips-bus@02000000 {
+               spba-bus@02000000 {
+                  compatible = "fsl,spba-bus", "simple-bus";
+                  #address-cells = <1>;
+                  #size-cells = <1>;
+                  reg = <0x02000000 0x40000>;
+                  ranges;
+
+                  uart1: serial@02020000 {
+                  compatible = "fsl,imx6ul-uart",
+                        "fsl,imx6q-uart", "fsl,imx21-uart";
+                  reg = <0x02020000 0x4000>;
+                  interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>;
+                  clocks = <&clks IMX6UL_CLK_UART1_IPG>,
+                     <&clks IMX6UL_CLK_UART1_SERIAL>;
+                  clock-names = "ipg", "per";
+                  status = "disabled";
+                  };
+
+                  uart7: serial@02018000 {
+                  compatible = "fsl,imx6ul-uart",
+                        "fsl,imx6q-uart", "fsl,imx21-uart";
+                  reg = <0x02018000 0x4000>;
+                  interrupts = <GIC_SPI 39 IRQ_TYPE_LEVEL_HIGH>;
+                  clocks = <&clks IMX6UL_CLK_UART7_IPG>,
+                     <&clks IMX6UL_CLK_UART7_SERIAL>;
+                  clock-names = "ipg", "per";
+                  dmas = <&sdma 43 4 0>, <&sdma 44 4 0>;
+                  dma-names = "rx", "tx";
+                  status = "disabled";
+                  };
+
+               }
+               tsc: tsc@02040000 {
+               compatible = "fsl,imx6ul-tsc";
+               reg = <0x02040000 0x4000>, <0x0219c000 0x4000>;
+               interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
+                     <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>;
+               clocks = <&clks IMX6UL_CLK_IPG>,
+                  <&clks IMX6UL_CLK_ADC2>;
+               clock-names = "tsc", "adc";
+               status = "disabled";
+               };
+         }
+      }
+
+   }
+
+可以归纳出其一级子节点树形结构如下图所示：
+
+.. image:: media/dev_tree002.png
+   :align: center
+   :alt: 未找到图片05|
+
+
+接着我们简单描述一下pribe的流程，函数的调用顺寻如下：
+
+.. code-block:: c
+   :linenos:
+   :caption: drivers/core/device.c
+
+   dm_init
+      device_probe(dev)
+         device_probe(dev)     //递归probe parent节点
+         uclass_resolve_seq(dev) //分配一个seq给此设备
+         dev->flags |= DM_FLAG_ACTIVATED;  //设置dev->flags，表示该设备已经被激活
+         pinctrl_select_state(dev, "default"); //初始化相关引脚
+         dev->parent->driver->child_pre_probe(dev) //执行父节点驱动的child_pre_probe接口函数
+         drv->ofdata_to_platdata(dev)  //执行设备驱动的ofdata_to_platdata接口函数
+         clk_set_defaults(dev) //设置默认时钟
+         drv->probe(dev) //配置驱动中的probe接口
+         uclass_post_probe_device(dev) //调用所属class驱动的post_probe接口函数
+
+我们可以发现device_probe时都会先调用一下drv->ofdata_to_platdata(dev)，
+之后才会去执行probe接口函数，我们可以看下drivers/core/uclass.c文件中
+uclass_find_device_by_seq函数的调试信息，其实u-boot是建立了一个哈希表来存放设备树的，
+下面是搜索遍历根节点设备的信息，当你打开debug后便会发现，串口控制台打印的很大一部分信息都是搜索设备树的信息。
+
+.. image:: media/uboot_pro020.png
+   :align: center
+   :alt: 未找到图片05|
+
+紧接着看下我们的设备树文件imx6ull.dtsi看看是不是一模一样的，^-^。
+
+.. image:: media/uboot_pro021.png
+   :align: center
+   :alt: 未找到图片05|
+
+由于要渗入理解设备模型比较复杂，我们只要熟悉一下它的工作流程即可。
+
+
+board_init函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: drivers/core/device.c
+   :emphasize-lines: 4
+
+   int board_init(void)
+   {
+      /* Address of boot parameters */
+      gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
+
+   #ifdef	CONFIG_FEC_MXC
+      setup_fec(CONFIG_FEC_ENET_DEV);
+   #endif
+
+   #ifdef CONFIG_FSL_QSPI
+      board_qspi_init();
+   #endif
+
+   #ifdef CONFIG_NAND_MXS
+      setup_gpmi_nand();
+   #endif
+
+      return 0;
+   }
+
+1. 第4行，此函数只有该行被执行，意思是设置启动参数的地址，其中PHYS_SDRAM被定义为0x10000000，因此gd->bd->bi_boot_params = 0x10000000 + 0x100 = 0x10000100。
+
+
+stdio_init_tables函数，因为该函数没有被配置相关的宏，所以没有做什么工作，忽略。
+
+
+initr_serial函数：该函数完成串口相关初始化，该函数还是有很多东西值得挖掘的，代码如下。
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 4
+
+   static int initr_serial(void)
+   {
+      serial_initialize();
+      return 0;
+   }
+
+这里我们并没有看到什么复杂操作，我们到进入serial_initialize函数里面看看。
+
+.. code-block:: c
+   :linenos:
+   :caption: drivers/serial/serial.c
+   :emphasize-lines: 21
+
+   /**
+    * serial_initialize() - Register all compiled-in serial port drivers
+    *
+    * This function registers all serial port drivers that are compiled
+    * into the U-Boot binary with the serial core, thus making them
+    * available to U-Boot to use. Lastly, this function assigns a default
+    * serial port to the serial core. That serial port is then used as a
+    * default output.
+    */
+   void serial_initialize(void)
+   {
+      atmel_serial_initialize();
+      mcf_serial_initialize();
+      mpc85xx_serial_initialize();
+      mxc_serial_initialize();
+      ns16550_serial_initialize();
+      pl01x_serial_initialize();
+      pxa_serial_initialize();
+      sh_serial_initialize();
+
+      serial_assign(default_serial_console()->name);
+   }
+
+1. 第12~19行，这些函数并没有初始化实际的硬件，他们单纯的向u-boot注册一下struct serial_device类型的串口设备。
+
+2. 第21行，serial_assign函数查找当前所使用的串口设备，同时把对应的结构体地址传给指向当前使用的串口设备指针serial_current。其遍历serial_devices，并根据设备名字匹配串口。
+
+
+initr_announce函数，该函数只有一行debug打印调试信息的代码，表示RAM正在运行，且u-boot已经完成了重定位，调试信息如下图所示：
+
+.. image:: media/uboot_pro0019.png
+   :align: center
+   :alt: 未找到图片05|
+
+
+power_init_board函数，此函数为空函数，忽略。
+
+
+initr_nand函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 6
+
+   #ifdef CONFIG_CMD_NAND
+   /* go init the NAND */
+   static int initr_nand(void)
+   {
+      puts("NAND:  ");
+      nand_init();
+      printf("%lu MiB\n", nand_size() / 1024);
+      return 0;
+   }
+   #endif
+
+1. 第5行，打印"NAND:  "信息到串口控制台，表示要初始化nand了，这是对于nand版本6u而言的，由于我目前使用的是emmc，故此函数什么也没做。
+
+
+initr_mmc函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: drivers/mmc/mmc.c
+   :emphasize-lines: 4
+
+   static int initr_mmc(void)
+   {
+      puts("MMC:   ");
+      mmc_initialize(gd->bd);
+      return 0;
+   }
+
+我们将第4行mmc_initialize函数展开分析一下。
+
+.. code-block:: c
+   :linenos:
+   :caption: drivers/mmc/mmc.c
+   :emphasize-lines: 6,14
+
+   int mmc_initialize(bd_t *bis)
+   {
+      static int initialized = 0;
+      int ret;
+      if (initialized)	/* Avoid initializing mmc multiple times */
+         return 0;
+      initialized = 1;
+
+   #if !CONFIG_IS_ENABLED(BLK)
+   #if !CONFIG_IS_ENABLED(MMC_TINY)
+      mmc_list_init();
+   #endif
+   #endif
+      ret = mmc_probe(bis);
+      if (ret)
+         return ret;
+
+   #ifndef CONFIG_SPL_BUILD
+      print_mmc_devices(',');
+   #endif
+
+      mmc_do_preinit();
+      return 0;
+   }
+
+1. 第5~7行，为了避免重复初始化emmc，所以设置了一个initialized标志位，只初始化一次emmc。
+
+2. 第14行，初始化emmc。
+
+
+initr_env函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 6,14,28
+
+   static int initr_env(void)
+   {
+      char *p;
+
+      /* initialize environment */
+      if (should_load_env())
+         env_relocate();
+      else
+         set_default_env(NULL, 0);
+   #ifdef CONFIG_OF_CONTROL
+      env_set_hex("fdtcontroladdr",
+            (unsigned long)map_to_sysmem(gd->fdt_blob));
+   #endif
+      if(1 == check_mmc_num())
+      {
+         env_set("storage_media","init=/opt/scripts/tools/Nand/init-Nand-flasher-v1.sh");
+         p = env_get("storage_media");
+         printf("WARNING:%s\n",p);
+      }
+      else
+      {
+         env_set("storage_media","init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh");
+         p = env_get("storage_media");
+         printf("WARNING:%s\n",p);
+      }
+      
+      /* Initialize from environment */
+      load_addr = env_get_ulong("loadaddr", 16, load_addr);
+      printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$WARNING:%X\n",load_addr); //为方便调试添加，查看加载地址
+      return 0;
+   }
+
+1. 第6~9行，检查早期在u-boot中的环境变量是否OK，和FDT核对一下，默认它是OK的，如果早期的环境变量OK就则找到且加载环境变量，否则使用默认的环境变量。
+
+我没进入env_relocate函数看看，到底发送了什么。
+
+.. code-block:: c
+   :linenos:
+   :caption: env/common.c
+   :emphasize-lines: 8,17
+
+   void env_relocate(void)
+   {
+   #if defined(CONFIG_NEEDS_MANUAL_RELOC)
+      env_reloc();
+      env_fix_drivers();
+      env_htab.change_ok += gd->reloc_off;
+   #endif
+      if (gd->env_valid == ENV_INVALID) {
+   #if defined(CONFIG_ENV_IS_NOWHERE) || defined(CONFIG_SPL_BUILD)
+         /* Environment not changable */
+         set_default_env(NULL, 0);
+   #else
+         bootstage_error(BOOTSTAGE_ID_NET_CHECKSUM);
+         set_default_env("bad CRC", 0);
+   #endif
+      } else {
+         env_load();
+      }
+   }
+
+我没看到第8行，大家可以回归头去看看我们前面化的global_data表格，其中gd->env_valid是等于1，即等于ENV_VALID的，所以我们直接
+分析env_load()函数了。
+
+.. code-block:: c
+   :linenos:
+   :caption: env/common.c
+   :emphasize-lines: 7,17
+
+   int env_load(void)
+   {
+      struct env_driver *drv;
+      int best_prio = -1;
+      int prio;
+
+      for (prio = 0; (drv = env_driver_lookup(ENVOP_LOAD, prio)); prio++) {
+         int ret;
+
+         if (!drv->load)
+            continue;
+
+         if (!env_has_inited(drv->location))
+            continue;
+
+         printf("#################################################################################\r\n");
+         printf("Loading Environment from %s... ", drv->name);
+         printf("#################################################################################\r\n");
+         /*
+         * In error case, the error message must be printed during
+         * drv->load() in some underlying API, and it must be exactly
+         * one message.
+         */
+         ret = drv->load();
+         if (!ret) {
+            printf("OK\n");
+            return 0;
+         } else if (ret == -ENOMSG) {
+            /* Handle "bad CRC" case */
+            if (best_prio == -1){
+               best_prio = prio;
+               printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %d\n", best_prio);
+            }
+         } else {
+            debug("Failed (%d)\n", ret);
+         }
+      }
+
+      /*
+      * In case of invalid environment, we set the 'default' env location
+      * to the best choice, i.e.:
+      *   1. Environment location with bad CRC, if such location was found
+      *   2. Otherwise use the location with highest priority
+      *
+      * This way, next calls to env_save() will restore the environment
+      * at the right place.
+      */
+      if (best_prio >= 0)
+         debug("Selecting environment with bad CRC\n");
+      else
+         best_prio = 0;
+      env_get_location(ENVOP_LOAD, best_prio);
+
+      return -ENODEV;
+   }
+
+首先看到第7行中的env_driver_lookup函数，它负责找到最适合的环境位置，成功后返回一个指向env_driver的指针，
+env_driver包含了存储设备的名字、从存储器加载环境的方法、保存环境到存储设备的方法以及设置初始的预搬迁环境的方法；
+第13行查看环境是否已经初始化过了；第16~18行，其中16与18行是我为了方便调试添加的；第24行，加载环境变量，如果加载成功则打印“OK”，
+环境变量中没有消息则打印32行数据，此行是我添加的，实际上会打印出第32行字符串。CRC校验失败，最后会使用自己设置的环境变量，我们再返回到initr_env函数
+，对照第14行，由于我们使用的是emmc所以check_mmc_num()返回值是2，及打印第22行对应的"init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh"环境变量信息。
+如下图所示：
+
+.. image:: media/uboot_pro022.png
+   :align: center
+   :alt: 未找到图片05|
+
+然后我们进入u-boot的命令行模式，打印一下“storage_media”这个环境变量看看是不是和我们预想的一样！
+
+.. image:: media/uboot_pro023.png
+   :align: center
+   :alt: 未找到图片05|
+
+2. initr_env函数中第28行，由于写的太长了，需要回到initr_env函数继续分析。该行中调用env_get_ulong函数得到环境变量中"loadaddr"的值，也就是加载地址0x80800000，地址打印如下所示。
+
+.. image:: media/uboot_pro024.png
+   :align: center
+   :alt: 未找到图片05|
+
+initr_secondary_cpu函数：对于imx6ull而言，它是单核cpu，所以此函数是个空函数，什么也没做，忽略。
+
+
+stdio_add_devices函数：添加标准输入输出设备。
+
+
+initr_jumptable函数：该函数调用了jumptable_init函数以初始化跳转表，为跳转表分配内存空间，它是基于动态分配的内存空间。
+
+
+console_init_r函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/console.c
+   :emphasize-lines: 14,30,58,72
+
+   /* Called after the relocation - use desired console functions */
+   int console_init_r(void)
+   {
+      char *stdinname, *stdoutname, *stderrname;
+      struct stdio_dev *inputdev = NULL, *outputdev = NULL, *errdev = NULL;
+   #ifdef CONFIG_SYS_CONSOLE_ENV_OVERWRITE
+      int i;
+   #endif /* CONFIG_SYS_CONSOLE_ENV_OVERWRITE */
+   #if CONFIG_IS_ENABLED(CONSOLE_MUX)
+      int iomux_err = 0;
+   #endif
+
+      /* set default handlers at first */
+      gd->jt->getc  = serial_getc;
+      gd->jt->tstc  = serial_tstc;
+      gd->jt->putc  = serial_putc;
+      gd->jt->puts  = serial_puts;
+      gd->jt->printf = serial_printf;
+
+      /* stdin stdout and stderr are in environment */
+      /* scan for it */
+      stdinname  = env_get("stdin");
+      stdoutname = env_get("stdout");
+      stderrname = env_get("stderr");
+
+      if (OVERWRITE_CONSOLE == 0) {	/* if not overwritten by config switch */
+         inputdev  = search_device(DEV_FLAGS_INPUT,  stdinname);
+         outputdev = search_device(DEV_FLAGS_OUTPUT, stdoutname);
+         errdev    = search_device(DEV_FLAGS_OUTPUT, stderrname);
+   #if CONFIG_IS_ENABLED(CONSOLE_MUX)
+         iomux_err = iomux_doenv(stdin, stdinname);
+         iomux_err += iomux_doenv(stdout, stdoutname);
+         iomux_err += iomux_doenv(stderr, stderrname);
+         if (!iomux_err)
+            /* Successful, so skip all the code below. */
+            goto done;
+   #endif
+      }
+      /* if the devices are overwritten or not found, use default device */
+      if (inputdev == NULL) {
+         inputdev  = search_device(DEV_FLAGS_INPUT,  "serial");
+      }
+      if (outputdev == NULL) {
+         outputdev = search_device(DEV_FLAGS_OUTPUT, "serial");
+      }
+      if (errdev == NULL) {
+         errdev    = search_device(DEV_FLAGS_OUTPUT, "serial");
+      }
+      /* Initializes output console first */
+      if (outputdev != NULL) {
+         /* need to set a console if not done above. */
+         console_doenv(stdout, outputdev);
+      }
+      if (errdev != NULL) {
+         /* need to set a console if not done above. */
+         console_doenv(stderr, errdev);
+      }
+      if (inputdev != NULL) {
+         /* need to set a console if not done above. */
+         console_doenv(stdin, inputdev);
+      }
+
+   #if CONFIG_IS_ENABLED(CONSOLE_MUX)
+   done:
+   #endif
+
+   #ifndef CONFIG_SYS_CONSOLE_INFO_QUIET
+      stdio_print_current_devices();//58
+   #endif /* CONFIG_SYS_CONSOLE_INFO_QUIET */
+   #ifdef CONFIG_VIDCONSOLE_AS_LCD
+      if (strstr(stdoutname, "lcd"))
+         printf("Warning: Please change 'lcd' to 'vidconsole' in stdout/stderr environment vars\n");
+   #endif
+
+   #ifdef CONFIG_SYS_CONSOLE_ENV_OVERWRITE
+      /* set the environment variables (will overwrite previous env settings) */
+      for (i = 0; i < MAX_FILES; i++) {
+         env_set(stdio_names[i], stdio_devices[i]->name);
+      }
+   #endif /* CONFIG_SYS_CONSOLE_ENV_OVERWRITE */
+
+      gd->flags |= GD_FLG_DEVINIT;	/* device initialization completed */
+
+   #if 0
+      /* If nothing usable installed, use only the initial console */
+      if ((stdio_devices[stdin] == NULL) && (stdio_devices[stdout] == NULL))
+         return 0;
+   #endif
+      print_pre_console_buffer(PRE_CONSOLE_FLUSHPOINT2_EVERYTHING_BUT_SERIAL);
+      return 0;
+   }
+
+1. 第14~18行，设置默认的控制台处理函数，都为串口。
+
+2. 第22~24行，从环境变量中扫描分别得到"stdin"、"stdout"及"stderr"（标准输入、标准输出及标准错误）对应的设备名字。
+
+3. 第27~29行，由于我们定义OVERWRITE_CONSOLE=0，因为没有配置控制台的设备，故执行这段代码，通过标准输入、输出、错误名字搜索其对应的设备。
+
+4. 第30~38行，如果没有搜索到设备，则搜索使用默认的串口设备"serial"，后面设置串口的引脚复用功能。
+
+5. 第58行，打印当前的标准输入、输出、错误对应的设备名字。
+
+我们将stdio_print_current_devices函数展开如下：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/console.c
+   :emphasize-lines: 4,11,17
+
+   void stdio_print_current_devices(void)
+   {
+      /* Print information */
+      puts("In:    ");
+      if (stdio_devices[stdin] == NULL) {
+         puts("No input devices available!\n");
+      } else {
+         printf ("%s\n", stdio_devices[stdin]->name);
+      }
+
+      puts("Out:   ");
+      if (stdio_devices[stdout] == NULL) {
+         puts("No output devices available!\n");
+      } else {
+         printf ("%s\n", stdio_devices[stdout]->name);
+      }
+
+      puts("Err:   ");
+      if (stdio_devices[stderr] == NULL) {
+         puts("No error devices available!\n");
+      } else {
+         printf ("%s\n", stdio_devices[stderr]->name);
+      }
+   }
+
+这个函数分别打印出标准输入、标准输出、标准错误对应的设备，大家看下面的图片就一目了然了。
+
+.. image:: media/uboot_pro025.png
+   :align: center
+   :alt: 未找到图片05|
+
+6. 第68行，设置环境变量"stdout=xxx"、"stderr=xxx"、"stdin=xxx"。
+
+7. 第72行，设置gd->flags中的GD_FLG_DEVINIT标志位，表示控制台设备已经初始化完成了。
+
+
+interrupt_init函数:中断初始化，为中断设置栈。
+
+
+initr_enable_interrupts函数：使能中断异常。
+
+
+initr_ethaddr函数：从环境变量中获得并初始化网络地址，即从环境变量中找到ethaddr的值，并将其存到gd->bd->bi_enetaddr。
+
+
+board_late_init函数：主要是复位看门狗。
+
+
+initr_net函数：初始化网卡。
+
+.. code-block:: c
+   :linenos:
+   :caption: common/console.c
+   :emphasize-lines: 3,4
+
+   static int initr_net(void)
+   {
+      puts("Net:   ");
+      eth_initialize();
+   #if defined(CONFIG_RESET_PHY_R)
+      debug("Reset Ethernet PHY\n");
+      reset_phy();
+   #endif
+      return 0;
+   }
+
+1. 第3行，打印网络初始化就绪信息。
+
+2. 第4行，调用eth_initialize函数初始化网络相关，如MAC地址，将其展开如下。
+
+.. code-block:: c
+   :linenos:
+   :caption: net/eth-uclass.c
+   :emphasize-lines: 32,41
+
+   int eth_initialize(void)
+   {
+      int num_devices = 0;
+      struct udevice *dev;
+
+      eth_common_init();
+
+      /*
+      * Devices need to write the hwaddr even if not started so that Linux
+      * will have access to the hwaddr that u-boot stored for the device.
+      * This is accomplished by attempting to probe each device and calling
+      * their write_hwaddr() operation.
+      */
+      uclass_first_device_check(UCLASS_ETH, &dev);
+      if (!dev) {
+         printf("No ethernet found.\n");
+         bootstage_error(BOOTSTAGE_ID_NET_ETH_START);
+      } else {
+         char *ethprime = env_get("ethprime");
+         struct udevice *prime_dev = NULL;
+
+         if (ethprime)
+            prime_dev = eth_get_dev_by_name(ethprime);
+         if (prime_dev) {
+            eth_set_dev(prime_dev);
+            eth_current_changed();
+         } else {
+            eth_set_dev(NULL);
+         }
+
+         bootstage_mark(BOOTSTAGE_ID_NET_ETH_INIT);
+         do {
+            if (num_devices)
+               printf(", ");
+
+            printf("eth%d: %s", dev->seq, dev->name);
+
+            if (ethprime && dev == prime_dev)
+               printf(" [PRIME]");
+
+            eth_write_hwaddr(dev);
+
+            uclass_next_device_check(&dev);
+            num_devices++;
+         } while (dev);
+
+         putc('\n');
+      }
+
+      return num_devices;
+   }
+
+1. 第32~45行，遍历所有网络设备。
+
+2. 第41行，设置相关环境变量及mac地址。
+
+
+run_main_loop函数，终于到run_main_loop函数了：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 32,41
+
+   static int run_main_loop(void)
+   {
+   #ifdef CONFIG_SANDBOX
+      sandbox_main_loop_init();
+   #endif
+      /* main_loop() can return to retry autoboot, if so just run it again */
+      for (;;)
+         main_loop();
+      return 0;
+   }
+
+一看就有个死循环，如果启动不成功，可能会因此死循环而不断重新启动，进入main_loop函数看下。
+
+.. code-block:: c
+   :linenos:
+   :caption: common/board_r.c
+   :emphasize-lines: 18,22
+
+   /* We come here after U-Boot is initialised and ready to process commands */
+   void main_loop(void)
+   {
+      const char *s;
+
+      bootstage_mark_name(BOOTSTAGE_ID_MAIN_LOOP, "main_loop");
+
+      if (IS_ENABLED(CONFIG_VERSION_VARIABLE))
+         env_set("ver", version_string);  /* set version variable */
+
+      cli_init();
+
+      run_preboot_environment_command();
+
+      if (IS_ENABLED(CONFIG_UPDATE_TFTP))
+         update_tftp(0UL, NULL, NULL);
+
+      s = bootdelay_process();
+      if (cli_process_fdt(&s))
+         cli_secure_boot_cmd(s);
+
+      autoboot_command(s);
+
+      cli_loop();
+      panic("No CLI available");
+   }
+
+1. 第18行，处理延时参数，此函数为空函数，忽略。
+
+2. 第22行，若启动延时结束前，用户输入任意按键打断启动过程，则返回，否则启动。
+
+3. 第24行，读取用户输入的命令并执行之，
+
+4. 第25行，cli_loop返回，执行此处表明用户再bootdelay这段时间都没有任何输入，因此打印提示信息，表示没有获得命令。
+
+我们下面分别分析一下bootdelay_process函数与autoboot_command函数。
+
+首先分析bootdelay_process函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/autoboot.c
+   :emphasize-lines: 8,22,46
+
+   const char *bootdelay_process(void)
+   {
+      char *s;
+      int bootdelay;
+
+      bootcount_inc();
+
+      s = env_get("bootdelay");
+      bootdelay = s ? (int)simple_strtol(s, NULL, 10) : CONFIG_BOOTDELAY;
+
+   #if defined(is_boot_from_usb)
+      if (is_boot_from_usb() && env_get("bootcmd_mfg")) {
+         disconnect_from_pc();
+         printf("Boot from USB for mfgtools\n");
+         bootdelay = 0;
+         set_default_env("Use default environment for \
+               mfgtools\n", 0);
+      } else if (is_boot_from_usb()) {
+         printf("Boot from USB for uuu\n");
+         env_set("bootcmd", "fastboot 0");
+      } else {
+         printf("Normal Boot\n");
+      }
+   #endif
+
+   #ifdef CONFIG_OF_CONTROL
+      bootdelay = fdtdec_get_config_int(gd->fdt_blob, "bootdelay",
+            bootdelay);
+   #endif
+
+      debug("### main_loop entered: bootdelay=%d\n\n", bootdelay);
+
+   #if defined(CONFIG_MENU_SHOW)
+      bootdelay = menu_show(bootdelay);
+   #endif
+      bootretry_init_cmd_timeout();
+
+   #ifdef CONFIG_POST
+      if (gd->flags & GD_FLG_POSTFAIL) {
+         s = env_get("failbootcmd");
+      } else
+   #endif /* CONFIG_POST */
+      if (bootcount_error())
+         s = env_get("altbootcmd");
+      else
+         s = env_get("bootcmd");
+
+   #if defined(is_boot_from_usb)
+      if (is_boot_from_usb() && env_get("bootcmd_mfg")) {
+         s = env_get("bootcmd_mfg");
+         printf("Run bootcmd_mfg: %s\n", s);
+      }
+   #endif
+
+      process_fdt_options(gd->fdt_blob);
+      stored_bootdelay = bootdelay;
+
+      return s;
+   }
+
+1. 第6行，该函数为空函数，忽略。
+
+2. 第8行，再环境变量中搜索bootdelay这个环境变量（字符串形式），如果有配置该环境变量则会将字符串转换成长整型数值，否则选择CONFIG_BOOTDELAY作为配置值。
+
+3， 第46行，从环境变量中获取bootcmd。
+
+
+接着分析autoboot_command函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/autoboot.c
+   :emphasize-lines: 3,5,46
+
+   void autoboot_command(const char *s)
+   {
+      debug("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
+
+      if (stored_bootdelay != -1 && s && !abortboot(stored_bootdelay)) {
+   #if defined(CONFIG_AUTOBOOT_KEYED) && !defined(CONFIG_AUTOBOOT_KEYED_CTRLC)
+         int prev = disable_ctrlc(1);	/* disable Control C checking */
+   #endif
+
+         run_command_list(s, -1, 0);
+
+   #if defined(CONFIG_AUTOBOOT_KEYED) && !defined(CONFIG_AUTOBOOT_KEYED_CTRLC)
+         disable_ctrlc(prev);	/* restore Control C checking */
+   #endif
+      }
+
+   #ifdef CONFIG_MENUKEY
+      if (menukey == CONFIG_MENUKEY) {
+         s = env_get("menucmd");
+         if (s)
+            run_command_list(s, -1, 0);
+      }
+   #endif /* CONFIG_MENUKEY */
+   }
+
+1. 第3行，打印bootcmd环境变量信息。
+
+2. 第5行，若stored_bootdelay != -1，且bootcmd有值，同时在启动过程中没有检测到任何打断启动过程的输入，则运行启动命令列表中的命令以启动。
+
+.. table:: 拨码开关启动配置表
+
+==== ====== ========== ==== == ===
+编号 名称   NAND FLASH eMMC SD USB
+==== ====== ========== ==== == ===
+1    MODE0  0          0    0  1
+2    MODE1  1          1    1  0
+3    CFG1-4 1          0    0  X
+4    CFG1-5 0          1    0  X
+5    CFG1-6 0          1    1  X
+6    CFG1-7 1          0    0  X
+7    CFG2-3 0          1    0  X
+8    CFG2-5 0          0    1  X
+==== ====== ========== ==== == ===
