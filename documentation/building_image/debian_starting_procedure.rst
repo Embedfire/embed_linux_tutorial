@@ -38,7 +38,7 @@ Andorid系统启动可以概括为两个阶段，第一阶段是uboot到OS，第
 更加类似，只是andorid在加载根文件系统之后有差异，三者都是类似的。
 
 
-u-boot源代码情景分析
+u-boot启动流程源代码情景分析
 ^^^^^^^
 
 u-boot启动第一阶段源代码分析
@@ -346,6 +346,7 @@ SCTLR寄存器用于控制标准内存和系统设备，并且为在硬件内核
 
 4. 第13行，将_start的值加载到r0寄存器当中。
 
+
 在u-boot源码目录下全局搜索_start（注意：要编译u-boot），在System.map文件中，可以看到_start的值为0x87800000，该地址为我们前面分析u-boot.lds中向量表vectors的起始地址，
 如下图所示：
 
@@ -361,6 +362,7 @@ SCTLR寄存器用于控制标准内存和系统设备，并且为在硬件内核
 
 总结：清除SCTLR中位域V[13]，然后设置VBAR指向向量表以实现向量表定位到0x87800000地址处。在分析后面代码之前，
 我们先总结一下这段_start中汇编做的工作：关闭中断、初始化异常向量表、设置SVC32模式、配置cp15.
+
 
 接着分析源码，如下所示：
 
@@ -842,8 +844,7 @@ cpu_init_crit的返回处，即接下来将进入_main函数。
 
 1. 第7行，不满足条件编译，忽略。
 
-2. 第10行，加载CONFIG_SYS_INIT_SP_ADDR到r0寄存器，CONFIG_SYS_INIT_SP_ADDR的值我们在前面已经计算过了，这里就不重复了，
-CONFIG_SYS_INIT_SP_ADDR = 0x0091ff00，详情参考include/configs/mx6ullevk.h文件。
+2. 第10行，加载CONFIG_SYS_INIT_SP_ADDR到r0寄存器，CONFIG_SYS_INIT_SP_ADDR的值我们在前面已经计算过了，这里就不重复了，CONFIG_SYS_INIT_SP_ADDR = 0x0091ff00，详情参考include/configs/mx6ullevk.h文件。
 
 3. 第12行，遵从ABI的8字节对齐，为什么要保证堆栈8字节对齐？AAPCS规则要求堆栈保持8字节对齐。如果不对齐，调用一般的函数也是没问题的。但是当调用需要严格遵守AAPCS规则的函数时可能会出错。例如调用sprintf输出一个浮点数时，栈必须是8字节对齐的，否则结果可能会出错。
 
@@ -1092,7 +1093,6 @@ bd_t结构体如下所示：
 
 3. 第6行，调用initcall_run_list（）初始化uboot的前半段。
 
-
 接着我们分析一下initcall_run_list。
 
 .. code-block:: c
@@ -1206,7 +1206,13 @@ bd_t结构体如下所示：
 
 setup_mon_len函数比较简单，它是根据.lds文件中__bss_end与__bss_end计算出u-boot本身的大，赋给gd->mon_len变量。
 
-fdtdec_setup函数，检查gd->fdt_blob处是否存在dtb。
+fdtdec_setup函数，检查gd->fdt_blob处是否存在dtb，我们来看下调试信息中gd->fdt_blob地址是否有存放设备树。
+
+.. image:: media/uboot_pro030.png
+   :align: center
+   :alt: 未找到图片01|
+
+通过上图发现gd->fdt_blob确实指向了设备树相关信息处。
 
 
 env_init函数：
@@ -1214,7 +1220,7 @@ env_init函数：
 .. code-block:: c
    :linenos:
    :caption: env/env.c
-   :emphasize-lines: 19,20
+   :emphasize-lines: 9,19,20
 
    int env_init(void)
    {
@@ -1243,7 +1249,9 @@ env_init函数：
       return ret;
    }
 
-1. 第19行，default_environment[]数组存放着默认的环境变量，该数组在include/env_default.h文件中有如下定义：
+1. 第9行，标记已经初始化环境变量。
+
+2. 第19行，default_environment[]数组存放着默认的环境变量，此段代码的意思是将默认环境变量default_environment的地址赋值给全局变量gd->env_addr，该数组在include/env_default.h文件中有如下定义：
 
 .. code-block:: c
    :linenos:
@@ -1357,6 +1365,8 @@ configs/mx6ull_npi_defconfig配置文件中的环境变量，修改该配置文�
 .. image:: media/uboot_pro014.png
    :align: center
    :alt: 未找到图片01|
+
+其中宏CONFIG_EXTRA_ENV_SETTINGS包含了我们include/configs/npi_common.h文件中的大多数环境变量，也包含fire-config中的/boot/uEnv.txt配置文件。
 
 2. 第20行，标记环境变量有效，gd->env_valid = ENV_VALID = 1。
 
@@ -2309,8 +2319,28 @@ initr_reloc_global_data函数（省略不符合条件编译部分）：
       return 0;
    }
 
-1. 第3~4行，设置monitor_flash_len及gd成员env_addr，重新定位早期的env_addr指针。
+1. 第3~4行，设置monitor_flash_len及gd成员env_addr=0x878a0499，重新定位早期的env_addr指针，我们打印一下定位后该地址存放的数据，看看是不是环境变量，如下图所示。
 
+.. image:: media/uboot_pro029.png
+   :align: center
+   :alt: 未找到图片05|
+
+其实我们在fire-config中修改的也就是环境变量中/boot/uEnv.txt文件，通过配饰该文件可以选择是否加载对应的设备树，我们分别对照一下include/configs/npi_common.h中的UBI_BOOT环境变量
+与存在env_addr所指向的内存地址处的环境变量，是一模一样的。
+
+.. image:: media/uboot_pro031.png
+   :align: center
+   :alt: 未找到图片05|
+
+.. image:: media/uboot_pro032.png
+   :align: center
+   :alt: 未找到图片05|
+
+2. 第6行，实现重定位，将EFI runtime重新定位到gd->relocaddr，重定位调试信息如下所示。
+
+.. image:: media/uboot_pro028.png
+   :align: center
+   :alt: 未找到图片05|
 
 initr_barrier函数，由于我们没有配置CONFIG_PPC宏，故忽略。
 
@@ -2429,6 +2459,7 @@ initr_dm函数如下：
                dm_scan_fdt_node     //在该函数中会确定设备是否具有clocks相关属性，如果没有则不会绑定
             dm_scan_fdt_ofnode_path //扫描"/firmware"节点
                dm_scan_fdt_node     //在该函数中会确定设备是否具有firmware相关属性，如果没有则不会绑定
+         dm_scan_other  //扫描其他设备
 
 完成以上函数的执行后，在内存中也就形成了一个至少深度为2的树形结构（假设有子节点），其中gd->dm_root
 保存着根节点的信息。
@@ -2508,13 +2539,17 @@ initr_dm函数如下：
       device_probe(dev)
          device_probe(dev)     //递归probe parent节点
          uclass_resolve_seq(dev) //分配一个seq给此设备
+            uclass_find_device_by_seq //根据ID和顺序查找uclass设备
+               uclass_get  //根据ID获取uclass，如果需要的话创建它
          dev->flags |= DM_FLAG_ACTIVATED;  //设置dev->flags，表示该设备已经被激活
          pinctrl_select_state(dev, "default"); //初始化相关引脚
+         uclass_pre_probe_device //处理probe后的设备
          dev->parent->driver->child_pre_probe(dev) //执行父节点驱动的child_pre_probe接口函数
          drv->ofdata_to_platdata(dev)  //执行设备驱动的ofdata_to_platdata接口函数
          clk_set_defaults(dev) //设置默认时钟
          drv->probe(dev) //配置驱动中的probe接口
          uclass_post_probe_device(dev) //调用所属class驱动的post_probe接口函数
+
 
 我们可以发现device_probe时都会先调用一下drv->ofdata_to_platdata(dev)，
 之后才会去执行probe接口函数，我们可以看下drivers/core/uclass.c文件中
@@ -2765,13 +2800,13 @@ initr_env函数：
       }
    }
 
-我没看到第8行，大家可以回归头去看看我们前面化的global_data表格，其中gd->env_valid是等于1，即等于ENV_VALID的，所以我们直接
+我没看到第8行，大家可以回归头去看看我们前面化的global_data表格，其中gd->env_valid是等于1，即等于ENV_VALID的，如果等于0就会使用默认的环境变量，所以我们直接
 分析env_load()函数了。
 
 .. code-block:: c
    :linenos:
    :caption: env/common.c
-   :emphasize-lines: 7,17
+   :emphasize-lines: 7,17,24
 
    int env_load(void)
    {
@@ -2845,6 +2880,18 @@ env_driver包含了存储设备的名字、从存储器加载环境的方法、�
 .. image:: media/uboot_pro023.png
    :align: center
    :alt: 未找到图片05|
+
+在这里我们要说一下，当其运行ret = drv->load()，它调用blk_find_device函数遍历加载环境变量时，为了方便管理环境变量，首先会创建一个哈希表，哈希表是基于哈希函数建立的一种查找表，然后将
+环境变量中的所有环境都依次填到哈希表中，调试信息如下所示。
+
+.. image:: media/uboot_pro033.png
+   :align: center
+   :alt: 未找到图片05|
+
+知识集锦【数据结构之什么是哈希表？】：
+
+- 哈希表就是一种以键值对存储数据的结构。
+- 哈希表是一个在空间和时间上做出权衡的经典例子。如果没有内存限制，那么可以直接将键作为数组的索引。那么所查找的时间复杂度为Ｏ(1);如果没有时间限制，那么我们可以使用无序数组并进行顺序查找，这样只需要很少的内存。哈希表使用了适度的时间和空间来在这两个极端之间找到了平衡。只需要调整哈希函数算法即可在时间和空间上做出取舍。
 
 2. initr_env函数中第28行，由于写的太长了，需要回到initr_env函数继续分析。该行中调用env_get_ulong函数得到环境变量中"loadaddr"的值，也就是加载地址0x80800000，地址打印如下所示。
 
@@ -2975,7 +3022,7 @@ console_init_r函数：
 .. code-block:: c
    :linenos:
    :caption: common/console.c
-   :emphasize-lines: 4,11,17
+   :emphasize-lines: 4,11,18
 
    void stdio_print_current_devices(void)
    {
@@ -3250,25 +3297,25 @@ run_main_loop函数，终于到run_main_loop函数了：
 .. code-block:: c
    :linenos:
    :caption: common/autoboot.c
-   :emphasize-lines: 3,5,46
+   :emphasize-lines: 3,5,10
 
    void autoboot_command(const char *s)
    {
       debug("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
 
       if (stored_bootdelay != -1 && s && !abortboot(stored_bootdelay)) {
-   #if defined(CONFIG_AUTOBOOT_KEYED) && !defined(CONFIG_AUTOBOOT_KEYED_CTRLC)
+   #if defined(CONFIG_AUTOBOOT_KEYED) && !defined(CONFIG_AUTOBOOT_KEYED_CTRLC)   //不执行
          int prev = disable_ctrlc(1);	/* disable Control C checking */
    #endif
 
          run_command_list(s, -1, 0);
 
-   #if defined(CONFIG_AUTOBOOT_KEYED) && !defined(CONFIG_AUTOBOOT_KEYED_CTRLC)
+   #if defined(CONFIG_AUTOBOOT_KEYED) && !defined(CONFIG_AUTOBOOT_KEYED_CTRLC)   //不执行
          disable_ctrlc(prev);	/* restore Control C checking */
    #endif
       }
 
-   #ifdef CONFIG_MENUKEY
+   #ifdef CONFIG_MENUKEY   //未定义不执行
       if (menukey == CONFIG_MENUKEY) {
          s = env_get("menucmd");
          if (s)
@@ -3279,7 +3326,371 @@ run_main_loop函数，终于到run_main_loop函数了：
 
 1. 第3行，打印bootcmd环境变量信息。
 
-2. 第5行，若stored_bootdelay != -1，且bootcmd有值，同时在启动过程中没有检测到任何打断启动过程的输入，则运行启动命令列表中的命令以启动。
+2. 第5行，若stored_bootdelay != -1，且bootcmd有值，同时在启动过程中没有检测到任何打断启动过程的输入，则运行启动命令列表run_command_list中的一系列命令,即默认的bootcmd命令，其中stored_bootdelay会在abortboot函数主每过一秒钟减1。
+
+然后我们来看下debug的调试信息，其显示了bootdelay和bootcmd的值。
+
+.. image:: media/uboot_pro027.png
+   :align: center
+   :alt: 未找到图片05|
+
+其中"run distro_bootcmd"这条命令是U-Boot中设计的一种启动机制，用来自适应各种不同的启动媒介，并从中找到可用的启动镜像然后启动。
+
+
+cli_loop函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/cli.c
+   :emphasize-lines: 4
+
+   void cli_loop(void)
+   {
+   #ifdef CONFIG_HUSH_PARSER
+      parse_file_outer();
+      /* This point is never reached */
+      for (;;);
+   #elif defined(CONFIG_CMDLINE)
+      cli_simple_loop();
+   #else
+      printf("## U-Boot command line is disabled. Please enable CONFIG_CMDLINE\n");
+   #endif /*CONFIG_HUSH_PARSER*/
+   }
+
+1. 第4行，一般情况下该函数只有第4行执行，如果我们在启动倒计时bootdelay减为0之前按下了按键打断其自启动过程，就会进入cli_loop函数，此函数负责不断循环检测并处理用户输入的命令。
+
+接着我们将parse_file_outer函数展开，如下所示:
+
+.. code-block:: c
+   :linenos:
+   :caption: common/cli_hush.c
+   :emphasize-lines: 9,11
+
+   int parse_file_outer(void)
+   #endif
+   {
+      int rcode;
+      struct in_str input;
+   #ifndef __U_BOOT__ //未定义
+      setup_file_in_str(&input, f);
+   #else
+      setup_file_in_str(&input);
+   #endif
+      rcode = parse_stream_outer(&input, FLAG_PARSE_SEMICOLON);
+      return rcode;
+   }
+
+1. 第9行，执行setup_file_in_str函数完成结构体input的初始化。
+
+2. 第11行，函数parse_stream_outer循环的主体，即do-while循环体，它完成用户输入命令的解析及执行。
+
+我们详细看下parse_stream_outer函数的执行流程：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/cli_hush.c
+   :emphasize-lines: 10,16,27
+
+   static int parse_stream_outer(struct in_str *inp, int flag)
+   {
+
+      struct p_context ctx;
+      o_string temp=NULL_O_STRING;
+      int rcode;
+   #ifdef __U_BOOT__
+      int code = 1;
+   #endif
+      do {
+         ctx.type = flag;
+         initialize_context(&ctx);
+         update_ifs_map();
+         if (!(flag & FLAG_PARSE_SEMICOLON) || (flag & FLAG_REPARSING)) mapset((uchar *)";$&|", 0);
+         inp->promptmode=1;
+         rcode = parse_stream(&temp, &ctx, inp,
+                  flag & FLAG_CONT_ON_NEWLINE ? -1 : '\n');
+   #ifdef __U_BOOT__
+         if (rcode == 1) flag_repeat = 0;
+   #endif
+         if (rcode != 1 && ctx.old_flag != 0) {
+            syntax();
+   #ifdef __U_BOOT__
+            flag_repeat = 0;
+   #endif
+         }
+         if (rcode != 1 && ctx.old_flag == 0) {
+            done_word(&temp, &ctx);
+            done_pipe(&ctx,PIPE_SEQ);
+   #ifndef __U_BOOT__
+            run_list(ctx.list_head);
+   #else
+            code = run_list(ctx.list_head);
+            if (code == -2) {	/* exit */
+               b_free(&temp);
+               code = 0;
+               /* XXX hackish way to not allow exit from main loop */
+               if (inp->peek == file_peek) {
+                  printf("exit not allowed from main input shell.\n");
+                  continue;
+               }
+               break;
+            }
+            if (code == -1)
+               flag_repeat = 0;
+   #endif
+         } else {
+            if (ctx.old_flag != 0) {
+               free(ctx.stack);
+               b_reset(&temp);
+            }
+   #ifdef __U_BOOT__
+            if (inp->__promptme == 0) printf("<INTERRUPT>\n");
+            inp->__promptme = 1;
+   #endif
+            temp.nonnull = 0;
+            temp.quote = 0;
+            inp->p = NULL;
+            free_pipe_list(ctx.list_head,0);
+         }
+         b_free(&temp);
+      /* loop on syntax errors, return on EOF */
+      } while (rcode != -1 && !(flag & FLAG_EXIT_FROM_LOOP) &&
+         (inp->peek != static_peek || b_peek(inp)));
+   #ifndef __U_BOOT__
+      return 0;
+   #else
+      return (code != 0) ? 1 : 0;
+   #endif /* __U_BOOT__ */
+   }
+
+1. 第10行，典型的do-While循环开始。
+
+2. 第16行，读取用户输入的命令，并解析，
+
+3. 第27行，执行用户输入的命令，我们进去看下。
+
+.. code-block:: c
+   :linenos:
+   :caption: common/cli_hush.c
+   :emphasize-lines: 8
+
+   /* Select which version we will use */
+   static int run_list(struct pipe *pi)
+   {
+      int rcode=0;
+   #ifndef __U_BOOT__
+      if (fake_mode==0) {
+   #endif
+         rcode = run_list_real(pi);
+   #ifndef __U_BOOT__
+      }
+   #endif
+      /* free_pipe_list has the side effect of clearing memory
+      * In the long run that function can be merged with run_list_real,
+      * but doing that now would hobble the debugging effort. */
+      free_pipe_list(pi,0);
+      return rcode;
+   }
+
+调用run_list_real函数，将收到的指令通过一系列处理加入一个执行列表，然后执行这个列表，带有很多控制与处理方式，最后
+调用cmd_process函数。
+
+分析cmd_process函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/command.c
+   :emphasize-lines: 1,20,21,28,49
+
+   enum command_ret_t cmd_process(int flag, int argc, char * const argv[],
+                  int *repeatable, ulong *ticks)
+   {
+      enum command_ret_t rc = CMD_RET_SUCCESS;
+      cmd_tbl_t *cmdtp;
+
+   #if defined(HUSH_CMDLINE_DBG)
+      {
+      int i;
+
+      printf("  +-+");
+      for (i = 0; i < argc; i++) {
+         printf("%s ", argv[i]);
+      }
+      printf("-+-\n");
+      }
+   #endif
+
+      /* Look up command in command table */
+      cmdtp = find_cmd(argv[0]);
+      if (cmdtp == NULL) {
+         printf("Unknown command '%s' - try 'help'\n", argv[0]);
+         printf("你敲的命令 '%s' 俺不认得喔！ - try 'help'\n", argv[0]);
+         return 1;
+      }
+
+      /* found - check max args */
+      if (argc > cmdtp->maxargs)
+         rc = CMD_RET_USAGE;
+
+   #if defined(CONFIG_CMD_BOOTD)
+      /* avoid "bootd" recursion */
+      else if (cmdtp->cmd == do_bootd) {
+         if (flag & CMD_FLAG_BOOTD) {
+            puts("'bootd' recursion detected\n");
+            rc = CMD_RET_FAILURE;
+         } else {
+            flag |= CMD_FLAG_BOOTD;
+         }
+      }
+   #endif
+
+      /* If OK so far, then do the command */
+      if (!rc) {
+         int newrep;
+
+         if (ticks)
+            *ticks = get_timer(0);
+         rc = cmd_call(cmdtp, flag, argc, argv, &newrep);
+         if (ticks)
+            *ticks = get_timer(*ticks);
+         *repeatable &= newrep;
+      }
+      if (rc == CMD_RET_USAGE)
+         rc = cmd_usage(cmdtp);
+      return rc;
+   }run_list_real
+
+
+1. 第1行，其中，argc,argv就是超级终端、minicom等软件通过串口输入的一行经过处理的命令，比如我们输入“mmc write 85000000 20000 30000”,就是把内存中0x85000000的内容写到emmc，从emmc地址0x20000开始，长度为0x30000，一下我们都以此例子来说明。经过前面的命令解析之后，argc = 5，argv[0] = emmc, argv[1] = write, argv[2] = 85000000, argv[3] = 20000, argv[4] = 30000。
+
+2. 第20行，通过mmc命令搜索要执行的代码。
+
+3. 第21~25行，如果u-boot没有支持用户输入的这个命令就会退出，当我们输错命令，或者胡乱输入就会看到Unknown command xxx字样。
+
+4. 第28行，用户输入的命令参数个数不能大于cmdtp->maxargs这个最大的参数个数。
+
+5. 第49行，运行用户输入的命令，将命令传递于命令处理函数。
+
+其中find_cmd函数负责查找用户输入的命令：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/command.c
+   :emphasize-lines: 5
+
+   cmd_tbl_t *find_cmd(const char *cmd)
+   {
+      cmd_tbl_t *start = ll_entry_start(cmd_tbl_t, cmd);
+      const int len = ll_entry_count(cmd_tbl_t, cmd);
+      return find_cmd_tbl(cmd, start, len);
+   }
+
+1. 第5行，以start为起始位置，开始从命令表中搜索命令。
+
+上面提到了命令表，那它到底是什么样子呢？
+
+cmd_tbl_s如下所示：
+
+.. code-block:: c
+   :linenos:
+   :caption: include/command.h
+
+   struct cmd_tbl_s {
+      char		*name;		/* 命令的名字 */
+      int		maxargs;	/* 最大的参数数量	*/
+                  /*
+                  * Same as ->cmd() except the command
+                  * tells us if it can be repeated.
+                  * Replaces the old ->repeatable field
+                  * which was not able to make
+                  * repeatable property different for
+                  * the main command and sub-commands.
+                  */
+      int		(*cmd_rep)(struct cmd_tbl_s *cmd, int flags, int argc,
+                  char * const argv[], int *repeatable);
+                  /* Implementation function	*/
+      int		(*cmd)(struct cmd_tbl_s *, int, int, char * const []);
+      char		*usage;		/* Usage message	(short)	*/
+   #ifdef	CONFIG_SYS_LONGHELP
+      char		*help;		/* Help  message	(long)	*/
+   #endif
+   #ifdef CONFIG_AUTO_COMPLETE
+      /* do auto completion on the arguments */
+      int		(*complete)(int argc, char * const argv[], char last_char, int maxv, char *cmdv[]);
+   #endif
+   };
+
+还有两个重要的宏：
+
+.. code-block:: c
+   :linenos:
+   :caption: include/command.h
+
+   #define U_BOOT_CMD_COMPLETE(_name, _maxargs, _rep, _cmd, _usage, _help,	\
+			    _comp)				\
+	_CMD_REMOVE(sub_ ## _name, _cmd)
+
+   #define U_BOOT_CMD(_name, _maxargs, _rep, _cmd, _usage, _help)		\
+	U_BOOT_CMD_COMPLETE(_name, _maxargs, _rep, _cmd, _usage, _help, NULL)
+
+我们已上面的emmc为例，展开后变成下面这样。
+
+.. code-block:: c
+   :linenos:
+   :caption: include/command.h
+
+   U_BOOT_CMD(
+         mmc, CONFIG_SYS_MAXARGS, 1, do_mmc,
+         "EMMC sub-system",
+         "info - show available EMMC devices\n"
+         "mmc device [dev] - show or set current device\n"
+         "mmc read - addr off|partition size\n"
+         "mmc write - addr off|partition size\n"
+         "    read/write 'size' bytes starting at offset 'off'\n"
+         "    to/from memory address 'addr', skipping bad blocks.\n"
+         "mmc read.raw - addr off|partition [count]\n"
+         "mmc write.raw - addr off|partition [count]\n"
+         "    Use read.raw/write.raw to avoid ECC and access the flash as-is.\n"
+   );
+
+- name：命令的名，非字符串，但在U_BOOT_CMD中用“#”符号转化为字符串
+- maxargs：命令的最大参数个数
+- repeatable：是否自动重复（按Enter键是否会重复执行）
+- command：该命令对应的响应函数指针
+- usage：简短的使用说明
+- help：详细的使用说明
+
+这些参数都会被存储在u-boot.lds文件所描述的.u_boot_list段中，
+
+.. code-block:: c
+   :linenos:
+   :caption: u-boot.lds
+
+   . = ALIGN(4);
+   .u_boot_list : {
+   KEEP(*(SORT(.u_boot_list*)));
+   }
+   . = ALIGN(4);
+
+
+
+u-boot加载内核阶段源代码分析
+'''''''
+
+u-boot初始化好硬件，分配完内存。最后，u-boot要将控制权交给linux，u-boot在第一阶段进行重定位
+的时候会将其第二阶段的整个u-boot重定位到内存中，内核也一样，因为内核是要运行在DDR中的，因此就要将内核重定位到DDR中。
+前面我们讲了很多环境变量、设备树等，这些都要传递给linux内核，Linux会读取这些参数，并且根据这些参数进行配置，它们是如何进行数据传递的呢？
+对于u-boot而言，它是可以自我自动的，不需要别人的干预，而对于linux内核而言，这就不一样了，他需要u-boot
+帮他搭建好内核运行所必须的环境，配置各种寄存器，和硬件紧密联系的是u-boot，而Linux地重定位也是由u-boot完成地，当所有环境都搭建好并传递给内核参数之后，才能让linux内核正常
+地运行，我们来看下调试信息中u-boot与Linux内核进行控制权交接的部分，其中地址0x80800000便是Linux的入口地址。
+
+.. image:: media/uboot_pro036.png
+   :align: center
+   :alt: 未找到图片05|
+
+那么问题来了，既然要运行在DDR中，去哪里找内核镜像加载到DDR？这就就是我们经常说的从哪里启动的问题，
+对于imx6ull EVK pro开发板而言，支持3种启动方式，也就是u-boot可以从3个地方获取linux内核，如NAND启动/EMMC启动、
+SD卡启动、USB启动等。我们开发板上板载了启动方式选择地拨码开关，根据下面表格设置拨码开关就可以实现从不同介质中加载Linux内核到
+DDR中运行，imx6ull在启动内核前会判断启动引脚地电平状态，根据启动引脚地电平状态选择不同的启动方式。
 
 .. table:: 拨码开关启动配置表
 
@@ -3295,3 +3706,445 @@ run_main_loop函数，终于到run_main_loop函数了：
 7    CFG2-3 0          1    0  X
 8    CFG2-5 0          0    1  X
 ==== ====== ========== ==== == ===
+
+当然，除了以上几种启动方式以外，u-boot还支持从网络下载远程服务器中的镜像的方式启动Linux内核，u-boot直接从远程服务器将镜像下载
+到本地DDR中运行，并且可以挂载根文件系统到远程服务器。
+
+不管是那种启动方式，最终都要将内核镜像加载到DDR中运行，当使用网络（tftp与nfs）启动时，还应该在u-boot的命令终端
+上配置相应的环境变量，如本机ip、服务器ip、网关、子网掩码等，特别提示：需要设置板子ip与服务器ip在同一个网段上才可以实现网络数据访问。
+
+接下来我们分析一下linux内核启动源码。
+
+当u-boot执行bootcmd的命令后，最终会调用do_bootz函数启动Linux内核：
+
+在do_bootz之前会运行一段启动脚本，该启动脚本在include/configs/npi_common.h文件中有相关描述。
+我们挑一段启动脚本简要梳理一下。
+
+.. code-block:: c
+   :linenos:
+   :caption: include/configs/npi_common.h
+
+   #define UBI_BOOT   \
+      "ubiboot=" \
+         "echo debug:[${devtype} ${ubidev}];" \
+         "if ${devtype} part rootfs; then " \
+            "setenv bootpart ${ubidev}:rootfs; " \
+            "ubifsmount ubi0;"\
+            "if test -e ${devtype} ${bootpart} /etc/fstab; then " \
+               "setenv ubipart 1;" \
+            "fi; " \
+            "echo Checking for: uEnv.txt ...;" \ //检查配置文件uEnv.txt
+            "if test -e ${devtype} ${bootpart} uEnv.txt; then " \
+               "if run nandbootnev; then " \
+                  "echo Loaded environment from uEnv.txt;" \
+                  "run importbootenv;" \
+               "fi;" \
+               "echo Checking if client_ip is set ...;" \
+               "if test -n ${client_ip}; then " \
+                  "if test -n ${dtb}; then " \
+                     "setenv fdtfile ${dtb};" \
+                     "echo using ${fdtfile} ...;" \
+                  "fi;" \
+                  "if test -n ${uname_r}; then " \
+                     "echo Running nfsboot_uname_r ...;" \
+                     "run nfsboot_uname_r;" \
+                  "fi;" \
+                  "echo Running nfsboot ...;" \
+                  "run nfsboot;" \
+               "fi;" \
+            "fi; " \
+            "echo Checking for: /${script} ...;" \
+            "if test -e ${devtype} ${bootpart} /${script}; then " \
+               "setenv scriptfile ${script};" \
+               "run loadbootscript;" \
+               "echo Loaded script from ${scriptfile};" \
+               "run bootscript;" \
+            "fi; " \
+            "echo Checking for: /boot/${script} ...;" \
+            "if test -e ${devtype} ${bootpart} /boot/${script}; then " \ //检查脚本文件是否存在
+               "setenv scriptfile /boot/${script};" \ //设置脚本文件
+               "run loadbootscript;" \ //加载启动脚本
+               "echo Loaded script from ${scriptfile};" \ //打印从scriptfile中加载脚本
+               "run bootscript;" \ //执行启动脚本
+            "fi; " \
+            "echo Checking for: /boot/uEnv.txt ...;" \ //检查/boot/uEnv.txt，该脚本为fire-config主要的配置脚本
+            "for i in 1 2 3 4 5 6 7 ; do " \
+               "setenv ubipart ${i};" \
+               "setenv curpart ${ubidev}:${ubipart};" \
+               "if test -e ${devtype} ${curpart} /boot/uEnv.txt; then " \ //判断/boot/uEnv.txt文件是否存在
+                  "setenv bootpart ${mmcdev}:${mmcpart};" \
+                  "ubifsload ${loadaddr} /boot/uEnv.txt;" \ //加载/boot/uEnv.txt配置文件
+                  "env import -t ${loadaddr} ${filesize};" \
+                  "echo Loaded environment from /boot/uEnv.txt;" \ //从/boot/uEnv.txt中加载环境变量
+               "fi;" \
+               "if test -e ${devtype} ${curpart} /bin/sh; then " \ //判断/bin/sh文件是否存在
+                  "setenv rootpart ${ubidev}:${ubipart};" \
+                  "if test -n ${dtb}; then " \ //如果${dtb}字符串（即imx6ull-seeed-npi.dtb）长度不为零则运行下面语句
+                     "echo debug: [dtb=${dtb}] ... ;" \ //打印所使用的设备树文件（imx6ull-seeed-npi.dtb）
+                     "setenv fdtfile ${dtb};" \ //设置环境变量中设备树文件为imx6ull-seeed-npi.dtb
+                     "echo Using: dtb=${fdtfile} ...;" \ //使用设备树文件，在/boot/uEnv中设备树文件被配置为imx6ull-seeed-npi.dtb
+                  "fi;" \
+                  "echo Checking if uname_r is set in /boot/uEnv.txt...;" \ //检查/boot/uEnv.txt文件中是否设置了uname_r（内核版本）信息
+                  "if test -n ${uname_r}; then " \ //如果/boot/uEnv.txt文件中设置了uname_r
+                     "setenv oldroot /dev/ubi${ubidev}p${ubipart};" \
+                     "echo Running uname_boot ...;" \
+                     "run uname_nandboot;" \ //运行uname_nandboot，uname_nandboot又是一段脚本
+                  "fi;" \
+               "fi;" \
+            "done;" \
+         "fi;\0" \
+
+   #define NPI_UNAME_NANDBOOT \
+      "uname_nandboot="\
+      ......
+      "bootz ${loadaddr} ${rdaddr}:${rdsize} ${fdtaddr}; " \ //最终会运行bootz命令来启动Linux内核，告知linux镜像存放在那个地址，设备树放在哪里
+
+执行完上面的脚本后，在串口终端会输出相应的信息，如下所示。
+
+.. image:: media/uboot_pro037.png
+   :align: center
+   :alt: 未找到图片05|
+
+.. image:: media/uboot_pro038.png
+   :align: center
+   :alt: 未找到图片05|
+
+.. image:: media/uboot_pro039.png
+   :align: center
+   :alt: 未找到图片05|
+
+
+由上脚本可知，最终会执行bootz命令，那么我们看下bootz命令是什么。
+
+.. code-block:: c
+   :linenos:
+   :caption: cmd/bootz.c
+   :emphasize-lines: 2
+
+   U_BOOT_CMD(
+	bootz,	CONFIG_SYS_MAXARGS,	1,	do_bootz,
+	"boot Linux zImage image from memory", bootz_help_text
+   );
+
+我们可以看到第2行，执行bootz命令会调用do_bootz函数。
+
+do_bootz函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/command.c
+   :emphasize-lines: 7,14,16,17
+
+   int do_bootz(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+   {
+      int ret;
+
+      /* Consume 'bootz' */
+      argc--; argv++;
+      if (bootz_start(cmdtp, flag, argc, argv, &images))
+         return 1;
+
+      /*
+      * We are doing the BOOTM_STATE_LOADOS state ourselves, so must
+      * disable interrupts ourselves
+      */
+      bootm_disable_interrupts();   //关闭中断
+
+      images.os.os = IH_OS_LINUX;   //表示使用的是linux
+      ret = do_bootm_states(cmdtp, flag, argc, argv,
+   #ifdef CONFIG_SYS_BOOT_RAMDISK_HIGH
+                  BOOTM_STATE_RAMDISK |
+   #endif
+                  BOOTM_STATE_OS_PREP | BOOTM_STATE_OS_FAKE_GO |
+                  BOOTM_STATE_OS_GO,
+                  &images, 1);
+
+      return ret;
+   }
+
+1. 第7行，设置并找到linux镜像的入口点。
+
+2. 第14行，由于需要加载linux镜像，所以必须关闭中断。
+
+
+下面我们将详细分析do_bootz函数的细节，首先我们看到第7行中使用了images这个全局变量作为镜像的信息和交换的数据要用到的信息，
+images是一个很重要的全局变量。它的类型是bootm_headers_t，其定义如下（删除了不符合条件编译部分，展开部分重要结构）：
+
+.. code-block:: c
+   :linenos:
+   :caption: include/image.h
+
+   typedef struct bootm_headers {neg
+      image_header {
+         __be32		ih_magic;	/* 镜像头部幻数，为include/image.h中的 IH_MAGIC = 0x27051956  	*/
+         __be32		ih_hcrc;	/* 镜像头部crc校验码	*/
+         __be32		ih_time;	/* 镜像创建时间戳	*/
+         __be32		ih_size;	/* 镜像数据大小（除去头部）	*/
+         __be32		ih_load;	/* 数据将要载入的内存地址	*/
+         __be32		ih_ep;		/* 镜像入口地址		*/
+         __be32		ih_dcrc;	/* 镜像数据校验码	*/
+         uint8_t		ih_os;		/* 操作系统类型：IH_OS_LINUX		*/
+         uint8_t		ih_arch;	/* CPU架构类型：IH_ARCH_ARM		*/
+         uint8_t		ih_type;	/* 镜像类型：IH_TYPE_KERNEL */
+         uint8_t		ih_comp;	/* 压缩的类型：IH_COMP_NONE 		*/
+         uint8_t		ih_name[IH_NMLEN];	/* 镜像名字	IH_NMLEN = 32	*/
+      } *legacy_hdr_os,		/* 镜像头部指针ne'g */
+      legacy_hdr_os_copy;   /* header copy */
+
+      ulong		legacy_hdr_valid;  
+
+      image_info {
+         ulong		start, end;		/* 镜像的起始地址和结束地址 */
+         ulong		image_start, image_len; /* 镜像的起始地址和长度 */
+         ulong		load;			/* 镜像的加载地址 */
+         uint8_t		comp, type, os;		/* 压缩, 镜像的类型, 操作系统的类型 */
+         uint8_t		arch;			/* cpu的架构 */
+      } os;
+
+      ulong		ep;		/* 操作系统的入口点 */
+
+      ulong		rd_start, rd_end; /* ramdisk的起始地址和结束地址 */
+
+      char		*ft_addr;	/* 设备树地址 */
+      ulong		ft_len;		/* 设备树所占用的长度 */
+
+      ulong		initrd_start;
+      ulong		initrd_end;
+      ulong		cmdline_start;    //命令行起始地址
+      ulong		cmdline_end;      //命令行结束地址
+      bd_t		*kbd;
+      int		verify;		/* env_get("verify")[0] != 'n' */
+
+   #define	BOOTM_STATE_START	(0x00000001)   //要执行的状态
+   #define	BOOTM_STATE_FINDOS	(0x00000002)
+   #define	BOOTM_STATE_FINDOTHER	(0x00000004)
+   #define	BOOTM_STATE_LOADOS	(0x00000008)
+   #define	BOOTM_STATE_RAMDISK	(0x00000010)
+   #define	BOOTM_STATE_FDT		(0x00000020)
+   #define	BOOTM_STATE_OS_CMDLINE	(0x00000040)
+   #define	BOOTM_STATE_OS_BD_T	(0x00000080)
+   #define	BOOTM_STATE_OS_PREP	(0x00000100)
+   #define	BOOTM_STATE_OS_FAKE_GO	(0x00000200)	/* 'Almost' run the OS */
+   #define	BOOTM_STATE_OS_GO	(0x00000400)
+      int		state;   //状态
+   } bootm_headers_t;
+
+   extern bootm_headers_t images;   //声明给外部调用
+
+看完image结构之后，我们继续回到do_bootz函数中的bootz_start函数去继续分析。
+
+bootz_start函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: cmd/bootz.c
+   :emphasize-lines: 7
+
+   static int bootz_start(cmd_tbl_t *cmdtp, int flag, int argc,
+            char * const argv[], bootm_headers_t *images)
+   {
+      int ret;
+      ulong zi_start, zi_end;
+
+      ret = do_bootm_states(cmdtp, flag, argc, argv, BOOTM_STATE_START,
+                  images, 1);
+
+      /* Setup Linux kernel zImage entry point */
+      if (!argc) {
+         images->ep = load_addr;
+         debug("*  kernel: default image load address = 0x%08lx\n",
+               load_addr);
+      } else {
+         images->ep = simple_strtoul(argv[0], NULL, 16); //将内核入口点字符串转成无符号长整型的十六进制数值：0x80800000
+         debug("*  kernel: cmdline image address = 0x%08lx\n",
+            images->ep);
+      }
+
+      ret = bootz_setup(images->ep, &zi_start, &zi_end);
+      if (ret != 0)
+         return 1;
+
+      lmb_reserve(&images->lmb, images->ep, zi_end - zi_start);
+
+      /*
+      * Handle the BOOTM_STATE_FINDOTHER state ourselves as we do not
+      * have a header that provide this informaiton.
+      */
+      if (bootm_find_images(flag, argc, argv))  //找到镜像的位置
+         return 1;
+
+   #ifdef CONFIG_SECURE_BOOT
+      extern int authenticate_image(
+            uint32_t ddr_start, uint32_t raw_image_size);
+      if (authenticate_image(images->ep, zi_end - zi_start) != 0) {
+         printf("Authenticate zImage Fail, Please check\n");
+         return 1;
+      }
+   #endif
+      return 0;
+   }
+
+   1. 第7行，do_bootm_states函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: cmd/bootz.c
+   :emphasize-lines: 7
+
+   int do_bootm_states(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
+            int states, bootm_headers_t *images, int boot_progress)
+   {
+      boot_os_fn *boot_fn;
+      ulong iflag = 0;
+      int ret = 0, need_boot_fn;
+
+      images->state |= states;   //经过打印得知，镜像执行的状态有：BOOTM_STATE_START、BOOTM_STATE_RAMDISK、BOOTM_STATE_OS_PREP、BOOTM_STATE_OS_FAKE_GO、BOOTM_STATE_OS_GO，为缩减代码，删去未执行状态相关的代码。
+
+      if (states & BOOTM_STATE_START)
+         ret = bootm_start(cmdtp, flag, argc, argv);
+
+      /* From now on, we need the OS boot function */
+      if (ret)
+         return ret;
+      boot_fn = bootm_os_get_boot_func(images->os.os);
+      need_boot_fn = states & (BOOTM_STATE_OS_CMDLINE |
+            BOOTM_STATE_OS_BD_T | BOOTM_STATE_OS_PREP |
+            BOOTM_STATE_OS_FAKE_GO | BOOTM_STATE_OS_GO);
+      if (boot_fn == NULL && need_boot_fn) {
+         if (iflag)
+            enable_interrupts();
+         printf("ERROR: booting os '%s' (%d) is not supported\n",
+               genimg_get_os_name(images->os.os), images->os.os);
+         bootstage_error(BOOTSTAGE_ID_CHECK_BOOT_OS);
+         return 1;
+      }
+
+
+      /* Call various other states that are not generally used */
+      if (!ret && (states & BOOTM_STATE_OS_CMDLINE))
+         ret = boot_fn(BOOTM_STATE_OS_CMDLINE, argc, argv, images);
+      if (!ret && (states & BOOTM_STATE_OS_BD_T))
+         ret = boot_fn(BOOTM_STATE_OS_BD_T, argc, argv, images);
+      if (!ret && (states & BOOTM_STATE_OS_PREP)) {
+         ret = boot_fn(BOOTM_STATE_OS_PREP, argc, argv, images);
+      }
+
+      /* Check for unsupported subcommand. */
+      if (ret) {
+         puts("subcommand not supported\n");
+         return ret;
+      }
+
+      /* Now run the OS! We hope this doesn't return */
+      if (!ret && (states & BOOTM_STATE_OS_GO))
+         ret = boot_selected_os(argc, argv, BOOTM_STATE_OS_GO,
+               images, boot_fn);
+
+      /* Deal with any fallout */
+   err:
+      if (iflag)
+         enable_interrupts();
+
+      if (ret == BOOTM_ERR_UNIMPLEMENTED)
+         bootstage_error(BOOTSTAGE_ID_DECOMP_UNIMPL);
+      else if (ret == BOOTM_ERR_RESET)
+         do_reset(cmdtp, flag, argc, argv);
+
+      return ret;
+   }
+
+do_bootm_states函数首先调用bootm_start，如下，因为函数调用比较多，所以将函数说明写在注释中：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/bootm.c
+
+   static int bootm_start(cmd_tbl_t *cmdtp, int flag, int argc,
+		       char * const argv[])
+   {
+      memset((void *)&images, 0, sizeof(images));  //清空前面讲到的image结构
+      images.verify = env_get_yesno("verify");  // verify = -1
+      boot_start_lmb(&images);   //空函数
+
+      bootstage_mark_name(BOOTSTAGE_ID_BOOTM_START, "bootm_start"); //标记引导阶段
+      images.state = BOOTM_STATE_START; //标记为开始状态
+
+      return 0;
+   }
+
+
+最后进入到do_bootm_linux函数：
+
+.. code-block:: c
+   :linenos:
+   :caption: common/bootm.c
+
+   int do_bootm_linux(int flag, int argc, char * const argv[],
+            bootm_headers_t *images)
+   {
+      /* No need for those on ARM */
+      if (flag & BOOTM_STATE_OS_BD_T || flag & BOOTM_STATE_OS_CMDLINE)
+         return -1;
+
+      if (flag & BOOTM_STATE_OS_PREP) {
+         boot_prep_linux(images);
+         return 0;
+      }
+
+      if (flag & (BOOTM_STATE_OS_GO | BOOTM_STATE_OS_FAKE_GO)) {
+         boot_jump_linux(images, flag);
+         return 0;
+      }
+
+      boot_prep_linux(images);
+      boot_jump_linux(images, flag);
+      return 0;
+   }
+
+我们简单看下do_bootm_linux函数的调用顺序。
+
+.. code-block:: c
+   :linenos:
+   :caption: arch/arm/lib/bootm.c
+   :emphasize-lines: 21,24
+
+   do_bootm_linux(int flag, int argc, char * const argv[], bootm_headers_t *images)
+      boot_prep_linux(images) //Linux与启动相关设置，将环境变量bootargs保存以便后面传递给内核
+         image_setup_linux(images)
+            boot_fdt_add_mem_rsv_regions //为fdt保留一块内存
+            boot_relocate_fdt //重定向设备树，
+            image_setup_libfdt
+               fdt_root //在引导Linux之前，将数据添加到FDT的根节点中
+               fdt_chosen  寻找 chosen node ，如果没有这个节点则创建
+                  env_get("bootargs"); //得到启动参数
+                  fdt_setprop(fdt, nodeoffset, "bootargs", str, strlen(str) + 1);   //把"bootargs"设置成设备树的属性
+               arch_fixup_fdt
+                  or (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
+                     start[bank] = bd->bi_dram[bank].start;
+                     size[bank] = bd->bi_dram[bank].size;
+                  }  //获取内存的起始地址与长度
+                  fdt_fixup_memory_banks(blob, start, size, CONFIG_NR_DRAM_BANKS);//修复或创建内存节点
+                  fdt_update_ethernet_dt(blob); //更新网络相关的fdt
+               fdt_fixup_ethernet(blob);  //更新网络节点
+      boot_jump_linux(images, flag);
+         machid = gd->bd->bi_arch_number  //得到机器ID，主要用于Linux检查，若Linux的ID表中有这个机器ID才会启动。
+         void (*kernel_entry)(int zero, int arch, uint params) //定义一个函数指针kernel_entry
+         kernel_entry = (void (*)(int, int, uint))images->ep  //将images ->ep内核入口点强制类型转换为kernel_entry函数指针
+         announce_and_cleanup(fake) //清除
+            printf("\nStarting kernel ...%s\n\n", fake ?"(fake run for tracing)" : "");//打印字符串，表示Linux内核启动中
+            cleanup_before_linux(void) //关闭且清空cache
+         r2 = (unsigned long)images->ft_addr   //以设fdt方式传递参数
+         kernel_entry(0, machid, r2)   //启动Linux内核
+
+1. 第21行，images->ep中的ep就是entrypoint的缩写，这便是程序的入口点，该行代码将ep赋值给kernel_entry，而这个函数指针指向的是在内存中加载linux镜像的入口地址，也就是linux第一个将要执行的代码。
+
+2. 第24行，当内核正常启动时会打印“Starting kernel ...”，说明已经成功的加载了linux镜像，校验成功，并找到了入口地址，若未打印该字符型串，则应该检查一下传参是否正确。
+
+3. 第27行，启动Linux内核，kernel_entry函数为汇编函数，其传参形式和前面我们分析汇编调用c函数的传参方式（ARM程序调用规则ATPCS）是类似的，也就是r0存放第一个参数0、r1存放第二个参数machid（机器ID告诉Linux内核我们用的是哪个cpu，从而调用相应的初始化函数）、r2存放第三个参数（设备树首地址）。
+
+
+u-boot mainline 从v1.1.3开始便支持设备树，其对ARM的支持则是和ARM内核支持Device Tree同期完成。
+由于我们在configs/mx6ull_npi_defconfig配置文件中定义了CONFIG_OF_LIBFDT=y，从而使能了设备树传参形式，
+u-boot将从启动介质中将设备树读取到内存。当然，设备树的存放位置并不是随意存放的，它必须保证不能破坏u-boot、不能破坏操作系统及其用到的内存空间，
+不能占用他们的内存。
+
