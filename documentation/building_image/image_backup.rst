@@ -282,14 +282,65 @@ SD卡格式为FAT32格式的话，是不支持4G以上内容拷贝的，起初�
    :alt: 未找到图片00|
 
 最后接着使用dd命令将整个emmc设备的内容全部备份到/mnt/中，注意在我们imx6ull系列板子上，emmc有两个分区，分别为mmcblk1p1和mmcblk1p2，为了备份emmc设备的全部内容，
-我们只需要备份mmcblk1就可以了，注意！注意！注意！不要加p1或p2，备份到SD卡挂载点/mnt目录下，并以.img形式命名，比如我命名为image_emmc_backup.img。
+我们只需要备份mmcblk1就可以了，注意！注意！注意！不要加p1或p2，备份到SD卡挂载点/mnt目录下，并以.img形式命名，比如我命名为image_emmc_backup.img，然后
+输入命令：sudo dd if=/dev/mmcblk1 of=/mnt/image_emmc_backup.img，开始拷贝。
 
 .. image:: media/image_backup023.png
    :align: center
    :alt: 未找到图片00|
 
-输入这条命令之后，你需要耐心的等待它备份完，因为我们的emmc标配是8G的，所以非常耗时间，一般需要好几个小时，你可以去忙其他事情了！
+输入这条命令之后，你需要耐心的等待它备份完，因为我们的emmc标配是8G的，所以非常耗时间，一般需要好几个小时，甚至一上午，你可以去忙其他事情了！
 
+好了，漫长的等待终于拷贝完成，当我们看到如下信息，表明拷贝完成。
 
+.. image:: media/image_backup025.png
+   :align: center
+   :alt: 未找到图片00|
 
+我们进入/mnt挂载点确认一下是否真正拷贝了，确认后记得输入umount /mnt 卸载前面所做的挂载。
 
+.. image:: media/image_backup026.png
+   :align: center
+   :alt: 未找到图片00|
+
+接着我们切换到另一块imx6ull的emmc类型板子，同样的插入带镜像的SD卡（注意不是刚刚备份好的），将刚刚备份好的SD卡插入读卡器并接入板子，
+拨动拨码开关以SD卡方式启动，进入系统后输入sudo mount -t ntfs-3g /dev/sdb1 /mnt/,将SD卡设备挂载到/mnt这个挂载点上，注意此挂载点最好是空的，若非空，可以使用mkdir命令创建一个空的目录以挂载。
+
+.. image:: media/image_backup027.png
+   :align: center
+   :alt: 未找到图片00|
+
+挂载好以后，接下来就是将挂载点/mnt目录下的image_emmc_backup.img文件烧录到emmc或nand上，由于我们前是拷贝emmc设备的内容，所以必须也要烧录到新的emmc设备上，
+我的开发板的emmc设备默认被挂载到了/dev/mmcblk1上。
+
+.. image:: media/image_backup028.png
+   :align: center
+   :alt: 未找到图片00|
+
+接着输入sudo dd if=/mnt/image_emmc_backup.img of=/dev/mmcblk1，接着又是好几个小时的漫长等待......，我做个实验基本要花费一快天的时间了！输入dd命令之前一定要想清楚哪个文件是输入文件，哪个文件是输出文件，在此，我们是想将SD卡的内容备份到emmc设备，而emmc设备被挂载到了/dev/mmcblk1下，SD卡设备被挂载到了/mnt/下。
+所以，/mnt/image_emmc_backup.img是输入文件“if=指定”，/dev/mmcblk1是输出文件“of=指定”。如果写反了，半天的努力就前功尽弃了。
+
+.. image:: media/image_backup029.png
+   :align: center
+   :alt: 未找到图片00|
+
+拷贝完成后输出如下信息，然后拨动拨码开关至emmc启动，即可看到板子可以正常启动了，
+进入系统后，输入arm-然后按下tab按键，命令可以自动补全，说明我们带自定义环境的Debian镜像备份成功了。
+
+.. image:: media/image_backup030.png
+   :align: center
+   :alt: 未找到图片00|
+
+自动补全，且有之前搭建环境的信息，因为这块新板子emmc烧的是纯净的Debian，所以按理说是不带交叉编译器arm-linux-gnueabihf-gcc与ntfs-3g的，但是现在有这些环境，证明我们成功实现了镜像的迁移：
+
+.. image:: media/image_backup031.png
+   :align: center
+   :alt: 未找到图片00|
+
+.. image:: media/image_backup033.png
+   :align: center
+   :alt: 未找到图片00|
+
+.. image:: media/image_backup034.png
+   :align: center
+   :alt: 未找到图片00|
