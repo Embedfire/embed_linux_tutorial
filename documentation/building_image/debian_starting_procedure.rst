@@ -2438,8 +2438,8 @@ initr_dm函数如下：
    :linenos:
    :caption: drivers/core/root.c
 
-   initr_dm //初始化一个树形的驱动模型结构
-      dm_init_and_scan  //初始化根节点的设备，同时绑定根节点下的全部子节点
+   initr_dm() //初始化一个树形的驱动模型结构
+      dm_init_and_scan()  //初始化根节点的设备，同时绑定根节点下的全部子节点
          dm_init  //绑定根节点到gd->dm_root中，并初始化根节点下的设备
             device_bind_by_name //根据名字绑定，查找和设备信息匹配的driver，然后创建对应的udevice和uclass并进行绑定，最后放在DM_ROOT_NON_CONST中
                device_probe //对根设备执行probe操作，
@@ -2566,7 +2566,7 @@ uclass_find_device_by_seq函数的调试信息，其实u-boot是建立了一个�
    :align: center
    :alt: 未找到图片05|
 
-由于要渗入理解设备模型比较复杂，我们只要熟悉一下它的工作流程即可。
+由于要深入理解设备模型比较复杂，我们只要熟悉一下它的工作流程即可。
 
 
 board_init函数：
@@ -2700,7 +2700,7 @@ initr_mmc函数：
 .. code-block:: c
    :linenos:
    :caption: drivers/mmc/mmc.c
-   :emphasize-lines: 6,14
+   :emphasize-lines: 5,6,7,14
 
    int mmc_initialize(bd_t *bis)
    {
@@ -2800,7 +2800,7 @@ initr_env函数：
       }
    }
 
-我没看到第8行，大家可以回归头去看看我们前面化的global_data表格，其中gd->env_valid是等于1，即等于ENV_VALID的，如果等于0就会使用默认的环境变量，所以我们直接
+我们看第8行，大家可以回归头去看看我们前面化的global_data表格，其中gd->env_valid是等于1，即等于ENV_VALID的，如果等于0就会使用默认的环境变量，所以我们直接
 分析env_load()函数了。
 
 .. code-block:: c
@@ -2882,7 +2882,7 @@ env_driver包含了存储设备的名字、从存储器加载环境的方法、�
    :alt: 未找到图片05|
 
 在这里我们要说一下，当其运行ret = drv->load()，它调用blk_find_device函数遍历加载环境变量时，为了方便管理环境变量，首先会创建一个哈希表，哈希表是基于哈希函数建立的一种查找表，然后将
-环境变量中的所有环境都依次填到哈希表中，调试信息如下所示。
+环境变量都依次填到哈希表中，调试信息如下所示。
 
 .. image:: media/uboot_pro033.png
    :align: center
@@ -3389,7 +3389,7 @@ cli_loop函数：
 .. code-block:: c
    :linenos:
    :caption: common/cli_hush.c
-   :emphasize-lines: 10,16,27
+   :emphasize-lines: 10,16,27,33
 
    static int parse_stream_outer(struct in_str *inp, int flag)
    {
@@ -3466,7 +3466,7 @@ cli_loop函数：
 
 2. 第16行，读取用户输入的命令，并解析，
 
-3. 第27行，执行用户输入的命令，我们进去看下。
+3. 第33行，执行用户输入的命令，我们进去看下。
 
 .. code-block:: c
    :linenos:
@@ -3632,7 +3632,7 @@ cmd_tbl_s如下所示：
    #define U_BOOT_CMD(_name, _maxargs, _rep, _cmd, _usage, _help)		\
 	U_BOOT_CMD_COMPLETE(_name, _maxargs, _rep, _cmd, _usage, _help, NULL)
 
-我们已上面的emmc为例，展开后变成下面这样。
+我们以上面的emmc为例，展开后变成下面这样。
 
 .. code-block:: c
    :linenos:
@@ -4106,7 +4106,7 @@ do_bootm_states函数首先调用bootm_start，如下，因为函数调用比较
 .. code-block:: c
    :linenos:
    :caption: arch/arm/lib/bootm.c
-   :emphasize-lines: 21,24
+   :emphasize-lines: 21,24,27
 
    do_bootm_linux(int flag, int argc, char * const argv[], bootm_headers_t *images)
       boot_prep_linux(images) //Linux与启动相关设置，将环境变量bootargs保存以便后面传递给内核
@@ -4136,11 +4136,11 @@ do_bootm_states函数首先调用bootm_start，如下，因为函数调用比较
          r2 = (unsigned long)images->ft_addr   //以设fdt方式传递参数
          kernel_entry(0, machid, r2)   //启动Linux内核
 
-1. 第21行，images->ep中的ep就是entrypoint的缩写，这便是程序的入口点，该行代码将ep赋值给kernel_entry，而这个函数指针指向的是在内存中加载linux镜像的入口地址，也就是linux第一个将要执行的代码。
+1. 第21行，images->ep中的ep是entrypoint的缩写，这便是程序的入口点，该行代码将ep赋值给kernel_entry，而这个函数指针指向的是在内存中加载linux镜像的入口地址，也就是linux第一个将要执行的代码。
 
 2. 第24行，当内核正常启动时会打印“Starting kernel ...”，说明已经成功的加载了linux镜像，校验成功，并找到了入口地址，若未打印该字符型串，则应该检查一下传参是否正确。
 
-3. 第27行，启动Linux内核，kernel_entry函数为汇编函数，其传参形式和前面我们分析汇编调用c函数的传参方式（ARM程序调用规则ATPCS）是类似的，也就是r0存放第一个参数0、r1存放第二个参数machid（机器ID告诉Linux内核我们用的是哪个cpu，从而调用相应的初始化函数）、r2存放第三个参数（设备树首地址）。
+3. 第27行，启动Linux内核，kernel_entry函数为汇编函数，其传参形式和前面我们分析汇编调用c函数的传参方式（ARM程序调用规则ATPCS）是类似的，也就是r0存放第一个参数0、r1存放第二个参数machid（机器ID告诉Linux内核我们用的是哪个cpu，从而调用相应的初始化函数）、r2存放第三个参数（设备树首地址），注意我们使用的是设备树的方式传参，而非传统的ATAG方式传参，传统的传参是将struct tag地址赋值给r2寄存器。
 
 
 u-boot mainline 从v1.1.3开始便支持设备树，其对ARM的支持则是和ARM内核支持Device Tree同期完成。
@@ -4148,3 +4148,12 @@ u-boot mainline 从v1.1.3开始便支持设备树，其对ARM的支持则是和A
 u-boot将从启动介质中将设备树读取到内存。当然，设备树的存放位置并不是随意存放的，它必须保证不能破坏u-boot、不能破坏操作系统及其用到的内存空间，
 不能占用他们的内存。
 
+总结： 
+
+- 首先根据启动方式，从存放镜像的介质中加载到ddr。
+
+- 检查、校验是哪类镜像。
+
+- 传递参数给内核。
+
+- 运行内核。
