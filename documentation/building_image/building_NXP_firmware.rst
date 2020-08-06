@@ -500,7 +500,7 @@ log命令查看补丁信息：
 
 **安装独立编译工具链**
 
-1. 命令安装方式（推荐新手使用这种方法）：
+1. 命令安装方式：
 
 arm-linux-gnueabihf-gcc： ``v7.4.0``
 
@@ -508,12 +508,12 @@ arm-linux-gnueabihf-gcc： ``v7.4.0``
 
     sudo apt-get install gcc-arm-linux-gnueabihf
 
-2. 安装包安装方式(推荐老手使用这种方法)
+2. 安装包安装方式(优先推荐使用)
 
 从百度云盘下载 ``arm-linux-gnueabihf-gcc`` 编译器的压缩包，版本是
 ``v4.9.3``
 
-链接： https://github.com/Embedfire/products/wiki
+链接： https://ebf-products.readthedocs.io/zh_CN/latest/linux/ebf_i.mx6ull.html
 
 在 **Linux系列产品** 中找到的网盘链接，在 ``i.MX6ULL系列\5-编译工具链\arm-gcc`` 目录下找到``arm-gcc.tar.gz``压缩包并且下载，然后解压到 ``/opt/arm-gcc/`` 目录下，如果没有创建即可，解压后就可以在 ``/opt/arm-gcc/bin/`` 目录下找到我们的编译器 ``arm-linux-gnueabihf-gcc`` ，它的版本是 ``gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11)`` ，然后可以将编译器所在的路径添加到环境变量中，只修改当前用户的配置文件，通常是 ``"~/.bashrc"`` 或者 ``"~/.bash_profile"`` ，直接
 vi 打开即可，在文件末尾增加编译器所在的路径：

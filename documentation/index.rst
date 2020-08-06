@@ -44,6 +44,7 @@
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
+   linux_basis/make_pakage_of_deb
    linux_basis/image_brief
    install_image/install_debian_to_sd
    linux_basis/fire-config_brief
@@ -79,6 +80,8 @@
    building_image/building_NXP_firmware
    building_image/burning_NXP_firmware
    building_image/building_debian
+   building_image/debian_starting_procedure
+   building_image/image_backup
 
 
    #building_image/building_kernel
@@ -198,6 +201,9 @@
    :numbered:
 
    linux_driver/add_lcd_device_tree.rst
+   linux_driver/touch_screen.rst
+
+   
 
 
 
