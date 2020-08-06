@@ -1,14 +1,13 @@
 .. vim: syntax=rst
 
 使用脚本测试硬件
---------
+----------------
 
-为方便对开发板的硬件进行测试，我们在开发板出厂配套的系统镜像中提供了一些脚
-本来演示如何控制嵌入式行业常见的板载外设。使用这些脚本可以方便地体验开发板的强大之处。
+为方便对开发板的硬件进行测试，我们在开发板出厂配套的系统镜像中提供了一些脚本来演示如何控制嵌入式行业常见的板载外设。
+使用这些脚本可以方便地体验开发板的强大之处。
 
-作为一个合格的程序员，可能在阅读本节的时候，会思考这部分的代码是如何实现的
-呢？不过本章我们先进行体验，建立概念，在后面章节再对其中的原理进行详细讲解。只要耐心地
-看完本书，精彩都是在后头的。
+作为一个合格的程序员，可能在阅读本节的时候，会思考这部分的代码是如何实现的呢？
+不过本章我们先进行体验，建立概念，在后面章节再对其中的原理进行详细讲解。只要耐心地看完本书，精彩都是在后头的。
 
 
 fire-config使能外设
@@ -19,11 +18,9 @@ fire-config使能外设
 
 .. image:: media/script000.png
    :align: center
-   :alt: 未找到图片2|
 
 .. image:: media/script001.png
    :align: center
-   :alt: 未找到图片2|
 
 
 安装脚本文件
@@ -57,7 +54,6 @@ fire-config使能外设
 
 .. image:: media/script002.png
    :align: center
-   :alt: 未找到图片2|
 
 
 
@@ -84,7 +80,6 @@ led.sh脚本可以控制开发板上的LED灯，对于EBF6ULL Pro开发板的RGB
 
 .. image:: media/script003.png
    :align: center
-   :alt: 未找到图片3|
 
 
 
@@ -106,7 +101,6 @@ input.sh脚本可用于对输入设备进行测试，包括按键、触摸屏、
 
 .. image:: media/script004.png
    :align: center
-   :alt: 未找到图片4|
 
 
 
@@ -138,7 +132,6 @@ EBF6ULL Pro开发板带有蜂鸣器，可进行蜂鸣器测试。
 
 .. image:: media/script005.jpg
    :align: center
-   :alt: 未找到图片5|
 
 
 
@@ -160,7 +153,6 @@ EBF6ULL Pro开发板带有电位器，可进行ADC电压采集测试。
 
 .. image:: media/script006.jpg
    :align: center
-   :alt: 未找到图片6|
 
 
 
@@ -180,7 +172,6 @@ EBF6ULL Pro开发板带有陀螺仪，可进行陀螺仪测试。
 
 .. image:: media/script007.png
    :align: center
-   :alt: 未找到图片7|
 
 其它
 ~~~~~~~~~~~~
@@ -192,29 +183,3 @@ EBF6ULL Pro开发板上还有DHT11、摄像头、WiFi等硬件接口，不过由
 
 
 
-
-
-.. |script002| image:: media/script002.png
-   :width: 4.45833in
-   :height: 0.8896in
-.. |script003| image:: media/script003.png
-   :width: 3.52778in
-   :height: 2.46293in
-.. |script004| image:: media/script004.png
-   :width: 5.125in
-   :height: 2.89705in
-.. |script005| image:: media/script005.jpg
-   :width: 3.52273in
-   :height: 0.42424in
-.. |script006| image:: media/script006.jpg
-   :width: 3.40833in
-   :height: 1.58333in
-.. |script007| image:: media/script007.png
-   :width: 3.02905in
-   :height: 2.19861in
-.. |script008| image:: media/script008.png
-   :width: 4.49333in
-   :height: 4.68056in
-.. |script009| image:: media/script009.png
-   :width: 4.51721in
-   :height: 4.69444in

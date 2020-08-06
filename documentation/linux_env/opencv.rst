@@ -287,7 +287,7 @@ numpy是用Python进行科学计算的基础软件包，必须要安装，OpenCV
 使能摄像头设备
 ~~~~~~~~~~~~~~
 
-首先在开发板插入网线，然后插入免驱的USB摄像头，或者在fire-config中打开摄像头插件，然后插入野火的ov5640摄像头，重启开发板。
+首先在开发板插入网线，然后插入免驱的USB摄像头，或者在fire-config中打开摄像头插件，并且关闭LED插件，然后插入野火的ov5640摄像头，重启开发板。
 
 .. code:: bash
 
@@ -298,12 +298,12 @@ numpy是用Python进行科学计算的基础软件包，必须要安装，OpenCV
 
    opencv001.png
    
-在重启开发板后，查看/dev目录下是否存在video1，如果存在则表示有摄像头。
+在重启开发板后，查看/dev目录下是否存在video名字开头的设备，如果存在则表示有摄像头。
 
 .. code:: bash
 
-    ➜  ~ ls /dev | grep video1
-    video1
+    ➜  ~ ls /dev | grep video
+    video0
 
 使用OpenCV
 ~~~~~~~~~~
