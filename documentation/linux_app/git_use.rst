@@ -6,8 +6,8 @@
 
 本项目通过Git开源，用户可以在GitHub和Gitee下载本项目相关源码：
 
-- GitHub仓库地址：https://github.com/Embdefire/embed_linux_tutorial
-- Gitee 仓库地址：https://gitee.com/wildfireteam/embed_linux_tutorial
+- GitHub仓库地址：https://github.com/Embedfire/embed_linux_tutorial
+- Gitee 仓库地址：https://gitee.com/Embedfire/embed_linux_tutorial
 
 Git是什么
 ~~~~~~~~~~~~~~~~~~
@@ -57,7 +57,7 @@ https://gitforwindows.org
 
 根据不同发行版，使用相关包管理工具安装即可。
 
-比如Ubantu：在终端执行"sudo apt-get install git -y"即可。
+比如Ubantu：在终端执行“sudo apt-get install git -y”即可。
 
 获取项目仓库地址
 ^^^^^^^^^^^^^^^^^^^^^
@@ -73,7 +73,7 @@ GitHub仓库地址
 
 Gitee仓库地址
 
-.. image:: media/gitee_url.png
+.. image:: media/gitee_url1.png
    :align: center
    :alt: 未找到图片
 
@@ -82,34 +82,67 @@ Gitee仓库地址
 
 下面以Windows系统为例，linux系统的操作是类似的。
 
-1、windows安装完Git后，.在将要下载项目的目录中，右键选择"Git Bash Here"项，
-打开git bash命令工具。
+1、windows安装完Git后，.在将要下载项目的目录中，右键选择“Git Bash Here”项，
+打开git bash命令工具，然后输入命令：“git init”初始化文件夹，将这个文件夹变成Git可管理的仓库。
 
 如下图:
 
-.. image:: media/git_bash.png
+.. image:: media/git_bash1.png
    :align: center
    :alt: 未找到图片
 
-2、在git bash命令工具运行:"git clone +"仓库地址""命令，进行项目下载。
-本项目在GitHub的仓库地址为:https://github.com/Embdefire/embed_linux_tutorial。
+
+2、在git bash命令工具运行:“git clone +”仓库地址“”命令，进行项目下载。
+本项目在GitHub的仓库地址为:https://github.com/Embedfire/embed_linux_tutorial。
 因此要运行的命令为:
 
 .. code-block:: sh
    :linenos:
 
-    git clone https://github.com/Embdefire/embed_linux_tutorial
+    git clone https://github.com/Embedfire/embed_linux_tutorial
 
 如下图:
 
-.. image:: media/git_clone.png
+.. image:: media/git_clone1.png
    :align: center
    :alt: 未找到图片
 
 
-3、等待项目下载完毕,注意:GitHub网速在国内受限，可能会出现多次下载失败的现象。
+3、在ubuntu中下载项目，使用：“mkdir + “存放项目的目录名字””命令创建一个将要下载的目录，然后进入被创建的目录下。
+
+如下图:
+
+.. image:: media/ubuntogitclone1.0.PNG
+   :align: center
+   :alt: 未找到图片
+
+4、接着运行：“git clone + “仓库地址””命令，进行项目下载。同样，本项目在GitHub的仓库地址为：//https://github.com/Embedfire/embed_linux_tutorial。运行的命令为：
+
+.. code-block:: sh
+   :linenos:
+
+    git clone https://github.com/Embedfire/embed_linux_tutorial
+
+如下图:
+
+.. image:: media/ubuuntugitclone1.1.PNG
+   :align: center
+   :alt: 未找到图片
 
 
+5、等待项目下载完毕,注意:GitHub网速在国内受限，可能会出现多次下载失败的现象，如果使用GitHub下载时网速太慢可以使用Gitee来下载，只需改变仓库地址即可。运行的命令为：
 
-4、项目下载完毕后，在项目目录下的base_code文件夹存放了所有实验的相关代码，用户可根据实际需要进行查阅使用。
+.. code-block:: sh
+   :linenos:
+
+    git clone https://gitee.com/Embedfire/embed_linux_tutorial
+
+如下图:
+
+.. image:: media/gitee_clone.PNG
+   :align: center
+   :alt: 未找到图片
+
+
+6、项目下载完毕后，在项目目录下的base_code文件夹存放了所有实验的相关代码，用户可根据实际需要进行查阅使用。
 

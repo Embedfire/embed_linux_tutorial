@@ -1538,7 +1538,7 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
 -------------------
 
-教程中为了节省篇幅，只列举了一个led灯，配套的例程中提供了三个LED的代码。当我们运行命令"insmod led_pdev.ko"后，
+教程中为了节省篇幅，只列举了一个led灯，配套的例程中提供了三个LED的代码。当我们运行命令“insmod led_pdev.ko”后，
 
 可以在/sys/bus/platform/devices下看到我们注册的LED灯设备，共有三个，后面的数字0、1、2对应了平台设备结构体的id编号。
 

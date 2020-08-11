@@ -35,7 +35,7 @@ Tree），我们这里翻译为“设备树插件”。设备树插件可以理�
 
 
 标号①处用于指定dts的版本。标号②表示允许使用未定义的引用并记录它们，设备树插件中可以引用主设备树中的节点，而这些“引用的节点”对于设备树插件来说就是未定义的，所以设备树插件应该加上“/plugin/”。标号③指定设备树插件的加载位置，默认我们加载到根节点下，既“target-path =
-"/"”。
+“/”。
 
 我们要插入的设备及节点或者要引用（追加）的设备树节点放在__overlay_\_ {…}；内。下面我们尝试将上一节编写的RGB灯节点使用设备 树的方式添加到系统中。
 
@@ -123,7 +123,13 @@ Tree），我们这里翻译为“设备树插件”。设备树插件可以理�
 dtoverlays-master/”执行“make”即可。生成的.dtbo位于“~/ebf-linux-dtoverlays-master/output”目录
 下。例如本章的RGB设备树插件为“imx-fire-rgb-led-overlay.dts”将其拷贝到“~/ebf-linux-
 dtoverlays-master/overlays/ebf”目录下，编译之后就会在“~/ebf-linux-dtoverlays-master/output”目录
-下生成同名的.dtbo文件。得到.dtbo后，下一步就是将其加载到系统中。
+下生成同名的.dtbo文件。得到.dtbo后，下一步就是将其加载到系统中。需要注意的是，如果你在执行“make”后出现下图报错，可以尝试
+先卸载device-tree-compiler（卸载命令为：“sudo apt-get autoremove device-tree-compiler”）,重新安装，
+然后在“ebf-linux-dtoverlays-master”目录下修改scripts/basic/fixdep文件的权限，修改权限命令为：“chmod 777 scripts/basic/fixdep”。
+
+.. image:: ./media/dtboerr001.png
+   :align: center
+   :alt: 02|
 
 将设备树插件加入系统
 ~~~~~~~~~~

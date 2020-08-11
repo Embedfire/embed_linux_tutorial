@@ -36,13 +36,13 @@ github仓库地址： https://github.com/Embedfire/ebf_6ull_buildroot
 
     git clone https://github.com/Embedfire/ebf_6ull_buildroot.git
 
-gitee仓库地址： https://gitee.com/wildfireteam/ebf_6ull_buildroot
+gitee仓库地址： https://gitee.com/Embedfire/ebf_6ull_buildroot
 
 下载
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_6ull_buildroot.git
+    git clone https://gitee.com/Embedfire/ebf_6ull_buildroot.git
 
 Buildroot目录简介
 -----------------

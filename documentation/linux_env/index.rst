@@ -22,3 +22,5 @@
 ..    using_sqlite
 ..    using_qtsqlite
 ..    using_php
+..    java_env
+..    opencv

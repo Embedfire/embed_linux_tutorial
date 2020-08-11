@@ -31,7 +31,7 @@ processors/i.mx-6-processors/i.mx-6ull-single-core-processor-with-arm-cortex-a7-
    :alt: 未找到图片
 
 
-(3) 打开链接之后选择"TOOLS&SOFTWATE"如下所示。
+(3) 打开链接之后选择“TOOLS&SOFTWATE”如下所示。
 
 
 .. image:: media/sdk003.png
@@ -40,7 +40,7 @@ processors/i.mx-6-processors/i.mx-6ull-single-core-processor-with-arm-cortex-a7-
 
 
 
-(4) 网页上可以看到多个下载选项我们选择"SDK2.2_iXMX6ULL_WIN"下载项目点击下载即可，如下所示。
+(4) 网页上可以看到多个下载选项我们选择“SDK2.2_iXMX6ULL_WIN”下载项目点击下载即可，如下所示。
 
 .. image:: media/sdk004.png
    :align: center
@@ -51,7 +51,7 @@ processors/i.mx-6-processors/i.mx-6ull-single-core-processor-with-arm-cortex-a7-
 SDK目录、文件简介
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-本书讲解的例程全部采用2.2版本SDK的库文件，以下内容请大家打开"SDK_2.2_MCIM6ULL_EBF6ULL"的SDK包配合阅读，如下所示。
+本书讲解的例程全部采用2.2版本SDK的库文件，以下内容请大家打开“SDK_2.2_MCIM6ULL_EBF6ULL”的SDK包配合阅读，如下所示。
 
 .. image:: media/sdk005.png
    :align: center
@@ -64,7 +64,7 @@ boards：示例程序
 
 SDK的boards目录包含了NXP官方评估版MCIMX6ULL-EVK的各种示例程序，非常有参考价值。
 
-例如，下图是"boards\evkmcimx6ull"目录。
+例如，下图是“boards\evkmcimx6ull”目录。
 
 
 .. image:: media/sdk006.png
@@ -75,7 +75,7 @@ SDK的boards目录包含了NXP官方评估版MCIMX6ULL-EVK的各种示例程序�
 
 这些文件夹的说明如下：
 
--  demo_apps包含了一些应用范例，如串口打印"hello world"、使用lwip协议栈进行网络通讯等内容，具体如下图所示。
+-  demo_apps包含了一些应用范例，如串口打印“hello world”、使用lwip协议栈进行网络通讯等内容，具体如下图所示。
 
 ..
 
@@ -87,8 +87,8 @@ SDK的boards目录包含了NXP官方评估版MCIMX6ULL-EVK的各种示例程序�
 
 
 
--  driver_example包含了i.mx6主要片上外设的使用范例，非常详细。例】
-   如在"boards\evkmcimx6ull\driver_examples"目录下包含各个外设的程序如下图所示。
+-  driver_example包含了i.mx6主要片上外设的使用范例，非常详细。例
+   如在“boards\evkmcimx6ull\driver_examples”目录下包含各个外设的程序如下图所示。
 
 .. image:: media/sdk008.png
    :align: center
@@ -274,7 +274,7 @@ gcc、iar目录
 
 
 在iar文件夹下startup_MCIMX6Y2.s文件，主要用于配置存储器分配和提供芯片启动时运行的代码指令，其他几个.icf文件根据芯片型号以及芯片所接的存储器类型选择，
-"MCIMX6Y2xxxxx"指定芯片型号，_ram适配nandFlash和eMMC，本教程配套开发板应当选择这种.icf文件。_flash适配norFlash。.icf是程序的分散加载文件，使用到时再详细介绍。
+“MCIMX6Y2xxxxx”指定芯片型号，_ram适配nandFlash和eMMC，本教程配套开发板应当选择这种.icf文件。_flash适配norFlash。.icf是程序的分散加载文件，使用到时再详细介绍。
 
 MCIMX6Y2\drivers目录
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -291,10 +291,10 @@ drivers目录是固件库的主体，有时我们把这些文件称为外设驱�
    外设名字，如ADC、GPIO、UART、I2C等外设，大部分外设包含一个C源文件和头文件。
 
 -  当使用到某个外设时，我们会把此处对应的外设驱动源文
-   件添加到工程中，加入编译，对于没有源文件的IOMUXC外设，则直接使用"#include"包含其头文件fsl_iomuxc.h。
+   件添加到工程中，加入编译，对于没有源文件的IOMUXC外设，则直接使用“#include”包含其头文件fsl_iomuxc.h。
 
 -  特别地，其中的fsl_common.c和fsl_common.h中的common不是i.MX6芯片
-   的某个外设名字，它表示绝大多数工程都会需要这些"共同"的内容，所以一般工程都
+   的某个外设名字，它表示绝大多数工程都会需要这些“共同”的内容，所以一般工程都
    会添加这个fsl_common.c文件，并且可以通过fsl_common.h文件包含前面介绍的fsl_device_regi
    sters.h头文件，达到最终包含具有大量寄存器定义的MCIMX6Y2.h核心头文件的目的。
 
@@ -351,7 +351,7 @@ SDK中的middleware文件夹主要包含一些中间层软件，即这些软件�
 rtos：实时操作系统
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-SDK目录下的rtos文件夹包含了FreeRTOS实时操作系统的源代码，位于"boards\evkmcimx6ull\rtos_examples"目录的FreeRTOS例程会使用到这里的源码，我们只需要知道源码再这里就可以了。见下图。
+SDK目录下的rtos文件夹包含了FreeRTOS实时操作系统的源代码，位于“boards\evkmcimx6ull\rtos_examples”目录的FreeRTOS例程会使用到这里的源码，我们只需要知道源码再这里就可以了。见下图。
 
 
 .. image:: media/sdk019.png
@@ -397,7 +397,7 @@ mcimx6_DEBUG：调试工具
 ^^
 
 在SDK的根目录下还包含了几个.xml、.txt、.htm以及.bat文件，具
-体见图 45‑21。.xml和txt文件它们主要是包含SDK第三方构件的一些版
+体见图 45-21。.xml和txt文件它们主要是包含SDK第三方构件的一些版
 权、出处说明以及EVK-MCIMX6UL生成的一些说明信息，keilkill.bat批处
 理文件用于清理编译程序生成的中间文件。
 

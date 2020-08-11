@@ -31,7 +31,7 @@ loader，boot阶段启动系统，初始化硬件设备，建立内存空间映�
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_6ull_uboot.git
+    git clone https://gitee.com/Embedfire/ebf_6ull_uboot.git
 
 当然啦，如果你想下载NXP原厂的uboot怎么办呢？很简单，直接去NXP官方网站下载就好了，打开
 http://git.freescale.com/git/
@@ -152,14 +152,14 @@ arm-none-eabi-gcc：v6.3.1
 .. code:: bash
 
     命令（编译emmc卡版本uboot）
-    make ARCH=arm mx6ull_14x14_evk_ emmc _defconfig
+    make ARCH=arm mx6ull_14x14_evk_emmc_defconfig
 
-想编译从emmc启动的uboot，则运行：
+想编译从nand启动的uboot，则运行：
 
 .. code:: bash
 
     命令（编译nand卡版本uboot）
-    make ARCH=arm mx6ull_14x14_evk_ nand _defconfig
+    make ARCH=arm mx6ull_14x14_evk_nand_defconfig
 
 在运行以上命令后，Makefile会根据对应的配置文件的内容将配置更新到当前目录下的
 ``.config`` 文件中，如果读者感兴趣可以查看一下该文件的内容，接下来的编译则是根据 ``.config`` 文件的配置进行编译的。
@@ -368,7 +368,7 @@ arm-none-eabi-gcc：v6.3.1
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_6ull_linux.git
+    git clone https://gitee.com/Embedfire/ebf_6ull_linux.git
 
     Cloning into 'ebf_6ull_linux'...
     remote: Enumerating objects: 54412, done.
@@ -500,7 +500,7 @@ log命令查看补丁信息：
 
 **安装独立编译工具链**
 
-1. 命令安装方式（推荐新手使用这种方法）：
+1. 命令安装方式：
 
 arm-linux-gnueabihf-gcc： ``v7.4.0``
 
@@ -508,12 +508,12 @@ arm-linux-gnueabihf-gcc： ``v7.4.0``
 
     sudo apt-get install gcc-arm-linux-gnueabihf
 
-2. 安装包安装方式(推荐老手使用这种方法)
+2. 安装包安装方式(优先推荐使用)
 
 从百度云盘下载 ``arm-linux-gnueabihf-gcc`` 编译器的压缩包，版本是
 ``v4.9.3``
 
-链接： https://github.com/Embedfire/products/wiki
+链接： https://ebf-products.readthedocs.io/zh_CN/latest/linux/ebf_i.mx6ull.html
 
 在 **Linux系列产品** 中找到的网盘链接，在 ``i.MX6ULL系列\5-编译工具链\arm-gcc`` 目录下找到``arm-gcc.tar.gz``压缩包并且下载，然后解压到 ``/opt/arm-gcc/`` 目录下，如果没有创建即可，解压后就可以在 ``/opt/arm-gcc/bin/`` 目录下找到我们的编译器 ``arm-linux-gnueabihf-gcc`` ，它的版本是 ``gcc version 4.9.3 20141031 (prerelease) (Linaro GCC 2014.11)`` ，然后可以将编译器所在的路径添加到环境变量中，只修改当前用户的配置文件，通常是 ``"~/.bashrc"`` 或者 ``"~/.bash_profile"`` ，直接
 vi 打开即可，在文件末尾增加编译器所在的路径：
@@ -1030,13 +1030,13 @@ github仓库地址： https://github.com/Embedfire/ebf_6ull_buildroot
 
     git clone https://github.com/Embedfire/ebf_6ull_buildroot.git
 
-gitee仓库地址： https://gitee.com/wildfireteam/ebf_6ull_buildroot
+gitee仓库地址： https://gitee.com/Embedfire/ebf_6ull_buildroot
 
 下载
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_6ull_buildroot.git
+    git clone https://gitee.com/Embedfire/ebf_6ull_buildroot.git
 
 Buildroot目录简介
 ~~~~~~~~~~~~~~~~~~~~~~

@@ -12,7 +12,9 @@
 
    README
    about_us
-   TODO
+..   TODO 
+   contribute/how_to_contribute
+
 
 .. toctree::
    :maxdepth: 1
@@ -38,12 +40,14 @@
    :numbered:
 
    linux_basis/ebf6ull_hardware
-   install_image/install_debian_to_sd
    linux_basis/board_startup
    linux_basis/system_information
-   linux_basis/fire-config_brief
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
+   linux_basis/make_pakage_of_deb
+   linux_basis/image_brief
+   install_image/install_debian_to_sd
+   linux_basis/fire-config_brief
    linux_basis/ec20_4g_module
 
 .. toctree::
@@ -76,6 +80,8 @@
    building_image/building_NXP_firmware
    building_image/burning_NXP_firmware
    building_image/building_debian
+   building_image/debian_starting_procedure
+   building_image/image_backup
 
 
    #building_image/building_kernel
@@ -99,6 +105,8 @@
    linux_env/using_sqlite
    linux_env/using_qtsqlite
    linux_env/using_php
+   linux_env/java_env
+   linux_env/opencv
 
 .. toctree::
    :maxdepth: 1
@@ -116,6 +124,7 @@
    system_programing/posix_mutex
    system_programing/tcp_ip
    system_programing/socket
+   system_programing/socket_io
 
 .. toctree::
    :maxdepth: 1
@@ -182,8 +191,21 @@
    linux_driver/concurrency
    linux_driver/i2c_mpu6050.rst
    linux_driver/ecspi_oled.rst
+   linux_driver/button_interrupt.rst
+   linux_driver/input_sub_system.rst
+   linux_driver/pwm_sub_system.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: 添加驱动模块
+   :numbered:
+
+   linux_driver/add_lcd_device_tree.rst
+   linux_driver/touch_screen.rst
+
    
-   
+
+
 
 .. toctree::
    :maxdepth: 1
@@ -206,12 +228,12 @@
    submission/buildroot2017-3
 
 
-.. toctree::
-   :maxdepth: 1
-   :caption: 贡献与投稿
-   :numbered:
+.. .. toctree::
+..   :maxdepth: 1
+..   :caption: 贡献与投稿
+..  :numbered:
 
-   contribute/how_to_contribute
+..   contribute/how_to_contribute
 
 
 .. toctree::

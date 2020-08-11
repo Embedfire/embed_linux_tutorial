@@ -61,7 +61,7 @@ ARM-GCC和开发板的HelloWorld
 既然已经有本地编译，为什么需要交叉编译？这是因为通常编译工具链对编译环境有较高的要求，编译复杂的程序时，可能需要巨大的存储空间以及强大的CPU运算能力加快编译速度。常见的ARM
 架构平台资源有限，无论是存储空间还是CPU运算能力，都与X86平台相去甚远，特别是对于MCU平台，安装编译器根本无从谈起。有了交叉编译，我们就可以在PC上快速编译出针对其他架构的可执行程序。
 
-相对的，能进行架构"交叉"编译过程的编译器，就被称为 **交叉编译器（Cross compiler）**。
+相对的，能进行架构“交叉”编译过程的编译器，就被称为 **交叉编译器（Cross compiler）**。
 交叉编译器听起来是个新概念，但在MCU开发中一直使用的就是交叉编译器，
 例如开发STM32、RT1052所使用的IDE软件Keil（MDK）或IAR，就是在Windows x86架构编译，生成MCU平台的应用程序，最后下载到板子执行。
 
@@ -101,7 +101,7 @@ ARM-GCC和开发板的HelloWorld
 
          arm-linux-gnueabihf-gcc –v
 
-可以看到下图的内容，它表明交叉编译工具链安装成功了，输出信息表明了它是7.4.0版本的编译器，其中的 "Target:arm-linux-gnueabihf"也表明了它的目标架构。
+可以看到下图的内容，它表明交叉编译工具链安装成功了，输出信息表明了它是7.4.0版本的编译器，其中的 “Target:arm-linux-gnueabihf”也表明了它的目标架构。
 
 .. image:: media/armgcc003.png
    :align: center
@@ -109,7 +109,7 @@ ARM-GCC和开发板的HelloWorld
 
  arm-linux-gnueabi-gcc版本信息
 
-安装完成后输入"arm-linux-gnueabihf-"，再按两下TAB键，终端会提示可用的相关命令，如下图包含了ARM-GCC工具链Binutils的各种工具。
+安装完成后输入“arm-linux-gnueabihf-”，再按两下TAB键，终端会提示可用的相关命令，如下图包含了ARM-GCC工具链Binutils的各种工具。
 
 .. image:: media/armgcc004.png
    :align: center
@@ -210,7 +210,7 @@ hf   浮点模式
 ==== ==============
 
 以我们安装的arm-linux-gnueabihf-gcc编译器为例，表示它的目标芯片架构为ARM，目标操作系统为Linux，使用GNU的C标准库即glibc，使用嵌入式应用二进制接口（eabi），编译器的浮点模式为硬浮点hard-float。而另一种名为arm-linux-gnueabi-
-gcc的编译器与它的差别就在于是否带"hf"，不带"hf"表示它使用soft-float模式。
+gcc的编译器与它的差别就在于是否带“hf”，不带“hf”表示它使用soft-float模式。
 
 关于编译器的各个字段详细说明如下：
 
@@ -223,7 +223,7 @@ arm-linux-gnueabihf-gcc直接以arm表示ARMv7架构。
 大小端
 ^^^^^^^^
 
-指目标芯片的大小端模式，i.MX 6ULL使用的是小端模式。若是大端模式（big edian），编译器名字中会带"be"或"eb"字段进行标标注。
+指目标芯片的大小端模式，i.MX 6ULL使用的是小端模式。若是大端模式（big edian），编译器名字中会带“be”或“eb”字段进行标标注。
 
 目标操作系统
 ^^^^^^^^^^^^^^^
@@ -231,7 +231,7 @@ arm-linux-gnueabihf-gcc直接以arm表示ARMv7架构。
 目标操作系统表示编译后的程序运行的系统，主要有Linux或bare-metal（无操作系统）两种，arm-linux-gnueabi-gcc 表示它目标程序的运行环境为Linux系统，程序可以使用Linux下的C标准库或Linux内核提供的API，如fork等进程函数。而arm-
 eabi-gcc或arm-none-eabi-gcc表示它们的目标程序运行在无操作系统的环境中。
 
-所以严格来说，我们编译Linux应用程序时应该使用带"linux"的编译器，而编译uboot、裸机程序时，应该使用"bare-metal"类型的裸机编译器，但很多开发者常常把它们混用也没有出现问题，这一般是因为开发者编写的裸机程序本身就没有使用到Linux系统提供的API，所以才不会出错。
+所以严格来说，我们编译Linux应用程序时应该使用带“linux”的编译器，而编译uboot、裸机程序时，应该使用“bare-metal”类型的裸机编译器，但很多开发者常常把它们混用也没有出现问题，这一般是因为开发者编写的裸机程序本身就没有使用到Linux系统提供的API，所以才不会出错。
 
 C标准库类型
 ^^^^^^^^^^^^^^
@@ -242,16 +242,16 @@ C标准库类型通常有gnu、uclibc等，分别表示GNU的glibc库和uclibc�
 应用二进制接口
 ^^^^^^^^^^^^^^^
 
-应用二进制接口（Application Binary Interface），描述了应用程序和操作系统之间或其他应用程序的低级接口。在编译器选项中主要有"abi"和"eabi"两种类型，abi通常用在x86架构上，而eabi表示embed abi，即嵌入式架构，如ARM、MIPS等。
+应用二进制接口（Application Binary Interface），描述了应用程序和操作系统之间或其他应用程序的低级接口。在编译器选项中主要有“abi”和“eabi”两种类型，abi通常用在x86架构上，而eabi表示embed abi，即嵌入式架构，如ARM、MIPS等。
 
 浮点模式
 ^^^^^^^^^^^
 
 部分ARM处理器带浮点运算单元，代码需要进行浮点运算时若交给fpu处理，可以加快运算速度。编译器针对浮点运算的不同处理情况提供了以下几种模式：
 
-- hard： 硬浮点类型（hard-float），采用fpu参与浮点运算。 arm-linux-gnueabihf-gcc、armeb-linux-gnueabihf-gcc都是硬浮点类型，即名字中带"hf"。
+- hard： 硬浮点类型（hard-float），采用fpu参与浮点运算。 arm-linux-gnueabihf-gcc、armeb-linux-gnueabihf-gcc都是硬浮点类型，即名字中带“hf”。
 
-- soft：软浮点类型（soft-float），即使有fpu浮点运算单元也不用，而是使用软件模式，arm-linux-gnueabi-gcc、armeb-linux-gnueabi-gcc都是软浮点类型，即名字中不带"hf"。
+- soft：软浮点类型（soft-float），即使有fpu浮点运算单元也不用，而是使用软件模式，arm-linux-gnueabi-gcc、armeb-linux-gnueabi-gcc都是软浮点类型，即名字中不带“hf”。
 
 - softfp：允许使用浮点指令，但保持与软浮点ABI的兼容性。
 
@@ -270,7 +270,7 @@ i.MX6ULL带有fpu，对于soft-float和hard-float模式都支持，不过本开�
 安装软浮点编译器
 ^^^^^^^^
 
-首先安装浮点模式为soft-float类型的编译器，即arm-linux-gnueabi-gcc，它与前面使用的arm-linux-gnueabihf-gcc差异为编译器名字不带"hf"：
+首先安装浮点模式为soft-float类型的编译器，即arm-linux-gnueabi-gcc，它与前面使用的arm-linux-gnueabihf-gcc差异为编译器名字不带“hf”：
 
 ::
 
@@ -294,7 +294,7 @@ i.MX6ULL带有fpu，对于soft-float和hard-float模式都支持，不过本开�
 
 安装好arm-linux-gnueabi-gcc软浮点编译器后，继续使用hello.c程序进行实验。
 
-切换至前面hello.c的目录，使用不带"hf"的软浮点编译器重新编译：
+切换至前面hello.c的目录，使用不带“hf”的软浮点编译器重新编译：
 
 ::
 

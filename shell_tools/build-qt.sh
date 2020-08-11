@@ -71,7 +71,7 @@ do_tar_package () {
 do_install_config_dependent () {
    sudo apt install g++ make qt3d5-dev-tools -y
    sudo apt install qml-module-qtquick-xmllistmodel -y
-   sudo apt install qml-module-qtquick-virtualkeyboard qml-module-qtquick-shapes qml-module-qtquick-privatewidgets qml-module-qtquick-dialogs qml-module- qt-labs-calendar qml -y
+   sudo apt install qml-module-qtquick-virtualkeyboard qml-module-qtquick-privatewidgets qml-module-qtquick-dialogs qml -y
    sudo apt install libqt53dquickscene2d5 libqt53dquickrender5 libqt53dquickinput5 libqt53dquickextras5 libqt53dquickanimation5 libqt53dquick5 -y
    sudo apt install qtdeclarative5-dev qml-module-qtwebengine qml-module-qtwebchannel qml-module-qtmultimedia qml-module-qtaudioengine -y
 }

@@ -1,0 +1,46 @@
+/*
+ * Copyright (C) 2019 - All Rights Reserved by 
+ * filename : imx-fire-mpu6050-overlay.dts
+ * brief : Device Tree overlay for EBF6ull Pro mpu6050 device
+ * author : embedfire
+ * date : 2019-11-26
+ * version : A001
+ */
+
+ /dts-v1/;
+ /plugin/;
+
+
+#include "imx6ul-pinfunc.h"
+#include "./dt-bindings/gpio/gpio.h"
+
+ / {
+     fragment@0 {
+          target-path = "/";
+         __overlay__ { 
+	        red_led_pwm {
+	        	compatible = "red_led_pwm";
+	        	pinctrl-names = "default";
+	        	pinctrl-0 = <&red_led_pwm>;
+
+	        	front {
+					pwm-names = "red_led_pwm3";
+	        		pwms = <&pwm3 0 50000>;
+	        	};
+	        };   
+         };
+     };
+
+     fragment@1 {
+         target = <&iomuxc>;
+         __overlay__ { 
+	        red_led_pwm: ledsgrp {
+	        	fsl,pins = <
+	        		MX6UL_PAD_GPIO1_IO04__PWM3_OUT 0x1b0b0
+	        	>;
+			};
+         };
+     };
+ };
+
+

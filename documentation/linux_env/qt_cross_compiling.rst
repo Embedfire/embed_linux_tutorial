@@ -44,7 +44,7 @@ build-gcc.sh 脚本内容如下：
     SCRIPT_PATH=$(pwd)
 
     #修改源码包解压后的名称
-    MAJOR_NAME=arm-linux-gnueabihf
+    MAJOR_NAME=gcc-arm-linux-gnueabihf
 
     #修改需要下载的源码版本前缀和后缀
     OPENSRC_VER_PREFIX=8.3
@@ -64,8 +64,10 @@ build-gcc.sh 脚本内容如下：
     #下载源码包
     do_download_src () {
        echo "\033[1;33mstart download ${COMPRESS_PACKAGE}...\033[0m"
-       if [ ! -d "${COMPRESS_PACKAGE}" ];then
-          wget -c ${DOWNLOAD_LINK}
+       if [ ! -f "${COMPRESS_PACKAGE}" ];then
+          if [ ! -d "${PACKAGE_NAME}" ];then
+            wget -c ${DOWNLOAD_LINK}
+          fi
        fi
        echo "\033[1;33mdone...\033[0m"
     }
@@ -77,7 +79,7 @@ build-gcc.sh 脚本内容如下：
        mkdir -p ${INSTALL_PATH}
 
        if [ ! -d "${PACKAGE_NAME}" ];then
-          tar -xf ${COMPRESS_PACKAGE} -C ${INSTALL_PATH}
+          tar -xf ${COMPRESS_PACKAGE} -C ${INSTALL_PATH} --strip-components=1 
        fi
        echo "\033[1;33mdone...\033[0m"
     }
@@ -556,7 +558,7 @@ build-qt.sh 脚本内容如下：
     do_install_config_dependent () {
        sudo apt install g++ make qt3d5-dev-tools -y
        sudo apt install qml-module-qtquick-xmllistmodel -y
-       sudo apt install qml-module-qtquick-virtualkeyboard qml-module-qtquick-shapes qml-module-qtquick-privatewidgets qml-module-qtquick-dialogs qml-module- qt-labs-calendar qml -y
+       sudo apt install qml-module-qtquick-virtualkeyboard qml-module-qtquick-privatewidgets qml-module-qtquick-dialogs qml -y
        sudo apt install libqt53dquickscene2d5 libqt53dquickrender5 libqt53dquickinput5 libqt53dquickextras5 libqt53dquickanimation5 libqt53dquick5 -y
        sudo apt install qtdeclarative5-dev qml-module-qtwebengine qml-module-qtwebchannel qml-module-qtmultimedia qml-module-qtaudioengine -y
     }
@@ -1082,7 +1084,7 @@ Creator去编译：
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_debian_qt_demo.git
+    git clone https://gitee.com/Embedfire/ebf_debian_qt_demo.git
 
 打开Qt Creator，添加QtUi进行单独的编译，通过Qt Creator界面的【文件】 ->
 【添加文件或项目】，选择 ``ebf_debian_qt_demo/QtUi`` 目录下的QtUi.pro工程添加到Qt
@@ -1289,13 +1291,13 @@ FireApp工程构建后运行：
 
 .. code:: bash
 
-    git clone https://github.com/Embdefire/ebf_debian_qt_demo.git
+    git clone https://github.com/Embedfire/ebf_debian_qt_demo.git
 
 **gitee**
 
 .. code:: bash
 
-    git clone https://gitee.com/wildfireteam/ebf_debian_qt_demo.git
+    git clone https://gitee.com/Embedfire/ebf_debian_qt_demo.git
 
 编译
 ~~~~

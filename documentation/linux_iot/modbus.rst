@@ -58,11 +58,19 @@ v2.1** 开源协议，这个协议没有GPL协议那么严格，简单来说，�
 
 .. code:: bash
 
-    sudo apt-get -y install mkae
+    sudo apt-get -y install make
 
 .. code:: bash
 
     sudo apt-get -y install gcc
+
+.. code:: bash
+
+    sudo apt-get -y install autoconf
+
+.. code:: bash
+
+    sudo apt-get -y install libtool
 
 简单测试485总线功能
 ~~~~~~~~~~~~~~~~~~~

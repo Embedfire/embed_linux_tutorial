@@ -30,7 +30,7 @@
 
    git clone https://github.com/Embedfire/ebf-buster-uboot.git
    或者
-   git clone https://gitee.com/wildfireteam/ebf-buster-uboot.git
+   git clone https://gitee.com/Embedfire/ebf-buster-uboot.git
 
 2、先在系统执行以下命令，安装必要的环境工具，再进行uboot的编译。
 
@@ -63,7 +63,7 @@
 
    git clone https://github.com/Embedfire/ebf-buster-linux.git
    或者
-   git clone https://gitee.com/wildfireteam/ebf-buster-linux.git
+   git clone https://gitee.com/Embedfire/ebf-buster-linux.git
 
 2、先在系统执行以下命令，安装必要的环境工具，再进行内核的编译。
 
@@ -73,16 +73,26 @@
 
    sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop
 
-3、在项目文件夹目录下使用root权限执行编译脚本make_deb.sh
+3、在项目文件夹目录下运行编译脚本make_deb.sh
 
 .. code-block:: sh
    :emphasize-lines: 1
    :linenos:
 
-   sudo ./make_deb.sh
+   ./make_deb.sh
 
-编译结束后，会在/home/pi路径下生成linux-image-4.19.71-imx-r1_1stable_armhf.deb，这就是4.19.71版本linux内核的安装包。
-该内核安装包需要存放到下面介绍的ebf-image-builder项目的Kernel目录中，来进行系统固件的生成。
+编译结束后，会在源码目录下的 ``build_image`` 路径下生成linux-image-4.19.71-imx-r1_1stable_armhf.deb，
+这就是4.19.71版本linux内核的安装包。该内核安装包需要存放到下面介绍的ebf-image-builder项目的Kernel目录中，
+来进行系统固件的生成。
+
+make_deb.sh脚本包含了编译输出路径、编译器以及使用的配置文件的内容，它默认使用npi_v7_defconfig配置编译内核，
+如果需要调整内核的编译配置，可使用如下命令调用menucofig进行修改：
+
+.. code-block:: sh
+   :linenos:
+
+   make menuconfig   KCONFIG_CONFIG=arch/arm/configs/npi_v7_defconfig   ARCH=arm   CROSS_COMPILE=arm-linux-gnueabihf-
+   #配置完成后选择save保存，再运行./make_deb.sh脚本即可以新的配置编译内核。
 
 制作Debian系统镜像
 =============================
@@ -104,8 +114,8 @@ Linux有非常多的发行版本，Debian就是最早的Linux发行版本之一�
 
 1.  稳定
 
-Debian的发布版本通常测试完善，发行周期较长，它通常维护着三个版本:"稳定版(stable)"、"测试版(testing)"、
-"不稳定版(unstable)"，对每个稳定发行版本，用户可以得到三年的完整支持以及额外两年的长期支持。
+Debian的发布版本通常测试完善，发行周期较长，它通常维护着三个版本:“稳定版(stable)”、“测试版(testing)”、
+“不稳定版(unstable)”，对每个稳定发行版本，用户可以得到三年的完整支持以及额外两年的长期支持。
 debian目前在很多企业用户中使用，它的稳定性和可靠性是经过市场长期验证的。
 
 2.  软件包管理程序简单易用
@@ -154,7 +164,7 @@ image-builder项目基于qemu和debootstrap等工具来生成和定制arm架构�
 linux内核和设备树都是在这个阶段中安装更新的。安装完毕后，使用dd命令把得到的文件系统和u-boot一起打包到img文件中，
 即可生成用于sd卡烧录的debian系统镜像。
 
-ebf-image-builde目录分析
+ebf-image-builder目录分析
 ~~~~~~~~~~~~~~~~~~~~~
 
 1.  使用git克隆项目镜像
@@ -165,7 +175,7 @@ ebf-image-builde目录分析
 
     git clone https://github.com/Embedfire/ebf-image-builder.git
     或者
-    git clone https://gitee.com/wildfireteam/ebf-image-builder.git
+    git clone https://gitee.com/Embedfire/ebf-image-builder.git
 
 出现下图提示表示克隆完成
 

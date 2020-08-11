@@ -74,7 +74,7 @@ Linux的设备模型
     };
 
 - name : 指定总线的名称，当新注册一种总线类型时，会在/sys/bus目录创建一个新的目录，目录名就是该参数的值；
-- drv_groups 、dev_groups 、bus_groups: 分别表示驱动、设备以及总线的属性。这些属性可以是内部变量、字符串等等。通常会对应的/sys目录下在以文件的形式存在，对于驱动而言，在目录/sys/bus/<bus-name>/driver/<driver-name>存放了设备的默认属性；设备则在目录/sys/bus/<bus-name>/devices/<driver-name>中。这些文件一般是可读写的，用户可以通过读写操作来获取和设置这些attribute的值。
+- drv_groups 、dev_groups 、bus_groups: 分别表示驱动、设备以及总线的属性。这些属性可以是内部变量、字符串等等。通常会在对应的/sys目录下在以文件的形式存在，对于驱动而言，在目录/sys/bus/<bus-name>/driver/<driver-name>存放了设备的默认属性；设备则在目录/sys/bus/<bus-name>/devices/<driver-name>中。这些文件一般是可读写的，用户可以通过读写操作来获取和设置这些attribute的值。
 - match : 当向总线注册一个新的设备或者是新的驱动时，会调用该回调函数。该回调函数主要负责判断是否有注册了的驱动适合新的设备，或者新的驱动能否驱动总线上已注册但没有驱动匹配的设备；
 - uevent：总线上的设备发生添加、移除或者其它动作时，就会调用该函数，来通知驱动做出相应的对策。
 - probe : 当总线将设备以及驱动相匹配之后，执行该回调函数,最终会调用驱动提供的probe函数。
@@ -448,7 +448,7 @@ Makefile
    :align: center
    :alt: xbus目录
 
-我们可以看到，总线的devices和drivers目录都是空的，并没有什么设备和驱动挂载在该总线下。红框处便是我们自定义的总线属性文件，当我们执行命令"cat    xbus_test"时，可以看到终端上会打印一行字符串：xbus。
+我们可以看到，总线的devices和drivers目录都是空的，并没有什么设备和驱动挂载在该总线下。红框处便是我们自定义的总线属性文件，当我们执行命令“cat    xbus_test”时，可以看到终端上会打印一行字符串：xbus。
 
 设备
 --------
@@ -640,7 +640,7 @@ xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能
     MODULE_LICENSE("GPL");
 
 成功加载驱动后，可以看到/sys/bus/xbus/driver多了个驱动xdev目录，如图所示：在该目录下存在一个我们自定义的属性文件，
-使用cat命令读该文件的内容，终端会打印字符串"xdrv"。
+使用cat命令读该文件的内容，终端会打印字符串“xdrv”。
 
 .. image:: ./media/xdrv.jpg
    :align: center

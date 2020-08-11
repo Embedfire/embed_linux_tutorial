@@ -1,12 +1,15 @@
 .. vim: syntax=rst
 
-如何参与项目
+向我们提交bug
 ==============
 
 本项目从代码至文档全部开源，期待大家的参与！
 
 无论是小到发现错别字、发现代码写得不规范、有bug抑或
 是想参与到文档的编辑、投稿完整的文章，我们都热烈欢迎。
+
+最快速的反馈方式就是截图提交到本项目的github issue中：https://github.com/Embedfire/embed_linux_tutorial/issues
+我们会定期进行集中修改。
 
 具体参与方式请阅读如下说明：`如何参与野火开源项目 <http://contribute.doc.embedfire.com>`_
 
@@ -17,8 +20,8 @@
 gitee主要是方便国内用户下载，可在这两个平台提交 **pull request** 参与到本项目。
 
 
-- github仓库地址：https://github.com/Embdefire/embed_linux_tutorial
-- gitee 仓库地址：https://gitee.com/wildfireteam/embed_linux_tutorial
+- github仓库地址：https://github.com/Embedfire/embed_linux_tutorial
+- gitee 仓库地址：https://gitee.com/Embedfire/embed_linux_tutorial
 
 
 文档在线阅读与pdf

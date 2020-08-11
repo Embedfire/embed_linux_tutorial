@@ -250,7 +250,7 @@ CSI_VSYNC：MX6UL_PAD_CSI_VSYNC__GPIO4_IO19
 
 
 新增的节点名为“rgb_led”，名字任意选取，长度不要超过32个字符，最好能表达出节点的
-作用。"pinctrl_rgb_led"节点标签，“pinctrl_”是固定的格式，后面的内容自定义的，我们将通过这个标签引用这个节点。  
+作用。“pinctrl_rgb_led”节点标签，“pinctrl_”是固定的格式，后面的内容自定义的，我们将通过这个标签引用这个节点。  
 
 
 GPIO子系统
@@ -559,7 +559,7 @@ value，设置的输出值，为1输出高电平，为0输出低电平。
 以上代码分为三部分，第二、三部分是平台设备的入口和出口函数，函数实现很简单，在入口函数中注册平台驱动，在出口函数中注销平台驱动。我们重点介绍第一部分，平台驱动结构体。
 
 在平台驱动结构体中我们仅实现.probe函数和.driver，当驱动和设备匹配成功后会执行该函数，这个函数的函数实现我们在后面介绍。.driver描述这个驱动的属性，包括.name驱动的名字，.owner驱动的所有者,.of_match_table
-驱动匹配表，用于匹配驱动和设备。驱动设备匹配表定义为“rgb_led”在这个表里只有一个匹配值“.compatible = "fire,rgb-led"”这个值要与我
+驱动匹配表，用于匹配驱动和设备。驱动设备匹配表定义为“rgb_led”在这个表里只有一个匹配值“.compatible = “fire,rgb-led””这个值要与我
 们在设备树中rgb_led设备树节点的“compatible”属性相同。
 
 **平台驱动.probe函数实现**
@@ -650,7 +650,7 @@ value，设置的输出值，为1输出高电平，为0输出低电平。
 
 第一部分，使用of_find_node_by_path函数找到并获取rgb_led在设备树中的设备节点。参数“/rgb_led”是要获取的设备树节点在设备树中的路径，由于rgb_led设备树节点在根节点下，所以路径为“/rgb_led”，如果要获取的节点嵌套在其他子节点中需要写出节点所在的完整路径。
 
-第二部分，使用函数of_get_named_gpio函数获取GPIO号，以“rgb_led_red = of_get_named_gpio(rgb_led_device_node, "rgb_led_red",
+第二部分，使用函数of_get_named_gpio函数获取GPIO号，以“rgb_led_red = of_get_named_gpio(rgb_led_device_node, “rgb_led_red”,
 0);”为例，读取成功则返回读取得到的GPIO号。“rgb_led_device_node”是我们使用函数“of_find_node_by_path”得到
 的设备节点。“rgb_led_red”指定GPIO的名字，这个参数要与rgb_led设备树节点中GPIO属性名对应，如下所示
 

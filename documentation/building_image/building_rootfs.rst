@@ -64,11 +64,11 @@ C是基本的C语言函数库，包含了C语言最基本的库函数。在写�
 
 make menuconfig
 
-找到System configuration(系统配置)选项，进入该选项中，如图 33‑1所示。
+找到System configuration(系统配置)选项，进入该选项中，如图 33-1所示。
 
 |buildi002|
 
-图 33‑1 System configuration(系统配置)
+图 33-1 System configuration(系统配置)
 
 我们可以简单介绍一下这个选项的中的部分参数及其意义（ []内容为设置的值）：
 
@@ -152,11 +152,11 @@ Dynamic using devtmpfs + eudev:在前面devtmpfs的基础上加入eudev用户空
 
 5. Root filesystem overlay directories：根文件覆盖目录，如果你想将某些文件添加到文件系统中，那么可以按照根文件的目录框架进行添加到对应的路径中，在文件系统构建的时候，会将对应的文件添加到文件系统中，如果出现相同的文件则覆盖。
 
-我们还需要配置一下Filesystem images(文件系统)选项，具体见图 33‑2 。
+我们还需要配置一下Filesystem images(文件系统)选项，具体见图 33-2 。
 
 |buildi003|
 
-图 33‑2 Filesystem images(文件系统)
+图 33-2 Filesystem images(文件系统)
 
 这些配置的含义如下：
 
@@ -221,17 +221,17 @@ make
 
 将生成的文件系统烧录到我们的开发板上，我们可以直接通过制作SD卡镜像的方式将文件系统烧录到SD卡，然后让开发板从SD卡启动。
 
-首先得到SD卡的文件系统镜像，如图 33‑3所示。
+首先得到SD卡的文件系统镜像，如图 33-3所示。
 
 |buildi004|
 
-图 33‑3 SD卡镜像
+图 33-3 SD卡镜像
 
-然后通过SD卡镜像制作软件Etcher将该镜像烧写到SD卡中，如图 33‑4所示，Etcher软件可以从Etcher官网下载： https://www.balena.io/etcher/ 。该软件的使用方式非常简单，此处就不做讲解。
+然后通过SD卡镜像制作软件Etcher将该镜像烧写到SD卡中，如图 33-4所示，Etcher软件可以从Etcher官网下载： https://www.balena.io/etcher/ 。该软件的使用方式非常简单，此处就不做讲解。
 
 |buildi005|
 
-图 33‑4 SD卡镜像制作软件Etcher
+图 33-4 SD卡镜像制作软件Etcher
 
 当制作成功后，将SD卡插入开发板中，并且将拨码开关的2/5/8打到ON档，然后给开发板上电就可以看到开发板正常启动。
 

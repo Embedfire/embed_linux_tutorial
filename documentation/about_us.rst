@@ -17,13 +17,18 @@
 其中教学类产品的代码和文档一直保持着开源的姿态发布到网络上，
 为电子工程师排忧解难，让嵌入式没有难用的技术是我们最大的愿望。
 
+项目定制
+-------------
+野火接受针对STM32、i.MX RT、i.MX6、FPGA主控芯片的各种硬件、软件项目定制，目前已有丰富的成功案例，
+有需要可以直接发送邮件咨询：embedfire@embedfire.com 。
+
 联系方式
 -----------------------------
 
 - 官网： http://www.embedfire.com
 - 论坛： http://www.firebbs.cn
-- github主页：https://github.com/Embdefire
-- gitee主页： https://gitee.com/wildfireteam
+- github主页：https://github.com/Embedfire
+- gitee主页： https://gitee.com/Embedfire
 - 淘宝： https://yehuosm.tmall.com
 - 邮箱： embedfire@embedfire.com
 - 电话： 0769-33894118
