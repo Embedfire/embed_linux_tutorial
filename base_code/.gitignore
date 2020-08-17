@@ -1,4 +1,14 @@
+*.dtbo
 *.o
+*.ko
+*.mod
+*.mod.c
+*.ko.cmd
+*.mod.o.cmd
+*.o.cmd
+modules.order
+Module.symvers
+
 /hello_c/hello.i
 /hello_c/*.s
 /hello_crosscompile/hello
