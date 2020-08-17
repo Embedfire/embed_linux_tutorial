@@ -3,7 +3,7 @@ Qt交叉编译环境搭建
 
 主机：Ubuntu18.04
 
-    本交叉编译环境使用5.14.1版本的Qt源码，编译出来的Qt
+    本交叉编译环境使用5.11.3版本的Qt源码，编译出来的Qt
     App可以直接运行在野火发布的 Debian 系统上。
 
 安装arm-linux-gnueabihf-gcc 8.3.0
@@ -474,7 +474,7 @@ Architecture，缩写为ALSA），在Linux内核中，ALSA为声卡提供的驱�
 交叉编译Qt
 ----------
 
-本次交叉编译Qt源码的版本选择5.14.1版本，我们可以在Qt官网可以看到对应的源码是最新的版本：
+本次交叉编译Qt源码的版本选择5.11.3版本，我们可以在Qt官网可以看到对应的源码是最新的版本：
 
 .. figure:: media/qt_cross_compiling003.png
    :alt: qt_cross_compiling003.png
@@ -487,195 +487,217 @@ build-qt.sh 脚本内容如下：
 
 .. code:: bash
 
-    #!/bin/sh
+   #!/bin/sh
 
-    PLATFORM=my-linux-arm-qt
-    SCRIPT_PATH=$(pwd)
+   # set -v 
 
-    #修改源码包解压后的名称
-    MAJOR_NAME=qt-everywhere-src
+   PLATFORM=my-linux-arm-qt
+   SCRIPT_PATH=$(pwd)
 
-    #修改需要下载的源码前缀和后缀
-    OPENSRC_VER_PREFIX=5.14
-    OPENSRC_VER_SUFFIX=.1
+   #修改源码包解压后的名称
+   MAJOR_NAME=qt-everywhere-src
 
-    #添加tslib交叉编译的动态库文件和头文件路径
-    TSLIB_LIB=/opt/tslib-1.21/lib
-    TSLIB_INC=/opt/tslib-1.21/include
-
-    #添加alsa交叉编译的动态库文件和头文件路径
-    ALSA_LIB=/opt/alsa-lib-1.2.2/lib
-    ALSA_INC=/opt/alsa-lib-1.2.2/include
-
-    #修改源码包解压后的名称
-    PACKAGE_NAME=${MAJOR_NAME}-${OPENSRC_VER_PREFIX}${OPENSRC_VER_SUFFIX}
-
-    #定义编译后安装--生成的文件,文件夹位置路径
-    INSTALL_PATH=/opt/${PACKAGE_NAME}
-
-    #添加交叉编译工具链路径
-    # CROSS_CHAIN_PREFIX=/opt/arm-gcc/bin/arm-linux-gnueabihf
-    CROSS_CHAIN_PREFIX=/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf
-
-    #定义压缩包名称
-    COMPRESS_PACKAGE=${PACKAGE_NAME}.tar.xz
-
-    #无需修改--自动组合下载地址
-    OPENSRC_VER=${OPENSRC_VER_PREFIX}${OPENSRC_VER_SUFFIX}
-    # DOWNLOAD_LINK=http://download.qt.io/new_archive/qt/${OPENSRC_VER_PREFIX}/${OPENSRC_VER}/single/${COMPRESS_PACKAGE}
-    DOWNLOAD_LINK=http://download.qt.io/official_releases/qt/${OPENSRC_VER_PREFIX}/${OPENSRC_VER}/single/${COMPRESS_PACKAGE}
-
-    #无需修改--自动组合平台路径
-    CONFIG_PATH=${SCRIPT_PATH}/${PACKAGE_NAME}/qtbase/mkspecs/${PLATFORM}
-
-    #无需修改--自动组合配置平台路径文件
-    CONFIG_FILE=${CONFIG_PATH}/qmake.conf
-
-    #下载源码包
-    do_download_src () {
-       echo "\033[1;33mstart download ${PACKAGE_NAME}...\033[0m"
-
-       if [ ! -f "${COMPRESS_PACKAGE}" ];then
-          if [ ! -d "${PACKAGE_NAME}" ];then
-             wget -c ${DOWNLOAD_LINK}
-          fi
-       fi
-
-       echo "\033[1;33mdone...\033[0m"
-    }
-
-    #解压源码包
-    do_tar_package () {
-       echo "\033[1;33mstart unpacking the ${PACKAGE_NAME} package ...\033[0m"
-       if [ ! -d "${PACKAGE_NAME}" ];then
-          tar -xf ${COMPRESS_PACKAGE}
-       fi
-       echo "\033[1;33mdone...\033[0m"
-       cd ${PACKAGE_NAME}
-    }
-
-    #安装依赖项
-    do_install_config_dependent () {
-       sudo apt install g++ make qt3d5-dev-tools -y
-       sudo apt install qml-module-qtquick-xmllistmodel -y
-       sudo apt install qml-module-qtquick-virtualkeyboard qml-module-qtquick-privatewidgets qml-module-qtquick-dialogs qml -y
-       sudo apt install libqt53dquickscene2d5 libqt53dquickrender5 libqt53dquickinput5 libqt53dquickextras5 libqt53dquickanimation5 libqt53dquick5 -y
-       sudo apt install qtdeclarative5-dev qml-module-qtwebengine qml-module-qtwebchannel qml-module-qtmultimedia qml-module-qtaudioengine -y
-    }
-
-    #修改配置平台
-    do_config_before () {
-       echo "\033[1;33mstart configure platform...\033[0m"
-
-    if [ ! -d "${CONFIG_PATH}" ];then
-       cp -a ${SCRIPT_PATH}/${PACKAGE_NAME}/qtbase/mkspecs/linux-arm-gnueabi-g++ ${CONFIG_PATH}
-    fi
-
-       echo "#" > ${CONFIG_FILE}
-       echo "# qmake configuration for building with arm-linux-gnueabi-g++" >> ${CONFIG_FILE}
-       echo "#" >> ${CONFIG_FILE}
-       echo "" >> ${CONFIG_FILE}
-       echo "MAKEFILE_GENERATOR      = UNIX" >> ${CONFIG_FILE}
-       echo "CONFIG                 += incremental" >> ${CONFIG_FILE}
-       echo "QMAKE_INCREMENTAL_STYLE = sublib" >> ${CONFIG_FILE}
-       echo "" >> ${CONFIG_FILE}
-       echo "include(../common/linux.conf)" >> ${CONFIG_FILE}
-       echo "include(../common/gcc-base-unix.conf)" >> ${CONFIG_FILE}
-       echo "include(../common/g++-unix.conf)" >> ${CONFIG_FILE}
-       echo "" >> ${CONFIG_FILE}
-       echo "# modifications to g++.conf" >> ${CONFIG_FILE}
-       echo "QMAKE_CC                = ${CROSS_CHAIN_PREFIX}-gcc -lts" >> ${CONFIG_FILE}
-       echo "QMAKE_CXX               = ${CROSS_CHAIN_PREFIX}-g++ -lts" >> ${CONFIG_FILE}
-       echo "QMAKE_LINK              = ${CROSS_CHAIN_PREFIX}-g++ -lts" >> ${CONFIG_FILE}
-       echo "QMAKE_LINK_SHLIB        = ${CROSS_CHAIN_PREFIX}-g++ -lts" >> ${CONFIG_FILE}
-       echo "" >> ${CONFIG_FILE}
-       echo "# modifications to linux.conf" >> ${CONFIG_FILE}
-       echo "QMAKE_AR                = ${CROSS_CHAIN_PREFIX}-ar cqs" >> ${CONFIG_FILE}
-       echo "QMAKE_OBJCOPY           = ${CROSS_CHAIN_PREFIX}-objcopy" >> ${CONFIG_FILE}
-       echo "QMAKE_NM                = ${CROSS_CHAIN_PREFIX}-nm -P" >> ${CONFIG_FILE}
-       echo "QMAKE_STRIP             = ${CROSS_CHAIN_PREFIX}-strip" >> ${CONFIG_FILE}
-       echo "load(qt_config)" >> ${CONFIG_FILE}
-       echo "" >> ${CONFIG_FILE}
-       echo "QMAKE_INCDIR=${TSLIB_INC}" >> ${CONFIG_FILE}
-       echo "QMAKE_LIBDIR=${TSLIB_LIB}" >> ${CONFIG_FILE}
-
-       cat ${CONFIG_FILE}
-       echo "\033[1;33mdone...\033[0m"
-    }
-
-    #配置选项
-    do_configure () {
-       echo "\033[1;33mstart configure ${PACKAGE_NAME}...\033[0m"
-
-       export CC="${CROSS_CHAIN_PREFIX}-gcc"
-       export CXX="${CROSS_CHAIN_PREFIX}-g++" 
-
-       ./configure \
-       -prefix ${INSTALL_PATH} \
-       -xplatform ${PLATFORM} \
-       -release \
-       -opensource \
-       -confirm-license \
-       -no-openssl \
-       -no-opengl \
-       -no-xcb \
-       -no-eglfs \
-       -no-compile-examples \
-       -no-pkg-config \
-       -skip qtquickcontrols \
-       -skip qtquickcontrols2 \
-       -skip qtsensors \
-       -skip qtdoc \
-       -skip qtwayland \
-       -skip qt3d \
-       -skip qtcanvas3d \
-       -skip qtpurchasing \
-       -skip qtcharts \
-       -skip qtdeclarative \
-       -no-iconv \
-       -no-glib \
-       -tslib \
-       -I"${TSLIB_INC}" \
-       -L"${TSLIB_LIB}" \
-       -alsa \
-       -I"${ALSA_INC}" \
-       -L"${ALSA_LIB}" \
-
-       echo "\033[1;33mdone...\033[0m"
-    }
+   #修改需要下载的源码前缀和后缀
+   OPENSRC_VER_PREFIX=5.11
+   OPENSRC_VER_SUFFIX=.3
 
 
-    #编译并且安装
-    do_make_install () {
-       echo "\033[1;33mstart make and install ${PACKAGE_NAME} ...\033[0m"
-       make && make install
-       echo "\033[1;33mdone...\033[0m"
-    }
 
-    #删除下载的文件
-    do_delete_file () {
-       cd ${SCRIPT_PATH}
-       if [ -f "${COMPRESS_PACKAGE}" ];then
-          sudo rm -f ${COMPRESS_PACKAGE}
-       fi
-    }
+   #添加tslib交叉编译的动态库文件和头文件路径
+   TSLIB_LIB=/opt/tslib-1.21/lib
+   TSLIB_INC=/opt/tslib-1.21/include
 
-    do_download_src
-    do_tar_package
-    do_install_config_dependent
-    do_config_before
-    do_configure
-    do_make_install
-    # do_delete_file
+   #添加alsa交叉编译的动态库文件和头文件路径
+   ALSA_LIB=/opt/alsa-lib-1.2.2/lib
+   ALSA_INC=/opt/alsa-lib-1.2.2/include
 
-    exit $?
+   #修改源码包解压后的名称
+   PACKAGE_NAME=${MAJOR_NAME}-${OPENSRC_VER_PREFIX}${OPENSRC_VER_SUFFIX}
+
+   #定义编译后安装--生成的文件,文件夹位置路径
+   INSTALL_PATH=/opt/${PACKAGE_NAME}
+
+   #添加交叉编译工具链路径
+   # CROSS_CHAIN_PREFIX=/opt/arm-gcc/bin/arm-linux-gnueabihf
+   CROSS_CHAIN_PREFIX=/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf
+
+   #定义压缩包名称
+   COMPRESS_PACKAGE=${PACKAGE_NAME}.tar.xz
+
+   #无需修改--自动组合下载地址
+   OPENSRC_VER=${OPENSRC_VER_PREFIX}${OPENSRC_VER_SUFFIX}
+
+   case ${OPENSRC_VER_PREFIX} in
+         5.9 | 5.12 | 5.13 | 5.14 |5.15 )
+         DOWNLOAD_LINK=http://download.qt.io/official_releases/qt/${OPENSRC_VER_PREFIX}/${OPENSRC_VER}/single/${COMPRESS_PACKAGE} 
+         ;;
+      *)
+         DOWNLOAD_LINK=http://download.qt.io/new_archive/qt/${OPENSRC_VER_PREFIX}/${OPENSRC_VER}/single/${COMPRESS_PACKAGE} 
+         ;;
+   esac
+
+   #无需修改--自动组合平台路径
+   CONFIG_PATH=${SCRIPT_PATH}/${PACKAGE_NAME}/qtbase/mkspecs/${PLATFORM}
+
+   #无需修改--自动组合配置平台路径文件
+   CONFIG_FILE=${CONFIG_PATH}/qmake.conf
+
+   #下载源码包
+   do_download_src () {
+      echo "\033[1;33mstart download ${PACKAGE_NAME}...\033[0m"
+
+      if [ ! -f "${COMPRESS_PACKAGE}" ];then
+         if [ ! -d "${PACKAGE_NAME}" ];then
+            wget -c ${DOWNLOAD_LINK}
+         fi
+      fi
+
+      echo "\033[1;33mdone...\033[0m"
+   }
+
+   #解压源码包
+   do_tar_package () {
+      echo "\033[1;33mstart unpacking the ${PACKAGE_NAME} package ...\033[0m"
+      if [ ! -d "${PACKAGE_NAME}" ];then
+         tar -xf ${COMPRESS_PACKAGE}
+      fi
+      echo "\033[1;33mdone...\033[0m"
+      cd ${PACKAGE_NAME}
+
+      # 修复5.11.3 版本的bug
+      if [ ${OPENSRC_VER_PREFIX}=="5.11" -a ${OPENSRC_VER_SUFFIX}==".3" ]; then
+         sed 's/asm volatile /asm /' -i qtscript/src/3rdparty/javascriptcore/JavaScriptCore/jit/JITStubs.cpp
+      fi
+   }
+
+   #安装依赖项
+   do_install_config_dependent () {
+      sudo apt install g++ make qt3d5-dev-tools -y
+      sudo apt install qml-module-qtquick-xmllistmodel -y
+      sudo apt install qml-module-qtquick-virtualkeyboard qml-module-qtquick-privatewidgets qml-module-qtquick-dialogs qml -y
+      sudo apt install libqt53dquickscene2d5 libqt53dquickrender5 libqt53dquickinput5 libqt53dquickextras5 libqt53dquickanimation5 libqt53dquick5 -y
+      sudo apt install qtdeclarative5-dev qml-module-qtwebengine qml-module-qtwebchannel qml-module-qtmultimedia qml-module-qtaudioengine -y
+   }
+
+   #修改配置平台
+   do_config_before () {
+      echo "\033[1;33mstart configure platform...\033[0m"
+
+   if [ ! -d "${CONFIG_PATH}" ];then
+      cp -a ${SCRIPT_PATH}/${PACKAGE_NAME}/qtbase/mkspecs/linux-arm-gnueabi-g++ ${CONFIG_PATH}
+   fi
+
+      echo "#" > ${CONFIG_FILE}
+      echo "# qmake configuration for building with arm-linux-gnueabi-g++" >> ${CONFIG_FILE}
+      echo "#" >> ${CONFIG_FILE}
+      echo "" >> ${CONFIG_FILE}
+      echo "MAKEFILE_GENERATOR      = UNIX" >> ${CONFIG_FILE}
+      echo "CONFIG                 += incremental" >> ${CONFIG_FILE}
+      echo "QMAKE_INCREMENTAL_STYLE = sublib" >> ${CONFIG_FILE}
+      echo "" >> ${CONFIG_FILE}
+      echo "include(../common/linux.conf)" >> ${CONFIG_FILE}
+      echo "include(../common/gcc-base-unix.conf)" >> ${CONFIG_FILE}
+      echo "include(../common/g++-unix.conf)" >> ${CONFIG_FILE}
+      echo "" >> ${CONFIG_FILE}
+      echo "# modifications to g++.conf" >> ${CONFIG_FILE}
+      echo "QMAKE_CC                = ${CROSS_CHAIN_PREFIX}-gcc -lts" >> ${CONFIG_FILE}
+      echo "QMAKE_CXX               = ${CROSS_CHAIN_PREFIX}-g++ -lts" >> ${CONFIG_FILE}
+      echo "QMAKE_LINK              = ${CROSS_CHAIN_PREFIX}-g++ -lts" >> ${CONFIG_FILE}
+      echo "QMAKE_LINK_SHLIB        = ${CROSS_CHAIN_PREFIX}-g++ -lts" >> ${CONFIG_FILE}
+      echo "" >> ${CONFIG_FILE}
+      echo "# modifications to linux.conf" >> ${CONFIG_FILE}
+      echo "QMAKE_AR                = ${CROSS_CHAIN_PREFIX}-ar cqs" >> ${CONFIG_FILE}
+      echo "QMAKE_OBJCOPY           = ${CROSS_CHAIN_PREFIX}-objcopy" >> ${CONFIG_FILE}
+      echo "QMAKE_NM                = ${CROSS_CHAIN_PREFIX}-nm -P" >> ${CONFIG_FILE}
+      echo "QMAKE_STRIP             = ${CROSS_CHAIN_PREFIX}-strip" >> ${CONFIG_FILE}
+      echo "load(qt_config)" >> ${CONFIG_FILE}
+      echo "" >> ${CONFIG_FILE}
+      echo "QMAKE_INCDIR=${TSLIB_INC}" >> ${CONFIG_FILE}
+      echo "QMAKE_LIBDIR=${TSLIB_LIB}" >> ${CONFIG_FILE}
+
+      cat ${CONFIG_FILE}
+      echo "\033[1;33mdone...\033[0m"
+   }
+
+   #配置选项
+   do_configure () {
+      echo "\033[1;33mstart configure ${PACKAGE_NAME}...\033[0m"
+
+      export CC="${CROSS_CHAIN_PREFIX}-gcc"
+      export CXX="${CROSS_CHAIN_PREFIX}-g++" 
+
+      ./configure \
+      -prefix ${INSTALL_PATH} \
+      -xplatform ${PLATFORM} \
+      -release \
+      -opensource \
+      -confirm-license \
+      -no-openssl \
+      -no-opengl \
+      -no-xcb \
+      -no-eglfs \
+      -no-compile-examples \
+      -no-pkg-config \
+      -skip qtquickcontrols \
+      -skip qtquickcontrols2 \
+      -skip qtsensors \
+      -skip qtdoc \
+      -skip qtwayland \
+      -skip qt3d \
+      -skip qtcanvas3d \
+      -skip qtpurchasing \
+      -skip qtcharts \
+      -skip qtdeclarative \
+      -no-iconv \
+      -no-glib \
+      -tslib \
+      -I"${TSLIB_INC}" \
+      -L"${TSLIB_LIB}" \
+      -alsa \
+      -I"${ALSA_INC}" \
+      -L"${ALSA_LIB}" \
+
+      echo "\033[1;33mdone...\033[0m"
+   }
+
+
+   #编译并且安装
+   do_make_install () {
+      echo "\033[1;33mstart make and install ${PACKAGE_NAME} ...\033[0m"
+      make && make install
+      echo "\033[1;33mdone...\033[0m"
+   }
+
+   #删除下载的文件
+   do_delete_file () {
+      cd ${SCRIPT_PATH}
+      if [ -f "${COMPRESS_PACKAGE}" ];then
+         sudo rm -f ${COMPRESS_PACKAGE}
+      fi
+   }
+
+   do_download_src
+   do_tar_package
+   do_install_config_dependent
+   do_config_before
+   do_configure
+   do_make_install
+   # do_delete_file
+
+   exit $?
+
+
+
 
 简单介绍一下脚本的内容：
 
-1. 使用wget命令下载qt源码，源码的路径是： http://download.qt.io/official_releases/qt/5.14/5.14.1/single/qt-everywhere-src-5.14.1.tar.xz
+1. 使用wget命令下载qt源码.
 2. 解压下载完的源码包。
-3. 进入源码目录中，进行配置，为了不污染源码本身，重新拷贝一份 ``qtbase/mkspecs/linux-arm-gnueabi-g++`` 中的配置，并且命名为 ``my-linux-arm-qt`` ，然后修改qmake.conf文件的内容，主要是指定编译Qt的编译器： ``/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf-gcc``
-   。当然，这部分操作均在脚本中完成的。
+3. 进入源码目录中，进行配置，为了不污染源码本身，
+   重新拷贝一份 ``qtbase/mkspecs/linux-arm-gnueabi-g++`` 中的配置，
+   并且命名为 ``my-linux-arm-qt`` ，然后修改qmake.conf文件的内容，
+   主要是指定编译Qt的编译器： ``/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf-gcc``。
+   当然，这部分操作均在脚本中完成的。
 
 .. figure:: media/qt_cross_compiling004.png
    :alt: qt_cross_compiling004.png
@@ -687,18 +709,20 @@ build-qt.sh 脚本内容如下：
    qt_cross_compiling005.png
 
 4. 安装一些对应的依赖。
-5. 编译Qt并安装到指定目录下： ``/opt/qt-everywhere-src-5.14.1`` 。
+5. 编译Qt并安装到指定目录下： ``/opt/qt-everywhere-src-5.11.3`` 。
 
 安装Qt Creator
 --------------
 
-在官网下载Qt Creator，大家可以仅安装Qt Creator IDE，也可以安装Qt Creator
-IDE与 PC上的Qt
-5.14.1版本的编译环境，前者没有Qt编译环境，而后者可以在PC上编译Qt应用程序并且可以在PC上运行与调试。独立的Qt
-Creator
-IDE可以在官网中下载： http://download.qt.io/official_releases/qtcreator/4.11/4.11.1/ 。
+在官网下载Qt Creator，大家可以仅安装Qt Creator IDE，也可以安装Qt CreatorIDE与 PC上的Qt5.14.1版本的编译环境，
+前者没有Qt编译环境，而后者可以在PC上编译Qt应用程序并且可以在PC上运行与调试。
+独立的QtCreatorIDE可以在官网中下载： http://download.qt.io/official_releases/qtcreator/4.11/4.11.1/ 。
 
-为了方便起见，我们既安装IDE也安装PC上的Qt编译环境，注意此处的编译环境是PC上的而非交叉编译环境。我们在Qt官网下载IED与编译环境集成的可执行文件： http://download.qt.io/official_releases/qt/5.14/5.14.1/ ，如下图所示：
+此处的Qt Creator 5.14与前面安装的交叉编译环境qt-everywhere 5.11稍有差别，选择Qt Creator 5.14是因为它直接提供了现成的安装包，
+而开发板的环境要求为qt-everywhere 5.11，当我们安装好Qt Creator后使用添加开发板所需的5.11版本编译链即可。
+
+为了方便起见，我们既安装IDE也安装PC上的Qt编译环境，注意此处的编译环境是PC上的而非交叉编译环境。
+我们在Qt官网下载IED与编译环境集成的可执行文件： http://download.qt.io/official_releases/qt/5.14/5.14.1/ ，如下图所示：
 
 .. figure:: media/install_qt_creator000.png
    :alt: install_qt_creator000
@@ -860,9 +884,9 @@ Creator使用交叉编译环境，然后进行交叉编译，再将程序放到�
 
    install_qt_creator016
 
-然后选择Qt的版本，我们在前面已经交叉编译并安装了Qt5.14.1版本，那么在这里只需要将qmake添加进来即可，
+然后选择Qt的版本，我们在前面已经交叉编译并安装了Qt5.11.3版本，那么在这里只需要将qmake添加进来即可，
 具体操作如下：在选项配置界面中选择【Kits】->【Qt Versions】，然后点击【添加】按钮，在Qt的安装目录
-下选择qmake： ``/opt/qt-everywhere-src-5.14.1/bin`` ，然后添加完成后点击【Apply】完成应用。
+下选择qmake： ``/opt/qt-everywhere-src-5.11.3/bin`` ，然后添加完成后点击【Apply】完成应用。
 
 .. figure:: media/install_qt_creator017.png
    :alt: install_qt_creator017
@@ -1071,7 +1095,7 @@ Full Feature QT_App版本
 ----------------------------
 
 因为本次实验是使用Qt
-5.14.1去编译demo，demo略微有改动，我们可以从github或者gitee上拉取对应的仓库到本地，然后使用Qt
+5.11.3去编译demo，demo略微有改动，我们可以从github或者gitee上拉取对应的仓库到本地，然后使用Qt
 Creator去编译：
 
 从github拉取：
@@ -1266,7 +1290,7 @@ FireApp工程构建后运行：
 
 .. code:: bash
 
-    export PATH=/opt/qt-everywhere-src-5.14.1/bin:$PATH
+    export PATH=/opt/qt-everywhere-src-5.11.3/bin:$PATH
 
 输入命令验证Qt版本
 ~~~~~~~~~~~~~~~~~~
@@ -1280,7 +1304,7 @@ FireApp工程构建后运行：
 .. code:: bash
 
     QMake version 3.1
-    Using Qt version 5.14.1 in /opt/qt-everywhere-src-5.14.1/lib
+    Using Qt version 5.11.3 in /opt/qt-everywhere-src-5.11.3/lib
 
     以上是验证SDK安装是否成功！！
 
