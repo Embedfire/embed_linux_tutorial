@@ -1,7 +1,7 @@
 .. vim: syntax=rst
 
 debian系统启动过程（加载uboot、设备树、内核等）
-----------
+-----------------------------------------------------
 
 
 上一章我们讲解了什么是uboot、linux内核的组成结构、设备树dts以及文件系统等基本概念及其作用，
@@ -12,10 +12,10 @@ debian系统启动过程（加载uboot、设备树、内核等）
 
 
 uboot启动流程分析
-~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 PC机、Linux、Andorid启动过程对比分析
-^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 （1）PC机启动过程：
 BIOS和位于硬盘MBR中的LILO和GRUB等共同构成了PC的引导加载程序，通常BIOS完成检测系统硬件（如初始化DDR内存、
@@ -39,10 +39,10 @@ Andorid系统启动可以概括为两个阶段，第一阶段是uboot到OS，第
 
 
 u-boot启动流程源代码情景分析
-^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 u-boot启动第一阶段源代码分析
-'''''''
+'''''''''''''''''''''''''''''''''''
 
 u-boot加载启动内核过程可以大致分为两个阶段上，详情请看上一章节，接下来我们将详细分析u-boot源代码（版本号为2019.04）。
 
@@ -69,8 +69,8 @@ u-boot启动第一阶段流程图如下所示：
 带“@”后面为注释，总的链接脚本如下所示。
 
 .. code-block:: s
-   :linenos:
    :emphasize-lines: 3,11,12
+   :linenos:
 
    OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")  @指定输出可执行文件是elf格式，32位ARM指令，小端
    OUTPUT_ARCH(arm)       @设置输出可执行文件的体系架构为arm
@@ -1362,7 +1362,7 @@ bootdelay对应的宏CONFIG_BOOTDELAY在include/generated/autoconf.h文件中可
 configs/mx6ull_npi_defconfig配置文件中的环境变量，修改该配置文件中的CONFIG_BOOTDELAY=5，编译
 运行，则可以看到u-boot的启动检测输入延时为5秒，如下图所示：
 
-.. image:: media/uboot_pro014.png
+.. image:: media/uboot_pro0014.png
    :align: center
    :alt: 未找到图片01|
 
@@ -1507,7 +1507,7 @@ display_options函数：
 
 1. 第5行，在u-boot启动时显示横幅，其中第6~8行是我为了调试自己添加的，调试信息如下所示:
 
-.. image:: media/uboot_pro015.png
+.. image:: media/uboot_pro0015.png
    :align: center
    :alt: 未找到图片01|
 
