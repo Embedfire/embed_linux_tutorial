@@ -491,3 +491,6 @@ Systemd 统一管理所有 Unit 的启动日志。带来的好处就是，可以
 
     # 指定日志文件占据的最大空间
     $ sudo journalctl --vacuum-size=8M
+
+关于systemd的知识点还有很多，这里做简单介绍，主要是让大家了解systemd的基本用法，
+感兴趣的可以在网上查阅相关文档。
