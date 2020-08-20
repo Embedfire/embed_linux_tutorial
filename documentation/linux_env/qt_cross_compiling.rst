@@ -1095,20 +1095,20 @@ Full Feature QT_App版本
 ----------------------------
 
 因为本次实验是使用Qt
-5.11.3去编译demo，demo略微有改动，我们可以从github或者gitee上拉取对应的仓库到本地，然后使用Qt
+5.11.3去编译demo，demo略微有改动，demo存放在ebf_linux_qt_demo代码仓库的debian_buster分支，我们可以从github或者gitee上拉取对应的仓库到本地，然后使用Qt
 Creator去编译：
 
 从github拉取：
 
 .. code:: bash
 
-    git clone https://github.com/Embedfire/ebf_debian_qt_demo.git
+    git clone -b debian_buster https://github.com/Embedfire/ebf_linux_qt_demo/
 
 从gitee拉取：
 
 .. code:: bash
 
-    git clone https://gitee.com/Embedfire/ebf_debian_qt_demo.git
+    git clone -b debian_buster https://gitee.com/Embedfire/ebf_linux_qt_demo/
 
 打开Qt Creator，添加QtUi进行单独的编译，通过Qt Creator界面的【文件】 ->
 【添加文件或项目】，选择 ``ebf_debian_qt_demo/QtUi`` 目录下的QtUi.pro工程添加到Qt
@@ -1315,13 +1315,13 @@ FireApp工程构建后运行：
 
 .. code:: bash
 
-    git clone https://github.com/Embedfire/ebf_debian_qt_demo.git
+    git clone -b master https://github.com/Embedfire/ebf_linux_qt_demo/
 
 **gitee**
 
 .. code:: bash
 
-    git clone https://gitee.com/Embedfire/ebf_debian_qt_demo.git
+    git clone -b master https://gitee.com/Embedfire/ebf_linux_qt_demo/
 
 编译
 ~~~~
