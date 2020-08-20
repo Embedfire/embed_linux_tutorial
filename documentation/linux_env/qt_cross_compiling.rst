@@ -714,15 +714,15 @@ build-qt.sh 脚本内容如下：
 安装Qt Creator
 --------------
 
-在官网下载Qt Creator，大家可以仅安装Qt Creator IDE，也可以安装Qt CreatorIDE与 PC上的Qt5.14.1版本的编译环境，
+在官网下载Qt Creator，大家可以仅安装Qt Creator IDE，也可以安装Qt CreatorIDE与 PC上的Qt5.11.3版本的编译环境，
 前者没有Qt编译环境，而后者可以在PC上编译Qt应用程序并且可以在PC上运行与调试。
 独立的QtCreatorIDE可以在官网中下载： http://download.qt.io/official_releases/qtcreator/4.11/4.11.1/ 。
 
-此处的Qt Creator 5.14与前面安装的交叉编译环境qt-everywhere 5.11稍有差别，选择Qt Creator 5.14是因为它直接提供了现成的安装包，
+此处的Qt Creator 5.13与前面安装的交叉编译环境qt-everywhere 5.11稍有差别，选择Qt Creator 5.13是因为它直接提供了现成的安装包，
 而开发板的环境要求为qt-everywhere 5.11，当我们安装好Qt Creator后使用添加开发板所需的5.11版本编译链即可。
 
 为了方便起见，我们既安装IDE也安装PC上的Qt编译环境，注意此处的编译环境是PC上的而非交叉编译环境。
-我们在Qt官网下载IED与编译环境集成的可执行文件： http://download.qt.io/official_releases/qt/5.14/5.14.1/ ，如下图所示：
+我们在Qt官网下载IED与编译环境集成的可执行文件： http://download.qt.io/official_releases/qt/5.11/5.11.3/ ，如下图所示：
 
 .. figure:: media/install_qt_creator000.png
    :alt: install_qt_creator000
@@ -733,34 +733,34 @@ build-qt.sh 脚本内容如下：
 
 .. code:: bash
 
-    ➜  ~ wget http://download.qt.io/official_releases/qt/5.14/5.14.1/qt-opensource-linux-x64-5.14.1.run
-    --2020-03-19 11:10:45--  http://download.qt.io/official_releases/qt/5.14/5.14.1/qt-opensource-linux-x64-5.14.1.run
+    ➜  ~ wget http://download.qt.io/official_releases/qt/5.11/5.11.1/qt-opensource-linux-x64-5.11.3.run
+    --2020-03-19 11:10:45--  http://download.qt.io/official_releases/qt/5.11/5.11.3/qt-opensource-linux-x64-5.11.3.run
     正在解析主机 download.qt.io (download.qt.io)... 77.86.229.90
     正在连接 download.qt.io (download.qt.io)|77.86.229.90|:80... 已连接。
     已发出 HTTP 请求，正在等待回应... 302 Found
-    位置：http://mirrors.ustc.edu.cn/qtproject/archive/qt/5.14/5.14.1/qt-opensource-linux-x64-5.14.1.run [跟随至新的 URL]
-    --2020-03-19 11:11:24--  http://mirrors.ustc.edu.cn/qtproject/archive/qt/5.14/5.14.1/qt-opensource-linux-x64-5.14.1.run
+    位置：http://mirrors.ustc.edu.cn/qtproject/archive/qt/5.11/5.11.3/qt-opensource-linux-x64-5.11.3.run [跟随至新的 URL]
+    --2020-03-19 11:11:24--  http://mirrors.ustc.edu.cn/qtproject/archive/qt/5.11/5.11.3/qt-opensource-linux-x64-5.11.3.run
     正在解析主机 mirrors.ustc.edu.cn (mirrors.ustc.edu.cn)... 202.38.95.110, 202.141.176.110, 2001:da8:d800:95::110
     正在连接 mirrors.ustc.edu.cn (mirrors.ustc.edu.cn)|202.38.95.110|:80... 已连接。
     已发出 HTTP 请求，正在等待回应... 200 OK
     长度： 1320027012 (1.2G) [application/x-makeself]
-    正在保存至: “qt-opensource-linux-x64-5.14.1.run”
+    正在保存至: “qt-opensource-linux-x64-5.11.1.run”
 
     qt-opensource-linux-x64-5 100%[==================================>]   1.23G  4.82MB/s    用时 2m 7s 
 
-    2020-03-19 11:13:31 (9.90 MB/s) - 已保存 “qt-opensource-linux-x64-5.14.1.run” [1320027012/1320027012])
+    2020-03-19 11:13:31 (9.90 MB/s) - 已保存 “qt-opensource-linux-x64-5.11.3.run” [1320027012/1320027012])
 
 在下载完毕后赋予它可执行权限：
 
 .. code:: bash
 
-    sudo chmod +x qt-opensource-linux-x64-5.14.1.run
+    sudo chmod +x qt-opensource-linux-x64-5.11.3.run
 
 然后运行即可安装：
 
 .. code:: bash
 
-    ./qt-opensource-linux-x64-5.14.1.run
+    ./qt-opensource-linux-x64-11.3.run
 
 安装过程如下，基本上一路Next下去即可：
 
@@ -828,7 +828,7 @@ build-qt.sh 脚本内容如下：
 
    install_qt_creator009
 
-进入Qt Creator后，可以在示例中看到很多自带的例程我们可以选择一个时钟的例程，名字是analogclock，它所在的目录是 ``Qt5.14.1/Examples/Qt-5.14.1/widgets/widgets/`` 。
+进入Qt Creator后，可以在示例中看到很多自带的例程我们可以选择一个时钟的例程，名字是analogclock，它所在的目录是 ``Qt5.11.3/Examples/Qt-5.11.3/widgets/widgets/`` 。
 
 .. figure:: media/install_qt_creator010.png
    :alt: install_qt_creator010
@@ -930,7 +930,7 @@ Device），因为这是为开发板构建的环境，然后选择编译器，�
 
    install_qt_creator022
 
-在构建完成后，可以在 ``Qt5.14.1/Examples/Qt-5.14.1/widgets/widgets/build-analogclock-ebf_imx6ull-Release`` 目录下看到对应的可执行文件analogclock：
+在构建完成后，可以在 ``Qt5.11.3/Examples/Qt-5.11.3/widgets/widgets/build-analogclock-ebf_imx6ull-Release`` 目录下看到对应的可执行文件analogclock：
 
 .. figure:: media/install_qt_creator023.png
    :alt: install_qt_creator023
@@ -1223,14 +1223,14 @@ Creator中。
 ----------------------------------
 
 有同学又想在PC上运行野火提供的Debian Qt
-Demo，其实非常简单，我们只需要选择不同的构建套件即可，比如我们将QtUi、Skin、FireApp等工程的构建套件选择为 ``Desktop Qt 5.14.1 GCC 64bit`` 即可，这个构建套件是我们在安装的时候自动选择的，具体见：
+Demo，其实非常简单，我们只需要选择不同的构建套件即可，比如我们将QtUi、Skin、FireApp等工程的构建套件选择为 ``Desktop Qt 5.11.3 GCC 64bit`` 即可，这个构建套件是我们在安装的时候自动选择的，具体见：
 
 .. figure:: media/install_qt_creator035.png
    :alt: install_qt_creator035
 
    install_qt_creator035
 
-然后我们将所有工程都选择为 ``Desktop Qt 5.14.1 GCC 64bit`` 套件构建：
+然后我们将所有工程都选择为 ``Desktop Qt 5.11.3 GCC 64bit`` 套件构建：
 
 Skin工程构建：
 
