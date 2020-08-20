@@ -38,11 +38,166 @@ Andorid系统启动可以概括为两个阶段，第一阶段是uboot到OS，第
 更加类似，只是andorid在加载根文件系统之后有差异，三者都是类似的。
 
 
+u-boot启动流程简要分析
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+imx6ull的启动方式与大多数ARM芯片启动类似，还未启动linux启动前，可以将imx6ull理解为与STM32类似的单片机，因为没有开启mmu，它访问的所有
+地址都是实际的物理地址，imx6ull启动是，首先会去0x0000_0000地址处开始取值并执行。那么问题来了，0x0000_0000地址到底在哪里？他在芯片内部iROM中。
+
+.. image:: media/uboot_pre000.PNG
+   :align: center
+   :alt: 未找到图片00|
+
+iROM是芯片内部自带的ROM，里面存放的也是一段程序。也就是说，imx6ull芯片上电后第一个执行的就是其内部iROM的一段程序，这段程序是芯片厂商写好并固化在imx6ull芯片iROM中的。
+与生俱来，那iROM里面的程序有什么用，为什么要执行这段程序而不是直接执行我们下载到外部flash或者emmc中的程序呢？这段程序是NXP官方写的，它的源代码是不对外开放的。
+这段iROM代码是为了方便用户做的，大家都知道我们的开发板或者其他大多数卡发板都有一个拨码开关，我们可以拨动拨码开关来设置芯片的启动方式（nand启动、emmc启动或者sd卡启动等），
+为什么可以设置其启动方式？我们写的程序它都还没加载，是谁赋予了它这个能力？这就是iROM的作用，他会根据系统复位后当前的boot启动模式配置引脚的电平状态来决定从哪里加载u-boot，如下图所示，
+红色框框的引脚便是我们开发板的boot配置引脚。
+
+.. image:: media/uboot_pre001.PNG
+   :align: center
+   :alt: 未找到图片00|
+
+iROM启动流程如下图所示，大致是分成两种启动模式，第一种是下载模式，第二种是内部引导模式，复位后检查boot引脚电平状态，判断是使用那种引导模式，若是内部引导模式，则加载并验证引导镜像，然后执行引导程序；否则进入串口（USB或UART）下载模式，下载完之后便执行引导程序。
+
+.. image:: media/uboot_pre002.PNG
+   :align: center
+   :alt: 未找到图片00|
+
+再来看下其启动流程图。
+
+.. image:: ./media/uboot_prex003.PNG
+   :align: center
+   :alt: 未找到图片03|
+
+我们可以分为四个步骤来分析：
+
+ - 芯片上电默认到0x0000_0000地址(iROM)处取指，iROM内部固化的程序负责完成系统基本功能的初始化，如时钟和堆栈，然后iROM从一个特定的启动设备中引导镜像（bootloader）到内部128KB的RAM中，iROM通过判断拨码开关状态来决定启动设备（Flash、eMMC、SD等），并根据安全引导键值执行完整性检查引导镜像。
+
+ - 将存储设备中的前4KB数据拷贝到iRAM中运行，这段数据包含了Program image（飞思卡尔定义的一个镜像数据结构），它包含了启动数据的地址以及长度，告诉boot ROM将启动数据拷贝到哪里以及拷贝多大，然后初始化外部DRAM控制器。
+
+ - 在初始化完DRAM控制器之后，bootloader主体部分被拷贝至外部DRAM中，bootloader随后便将linux操作系统镜像从引导设备加载到DRAM中，并对OS完整性检查。
+
+ - 引导完成之后，bootloader跳到操作系统中去运行，启动Linux内核。
+
+Linux内核又做了哪些事情？
+
+ linux启动以后，接着就是挂载文件系统。那么有个问题，linux和文件系统是什么关系？linux启动以后不挂载文件系统可以么？
+ Linux和STM32上谈到的传统的ucos、FreeRTOS不一样，Linux运行以后必须挂载文件系统，注意！是在linux运行后才挂载的。那安卓系统又是什么系统？
+ 安卓系统也是基于Linux系统的，他和Qt、ubuntu系统一样都基于linux系统，区分他们的就是文件系统不一样，这好几套系统底层全是Linux。
+ Linux内核启动以后就开始挂载文件系统，然后找到找到文件系统中的初始化脚本，开始启动一个又一个服务（或应用程序）。挂载文件系统的方式有两种，一种是
+ 通过nfs的方式挂载网络文件系统，另一种方式是从块设备挂载文件系统，以那种方式挂载，取决于对bootargs中root参数的设置，设置 rootfstype参数以表示挂载的文件系统的
+ 类型。如“bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext2”表示使用串口0作为控制终端，挂载mmc中第0块的第二个扇区作为文件系统，文件系统类型为ext2。
+ init参数是什么？这是我们接下来要讲的。
+
+
+传统的启动方式
+""""""""""""""""""""""""
+
+在以前，当Linux启动后，首先需要禁止中断并进入SVC模式，然后配置好各种环境，之后创建第一个进程，
+也就是init进程，该进程完成了根文件系统的挂载，init是Linux系统操作中不可缺少的程序之一，
+所谓的init进程，它是一个由内核启动的用户级进程。内核会在过去曾使用过init的几个地方查找它，
+它的正确位置（对Linux系统来说）是/sbin/init。如果内核找不到init，它就会试着运行/bin/sh，
+如果没有找到或者运行失败，那么系统的启动也会失败。内核自行启动（已经被载入内存，开始运行，
+并已初始化所有的设备驱动程序和数据结构等）之后，就通过启动一个用户级程序init的方式，完成引导进程。
+所以init始终是第一个进程（其进程编号始终为1）。
+
+.. image:: media/uboot_pre004.PNG
+   :align: center
+   :alt: 未找到图片00|
+
+/etc/init的主要的功能就是准备软件运行的环境，包括系统的主机名称、网络配置、语系处理、文件系统格式及其他服务的启动等。
+而启动init进程的配置文件是/etc/inittab，/etc/inittab文件是init在启动时读取的配置文件，也就是指挥官的决策书，
+这个决策书规定了当前战争的局势，比如和平局势、冷战局势、战争局势。以及该局势下的核心策略。
+init就是这样，通过inittab这个文件控制了计算机的启动级别，及该级别下启动的进程。
+我们一般默认的启动级别是5，其启动级别可配置为0~6，当设为0时，代表系统停机，你可以尝试输入“init 0”指令查看系统是否停机，当设置为6时，系统会重启。
+init启动脚本位置位于/etc/init.d目录符号链接到不同的 RunLevel 目录 （比如/etc/rc3.d、/etc/rc5.d等）。
+
+传统的init启动也带来了一些问题：
+
+ - 启动时间太长。init进程是串行启动的，也就是说只有当前一个进程启动之后才能接着启动下一个进程。
+
+ - 启动脚本复杂。init进程只是执行启动脚本，并不搭理其他事情，脚本需要自己处理各种情况，如此会使得脚本变得很长。
+
+
+Systemd启动方式
+""""""""""""""""""""""""
+s
+现在，我们采用的是systemd方式启动，systemd就是为了解决传统init启动问题而诞生的。其设计目标是，为系统的启动和管理提供一套完整的解决方案。
+systemd即为system daemon,是linux下的一种init软件,由Lennart Poettering带头开发,
+并在LGPL 2.1及其后续版本许可证下开源发布,开发目标是提供更优秀的框架以表示系统服务间的依赖关系，
+并依此实现系统初始化时服务的并行启动，同时达到降低Shell的系统开销的效果，最终代替常用的System V与BSD风格init程序。
+当内核自解压完成，则加载systemd进程，并转移控制权到systemd。
+
+
+输入“ps -A”查看所有进程，可以看到Systemd的进程PID为1，说明它是系统启动后运行的第一个进程，其他程序的启动由它负责，
+功能还包括日志进程、控制基础系统配置，维护登陆用户列表以及系统账户、运行时目录和设置，可以运行容器和虚拟机，
+可以简单的管理网络配置、网络时间同步、日志转发和名称解析等。
+
+.. image:: media/uboot_pre005.PNG
+   :align: center
+   :alt: 未找到图片00|
+
+在传统的init进程的配置文件是/etc/inittab，各种服务的配置文件存放在/etc/sysconfig目录。现在的配置文件主要存放在/lib/systemd目录，
+在/etc/systemd目录里面的修改可以覆盖原始设置。且传统的init启动模式中，会有runlevel（运行等级）的概念，在Systemd启动方式中，它被称为一种Target，
+与之不同的是，runlevel是互斥的，也就是说不能同时有多个runlevel启动，而target允许多个启动。
+
+.. table:: init与systemd初始化系统映射表
+
+========= =================== ==========
+runlevel         Target          注释 
+========= =================== ==========
+0           poweroff.target   关闭系统
+1           rescue.target     维护模式（单用户模式）         
+2,3,4       multi-user.target 多用户，无图形界面。用户可以通过终端或网络登录。        
+5           graphical.target  多用户，图形界面。继承级别3的服务，并启动图形界面服务。         
+6           reboot.target     重启系统            
+========= =================== ========== 
+
+我们输入“systemd-analyze plot > boot.svg”命令（或systemctl status -l）可以查看系统启动时都做了哪些工作，输入此命令后，
+系统把整个引导过程写入一个SVG格式文件里。整个引导过程非常长不方便阅读，
+所以通过这个命令我们可以把输出写入一个文件，之后再查看和分析。
+
+.. image:: media/uboot_pre007.PNG
+   :align: center
+   :alt: 未找到图片00|
+
+可以看到系统以systemd为首，创建了很多服务。比如创建打印logo服务、dbus服务、avahi服务、系统登陆服务等。
+与init相比，Systemd采用的时并行启动，它为每个需要启动的守护进程建立一个套接字（如上图所示.socket），这样使得
+不同进程之间实现信息交互。且Systemd会创建新的进程并且为其分配一个控制组，而且处于不同控制组的进程之间可以实现互相通信。
+Systemd 初始化系统引导，完成相关的初始化工作，它执行default.target以获得设定的启动target（输入“systemctl get-default”命令可知默认的target为graphical.target），接着Systemd执行相应的启动单元文件，
+依据单元文件中定义的依赖关系，传递控制权，依次执行其他的target单元文件。
+
+我们输入“cat /lib/systemd/system/graphical.target”命令，查看默认的target->graphical.target单元文件的依赖关系。
+
+.. image:: media/uboot_prex005.PNG
+   :align: center
+   :alt: 未找到图片00|
+
+由上可知，他将启动multi-user.target、rescue.service、rescue.target、display-manager.service，而multi-user.target
+又有相关的依赖，继续查看multi-user.target单元文件的依赖关系。
+
+.. image:: media/uboot_prex006.PNG
+   :align: center
+   :alt: 未找到图片00|
+
+根据依赖关系总结得出它会依次执行multi-user.target-->basic.target-->sysinit.target-->local-fs.target-->local-fs-pre.target-->...
+同时启动的每个 target 包含位于/etc/systemd/system/目录下的Unit。
+
+systemd到此先告一段落，后面我们将详细简介systemd。
+
+启动过程总结：
+
+.. image:: media/uboot_prex001.PNG
+   :align: center
+   :alt: 未找到图片00|
+
+
 u-boot启动流程源代码情景分析
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 u-boot启动第一阶段源代码分析
-'''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''
 
 u-boot加载启动内核过程可以大致分为两个阶段上，详情请看上一章节，接下来我们将详细分析u-boot源代码（版本号为2019.04）。
 
@@ -64,7 +219,7 @@ u-boot启动第一阶段流程图如下所示：
 
 .. attention:: 必须要将u-boot编译一遍，且译成功后才会出现完整的.lds文件.
 
-如何分析u-boot.lds链接脚本？每一个链接过程都会由连接脚本（一般以lds作为文件的后缀名）控制，经过编译后的u-boot源码
+链接脚本有什么用？它描述了输出文件的内存布局，如何分析u-boot.lds链接脚本？每一个链接过程都会由连接脚本（一般以lds作为文件的后缀名）控制，经过编译后的u-boot源码
 会输出各个层次的链接脚本，其中总的链接脚本在u-boot源码根目录下，通过分析总的链接脚本我们可以把握u-boot的来龙去脉，
 带“@”后面为注释，总的链接脚本如下所示。
 
@@ -184,7 +339,7 @@ u-boot启动第一阶段流程图如下所示：
    /* 中断向量表入口地址 */
    _undefined_instruction:	.word undefined_instruction  /* 当前地址（_undefined_instruction）存放undefined_instruction
    _software_interrupt:	.word software_interrupt
-   _prefetch_abort:	.word prefetch _abort
+   _prefetch_abort:	.word prefetch_abort
    _data_abort:		.word data_abort
    _not_used:		.word not_used
    _irq:			.word irq
@@ -192,7 +347,7 @@ u-boot启动第一阶段流程图如下所示：
 
       .balignl 16,0xdeadbeef
 
-代码中断都定义了各种异常向量，当cpu产生异常时，便会将对应的异常入口地址加载到pc中，进而处理相应的异常处理程序。
+代码中断都定义了各种异常向量，它和8051单片机中的中断向量很类似，没有什么神秘的，.word表示四字节对齐，也就是说他们的指令都是固定的。当cpu产生异常时，便会将对应的异常入口地址加载到pc中，进而处理相应的异常处理程序。
 各个异常向量具体描述如下表格所示：
 
 .. csv-table:: Frozen Delights!
