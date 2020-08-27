@@ -262,9 +262,9 @@ module_exit()           卸载模块时函数自动执行，进行清理操作
 并会在/sys/module下新建一个以模块名为名的目录，如下图中的红框处；
 返回非0值，表示模块初始化失败。
 
-.. image:: media/module005.jpg
+.. image:: media/module005.png
    :align: center
-   :alt: 未找到图片04|
+   :alt:   加载模块成功
 
 在C语言中，static关键字的作用如下：
 
