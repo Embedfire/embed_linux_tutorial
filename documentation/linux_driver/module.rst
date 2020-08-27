@@ -11,7 +11,7 @@
 
 1. 内核模块的概念：内核模块是什么东西？为什么引入内核模块机制？
 
-2. 内核模块实验1： 理解内核模块的代码框架，写一个自己内核模块，以及怎么使用内核模块？；
+2. 内核模块实验1： 理解内核模块的代码框架，写一个自己内核模块，以及怎么使用内核模块？
 
 3. 内核模块实验2： 理解内核模块的参数模式、符号共享、内核模块的自动加载。
 
@@ -96,6 +96,7 @@ gitee:
 编译内核模块
 ~~~~~~~~~~~~
 1.获取内核模块源码
+
 github:
 ::
 
@@ -142,7 +143,7 @@ helloworld 内核模块代码分析
 代码中包含了头文件<linux/init.h>和<linux/module.h>，这两个头文件是写内核模块必须要包含的。
 
 模块初始化函数hello_init调用了printk函数，在内核模块运行的过程中，他不能依赖于C库函数，
-因此用不了printf函数，需要使用单独的打印输出函数printk。该函数的用户与printf函数类似。
+因此用不了printf函数，需要使用单独的打印输出函数printk。该函数的用法与printf函数类似。
 完成模块初始化函数之后，还需要调用宏module_init来告诉内核，使用hello_init函数来进行初始化。
 模块卸载函数也用printk函数打印字符串，并用宏module_exit在内核注册该模块的卸载函数。
 
@@ -243,7 +244,7 @@ module_exit()           卸载模块时函数自动执行，进行清理操作
 
 回忆我们学过的STM32，假设我们要使用串口，是不是有一个BSP_USART_INIT函数，
 在这个函数里面，我们初始化了串口的GPIO，配置了串口的相关参，
-如波特率，数据位，停止位等等参数。func_init函数通常也是负责这部分内容的。
+如波特率，数据位，停止位等等参数。func_init函数实现内核模块的初始化工作相关。
 
 .. code-block:: c
 
@@ -281,11 +282,6 @@ module_exit()           卸载模块时函数自动执行，进行清理操作
 
    #define __init __section(.init.text) __cold notrace
    #define __initdata __section(.init.data)
-
-Linux内核的栈资源十分有限，可能只有一个4096字节大小的页，
-我们编写的函数与Linux内核共享同一个栈资源。可想而知，
-如果在我们的模块程序中定义了一个大的局部数组变量，
-那么有可能大致导致堆栈溢出，因此，如果需要很大的空间的变量，应该使用动态分配。
 
 以上代码 __init、__initdata宏定义（位于内核源码/linux/init.h）中的__init用于修饰函数，
 __initdata用于修饰变量。带有__init的修饰符，表示将该函数放到可执行文件的__init节区中，
@@ -391,21 +387,12 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
 可见GPL协议具有传染性。因此，我们可以在Linux使用各种各样的免费软件。
 在以后学习Linux的过程中，可能会发现我们安装任何一款软件，从来没有30天试用期或者是要求输入激活码的。
 
-在Linux内核版本2.4.10之后，模块必须通过MODULE_LICENSE宏声明此模块的许可证，
-否则在加载此模块时，会提示内核被污染，见下图。
-
 .. code-block:: c
 
    :caption: 许可证
    :linenos:
 
    #define MODULE_LICENSE(_license) MODULE_INFO(license, _license)
-
-.. image:: media/module007.jpg
-   :align: center
-   :alt:   内核被污染
-
-
 
 内核模块许可证有 “GPL”，“GPL v2”，“GPL and additional rights”，“Dual SD/GPL”，“Dual MPL/GPL”，“Proprietary”。
 
@@ -485,7 +472,7 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
 来保存内核源码的目录。变量obj-m保存着需要编译成模块的目标文件名。
 “$(MAKE)modules”实际上是执行Linux顶层Makefile的伪目标modules。
 通过选项“-C”，可以让make工具跳转到源码目录下读取顶层Makefile。M=$(CURDIR)
-表明然后返回到当前目录，读取并执行当前目录的Makefile，开始编译内核模块。
+表明返回到当前目录，读取并执行当前目录的Makefile，开始编译内核模块。
 CURDIR是make的内嵌变量，自动设置为当前目录。
 
 执行 ``make`` 命令，最后生成内核模块hello_world.ko。
@@ -666,7 +653,7 @@ gitee:
    该文件不允许它具有可执行权限。如果强行给该参数赋予表示可执行权限的参数值S_IXUGO，
    那么最终生成的内核模块在加载时会提示错误，见下图。
 
-   .. image:: media/module016.jpg
+   .. image:: media/module016.png
       :align: center
       :alt:   参数不可赋予可执行权限
 

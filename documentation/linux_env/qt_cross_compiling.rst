@@ -722,7 +722,7 @@ build-qt.sh 脚本内容如下：
 而开发板的环境要求为qt-everywhere 5.11，当我们安装好Qt Creator后使用添加开发板所需的5.11版本编译链即可。
 
 为了方便起见，我们既安装IDE也安装PC上的Qt编译环境，注意此处的编译环境是PC上的而非交叉编译环境。
-我们在Qt官网下载IED与编译环境集成的可执行文件： http://download.qt.io/official_releases/qt/5.11/5.11.3/ ，如下图所示：
+我们在Qt官网下载IDE与编译环境集成的可执行文件： http://download.qt.io/new_archive/qt/5.11/5.11.3/ （普通版本下载地址：http://download.qt.io/new_archive/qt，发行版下载地址：http://download.qt.io/official_releases/qt/），如下图所示：
 
 .. figure:: media/install_qt_creator000.png
    :alt: install_qt_creator000
