@@ -1,7 +1,7 @@
 .. vim: syntax=rst
 
 内核模块
---------------------
+==================
 
 
 从本章开始，我们就要真真正正地步入Linux设备驱动的殿堂了。了解一样新事物，
@@ -16,8 +16,10 @@
 3. 内核模块实验2： 理解内核模块的参数模式、符号共享、内核模块的自动加载。
 
 
+内核模块以及机制引入
+---------------------------------
 
-内核基本概念
+内核
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 内核按照体系结构分为两类：微内核（Micro Kernel）和宏内核（Monolithic Kernel）。
@@ -44,7 +46,7 @@ Windows操作系统、华为的鸿蒙操作系统就属于微内核结构。
 
 
 内核模块实验1 编写自己的内核模块
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 通过上一节的学习，我们知道了内核模块是什么东西，那么学完本小节的内容，我们就知道内核模块该
 如何使用。
 
@@ -533,7 +535,7 @@ modprobe                同样用于加载内核模块，与insmod不同，modpr
 
 
 内核模块实验2
-~~~~~~~~~~~~~
+---------------------------------
 
 编译内核模块
 ~~~~~~~~~~~~
@@ -772,7 +774,7 @@ calculation.c中使用extern关键字声明的参数itype，调用my_add()、my_
    :alt:   模块参数
 
 同样卸载的时，module_param.ko中的参数和函数被calculation.ko调用，必须先卸载calculation.ko
-再卸载module_param.ko，负责会报错"ERROR: Module module_param is in use by: calculation"
+再卸载module_param.ko，否则会报错"ERROR: Module module_param is in use by: calculation"
 
 .. image:: media/module020.png
    :align: center
