@@ -566,9 +566,9 @@ gitee:
 
 查看文件夹，新增calculation.ko和module_param.ko。
 
-   .. image:: media/module014.png
-      :align: center
-      :alt:   编译内核模块
+.. image:: media/module014.png
+   :align: center
+   :alt:   编译内核模块
 
 
 
@@ -655,9 +655,9 @@ gitee:
    该文件不允许它具有可执行权限。如果强行给该参数赋予表示可执行权限的参数值S_IXUGO，
    那么最终生成的内核模块在加载时会提示错误，见下图。
 
-   .. image:: media/module016.png
-      :align: center
-      :alt:   参数不可赋予可执行权限
+.. image:: media/module016.png
+   :align: center
+   :alt:   参数不可赋予可执行权限
 
 
 通过NFS将编译好的module_param.ko拷贝到开发板中，加载module_param.ko并传参
