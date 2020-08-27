@@ -33,7 +33,7 @@ Windows操作系统、华为的鸿蒙操作系统就属于微内核结构。
 其优点是执行效率非常高，缺点也是十分明显的，一旦我们想要修改、增加内核某个功能时，
 都需要重新编译一遍内核。
 
-.. image:: media/module001.PNG
+.. image:: media/module001.png
    :align: center
    :alt: 微内核与宏内核的体系结构
 
