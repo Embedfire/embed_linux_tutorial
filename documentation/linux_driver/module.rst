@@ -11,45 +11,52 @@
 
 1. 内核模块的概念：内核模块是什么东西？为什么引入内核模块机制？
 
-2. 内核模块实验1： 理解内核模块的代码框架，写一个自己内核模块，以及怎么使用内核模块？
+2. hellomodule实验： 理解内核模块的代码框架，写一个自己内核模块，以及怎么使用内核模块？
 
-3. 内核模块实验2： 理解内核模块的参数模式、符号共享、内核模块的自动加载。
+3. 内核模块传参实验： 理解内核模块的参数模式、符号共享、内核模块的自动加载。
 
 
 内核模块以及机制引入
 ---------------------------------
 
 内核
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 内核按照体系结构分为两类：微内核（Micro Kernel）和宏内核（Monolithic Kernel）。
+在微内核架构中，内核只提供操作系统核心功能，如
+实现进程管理、存储器管理、进程间通信、I/O设备管理等，
+而其它的应用层IPC、文件系统功能、设备驱动模块 则不被包含到内核功能中，
+属于微内核之外的模块，所以针对这些模块的修改不会影响到微内核的核心功能。
+微内核具有动态扩展性强的优点。Windows操作系统、华为的鸿蒙操作系统就属于微内核结构。
 
-Windows操作系统、华为的鸿蒙操作系统就属于微内核结构。
-微内核是提供操作系统核心功能的内核的精简版，
-实现进程管理、存储器管理、进程间通信、I/O设备管理等基本功能，
-其他功能模块则需要单独进行编译，具有动态扩展性的优点。
-
-而Linux操作系统则是采用了宏内核结构。宏内核是将内核所有的功能都编译成一个整体，
-其优点是执行效率非常高，缺点也是十分明显的，一旦我们想要修改、增加内核某个功能时，
-都需要重新编译一遍内核。
+而宏内核架构是将上述包括微内核以及微内核之外的应用层IPC、文件系统功能、
+设备驱动模块都编译成一个整体，其优点是执行效率非常高，但缺点也是十分明显的，一旦我们想要修改、
+增加内核某个功能时（如增加设备驱动程序）都需要重新编译一遍内核。
+Linux操作系统正是采用了宏内核结构。为了解决这一缺点，linux中引入了内核模块这一机制。
 
 .. image:: media/module001.png
    :align: center
    :alt: 微内核与宏内核的体系结构
 
+
 内核模块机制的引入
 ~~~~~~~~~~~~~~~~~~
 
-为了解决Linux宏内核的缺点，Linux引入了内核模块这一机制。内核模块就是实现了某个功能的一段内核代码，
-在内核运行过程，可以加载这部分代码到内核中， 从而动态地增加了内核的功能。基于这种特性，
-我们进行设备驱动开发时，以内核模块的形式编写设备驱动，只需要编译相关的驱动代码即可，无需对整个内核进行编译。
+内核模块就是实现了某个功能的一段内核代码，在内核运行过程，可以加载这部分代码到内核中， 
+从而动态地增加了内核的功能。基于这种特性，我们进行设备驱动开发时，以内核模块的形式编写设备驱动，
+只需要编译相关的驱动代码即可，无需对整个内核进行编译。
+
+内核模块的引入不仅提高了系统的灵活性，对于开发人员来说更是提供了极大的方便。在设备驱动的开发过程中，
+我们可以随意将正在测试的驱动程序添加到内核中或者从内核中移除，每次修改内核模块的代码不需要重新启动内核。
+在开发板上，我们也不需要将内核模块程序，或者说设备驱动程序的可执行文件存放在开发板中，
+免去占用不必要的存储空间。当需要加载内核模块的时候，可以通过挂载NFS服务器，将存放在其他设备中的内核模块，
+加载到开发板上。
+在某些特定的场合，我们可以按照需要加载/卸载系统的内核模块，从而更好的为当前环境提供服务。
 
 
-内核模块实验1 编写自己的内核模块
----------------------------------
-通过上一节的学习，我们知道了内核模块是什么东西，那么学完本小节的内容，我们就知道内核模块该
-如何使用。
-
+hellomodule实验 编写自己的内核模块
+------------------------------------------
+本小节通过编写自己的内核模块，来亲身体验一下内核模块的应用。
 
 实验环境
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -85,10 +92,12 @@ gitee:
 4.获取编译出来的内核相关文件
 ::
 
-   /home/pi/build
+   ebf-buster-linux/build_image/build
 
 
-注意内核编译的位置，由ebf-buster-linux/make_deb.sh中 build_opts="${build_opts} O=/home/pi/build" 指定
+注意内核编译的位置，由ebf-buster-linux/make_deb.sh中 build_opts="${build_opts} O=build_image/build" 指定，
+该内核版本即是开发板上运行的内核版本，想要我们自己编译的内核模块完美的运行，尽可能使用与开发板内核相同的内核源码来编译
+内核模块。
 
 .. image:: media/module002.png
    :align: center
@@ -96,37 +105,81 @@ gitee:
 
 
 编译内核模块
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 1.获取内核模块源码
 
 github:
 ::
 
-   git clone https://github.com/Embedfire-imx6/embed_linux_tutorial_ppt
+   git clone https://github.com/Embedfire-imx6/embed_linux_tutorial
 
 gitee:
 ::
 
-   git clone https://gitee.com/Embedfire-imx6/embed_linux_tutorial_ppt
+   git clone https://gitee.com/Embedfire-imx6/embed_linux_tutorial
 
-将配套代码解压到内核代码同级目录
+将配套代码 /base_code/linux_driver/module/hellomodule 解压到内核代码同级目录
 
 2.编译
 ::
 
-   cd part_1
-
-::
-
+   cd hellomodule
    make
 
-注意该目录下的Makefile中 "KERNEL_DIR=/home/pi/build"要与前面编译的内核所在目录一致
+注意该目录下的Makefile中 "KERNEL_DIR=../ebf-buster-linux/build_image/build"要与前面编译的内核所在目录一致。
+查看文件夹，新增hellomodule.ko，这就是我们自己编写、编译的内核模块。
 
-查看文件夹，新增helloworld.ko，这就是我们自己编写、编译的内核模块
 
 
-helloworld 内核模块代码分析
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+hellomodule 内核模块使用
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+表  内核模块相关命令
+
+======================= ==============================================================================================
+命令                    作用
+======================= ==============================================================================================
+lsmod                   用于显示所有已载入系统的内核模块
+insmod                  用于加载内核模块，通常可载入的模块一般是设备驱动程序
+rmmod                   用于卸载不需要的模块
+modinfo                 用于显示内核模块的相关信息
+depmod                  用于分析检测内核模块之间的依赖关系
+modprobe                同样用于加载内核模块，与insmod不同，modprobe会根据depmod产生的依赖关系，加载依赖的的其他模块
+======================= ==============================================================================================
+
+通过scp或NFS将编译好的hello_world.ko拷贝到开发板中
+
+使用lsmod显示已载入系统的内核模块。
+
+.. image:: media/module010.png
+   :align: center
+   :alt: 显示已载入的内核模块
+
+我们可以通过insmod命令加载hello_world.ko内存模块
+
+.. image:: media/module011.png
+   :align: center
+   :alt: 加载hello_world.ko的内核模块
+
+加载该内存模块的时候，该内存模块会自动执行module_init()函数，进行初始化操作。
+同样我们也可以通过rmmod命令卸载该内存模块，卸载时，内存模块会自动执行module_exit()函数，进行清理操作。
+
+.. image:: media/module012.png
+   :align: center
+   :alt: 卸载hello_world.ko的内核模块
+
+我们可以使用命令modinfo，来查看该模块的相关信息。
+
+.. image:: media/module013.png
+   :align: center
+   :alt: 内核模块信息
+
+我们从打印的输出信息中，可以得到该模块的相关说明，如该模块遵循的是GPL协议，
+该模块的作者是embedfire，该模块的vermagic等等。而这些信息在模块代码中由相关内核模块信息声明函数声明
+
+hellomodule 内核模块代码分析
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 内核模块编译成功，我们再花一点时间理解一下helloworld这个内核模块的代码。
 
 1.程序结构
@@ -171,7 +224,6 @@ helloworld 内核模块代码分析
 我们到该文件夹下，查看这两个头文件都有什么内容。
 
 .. code-block:: c
-
    :caption: init.h文件（位于内核源码 /include/linux）
    :linenos:
 
@@ -209,7 +261,6 @@ helloworld 内核模块代码分析
 Init.h头文件主要包含了内核模块的加载、卸载函数的声明，还有一些宏定义，因此，只要我们涉及内核模块的编程，就需要加上该头文件。
 
 .. code-block:: c
-
    :caption: module.h（位于内核源码/include/linux）
    :linenos:
 
@@ -228,7 +279,6 @@ Init.h头文件主要包含了内核模块的加载、卸载函数的声明，�
 以上代码中，列举了module.h文件中的部分宏定义，这部分宏定义，
 有的是可有可无的，但是MODULE_LICENSE这个是指定该内核模块的许可证，是必须要有的。
 
-
 加载/卸载内核模块
 ~~~~~~~~~~~~~~~~~
 
@@ -244,12 +294,11 @@ module_exit()           卸载模块时函数自动执行，进行清理操作
 内核模块加载函数module_init() 
 ''''''''''''''''''''''''''''''
 
-回忆我们学过的STM32，假设我们要使用串口，是不是有一个BSP_USART_INIT函数，
-在这个函数里面，我们初始化了串口的GPIO，配置了串口的相关参，
-如波特率，数据位，停止位等等参数。func_init函数实现内核模块的初始化工作相关。
+回忆我们使用单片机时，假设我们要使用串口等外设，是不是调用一个初始化函数，
+在这个函数里面，我们初始化了串口的GPIO，配置了串口的相关参数，如波特率，数据位，停止位等等参数。
+func_init函数在内核模块中也是做与初始化相关的工作。
 
 .. code-block:: c
-
    :caption: 内核模块加载函数
    :linenos:
 
@@ -278,7 +327,6 @@ module_exit()           卸载模块时函数自动执行，进行清理操作
 那么就可以避免这种错误。
 
 .. code-block:: c
-
    :caption: __init、__initdata宏定义（位于内核源码/linux/init.h）
    :linenos:
 
@@ -290,7 +338,6 @@ __initdata用于修饰变量。带有__init的修饰符，表示将该函数放�
 该节区的内容只能用于模块的初始化阶段，初始化阶段执行完毕之后，这部分的内容就会被释放掉，真可谓是“针尖也要削点铁”。
 
 .. code-block:: c
-
    :caption: module_init宏定义
    :linenos:
 
@@ -308,7 +355,6 @@ __initdata用于修饰变量。带有__init的修饰符，表示将该函数放�
 分配的设备号等，是初始化过程的逆过程。
 
 .. code-block:: c
-
    :caption: 内核模块卸载函数
    :linenos:
 
@@ -322,7 +368,6 @@ __initdata用于修饰变量。带有__init的修饰符，表示将该函数放�
 当执行完模块卸载阶段之后，就会自动释放该区域的空间。
 
 .. code-block:: c
-
    :caption: __exit、__exitdata宏定义
    :linenos:
 
@@ -365,7 +410,6 @@ __initdata用于修饰变量。带有__init的修饰符，表示将该函数放�
 
 - 内核log缓冲区大小有限制，缓冲区数据可能被冲掉
 
-
 内核模块的相关信息
 ~~~~~~~~~~~~~~~~~~~
 
@@ -390,7 +434,6 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
 在以后学习Linux的过程中，可能会发现我们安装任何一款软件，从来没有30天试用期或者是要求输入激活码的。
 
 .. code-block:: c
-
    :caption: 许可证
    :linenos:
 
@@ -409,7 +452,6 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
 作者信息
 
 .. code-block:: c
-
    :caption: 内核模块作者宏定义（位于内核源码/linux/module.h）
    :linenos:
 
@@ -421,7 +463,6 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
 模块描述信息
 
 .. code-block:: c
-
    :caption: 模块描述信息（位于内核源码/linux/module.h）
    :linenos:
 
@@ -432,7 +473,6 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
 模块别名
 
 .. code-block:: c
-
    :caption: 内核模块别名宏定义（位于内核源码/linux/module.h）
    :linenos:
 
@@ -452,7 +492,6 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
 这得益于编译Linux内核所采用的Kbuild系统，因此在编译内核模块时，我们也需要指定环境变量ARCH和CROSS_COMPILE的值。
 
 .. code-block:: makefile
-
    :caption: ../base_code/linux_driver/hello_world/Makefile
    :linenos:
 
@@ -485,57 +524,8 @@ CURDIR是make的内嵌变量，自动设置为当前目录。
 .. image:: media/module009.jpg
    :align: center
 
-
-helloworld 内核模块使用
-~~~~~~~~~~~~~~~~~~~~~~~
-
-表  内核模块相关命令
-
-======================= ==============================================================================================
-命令                    作用
-======================= ==============================================================================================
-lsmod                   用于显示所有已载入系统的内核模块
-insmod                  用于加载内核模块，通常可载入的模块一般是设备驱动程序
-rmmod                   用于卸载不需要的模块
-modinfo                 用于显示内核模块的相关信息
-depmod                  用于分析检测内核模块之间的依赖关系
-modprobe                同样用于加载内核模块，与insmod不同，modprobe会根据depmod产生的依赖关系，加载依赖的的其他模块
-======================= ==============================================================================================
-
-通过NFS将编译好的hello_world.ko拷贝到开发板中
-
-使用lsmod显示已载入系统的内核模块。
-
-.. image:: media/module010.png
-   :align: center
-   :alt: 显示已载入的内核模块
-
-我们可以通过insmod命令加载hello_world.ko内存模块
-
-.. image:: media/module011.png
-   :align: center
-   :alt: 加载hello_world.ko的内核模块
-
-加载该内存模块的时候，该内存模块会自动执行module_init()函数，进行初始化操作。
-同样我们也可以通过rmmod命令卸载该内存模块，卸载时，内存模块会自动执行module_exit()函数，进行清理操作。
-
-.. image:: media/module012.png
-   :align: center
-   :alt: 卸载hello_world.ko的内核模块
-
-我们可以使用命令modinfo，来查看该模块的相关信息。
-
-.. image:: media/module013.png
-   :align: center
-   :alt: 内核模块信息
-
-我们从打印的输出信息中，可以得到该模块的相关说明，如该模块遵循的是GPL协议，
-该模块的作者是embedfire，该模块的vermagic等等。而这些信息在模块代码中由相关内核模块信息声明函数声明
-
-
-
-内核模块实验2
----------------------------------
+内核模块传参实验 内核模块之间进行参数传递
+--------------------------------------------
 
 编译内核模块
 ~~~~~~~~~~~~
@@ -544,27 +534,25 @@ modprobe                同样用于加载内核模块，与insmod不同，modpr
 github:
 ::
 
-   git clone https://github.com/Embedfire-imx6/embed_linux_tutorial_ppt
+   git clone https://github.com/Embedfire-imx6/embed_linux_tutorial
 
 gitee:
 ::
 
-   git clone https://gitee.com/Embedfire-imx6/embed_linux_tutorial_ppt
+   git clone https://gitee.com/Embedfire-imx6/embed_linux_tutorial
 
-将配套代码解压到内核代码同级目录
+将配套代码 /base_code/linux_driver/module/parametermodule 解压到内核代码同级目录
+
 
 2.编译
 ::
 
-   cd part_2
-
-::
-
+   cd parametermodule
    make
 
-注意该目录下的Makefile中 "KERNEL_DIR=/home/pi/build"要与前面编译的内核所在目录一致
+注意该目录下的Makefile中 "KERNEL_DIR=../ebf-buster-linux/build_image/build"要与前面编译的内核所在目录一致
 
-查看文件夹，新增calculation.ko和module_param.ko。
+查看文件夹，新增calculation.ko和parametermodule.ko。
 
 .. image:: media/module014.png
    :align: center
@@ -581,7 +569,6 @@ gitee:
 根据不同应用场合给内核模块传递不同参数，提高内核模块灵活性
 
 .. code-block:: c
-
    :caption: 示例程序
    :linenos:
 
@@ -612,7 +599,6 @@ gitee:
 然后使用module_param函数来声明这四个参数，并在calculation_init中输出上述四个参数的值。
 
 .. code-block:: c
-
    :caption: 内核模块参数宏定义（位于内核源 码/linux/moduleparam.h）
    :linenos:
 
@@ -683,7 +669,6 @@ gitee:
 在使用命令insmod加载模块后，模块就被连接到了内核，因此可以访问内核的共用符号。
 
 .. code-block:: c
-
    :caption: 导出符号
    :linenos:
 
@@ -694,7 +679,6 @@ EXPORT_SYMBOL宏用于向内核导出符号，这样的话，其他模块也可�
 下面通过一段代码，介绍如何使用某个模块导出符号。
 
 .. code-block:: c
-
    :caption: module_param.c
    :linenos:
 
@@ -723,7 +707,6 @@ EXPORT_SYMBOL宏用于向内核导出符号，这样的话，其他模块也可�
 以上代码中，省略了内核模块程序的其他内容，如头文件，加载/卸载函数等。
 
 .. code-block:: c
-
    :caption: calculation.h
    :linenos:
 
@@ -739,7 +722,6 @@ EXPORT_SYMBOL宏用于向内核导出符号，这样的话，其他模块也可�
 
 
 .. code-block:: c
-
    :caption: calculation.c
    :linenos:
 
