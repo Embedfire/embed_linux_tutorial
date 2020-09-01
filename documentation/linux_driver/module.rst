@@ -484,7 +484,7 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
 这得益于编译Linux内核所采用的Kbuild系统，因此在编译内核模块时，我们也需要指定环境变量ARCH和CROSS_COMPILE的值。
 
 .. code-block:: makefile
-   :caption: ../base_code/linux_driver/hello_world/Makefile
+   :caption: ../base_code/linux_driver/hellomodule/Makefile
    :linenos:
 
    KERNEL_DIR=/home/pi/build
@@ -652,7 +652,7 @@ EXPORT_SYMBOL宏用于向内核导出符号，这样的话，其他模块也可�
 下面通过一段代码，介绍如何使用某个模块导出符号。
 
 .. code-block:: c
-   :caption: module_param.c
+   :caption: parametermodule.c
    :linenos:
 
    ...省略代码...
