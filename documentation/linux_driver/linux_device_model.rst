@@ -3,8 +3,8 @@
 
 Linux的设备模型
 ==================
-到目前为止，我们已经接触了如何编写内核模块以及简单的字符设备驱动了，算是半只脚踏进Linux的大门了。
-但着这会这些内容，还远远不够。通过前面两章的学习，我们发现，Linux的驱动代码不能够让我们随心所欲地写，它都具有一定的“套路”，
+
+通过前面两章的学习，我们发现，Linux的驱动代码不能够让我们随心所欲地写，它都具有一定的“套路”，
 比如某个函数负责初始化，某个函数负责注册设备等等。虽然如此，但是却也给我们带来了极大的便利。我们可以不需要关心内核是如何工作的，
 只需要编写好我们的驱动文件，然后加载进内核，这样就可以使我们的设备开始工作，当然啦，前提肯定是驱动是正确无误。因此，在Linux开发驱动，
 只要能够掌握了这些“套路”，开发一个驱动便不是难事。当然，我们不提倡自己从零开始写一个设备驱动，在内核源码的drivers中存放了大量的设备驱动代码，
@@ -14,14 +14,34 @@ Linux的设备模型
    :align: center
    :alt: 内核提供的驱动代码
 
+目前为止，我们已经接触了如何编写内核模块以及简单的字符设备驱动了，算是半只脚踏进Linux的大门了。
+但是这会这些内容是不够的。之前写的字符设备驱动将硬件信息(如GPIO的寄存器、时钟寄存器等)和驱动代码是写在一块的，这样子就存在着一个问题，当硬件有所改动时，就需要
+修改驱动代码了。这样子驱动代码的通用性就很差了，这就引入了Linux设备驱动模型的概念了。设备驱动模型采用了“总线-设备-驱动”的方式，将设备与
+驱动分离开来，使得驱动代码兼容性强、只需要修改设备中的小部分硬件信息即可。
 
-本章节，我们主要讲解Linux的设备模型，在旧版本的Linux代码中，内核无法知道：当前系统中存在什么设备、各个设备的电源管理方式、设备挂载在哪个总线上等信息。
-为此，Linux2.6版本开始提出了Linux设备模型（Linux device model），该设备模型通过几个数据结构来反映当前系统中总线、设备以及驱动的工作状况，提出了以下几个重要概念：
+
+接下来让我们正式开始进入Linux的设备模型学习，在旧版本的Linux代码中，内核无法知道：
+当前系统中存在什么设备、各个设备的电源管理方式、设备挂载在哪个总线上等信息。
+为此，Linux2.6版本开始提出了Linux设备模型（Linux device model）。
+
+.. image:: ./media/linux_device_model.png
+   :align: center
+   :alt: 设备驱动模型
+
+
+该设备模型通过几个数据结构来反映当前系统中总线、设备以及驱动的工作状况，
+并提出了以下几个重要概念：
 
 - 设备(device)：挂载在某个总线的物理设备；
 - 驱动(driver)：与特定设备相关的软件，负责初始化该设备以及提供一些操作该设备的操作方式；
 - 总线（bus)：负责管理挂载对应总线的设备以及驱动；
 - 类(class)：对于具有相同功能的设备，归结到一种类别，进行分类管理；
+
+采用“总线-设备-驱动的方式"的好处是将相同类型的驱动的代码差异性提取出来放在device中。而在driver中写一些通用的代码。
+bus总线管理着两个链表，加载相应的.ko模块时将device和driver分别挂入相对应的链表，
+同时总线会有个匹配的过程(调用bus_type 中的.match方法进行匹配)，匹配成功之后，将执行driver结构体中的 .probe方法。
+在这个方法中获取device中提供的资源，在获取到资源后进行通用平台硬件的初始化，
+实现操作硬件方法 xxx_open、xxx_read、xxx_write等。
 
 
 无论以后学习平台设备驱动、块设备驱动或者是其他总线设备，都跟Linux设备模型息息相关。此外，关于Linux设备模型与sysfs的关系，在讲解Linux文件目录结构时，提到过sysfs文件系统，该文件系统用于把内核的设备驱动导出到用户空间，用户便可通过访问sys目录及其下的文件，来查看甚至控制内核的一些驱动设备。
@@ -33,8 +53,9 @@ Linux的设备模型
 
 总线
 ~~~~
-总线是连接处理器和设备之间的桥梁，我们接触到的设备大部分是依靠总线来进行通信的，它们之间的物理连接如图所示，对于野火开发板而言，触摸芯片是依赖于I2C，鼠标、键盘等HID设备，
-则是依赖于USB。从功能上讲，这些设备都是将文字、字符、控制命令或采集的数据等信息输入到计算机。
+
+总线是连接处理器和设备之间的桥梁，总线代表着同类设备需要共同遵守的工作时序，是连接处理器和设备之间的桥梁。我们接触到的设备大部分是依靠总线来进行通信的，
+它们之间的物理连接如图所示，对于野火开发板而言，触摸芯片是依赖于I2C，鼠标、键盘等HID设备，则是依赖于USB。从功能上讲，这些设备都是将文字、字符、控制命令或采集的数据等信息输入到计算机。
 
 .. image:: ./media/LDM.jpg
    :align: center
@@ -128,6 +149,7 @@ Linux内核已经为我们写好了大部分总线驱动，我们一般不会去
 		struct class		*class;
         void (*release)(struct device *dev);
 		const struct attribute_group **groups;	/* optional groups */
+        struct device_private	*p;
 	};	
 
 - init_name：指定该设备的名称，总线匹配时，一般会根据比较名字，来进行配对；
@@ -178,6 +200,8 @@ Linux内核已经为我们写好了大部分总线驱动，我们一般不会去
 		int (*remove) (struct device *dev);
 
 		const struct attribute_group **groups;
+		struct driver_private *p;
+    
 	};	
 
 - name：指定驱动名称，总线进行匹配时，利用该成员与设备名进行比较；
@@ -198,6 +222,13 @@ Linux内核已经为我们写好了大部分总线驱动，我们一般不会去
 
     int driver_register(struct device_driver *drv);
     void driver_unregister(struct device_driver *drv);
+
+到为止简单地介绍了总线、设备、驱动的数据结构以及注册/注销接口函数。下图是总线关联上设备与驱动之后的结构关系图
+
+.. image:: ./media/linux_device_modle000.png
+   :align: center
+   :alt: /sys/bus目录
+
 
 attribute属性文件
 ~~~~~~~~~~~~
@@ -336,28 +367,22 @@ Makefile
 工欲善其事必先利其器，在开始写程序之前，我们需要先准备好我们的Makefile。针对当前开发板使用的是debian的镜像，那么我们便可以直接在开发板上进行编译，
 前提是板子上已经安装了gcc以及make工具。
 
-
+.. code-block:: makefile
    :caption: Makefile(位于../base_code/linux_driver/linux_device_model/Makefile)
-   :language: makefile
-   :linenos: 	
-	
-	NATIVE ?= true
+   :linenos: 
 
+    NATIVE ?= true
+    ifeq ($(NATIVE), false)
+        KERNEL_DIR = /home/embedfire/linux4.19
+    else
+        KERNEL_DIR = /lib/modules/$(shell uname -r)/build
+    endif
+    obj-m := xdev.o xbus.o xdrv.o
 
-	ifeq ($(NATIVE), false)
-		KERNEL_DIR = /home/embedfire/linux4.19
-	else
-		KERNEL_DIR = /lib/modules/$(shell uname -r)/build
-	endif
+    all:modules
+    modules clean:
+        $(MAKE) -C $(KERNEL_DIR) M=$(shell pwd) $@
 
-
-
-
-	obj-m := xdev.o xbus.o xdrv.o
-
-	all:modules
-	modules clean:
-		$(MAKE) -C $(KERNEL_DIR) M=$(shell pwd) $@
 
 我们通过变量NATIVE来控制我们的编译环境，该Makefile默认设置是在开发板进行编译，对于想要在PC机进行交叉编译的读者，需要指定变量KERNEL_DIR为自己内核源码的路径，
 再执行命令“make NATIVE=false”，完成编译。
