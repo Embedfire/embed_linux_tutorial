@@ -27,7 +27,7 @@
 实现进程管理、存储器管理、进程间通信、I/O设备管理等，
 而其它的应用层IPC、文件系统功能、设备驱动模块 则不被包含到内核功能中，
 属于微内核之外的模块，所以针对这些模块的修改不会影响到微内核的核心功能。
-微内核具有动态扩展性强的优点。Windows操作系统、华为的鸿蒙操作系统就属于微内核结构。
+微内核具有动态扩展性强的优点。Windows操作系统、华为的鸿蒙操作系统就属于这类微内核架构。
 
 而宏内核架构是将上述包括微内核以及微内核之外的应用层IPC、文件系统功能、
 设备驱动模块都编译成一个整体，其优点是执行效率非常高，但缺点也是十分明显的，一旦我们想要修改、
@@ -46,11 +46,12 @@ Linux操作系统正是采用了宏内核结构。为了解决这一缺点，lin
 从而动态地增加了内核的功能。基于这种特性，我们进行设备驱动开发时，以内核模块的形式编写设备驱动，
 只需要编译相关的驱动代码即可，无需对整个内核进行编译。
 
-内核模块的引入不仅提高了系统的灵活性，对于开发人员来说更是提供了极大的方便。在设备驱动的开发过程中，
-我们可以随意将正在测试的驱动程序添加到内核中或者从内核中移除，每次修改内核模块的代码不需要重新启动内核。
+内核模块的引入不仅提高了系统的灵活性，对于开发人员来说更是提供了极大的方便。
+在设备驱动的开发过程中，我们可以随意将正在测试的驱动程序添加到内核中或者从内核中移除，
+每次修改内核模块的代码不需要重新启动内核。
 在开发板上，我们也不需要将内核模块程序，或者说设备驱动程序的可执行文件存放在开发板中，
-免去占用不必要的存储空间。当需要加载内核模块的时候，可以通过挂载NFS服务器，将存放在其他设备中的内核模块，
-加载到开发板上。
+免去占用不必要的存储空间。当需要加载内核模块的时候，可以通过挂载NFS服务器，
+将存放在其他设备中的内核模块，加载到开发板上。
 在某些特定的场合，我们可以按照需要加载/卸载系统的内核模块，从而更好的为当前环境提供服务。
 
 
@@ -67,7 +68,7 @@ hellomodule实验 编写自己的内核模块
 
 编译内核
 ~~~~~~~~~
-1.源码
+1.我们可以从github或者gitee上克隆开发板的Debian镜像内核源码，国内推荐gitee，当然首先需要安装git工具。
 
 github:
 ::
@@ -79,25 +80,24 @@ gitee:
 
    git clone https://gitee.com/Embedfire/ebf-buster-linux.git
 
-2.安装必要环境工具库
+2.获取源码之后，我们还需要在ubuntu上安装必要环境工具库，比如交叉编译工具链等。
 ::
 
    sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop
 
-3.编译内核
+3.切换到内核源码目录下，执行编译内核的脚本，脚本配置了内核编译位置，运行平台，环境变量，编译工具等一些参数。
 ::
 
    sudo ./make_deb.sh
 
-4.获取编译出来的内核相关文件
+4.获取编译出来的内核相关文件，存放位置由脚本中的ebf-buster-linux/make_deb.sh中 build_opts="${build_opts} O=build_image/build" 指定
 ::
 
    ebf-buster-linux/build_image/build
 
 
-注意内核编译的位置，由ebf-buster-linux/make_deb.sh中 build_opts="${build_opts} O=build_image/build" 指定，
-该内核版本即是开发板上运行的内核版本，想要我们自己编译的内核模块完美的运行，尽可能使用与开发板内核相同的内核源码来编译
-内核模块。
+该内核版本即是开发板上运行的内核版本，想要我们自己编译的内核模块完美的运行，尽可能使用与开发板内核相同的内核源码来编译内核模块。
+使用'uname -r'命令可以查看对应的内核版本。
 
 .. image:: media/module002.png
    :align: center
@@ -106,7 +106,7 @@ gitee:
 
 编译内核模块
 ~~~~~~~~~~~~~~~~~
-1.获取内核模块源码
+1.获取内核模块示例源码，将配套代码 /base_code/linux_driver/module/hellomodule 解压到内核代码同级目录
 
 github:
 ::
@@ -118,9 +118,9 @@ gitee:
 
    git clone https://gitee.com/Embedfire-imx6/embed_linux_tutorial
 
-将配套代码 /base_code/linux_driver/module/hellomodule 解压到内核代码同级目录
 
-2.编译
+2.内核模块对象所需的构建步骤和编译很复杂，它利用了linux内核构建系统的强大功能，
+当然我们不需要深入了解这部分知识，利用简单的Make工具就能编译出我们想到内核模块。
 ::
 
    cd hellomodule
@@ -128,12 +128,16 @@ gitee:
 
 注意该目录下的Makefile中 "KERNEL_DIR=../ebf-buster-linux/build_image/build"要与前面编译的内核所在目录一致。
 查看文件夹，新增hellomodule.ko，这就是我们自己编写、编译的内核模块。
+使用file hellomodule.ko查看当前编译的文件，32-bit ARM架构的ELF文件。
+::
 
-
-
+   file hellomodule.ko
+   hellomodule.ko: ELF 32-bit LSB relocatable, ARM, EABI5 version 1 (SYSV),
+   BuildID[sha1]=1a139278874b2e1a335f1834e755d2cf3f9a4bff, not stripped
 
 hellomodule 内核模块使用
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+我们如愿编译了自己的内核模块，接下来就该了解如何使用这个内核模块了。常用的内核模块命令如下表所示。
 
 表  内核模块相关命令
 
@@ -148,7 +152,7 @@ depmod                  用于分析检测内核模块之间的依赖关系
 modprobe                同样用于加载内核模块，与insmod不同，modprobe会根据depmod产生的依赖关系，加载依赖的的其他模块
 ======================= ==============================================================================================
 
-通过scp或NFS将编译好的hello_world.ko拷贝到开发板中
+将上一小节编译好的hellomodule.ko通过scp或NFS拷贝到开发板中，试试上面表格中的命令吧。
 
 使用lsmod显示已载入系统的内核模块。
 
@@ -156,39 +160,41 @@ modprobe                同样用于加载内核模块，与insmod不同，modpr
    :align: center
    :alt: 显示已载入的内核模块
 
-我们可以通过insmod命令加载hello_world.ko内存模块
+通过insmod命令加载hellomodule.ko内存模块
 
 .. image:: media/module011.png
    :align: center
-   :alt: 加载hello_world.ko的内核模块
+   :alt: 加载hellomodule.ko的内核模块
 
-加载该内存模块的时候，该内存模块会自动执行module_init()函数，进行初始化操作。
-同样我们也可以通过rmmod命令卸载该内存模块，卸载时，内存模块会自动执行module_exit()函数，进行清理操作。
+加载该内存模块的时候，该内存模块会自动执行module_init()函数，进行初始化操作，该函数打印了 'hello module init'。
+再次查看已载入系统的内核模块，我们就会在列表中发现hellomodule.ko的身影。
+
+同样我们也可以通过rmmod命令卸载该内存模块，卸载时，内存模块会自动执行module_exit()函数，进行清理操作，
+module_exit()函数同样打印了一行内容，但是控制台并没有显示，可以使用dmesg查看，之所以没有显示是与printk的打印等级有关，
+后面关于printk函数有详细讲解。
 
 .. image:: media/module012.png
    :align: center
-   :alt: 卸载hello_world.ko的内核模块
+   :alt: 卸载hellomodule.ko的内核模块
 
-我们可以使用命令modinfo，来查看该模块的相关信息。
+关于该模块的相关信息，我们可以通过modinfo来查看，我们从打印的输出信息中，可以了解到，该模块遵循的是GPL协议，
+该模块的作者是embedfire，该模块的vermagic等等。而这些信息在模块代码中由相关内核模块信息声明函数声明
 
 .. image:: media/module013.png
    :align: center
    :alt: 内核模块信息
 
-我们从打印的输出信息中，可以得到该模块的相关说明，如该模块遵循的是GPL协议，
-该模块的作者是embedfire，该模块的vermagic等等。而这些信息在模块代码中由相关内核模块信息声明函数声明
-
 hellomodule 内核模块代码分析
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-内核模块编译成功，我们再花一点时间理解一下helloworld这个内核模块的代码。
+内核模块编译运行都成功了，我们再花一点时间来理解一下helloworld这个内核模块的代码吧。
 
-1.程序结构
+一.hellomodule.c
 
 .. image:: media/module003.png
    :align: center
    :alt: 内核模块代码
 
-程序结构包含以下四个部分
+程序结构包含以下四个部分：
 
 1. 头文件
 #. 加载/卸载内核模块的函数声明
@@ -196,13 +202,11 @@ hellomodule 内核模块代码分析
 #. 内核模块的相关信息。
 
 代码中包含了头文件<linux/init.h>和<linux/module.h>，这两个头文件是写内核模块必须要包含的。
-
 模块初始化函数hello_init调用了printk函数，在内核模块运行的过程中，他不能依赖于C库函数，
 因此用不了printf函数，需要使用单独的打印输出函数printk。该函数的用法与printf函数类似。
 完成模块初始化函数之后，还需要调用宏module_init来告诉内核，使用hello_init函数来进行初始化。
 模块卸载函数也用printk函数打印字符串，并用宏module_exit在内核注册该模块的卸载函数。
-
-最后，必须声明该模块使用遵循的许可证，这里我们设置为GPL协议。
+最后，必须声明该模块使用遵循的许可证，这里我们设置为GPL协议。下面是更为详细的代码解释。
 
 内核模块头文件
 ~~~~~~~~~~~~~~
@@ -258,7 +262,8 @@ hellomodule 内核模块代码分析
     */
     #define module_exit(x) __exitcall(x);
 
-Init.h头文件主要包含了内核模块的加载、卸载函数的声明，还有一些宏定义，因此，只要我们涉及内核模块的编程，就需要加上该头文件。
+Init.h头文件主要包含了内核模块的加载、卸载函数的声明，还有一些宏定义，
+因此，只要我们涉及内核模块的编程，就需要加上该头文件。
 
 .. code-block:: c
    :caption: module.h（位于内核源码/include/linux）
@@ -281,6 +286,7 @@ Init.h头文件主要包含了内核模块的加载、卸载函数的声明，�
 
 加载/卸载内核模块
 ~~~~~~~~~~~~~~~~~
+加载/卸载内核模块包含下表中的两个函数，执行命令insmod 和 rmmod时，模块会分别调用这两个函数
 
 表  内核模块相关函数
 
@@ -293,8 +299,7 @@ module_exit()           卸载模块时函数自动执行，进行清理操作
 
 内核模块加载函数module_init() 
 ''''''''''''''''''''''''''''''
-
-回忆我们使用单片机时，假设我们要使用串口等外设，是不是调用一个初始化函数，
+回忆我们使用单片机时，假设我们要使用串口等外设时，是不是都需要调用一个初始化函数，
 在这个函数里面，我们初始化了串口的GPIO，配置了串口的相关参数，如波特率，数据位，停止位等等参数。
 func_init函数在内核模块中也是做与初始化相关的工作。
 
@@ -349,7 +354,6 @@ __initdata用于修饰变量。带有__init的修饰符，表示将该函数放�
 
 内核模块卸载函数module_exit() 
 '''''''''''''''''''''''''''''
-
 理解了模块加载的内容之后，来学习模块卸载函数应该会比较简单。
 与内核加载函数相反，内核模块卸载函数func_exit主要是用于释放初始化阶段分配的内存，
 分配的设备号等，是初始化过程的逆过程。
@@ -379,9 +383,7 @@ __initdata用于修饰变量。带有__init的修饰符，表示将该函数放�
 
 内核打印函数 printk
 ''''''''''''''''''''''
-
 - printf：glibc实现的打印函数，工作于用户空间
-
 - printk：内核模块无法使用glibc库函数，内核自身实现的一个类printf函数，但是需要指定打印等级。
 
   - #define KERN_EMERG 	   "<0>" 通常是系统崩溃前的信息
@@ -393,26 +395,17 @@ __initdata用于修饰变量。带有__init的修饰符，表示将该函数放�
   - #define KERN_INFO      "<6>" 普通消息
   - #define KERN_DEBUG     "<7>" 调试信息
 
-查看当前系统printk打印等级：`cat /proc/sys/kernel/printk`
+查看当前系统printk打印等级：`cat /proc/sys/kernel/printk`，
+从左到右依次对应当前控制台日志级别、默认消息日志级别、最小的控制台级别、默认控制台日志级别。
 
 .. image:: media/module006.png
    :align: center
    :alt: printk打印等级
 
-依次对应
-
-- 当前控制台日志级别
-- 默认消息日志级别
-- 最小的控制台级别
-- 默认控制台日志级别
-
-打印内核所有打印信息：dmesg
-
-- 内核log缓冲区大小有限制，缓冲区数据可能被冲掉
+打印内核所有打印信息：dmesg，注意内核log缓冲区大小有限制，缓冲区数据可能被覆盖掉。
 
 内核模块的相关信息
 ~~~~~~~~~~~~~~~~~~~
-
 表  内核模块信息声明函数
 
 ======================= ==============================================================================================
@@ -426,7 +419,6 @@ MODULE_ALIAS()          给模块设置一个别名
 
 内核模块许可证
 ''''''''''''''''''''''
-
 Linux是一款免费的操作系统，采用了GPL协议，允许用户可以任意修改其源代码。
 GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品提供的库，
 衍生出一个新产品，该软件产品都必须采用GPL协议，即必须是开源和免费使用的，
@@ -483,7 +475,7 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
 使用命令depmod更新模块的依赖关系，否则的话，Linux内核怎么知道这个模块还有另一个名字。
 
 
-2.Makefile分析
+二.Makefile分析
 ~~~~~~~~~~~~~~~
 
 对于内核模块而言，它是属于内核的一段代码，只不过它并不在内核源码中。
@@ -500,7 +492,7 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
    ARCH=arm
    CROSS_COMPILE=arm-linux-gnueabihf-
    export  ARCH  CROSS_COMPILE
-   obj-m := helloworld.o
+   obj-m := hellomodule.o
    all:
 	   $(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) modules
    .PHONE:clean copy
@@ -509,14 +501,15 @@ GPL协议的主要内容是软件产品中即使使用了某个GPL协议产品�
    copy:
 	   sudo  cp  *.ko  /home/embedfire/workdir
 
-以上代码中提供了一个关于编译内核模块的Makefile。该Makefile定义了变量KERNEL_DIR，
-来保存内核源码的目录。变量obj-m保存着需要编译成模块的目标文件名。
-“$(MAKE)modules”实际上是执行Linux顶层Makefile的伪目标modules。
-通过选项“-C”，可以让make工具跳转到源码目录下读取顶层Makefile。M=$(CURDIR)
-表明返回到当前目录，读取并执行当前目录的Makefile，开始编译内核模块。
+以上代码中提供了一个关于编译内核模块的Makefile。
+该Makefile定义了变量KERNEL_DIR，来保存内核源码的目录。
+变量obj-m保存着需要编译成模块的目标文件名。
+'$(MAKE)modules'实际上是执行Linux顶层Makefile的伪目标modules。
+通过选项'-C'，可以让make工具跳转到源码目录下读取顶层Makefile。
+'M=$(CURDIR)'表明返回到当前目录，读取并执行当前目录的Makefile，开始编译内核模块。
 CURDIR是make的内嵌变量，自动设置为当前目录。
 
-执行 ``make`` 命令，最后生成内核模块hello_world.ko。
+执行 ``make`` 命令，最后生成内核模块hellomodule.ko。
 
 .. image:: media/module008.jpg
    :align: center
@@ -526,47 +519,31 @@ CURDIR是make的内嵌变量，自动设置为当前目录。
 
 内核模块传参实验 内核模块之间进行参数传递
 --------------------------------------------
+现在我们写了一个很简单的内核模块，了解其代码结构，接下来我们再深入了解下内核模块的参数传递和符号模式。
 
 编译内核模块
 ~~~~~~~~~~~~
-1.获取内核模块源码
-
-github:
-::
-
-   git clone https://github.com/Embedfire-imx6/embed_linux_tutorial
-
-gitee:
-::
-
-   git clone https://gitee.com/Embedfire-imx6/embed_linux_tutorial
-
-将配套代码 /base_code/linux_driver/module/parametermodule 解压到内核代码同级目录
-
-
-2.编译
+1.获取内核模块源码，将配套代码 /base_code/linux_driver/module/parametermodule 解压到内核代码同级目录
+2.编译源码
 ::
 
    cd parametermodule
    make
 
 注意该目录下的Makefile中 "KERNEL_DIR=../ebf-buster-linux/build_image/build"要与前面编译的内核所在目录一致
-
 查看文件夹，新增calculation.ko和parametermodule.ko。
 
 .. image:: media/module014.png
    :align: center
    :alt:   编译内核模块
 
-
-
 模块参数
 ~~~~~~~~
 
 内核模块参数
 ''''''''''''''
-
-根据不同应用场合给内核模块传递不同参数，提高内核模块灵活性
+根据不同应用场合给内核模块传递不同参数，提高内核模块灵活性。
+例如在程序中开启调试模式、设置详细输出模式以及制定与具体模块相关的选项，都可以接收参数，改变其行为。
 
 .. code-block:: c
    :caption: 示例程序
@@ -596,7 +573,7 @@ gitee:
    }
 
 首先我们定义了四个常见变量
-然后使用module_param函数来声明这四个参数，并在calculation_init中输出上述四个参数的值。
+然后使用module_param宏函数来声明这四个参数，并在calculation_init中输出上述四个参数的值。
 
 .. code-block:: c
    :caption: 内核模块参数宏定义（位于内核源 码/linux/moduleparam.h）
@@ -646,7 +623,8 @@ gitee:
    :alt:   参数不可赋予可执行权限
 
 
-通过NFS将编译好的module_param.ko拷贝到开发板中，加载module_param.ko并传参
+通过NFS将编译好的module_param.ko拷贝到开发板中，加载module_param.ko并传参，
+这时我们声明的四个变量的值，就是变成了我们赋的值。
 ::
 
    sudo insmod module_param.ko itype=123 btype=1 ctype=200 stype=abc
@@ -655,15 +633,10 @@ gitee:
    :align: center
    :alt:   模块参数
 
-
-
 符号共享
 ~~~~~~~~~~
-
-
 内核模块导出符号
 ''''''''''''''''
-
 内核模块导出符号，符号是什么东西？实际上，符号指的就是函数和变量。
 当模块被装入内核后，它所导出的符号都会记录在内核符号表中。
 在使用命令insmod加载模块后，模块就被连接到了内核，因此可以访问内核的共用符号。
@@ -703,7 +676,7 @@ EXPORT_SYMBOL宏用于向内核导出符号，这样的话，其他模块也可�
    EXPORT_SYMBOL(my_sub);
    ...省略代码...
 
-我们module_param.c中定义了参数itype和my_add、my_sub函数，并通过EXPORT_SYMBOL宏导出。
+在parametermodule.c中定义了参数itype和my_add、my_sub函数，并通过EXPORT_SYMBOL宏导出。
 以上代码中，省略了内核模块程序的其他内容，如头文件，加载/卸载函数等。
 
 .. code-block:: c
@@ -740,7 +713,7 @@ EXPORT_SYMBOL宏用于向内核导出符号，这样的话，其他模块也可�
 
 calculation.c中使用extern关键字声明的参数itype，调用my_add()、my_sub()函数进行计算。 
 
-查看向内核导出的符号表
+查看向内核导出的符号表 'cat /proc/kallsyms'
 
 .. image:: media/module018.png
    :align: center
@@ -748,15 +721,15 @@ calculation.c中使用extern关键字声明的参数itype，调用my_add()、my_
 
 手动加载内核模块
 ''''''''''''''''
-通过NFS将编译好的calculation.ko拷贝到开发板中，calculation.ko依赖module_param.ko中的参数和函数，
-所以先手动加载module_param.ko，然后再加载calculation.ko。
+通过NFS将编译好的calculation.ko拷贝到开发板中，calculation.ko依赖parametermodule.ko中的参数和函数，
+所以先手动加载parametermodule.ko，然后再加载calculation.ko。
 
 .. image:: media/module019.png
    :align: center
    :alt:   模块参数
 
-同样卸载的时，module_param.ko中的参数和函数被calculation.ko调用，必须先卸载calculation.ko
-再卸载module_param.ko，否则会报错"ERROR: Module module_param is in use by: calculation"
+同样卸载的时，parametermodule.ko中的参数和函数被calculation.ko调用，必须先卸载calculation.ko
+再卸载parametermodule.ko，否则会报错"ERROR: Module parametermodule is in use by: calculation"
 
 .. image:: media/module020.png
    :align: center
@@ -768,7 +741,6 @@ calculation.c中使用extern关键字声明的参数itype，调用my_add()、my_
 ::
 
    cp *.ko /lib/modules/内核版本
-
 
 内核版本查询
 ::
