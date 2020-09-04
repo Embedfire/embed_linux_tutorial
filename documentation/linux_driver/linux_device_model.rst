@@ -218,15 +218,26 @@ Linux的设备模型
     int driver_register(struct device_driver *drv);
     void driver_unregister(struct device_driver *drv);
 
-到为止简单地介绍了总线、设备、驱动的数据结构以及注册/注销接口函数。下图是总线关联上设备与驱动之后的结构关系图
+到为止简单地介绍了总线、设备、驱动的数据结构以及注册/注销接口函数。下图是总线关联上设备与驱动之后的数据结构关系图
 
 .. image:: ./media/linux_device_modle000.png
    :align: center
    :alt: /sys/bus目录
 
+大致注册流程如下
+
+.. image:: ./media/linux_device_modle003.png
+   :align: center
+   :alt: /sys/bus目录
+
+系统启动之后会调用buses_init函数创建/sys/bus文件目录，这部分系统在开机时已经帮我们准备好了，
+接下去就是通过总线注册函数bus_register进行总线注册，注册完总线后在总线的目录下生成devices文件夹和drivers文件夹，
+最后分别通过device_register以及driver_register函数注册相对应的设备和驱动。
+
 
 attribute属性文件
 ~~~~~~~~~~~~
+
 /sys目录有各种子目录以及文件，前面讲过当我们注册新的总线、设备或驱动时，内核会在对应的地方创建一个新的目录，目录名为各自结构体的name成员，
 每个子目录下的文件，都是内核导出到用户空间，用于控制我们的设备的。内核中以attribute结构体来描述/sys目录下的文件，如下所示：
 
