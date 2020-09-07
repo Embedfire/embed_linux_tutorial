@@ -41,38 +41,16 @@
    :alt: 未找到图片00|
 
 
-搭建自己的Debian系统环境
+制作Debian系统镜像(将带镜像SD卡的内容打包成镜像文件.img)
 '''''''
 
-备份系统镜像（以Debian为例）：
-
-debian系统与其他系统有些差异，Debian系统包含了linux内核以及设备树文件，可以说是集成的，它并不单单是个文件系统。
-
-首先，我先以SD卡启动，这张SD卡是我利用Etcher烧录过最新Debian镜像的，所以可以直接以SD卡启动，然后再基于该SD卡系统镜像
-搭建开发环境，我这里为了简单就下载了一个arm-linux-gnueabihf交叉编译工具（sudo apt-get install gcc-arm-linux-gnueabihf），
-此时我在终端上输入arm-，然后按下tab键是可以自动补全成arm-linux-gnueabihf的，表示此SD卡已经有我搭建的环境了，如下图所示:
-
-.. image:: media/image_backup001.png
-   :align: center
-   :alt: 未找到图片00|
-
-制作新的Debian系统镜像SD卡
-'''''''
-
-首先我们将另外一张的SD卡插到读卡器里面，并且接入电脑。
-
-.. image:: media/image_backup002.png
-   :align: center
-   :alt: 未找到图片00|
-
-使用SDFormatter将SD卡格式化，保证是空的SD卡且格式正确
-
-.. image:: media/image_backup003.png
-   :align: center
-   :alt: 未找到图片00|
-
-接着我们将格式化后的SD卡取出，同时将已经搭建好环境的SD卡从imx6ull mini开发板取出并插到读卡器上，然后将读卡器接入PC机（ubuntu中），
+将已经搭建好环境的SD卡从imx6ull mini开发板取出并插到读卡器上，然后将读卡器接入PC机（ubuntu中），
 首先输入df -h查看下SD卡中镜像的大小。
+
+.. code:: bash
+
+    df -h
+
 
 .. image:: media/image_backup004.png
    :align: center
@@ -80,7 +58,7 @@ debian系统与其他系统有些差异，Debian系统包含了linux内核以及
 
 可见，在我的Ubuntu中，该SD卡设备挂载在/dev/sdc中，由于该SD卡有两个分区，所以/dev/sdc分为/dev/sdc1和/dev/sd2。
 大家根据自己Ubuntu中SD卡设备的实际情况来处理，如果不知道自己的SD卡设备是哪个，可以先不插入读卡器，ls /dev看下有哪些设备，
-然后再插入读卡器再ls /dev查看当前设备，对比两次的ls /dev，一般多出来的设备便是该SD卡了。
+然后再插入读卡器再ls /dev查看当前设备，对比两次的ls /dev，一般多出来的设备便是该SD卡。
 
 从上图可以看到我的SD卡镜像大小为/dev/sdc1 + /dev/sdc2 = 410M + 35M = 445M。
 
@@ -88,17 +66,28 @@ debian系统与其他系统有些差异，Debian系统包含了linux内核以及
 
 接着我们使用mkdir命令创建一个新的目录，用于存放从带镜像的SD卡中拷贝的镜像。
 
+.. code:: bash
+
+    mkdir image_backup
+
+
 .. image:: media/image_backup005.png
    :align: center
    :alt: 未找到图片00|
 
 然后使用dd命令将带镜像的SD中的镜像拷贝到新创建的目录中。
 
+.. code:: bash
+
+    sudo dd if=/dev/sdc of=./imx6ull_backup.img count=1100 bs=1024k conv=sync
+
+
 .. image:: media/image_backup006.png
    :align: center
    :alt: 未找到图片00|
 
-使用dd命令拷贝的时候要注意拷贝的大小尽量大于SD卡中镜像的大小，我这里拷贝了1.1G，镜像大小为445M，保证整个镜像都被完整的拷贝出来而没有遗漏。
+使用dd命令拷贝的时候要注意拷贝的大小尽量大于SD卡中镜像的大小，我这里拷贝了1.1G，镜像大小为445M，保证整个镜像都被完整的拷贝出来而没有遗漏，到此镜像制作完毕，你可以将备份的镜像烧录到其他SD卡中。(若备份的镜像仍无法正常运行，
+请尝试将count、bs、conv这三个参数去掉重新备份.img)
 
 上图dd命令参数的含义：
 
@@ -112,11 +101,11 @@ debian系统与其他系统有些差异，Debian系统包含了linux内核以及
 
 - conv= sync：将每个输入块填充到ibs个字节，不足部分用空（NUL）字符补齐。
 
-下面介绍两种制作带镜像的SD卡的方法：
+下面介绍两种将刚刚备份的.img镜像烧到空的SD卡的方法(仅想获得.img文件的用户请忽略)：
 
 第一种方法：
 
-然后我们将带镜像的SD卡取出，注意我们有两张SD卡，不要混淆了，一张是我们搭建好环境的SD卡，一张是用于备份的空的SD卡。
+将带镜像的SD卡取出，注意我们有两张SD卡，不要混淆了，一张是我们搭建好环境的SD卡，一张是用于备份的空的SD卡。
 
 接着把格式化好的空的SD卡再插入读卡器，接入ubuntu中，再输入df -h命令查看一下是否正确识别到了该SD卡，以及查看该SD卡挂在哪个设备下。
 
@@ -124,7 +113,12 @@ debian系统与其他系统有些差异，Debian系统包含了linux内核以及
    :align: center
    :alt: 未找到图片00|
 
-接着我们再使用dd命令将备份在ubuntu中的imx6ull_bakcup.img镜像拷贝到空的SD卡中。
+接着我们再使用dd命令将备份在ubuntu中的imx6ull_bakcup.img镜像拷贝到空的SD卡中。(若备份的镜像仍无法正常运行，
+请尝试将count、bs、conv这三个参数去掉.img)
+
+.. code:: bash
+
+   sudo dd if=./imx6ull_backup.img of=/dev/sdc count=1100 bs=1024k conv=sync
 
 .. image:: media/image_backup008.png
    :align: center
@@ -137,49 +131,23 @@ debian系统与其他系统有些差异，Debian系统包含了linux内核以及
 为了减少大家对dd命令的错误使用率，我这里介绍第二种方法，
 将前面从带镜像的SD卡中备份出的imx6ull_bakcup.img镜像拷贝到windows中，大家可以使用FileZila软件进行拷贝，或者通过共享文件夹的形式，总之
 就是要将ubuntu中的imx6ull_bakcup.img搬到windows中去。我这里使用FileZila软件将imx6ull_bakcup.img拷贝到windows的桌面上，接着打开Etcher软件，
-选择刚刚的镜像，步骤如下图所示：
+选择刚刚的镜像,具体烧录步骤请参考 `烧录Debian镜像至SD卡`_。
 
-.. image:: media/image_backup010.png
-   :align: center
-   :alt: 未找到图片00|
+.. _烧录Debian镜像至SD卡: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/install_image/install_debian_to_sd.html
 
-.. image:: media/image_backup011.png
-   :align: center
-   :alt: 未找到图片00|
-
-.. image:: media/image_backup012.png
-   :align: center
-   :alt: 未找到图片00|
-
-.. image:: media/image_backup013.png
-   :align: center
-   :alt: 未找到图片00|
-
-这两种方法大家根据自己的喜好选择把！
-
-然后我们将制作好的SD卡从读卡器取出，插入到imx6ull mini开发板的SD卡插槽中，波动拨码开关，以SD卡方式启动Debian系统。
-可以看到系统打印出了启动信息，进入了Debian命令行终端，代表烧录的Debian系统镜像可以正常启动。
-然后我们在终端输入arm-，接着按下tab按键，可以看到终端可以补全我们的arm-linux-gnueabihf命令，并且看到了关于交叉编译工具
-的文件信息，如下图所示：
-
-.. image:: media/image_backup009.png
-   :align: center
-   :alt: 未找到图片00|
-
-可以自动补全，或者有我们之前搭建环境的相关文件，就说明我们备份系统镜像大功告成了。
-
-如果只是备份系统镜像，那么你看到这里就可以帮助你完成备份了，下面我将继续介绍关于产量产的情况，需要将SD卡镜像烧录到emmc或者nand存储介质中。
+这两种方法大家根据自己的喜好选择！
 
 
 产品量产，且需将制作好的SD卡镜像备份到emmc或nand中
 '''''''
 
-这部分请大家移步至我们的《fire-config工具简介》章节，按照相应的步骤刷机即可，再次也建议大家如果要量产或者大量需要配置自己的Debian环境时，尽量在SD卡上开发，
+这部分请大家移步至我们的`fire-config工具简介`_章节，按照相应的步骤刷机即可，再次也建议大家如果要量产或者大量需要配置自己的Debian环境时，尽量在SD卡上开发，
 便于刷机量产。
 
+.. _fire-config工具简介: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/linux_basis/fire-config_brief.html
 
 
-基于emmc或nand搭建了自己的环境(非基于SD卡搭建，须支持SD卡启动)
+备份emmc或nand中的环境(须支持SD卡启动)
 ~~~~~
 
 
@@ -221,11 +189,24 @@ SD卡格式为FAT32格式的话，是不支持4G以上内容拷贝的，起初�
 
 接着输入wget https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2017.3.23.tgz下载NTFS格式支持。
 
+.. code:: bash
+
+    sudo apt-get updade
+    sudo apt-get upgrade
+    sudo apt-get install -y wget
+    wget https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2017.3.23.tgz
+
+
 .. image:: media/image_backup014.png
    :align: center
    :alt: 未找到图片00|
 
 为了编译NTFS-3g，我们要安装gcc，sudo apt-get install gcc
+
+.. code:: bash
+
+    sudo apt-get install gcc
+
 
 .. image:: media/image_backup015.png
    :align: center
@@ -233,17 +214,32 @@ SD卡格式为FAT32格式的话，是不支持4G以上内容拷贝的，起初�
 
 接着将刚刚下载下来的ntfs-3g_ntfsprogs-2017.3.23.tg压缩包解压，输入 tar -zxvf ntfs-3g_ntfsprogs-2017.3.23.tgz即可解压到当前目录。
 
+.. code:: bash
+
+    tar -zxvf ntfs-3g_ntfsprogs-2017.3.23.tgz
+
+
 .. image:: media/image_backup016.png
    :align: center
    :alt: 未找到图片00|
 
 进入ntfs-3g_ntfsprogs-2017.3.23目录，输入./configure配置NTFS-3g。
 
+.. code:: bash
+
+    ./configure
+
+
 .. image:: media/image_backup017.png
    :align: center
    :alt: 未找到图片00|
 
 输入sudo apt-get install make，安装make。
+
+.. code:: bash
+
+    sudo apt-get install make
+
 
 .. image:: media/image_backup018.png
    :align: center
@@ -263,6 +259,11 @@ SD卡格式为FAT32格式的话，是不支持4G以上内容拷贝的，起初�
 
 编译时间比较长，编译完成以后我们输入make install安装NTFS-3g支持。
 
+.. code:: bash
+
+    make install
+
+
 .. image:: media/image_backup021.png
    :align: center
    :alt: 未找到图片00|
@@ -277,6 +278,11 @@ SD卡格式为FAT32格式的话，是不支持4G以上内容拷贝的，起初�
 
 然后我们将SD卡设备挂载到/mnt这个挂载点下，输入mount -t ntfs-3g /dev/sdb1 /mnt/。
 
+.. code:: bash
+
+    mount -t ntfs-3g /dev/sdb1 /mnt/
+
+
 .. image:: media/image_backup022.png
    :align: center
    :alt: 未找到图片00|
@@ -284,6 +290,11 @@ SD卡格式为FAT32格式的话，是不支持4G以上内容拷贝的，起初�
 最后接着使用dd命令将整个emmc设备的内容全部备份到/mnt/中，注意在我们imx6ull系列板子上，emmc有两个分区，分别为mmcblk1p1和mmcblk1p2，为了备份emmc设备的全部内容，
 我们只需要备份mmcblk1就可以了，注意！注意！注意！不要加p1或p2，备份到SD卡挂载点/mnt目录下，并以.img形式命名，比如我命名为image_emmc_backup.img，然后
 输入命令：sudo dd if=/dev/mmcblk1 of=/mnt/image_emmc_backup.img，开始拷贝。
+
+.. code:: bash
+
+    sudo dd if=/dev/mmcblk1 of=/mnt/image_emmc_backup.img
+
 
 .. image:: media/image_backup023.png
    :align: center
@@ -299,12 +310,22 @@ SD卡格式为FAT32格式的话，是不支持4G以上内容拷贝的，起初�
 
 我们进入/mnt挂载点确认一下是否真正拷贝了，确认后记得输入umount /mnt 卸载前面所做的挂载。
 
+.. code:: bash
+
+    umount /mnt
+
+
 .. image:: media/image_backup026.png
    :align: center
    :alt: 未找到图片00|
 
 接着我们切换到另一块imx6ull的emmc类型板子，同样的插入带镜像的SD卡（注意不是刚刚备份好的），将刚刚备份好的SD卡插入读卡器并接入板子，
 拨动拨码开关以SD卡方式启动，进入系统后输入sudo mount -t ntfs-3g /dev/sdb1 /mnt/,将SD卡设备挂载到/mnt这个挂载点上，注意此挂载点最好是空的，若非空，可以使用mkdir命令创建一个空的目录以挂载。
+
+.. code:: bash
+
+    sudo mount -t ntfs-3g /dev/sdb1 /mnt/
+
 
 .. image:: media/image_backup027.png
    :align: center
@@ -320,27 +341,13 @@ SD卡格式为FAT32格式的话，是不支持4G以上内容拷贝的，起初�
 接着输入sudo dd if=/mnt/image_emmc_backup.img of=/dev/mmcblk1，接着又是好几个小时的漫长等待......，我做个实验基本要花费一快天的时间了！输入dd命令之前一定要想清楚哪个文件是输入文件，哪个文件是输出文件，在此，我们是想将SD卡的内容备份到emmc设备，而emmc设备被挂载到了/dev/mmcblk1下，SD卡设备被挂载到了/mnt/下。
 所以，/mnt/image_emmc_backup.img是输入文件“if=指定”，/dev/mmcblk1是输出文件“of=指定”。如果写反了，半天的努力就前功尽弃了。
 
+.. code:: bash
+
+    sudo dd if=/mnt/image_emmc_backup.img of=/dev/mmcblk1
+
+
 .. image:: media/image_backup029.png
    :align: center
    :alt: 未找到图片00|
 
-拷贝完成后输出如下信息，然后拨动拨码开关至emmc启动，即可看到板子可以正常启动了，
-进入系统后，输入arm-然后按下tab按键，命令可以自动补全，说明我们带自定义环境的Debian镜像备份成功了。
-
-.. image:: media/image_backup030.png
-   :align: center
-   :alt: 未找到图片00|
-
-自动补全，且有之前搭建环境的信息，因为这块新板子emmc烧的是纯净的Debian，所以按理说是不带交叉编译器arm-linux-gnueabihf-gcc与ntfs-3g的，但是现在有这些环境，证明我们成功实现了镜像的迁移：
-
-.. image:: media/image_backup031.png
-   :align: center
-   :alt: 未找到图片00|
-
-.. image:: media/image_backup033.png
-   :align: center
-   :alt: 未找到图片00|
-
-.. image:: media/image_backup034.png
-   :align: center
-   :alt: 未找到图片00|
+至此，镜像备份结束。
