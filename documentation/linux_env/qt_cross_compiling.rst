@@ -638,16 +638,6 @@ build-qt.sh 脚本内容如下：
       -no-eglfs \
       -no-compile-examples \
       -no-pkg-config \
-      -skip qtquickcontrols \
-      -skip qtquickcontrols2 \
-      -skip qtsensors \
-      -skip qtdoc \
-      -skip qtwayland \
-      -skip qt3d \
-      -skip qtcanvas3d \
-      -skip qtpurchasing \
-      -skip qtcharts \
-      -skip qtdeclarative \
       -no-iconv \
       -no-glib \
       -tslib \
@@ -722,7 +712,7 @@ build-qt.sh 脚本内容如下：
 而开发板的环境要求为qt-everywhere 5.11，当我们安装好Qt Creator后使用添加开发板所需的5.11版本编译链即可。
 
 为了方便起见，我们既安装IDE也安装PC上的Qt编译环境，注意此处的编译环境是PC上的而非交叉编译环境。
-我们在Qt官网下载IED与编译环境集成的可执行文件： http://download.qt.io/official_releases/qt/5.11/5.11.3/ ，如下图所示：
+我们在Qt官网下载IDE与编译环境集成的可执行文件： http://download.qt.io/new_archive/qt/5.11/5.11.3/ （普通版本下载地址：http://download.qt.io/new_archive/qt，发行版下载地址：http://download.qt.io/official_releases/qt/），如下图所示：
 
 .. figure:: media/install_qt_creator000.png
    :alt: install_qt_creator000
@@ -1281,6 +1271,112 @@ FireApp工程构建后运行：
    :alt: install_qt_creator042
 
    install_qt_creator042
+
+
+开发板运行qml程序
+-----------------------------
+   QML是Qt推出的Qt Quick技术的一部分，是一种新增的简便易学的语言。
+   QML是一种陈述性语言，用来描述一个程序的用户界面
+
+   
+移植使用qml qchart的程序
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+启动qt_creator,找到qmlchart官方例程
+
+.. figure:: media/qml_chart001.png
+   :alt: qml_chart001.png
+
+   qml_chart001.png
+
+编译、运行桌面版qmlchart程序
+
+.. figure:: media/qml_chart002.png
+   :alt: qml_chart002.png
+
+   qml_chart002.png
+   
+.. figure:: media/qml_chart003.png
+   :alt: qml_chart003.png
+
+   qml_chart003.png
+
+使用交叉编译工具链，编译适配开发板的程序，
+开发板推荐使用 imx6ull-debian-buster-full-qt-app-armhf-2020-05-19-2gb.img.xz 镜像
+
+.. figure:: media/qml_chart004.png
+   :alt: qml_chart004.png
+
+   qml_chart004.png
+
+
+通过scp或NFS将编译好的程序拷贝到/home/debian/qt_app目录下
+修改run.sh，将最后一行修改为$APP_DIR/qmlchart
+
+.. figure:: media/qml_chart005.png
+   :alt: qml_chart005.png
+
+   qml_chart005.png
+
+执行 sudo ./run.sh
+如果出现“error while loading shared libraries: libQt5Charts.so.5:”等类似错误提示，
+则需要我们安装相应的库。
+
+.. figure:: media/qml_chart006.png
+   :alt: qml_chart006.png
+
+   qml_chart006.png
+
+
+配置debian环境
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+我们开发板上系统属于debian版本中的"buster"，
+所有的发行版libs 子版面的软件包都可以在下面的链接中找到
+https://packages.debian.org/buster/libs/
+
+.. figure:: media/qml_chart007.png
+   :alt: qml_chart007.png
+
+   qml_chart007.png
+
+
+上一小节移植了qmlchart这个程序，系统提示我们缺少 libQt5Charts.so.5 这个动态链接库
+我们可以在上述网页中找到对应的安装包，执行 apt install xxxx 就可以了。
+
+.. figure:: media/qml_chart008.png
+   :alt: qml_chart008.png
+
+   qml_chart008.png
+
+.. figure:: media/qml_chart009.png
+   :alt: qml_chart009.png
+
+   qml_chart009.png
+
+
+再次执行 sudo ./run.sh，将所有缺失的库补全或者更新就可以执行我们的程序了
+
+.. code:: bash
+
+    apt install libqt5charts5
+    apt install qml-module-qtquick2
+    apt install qml-module-qtcharts
+
+.. figure:: media/qml_chart010.png
+   :alt: qml_chart010.png
+
+   qml_chart010.png
+
+最终运行效果
+
+.. figure:: media/qml_chart011.jpg
+   :alt: qml_chart011.jpg
+
+   qml_chart011.jpg
+
+
+
 
 使用命令行编译
 --------------
