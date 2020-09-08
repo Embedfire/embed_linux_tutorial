@@ -17,9 +17,8 @@
 
 我们知道常见的物理总线有I2C、SPI、UART......在嵌入式开发中，我们经常使用的i2c、spi、uart，并不是真正的物理总线，
 它们是集成在SOC上面的控制器，如i2c控制器，spi控制器等等，它们都可以通过CPU的总线直接寻址，也就是我们常说的操作寄存器。
-对于这些控制器而言，本身也没有对应的物理总线可以进行连接，那么这些控制器也会以平台设备的身份注册到内核中去。
-但我们所注册的I2C设备、SPI设备最终是会连接到I2C总线、SPI总线，而不会连接到平台总线。
-简单来说，对于SOC上的i2c控制器、spi控制器是连接到平台设备总线上的，而一些I2C设备、SPI设备则是挂载到I2C总线、SPI总线上。
+对于这些控制器而言，本身也没有对应的物理总线可以进行连接，那么这些控制器也应该会以平台设备的身份注册到内核中去。
+但我们所注册的I2C设备、SPI设备最终是会连接到I2C总线、SPI总线，而不是连接到平台总线。
 
 
 前面，我们已经尝试过以字符设备的方式，来点亮板子上的LED灯。因为没有采用“总线——设备——驱动”的方式，所以设备和驱动并没有做到分离，将设备的硬件信息统统都定义在了驱动代码中，
@@ -33,8 +32,7 @@
 
 平台设备的工作是为驱动程序提供硬件资源,平台设备将设备本身的资源（如需要使用到什么寄存器，占用哪些中断号，内存资源,IO口等）
 注册进内核，由内核统一管理。
-平台设备最主要的一个基本特性就是可以通过CPU总线直接寻址，如我们常见的各种寄存器,而我们编写的大多数设备驱动都是为了驱动
-plaftom设备,可见paltform设备对Linux驱动工程师的重要性。
+平台设备最主要的一个基本特性就是可以通过CPU总线直接寻址。
 
 
 内核使用platform_device结构体来描述平台设备，结构体原型如下：
@@ -55,15 +53,10 @@ plaftom设备,可见paltform设备对Linux驱动工程师的重要性。
 
 
 - name：设备名称，总线进行匹配时，会比较设备和驱动的名称是否一致；
-
 - id：指定设备的编号，Linux支持同名的设备，而同名设备之间则是通过该编号进行区分；
-
-- dev：Linux设备模型中的device结构体，platform_device中嵌入继承了该结构体，方便内核管理平台设备；
-
+- dev：Linux设备模型中的device结构体，linux内核大量使用了面向对象思想，platform_device通过继承该结构体可复用它的相关代码，方便内核管理平台设备；
 - num_resources：记录资源的个数，当结构体成员resource存放的是数组时，需要记录resource数组的个数，内核提供了宏定义ARRAY_SIZE用于计算数组的个数；
-
 - resource：平台设备提供给驱动的资源，如irq，dma，内存等等。该结构体会在接下来的内容进行讲解；
-
 - id_entry：平台总线提供的另一种匹配方式，原理依然是通过比较字符串，这部分内容会在平台总线小节中讲，这里的id_entry用于保存匹配的结果；
 
 
@@ -89,29 +82,24 @@ plaftom设备,可见paltform设备对Linux驱动工程师的重要性。
 
 
 - name：指定资源的名字，可以设置为NULL；
-
 - start、end：指定资源的起始地址以及结束地址
-
 - flags：用于指定该资源的类型，在Linux中，资源包括I/O、Memory、Register、IRQ、DMA、Bus等多种类型，最常见的有以下几种：
 
-.. code-block:: c
-    :caption: 资源宏定义(内核源码/include/linux/ioport.h)
-    :linenos:
+.. csv-table::  
+    :header: "资源宏定义", "描述"
+    :widths: 15, 30
 
-    #define IORESOURCE_IO   0x00000100
-    #define IORESOURCE_MEM  0x00000200
-    #define IORESOURCE_IRQ  0x00000400
-    #define IORESOURCE_DMA  0x00000800
-
+    "IORESOURCE_IO", "用于IO地址空间，对应于IO端口映射方式"
+    "IORESOURCE_MEM", "用于外设的可直接寻址的地址空间"
+    "IORESOURCE_IRQ", "用于指定该设备使用某个中断"
+    "IORESOURCE_DMA", "用于指定使用的DMA通道"
 
 设备驱动程序的主要目的是操作设备的寄存器。不同架构的计算机提供不同的操作接口，主要有IO端口映射和IO內存映射两种方式。
-IORESOURCE_IO指的是IO地址空间，对应于IO端口映射方式，只能通过专门的接口函数（如inb、outb）才能访问；
-IORESOURCE_MEM指的是属于外设的可直接寻址的地址空间，也就是我们常说的某个寄存器地址，
+对应于IO端口映射方式，只能通过专门的接口函数（如inb、outb）才能访问；
 采用IO内存映射的方式，可以像访问内存一样，去读写寄存器。在嵌入式中，基本上没有IO地址空间，所以通常使用IORESOURCE_MEM。
-IORESOURCE_IRQ可以指定该设备使用某个中断，而IORESOURCE_DMA则是用于指定使用的DMA通道。
 
 在资源的起始地址和结束地址中，对于IORESOURCE_IO或者是IORESOURCE_MEM，他们表示要使用的内存的起始位置以及结束位置；
-而对于IORESOURCE_IRQ、IORESOURCE_DMA，若是只用一个中断引脚或者是一个通道，则start和end成员的值必须是相等的。
+若是只用一个中断引脚或者是一个通道，则它们的start和end成员值必须是相等的。
 
 
 Linux虽然提供了很多种资源类型供我们选择，但是不一定能够囊括所有的数据，如某个GPIO的引脚号。尽管如此，我们依然有办法可以解决这个问题。以上述问题为例，我们可以使用IORESOURCE_IRQ资源，把该引脚编号赋给start和end成员，驱动只需要调用对应的API，便可以得到我们的引脚号。这只是其中的一种方式，
@@ -143,6 +131,9 @@ Linux虽然提供了很多种资源类型供我们选择，但是不一定能够
     int platform_device_register(struct platform_device *pdev)
 
 
+- 参数pdev:platform_device类型结构体指针
+- 返回值:注册成功是返回0，失败则返回非0的数值
+
 
 同样，当我们想要移除我们的平台设备时，我们需要使用platform_device_unregister函数，来通知内核去移除该设备。
 
@@ -154,6 +145,9 @@ Linux虽然提供了很多种资源类型供我们选择，但是不一定能够
 
     void platform_device_unregister(struct platform_device *pdev)
 
+- 参数pdev:platform_device类型结构体指针
+- 返回值:无返回值
+
 到这里，平台设备的知识已经讲解完毕，平台设备的主要内容是将硬件部分的代码与驱动部分的代码分开，注册到平台设备总线中，在设备与驱动中间搭建
 了一座桥——统一的数据结构以及函数接口，设备和驱动的数据交互直接在“这座桥上”进行。
 
@@ -163,7 +157,6 @@ Linux虽然提供了很多种资源类型供我们选择，但是不一定能够
 
 现在我们想象一下，已经在内核中注册了一个平台设备，而我们的驱动程序应该如何去配合平台设备使得我们的设备正常工作呢，这便是平台驱动的重点。
 内核中使用platform_driver结构体来描述平台驱动，结构体原型如下所示：
-
 
 
 .. code-block:: c
@@ -182,11 +175,8 @@ Linux虽然提供了很多种资源类型供我们选择，但是不一定能够
 
 
 - probe：函数指针类型，指向驱动的probe函数，当总线为设备和驱动匹配上之后，会执行驱动的probe函数。我们通常在该函数中，对设备进行一系列的初始化。
-
 - remove：函数指针类型，指向驱动的remove函数，当我们移除我们的平台设备时，会调用该函数，该函数实现的操作，通常是probe函数的逆过程。
-
 - driver：Linux设备模型中用于抽象驱动的device_driver结构体，platform_driver嵌入该结构体，方便内核管理平台驱动；
-
 - id_table：表示该驱动能够兼容的设备类型。
 
 
@@ -258,6 +248,9 @@ platform_device_id结构体原型如下所示:
 
     };
 
+- 第1-18行:声明了一个结构体数组，用来表示不同平台的串口类型。
+- 第20-42行:使用platform_device_id结构体中的driver_data成员来储存上面的串口信息
+
 在上面的代码中，支持三种设备的串口，支持imx1、imx21、imx6q三种不同系列芯片，他们之间区别在于串口的test寄存器地址不同。
 当总线成功配对平台驱动以及平台设备时，会将对应的id_table条目赋值给平台设备的id_entry成员，而平台驱动的probe函数是以平台设备为参数，
 这样的话，就可以拿到当前设备串口的test寄存器地址了。
@@ -272,6 +265,9 @@ platform_device_id结构体原型如下所示:
 
     int platform_driver_register(struct platform_driver *drv);
 
+- 参数drv:platform_driver类型结构体指针
+- 返回值:注册成功是返回0，失败则返回错误代码
+
 
 当我们移除我们的模块时，需要注销掉已注册的平台驱动，Linux提供以下函数，用于注销我们的平台驱动。
 
@@ -281,7 +277,8 @@ platform_device_id结构体原型如下所示:
 
     void platform_driver_unregister(struct platform_driver *drv);
 
-
+- 参数drv:platform_driver类型结构体指针
+- 返回值:无返回值
 
 上面所讲的内容是最基本的平台驱动框架，只需要实现probe函数、remove函数，初始化platform_driver结构体，并调用platform_driver_register进行注册即可。
 
@@ -300,12 +297,10 @@ platform_device_id结构体原型如下所示:
 
 
 
-- dev：指定要获取哪个平台设备的资源；
-
-- type：指定获取资源的类型，如IORESOURCE_MEM、IORESOURCE_IO等；
-
-- num：指定要获取的资源编号。每个设备所需要资源的个数是不一定的，为此内核对这些资源进行了编号，对于不同的资源，编号之间是相互独立的。
-
+- 参数dev：指定要获取哪个平台设备的资源；
+- 参数type：指定获取资源的类型，如IORESOURCE_MEM、IORESOURCE_IO等；
+- 参数num：指定要获取的资源编号。每个设备所需要资源的个数是不一定的，为此内核对这些资源进行了编号，对于不同的资源，编号之间是相互独立的。
+- 返回值：成功返回struct resource结构体类型指针，失败则返回NULL
 
 
 假若资源类型为IORESOURCE_IRQ，内核还提供以下函数接口，来获取中断引脚，
@@ -318,30 +313,25 @@ platform_device_id结构体原型如下所示:
 
     int platform_get_irq(struct platform_device *pdev, unsigned int num)
 
-
-
-- pdev：指定要获取哪个平台设备的资源；
-
-- num：指定要获取的资源编号。
-
+- 参数pdev：指定要获取哪个平台设备的资源；
+- 参数num：指定要获取的资源编号。
+- 返回值：成功返回可用的中断号，失败则返回-ENXIO
 
 
 对于存放在device结构体中成员platform_data的数据，我们可以使用dev_get_platdata函数来获取，函数原型如下所示：
 
-
-
 .. code-block:: c 
     :caption: dev_get_platdata函数
     :linenos:
-
 
     static inline void *dev_get_platdata(const struct device *dev)
     {
         return dev->platform_data;
     }
 
+- 参数dev:struct device结构体类型指针
+- 返回值:返回device结构体中成员platform_data指针
 
-dev_get_platdata函数的实现十分简单，直接返回device结构体中成员platform_data的值。
 
 
 以上几个函数接口就是如何从平台设备中获取资源的常用的几个函数接口，到这里平台驱动部分差不多就结束了。总结一下平台驱动需要
@@ -410,11 +400,16 @@ dev_get_platdata函数的实现十分简单，直接返回device结构体中成�
 
     }
 
+- 第1-5行：platform_match函数只传入两个参数：dev和drv。我们知道在platform_device和platform_driver中也有对应的device、device_driver类型成员，
+  宏定义to_platform_device和to_platform_driver实现了对container_of的封装，利用该这两个宏便可以得到进行匹配的platform_driver和platform_device。
+
+- 第8-21行：platform总线提供了四种匹配方式，并且这四种方式存在着优先级：设备树机制>ACPI匹配模式>id_table方式>字符串比较。
+  虽然匹配方式五花八门，但是并没有涉及到任何复杂的算法，都只是在匹配的过程中，比较一下设备和驱动提供的某个成员的字符串是否相同。
+  设备树是一种描述硬件的数据结构，它用一个非C语言的脚本来描述这些硬件设备的信息。驱动和设备之间的匹配时通过比较compatible的值。
+  acpi主要是用于电源管理，基本上用不到，这里就并不进行讲解了。关于设备树的匹配机制，会在设备树章节进行详细分析。
 
 
-platform_match函数只传入两个参数：dev和drv。我们知道在platform_device和platform_driver中也有对应的device、device_driver类型成员，
-在platform_match开头，调用了两个宏定义to_platform_device和to_platform_driver，原型如下所示：
-
+宏定义to_platform_device和to_platform_driver，原型如下所示：
 
 .. code-block:: c
     :caption: to_platform_xxx宏定义(内核源码/include/linux/platform_device.h)
@@ -424,15 +419,9 @@ platform_match函数只传入两个参数：dev和drv。我们知道在platform_
     #define to_platform_driver(drv)   (container_of((drv), struct platform_driver, driver))
 
 
-宏定义to_platform_device和to_platform_driver实现了对container_of的封装，利用该这两个宏便可以得到进行匹配的platform_driver和platform_device。
-platform总线提供了四种匹配方式，并且这四种方式存在着优先级：设备树机制>ACPI匹配模式>id_table方式>字符串比较。虽然匹配方式五花八门，但是并没有涉及到任何复杂的算法，
-都只是在匹配的过程中，比较一下设备和驱动提供的某个成员的字符串是否相同。
-设备树是一种描述硬件的数据结构，它用一个非C语言的脚本来描述这些硬件设备的信息。驱动和设备之间的匹配时通过比较compatible的值。
-acpi主要是用于电源管理，基本上用不到，这里就并不进行讲解了。关于设备树的匹配机制，会在设备树章节进行详细分析。
-我们在定义结构体platform_driver时，我们需要提供一个id_table的数组，该数组说明了当前的驱动能够支持的设备。当加载该驱动时，总线的match函数发现id_table非空，
+
+在定义结构体platform_driver时，我们需要提供一个id_table的数组，该数组说明了当前的驱动能够支持的设备。当加载该驱动时，总线的match函数发现id_table非空，
 则会比较id_table中的name成员和平台设备的name成员，若相同，则会返回匹配的条目，具体的实现过程如下：
-
-
 
 .. code-block:: c
     :caption: platform_match_id函数(内核源码/drivers/base/platform.c)
@@ -453,11 +442,9 @@ acpi主要是用于电源管理，基本上用不到，这里就并不进行讲�
         return NULL;
     }
 
-
-
-每当有新的驱动或者设备添加到总线时，总线便会调用match函数对新的设备或者驱动进行配对。platform_match_id函数中第一个参数为驱动提供的id_table，
-第二个参数则是待匹配的平台设备。当待匹配的平台设备的name字段的值等于驱动提供的id_table中的值时，会将当前匹配的项赋值给platform_device中的id_entry，
-返回一个非空指针。若没有成功匹配，则返回空指针。
+大家可以看到这里的代码实现并不复杂，只是通过字符串进行配对。每当有新的驱动或者设备添加到总线时，总线便会调用match函数对新的设备或者驱动进行配对。
+platform_match_id函数中第一个参数为驱动提供的id_table，第二个参数则是待匹配的平台设备。当待匹配的平台设备的name字段的值等于驱动提供的id_table中的值时，
+会将当前匹配的项赋值给platform_device中的id_entry，返回一个非空指针。若没有成功匹配，则返回空指针。
 
 
 
@@ -492,7 +479,6 @@ acpi主要是用于电源管理，基本上用不到，这里就并不进行讲�
 包括GPIO时钟寄存器，IO配置寄存器，IO数据寄存器等，这里的资源，实际上就是寄存器地址，可以使用IORESOURCE_MEM进行处理；
 除了这些之外，还需要提供一些寄存器的偏移量，我们可以利用平台设备的私有数据进行管理。
 
-
 .. code-block:: c
     :caption: 寄存器宏定义(位于../base_code/linux_driver/platform_driver/led_pdev.c)
     :linenos:
@@ -513,10 +499,10 @@ acpi主要是用于电源管理，基本上用不到，这里就并不进行讲�
     #define IOMUXC_SW_MUX_CTL_PAD_GPIO4_IO019       0x020E01DC
     #define IOMUXC_SW_PAD_CTL_PAD_GPIO4_IO019       0x020E0468
 
+- 使用宏定义来对GPIO引脚的寄存器进行封装，具体每个寄存器的作用，可以参考《IMX6ULRM》用户手册。
 
-关于LED灯的寄存器，我们采用宏定义进行封装，具体每个寄存器的作用，可以参考《IMX6ULRM》用户手册。
+
 定义一个resource结构体，用于存放上述的寄存器地址，提供给驱动使用，如下所示：
-
 
 .. code-block:: c
     :caption: 定义资源数组(位于../base_code/linux_driver/platform_driver/led_pdev.c)
@@ -530,13 +516,9 @@ acpi主要是用于电源管理，基本上用不到，这里就并不进行讲�
         [4] = DEFINE_RES_MEM(IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04, 4),
     };
 
-
-
-在内核源码/include/linux/ioport.h中，提供了宏定义DEFINE_RES_MEM、DEFINE_RES_IO、DEFINE_RES_IRQ和DEFINE_RES_DMA，用来定义所需要的资源类型。
-DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入两个参数，一个是寄存器地址，另一个是大小。从手册上看，可以得知一个寄存器都是32位的，因此，
-这里我们选择需要4个字节大小的空间。rled_resource资源数组中，我们将所有的MEM资源进行了编号，0对应了GPIO1_DR，1对应了GPIO1_GDIR，驱动到时候就可以根据这些编号获得对应的寄存器地址。
-
-下面我们使用一个数组rled_hwinfo，来记录寄存器的偏移量，填充平台私有数据时，只需要把数组的首地址赋给platform_data即可。
+- 在内核源码/include/linux/ioport.h中，提供了宏定义DEFINE_RES_MEM、DEFINE_RES_IO、DEFINE_RES_IRQ和DEFINE_RES_DMA，用来定义所需要的资源类型。
+  DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入两个参数，一个是寄存器地址，另一个是大小。从手册上看，可以得知一个寄存器都是32位的，因此，
+  这里我们选择需要4个字节大小的空间。rled_resource资源数组中，我们将所有的MEM资源进行了编号，0对应了GPIO1_DR，1对应了GPIO1_GDIR，驱动到时候就可以根据这些编号获得对应的寄存器地址。
 
 
 .. code-block:: c
@@ -545,9 +527,10 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
     unsigned int rled_hwinfo[2] = { 4, 26 };
 
+- 使用一个数组rled_hwinfo，来记录寄存器的偏移量，填充平台私有数据时，只需要把数组的首地址赋给platform_data即可。
+
 
 关于设备的硬件信息，我们已经全部完成了，接下来只需要定义一个platform_device类型的变量，填充相关信息。
-
 
 .. code-block:: c
     :caption: 定义平台设备(位于../base_code/linux_driver/platform_driver/led_pdev.c)
@@ -571,15 +554,14 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
     };
 
-
-
-这里我们定义了一个设备名为“led_pdev”的设备，这里的名字确保要和驱动的名称保持一致，否则就会导致匹配失败。id编号设置为0，驱动会利用该编号来注册设备。
-对于设备资源，我们将上面实现好的rled_resource数组赋值给resource成员，同时，我们还需要指定资源的数量，内核提供了宏定义ARRAY_SIZE，用于计算数组长度，
-因此，num_resources直接赋值为ARRAY_SIZE(rled_resource)。这里的led_release函数为空，目的为了防止卸载模块，内核提示报错。
+- 第1-4行：声明了led_cdev_release函数，目的为了防止卸载模块，内核提示报错。
+- 第7-9行：定义了一个设备名为“led_pdev”的设备，这里的名字确保要和驱动的名称保持一致，否则就会导致匹配失败。id编号设置为0，驱动会利用该编号来注册设备。
+- 第10-11行：将上面实现好的rled_resource数组赋值给resource成员，同时，我们还需要指定资源的数量，内核提供了宏定义ARRAY_SIZE，用于计算数组长度，
+  因此，num_resources直接赋值为ARRAY_SIZE(rled_resource)。
+- 第12-15行：对dev中的成员进行赋值，将rled_hwinfo存储到platform_data中。
 
 
 最后，只需要在模块加载的函数中调用platform_device_register函数，这样，当加载该内核模块时，新的平台设备就会被注册到内核中去，实现方式如下：
-
 
 .. code-block:: c
     :caption: 模块初始化(位于../base_code/linux_driver/platform_driver/led_pdev.c)
@@ -609,6 +591,9 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
     MODULE_LICENSE("GPL");
     MODULE_DESCRIPTION("the example for platform driver");
 
+- 第1-8行：实现模块的入口函数，打印信息并注册平台设备
+- 第10-16行：实现模块的出口函数，打印信息并注销设备
+- 第18-20行：模块遵守协议以及一些模块信息
 
 这样，我们就实现了一个新的设备，只需要在开发板上加载该模块，平台总线下就会挂载我们LED灯的平台设备。
 
@@ -627,15 +612,15 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
     :caption: id_table(位于../base_code/linux_driver/platform_driver/led_pdrv.c)
     :linenos: 
 
-
     static struct platform_device_id led_pdev_ids[] = {
         {.name = "led_pdev"},
         {}
     };
     MODULE_DEVICE_TABLE(platform, led_pdev_ids);
 
+- 这块代码提供了驱动支持哪些设备
 
-这块代码提供了驱动支持哪些设备，这仅仅完成了第一个内容，这是总线进行匹配时所需要的内容。而在匹配成功之后，驱动需要去提取设备的资源，
+这仅仅完成了第一个内容，这是总线进行匹配时所需要的内容。而在匹配成功之后，驱动需要去提取设备的资源，
 这部分工作都是在probe函数中完成。由于我们采用字符设备的框架，因此，在probe过程，还需要完成字符设备的注册等工作，具体实现的代码如下：
 
 .. code-block:: c
@@ -737,16 +722,14 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
     }
 
-- 代码1-12行，仍然使用结构体led_data来管理我们LED灯的硬件信息
-- 代码31-38行，使用devm_kzalloc函数申请cur_led和led_hwinfo结构体内存大小
-- 代码41-43行，使用dev_get_platdata函数获取私有数据，得到LED灯的寄存器偏移量，并赋值给cur_led->led_pin和cur_led->clk_regshift。
-- 代码46-50行，利用函数platform_get_resource可以获取到各个寄存器的地址
-- 代码52-66行，在内核中，这些地址并不能够直接使用，使用devm_ioremap将获取到的寄存器地址转化为虚拟地址，到这里我们就完成了提取资源的工作了
-
-
-接下来，就需要注册一个LED字符设备了。开发板上板载了三个LED灯，在rled_pdev结构体中，我们指定了红灯的ID号为0，我们可以利用该id号，
-来作为字符设备的次设备号，用于区分不同的LED灯。使用MKDEV宏定义来创建一个设备编号，再调用register_chrdev_region、cdev_init、cdev_add等函数来注册字符设备。
-在probe函数的最后，我们使用platform_set_drvdata函数，将LED数据信息存入在平台驱动结构体中pdev->dev->driver_data中。
+- 第1-12行：仍然使用结构体led_data来管理我们LED灯的硬件信息。
+- 第31-38行：使用devm_kzalloc函数申请cur_led和led_hwinfo结构体内存大小。
+- 第41-43行：使用dev_get_platdata函数获取私有数据，得到LED灯的寄存器偏移量，并赋值给cur_led->led_pin和cur_led->clk_regshift。
+- 第46-50行：利用函数platform_get_resource可以获取到各个寄存器的地址。
+- 第52-66行：在内核中，这些地址并不能够直接使用，使用devm_ioremap将获取到的寄存器地址转化为虚拟地址，到这里我们就完成了提取资源的工作了。
+- 第69-81行：就需要注册一个LED字符设备了。开发板上板载了三个LED灯，在rled_pdev结构体中，我们指定了红灯的ID号为0，我们可以利用该id号，
+  来作为字符设备的次设备号，用于区分不同的LED灯。使用MKDEV宏定义来创建一个设备编号，再调用register_chrdev_region、cdev_init、cdev_add等函数来注册字符设备。
+- 第84行：使用platform_set_drvdata函数，将LED数据信息存入在平台驱动结构体中pdev->dev->driver_data中。
 
 
 当驱动的内核模块被卸载时，我们需要将注册的驱动注销，相应的字符设备也同样需要注销，具体的实现代码如下：
@@ -771,17 +754,14 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
     }
 
+- 第4行：在probe函数中调用了platform_set_drvdata，将当前的LED灯数据结构体保存到pdev的driver_data成员中，
+  在这里调用platform_get_drvdata，获取当前LED灯对应的结构体，该结构体中包含了字符设备。
+- 第8-11行：，调用cdev_del删除对应的字符设备，删除/dev目录下的设备，则调用函数device_destroy，最后使用函数unregister_chrdev_region，
+  注销掉当前的字符设备编号。
 
 
-我们在probe函数中调用了platform_set_drvdata，将当前的LED灯数据结构体保存到pdev的driver_data成员中，
-我们只需要调用platform_get_drvdata，即可获取当前LED灯对应的结构体，该结构体中包含了字符设备，调用cdev_del删除对应的字符设备，
-删除/dev目录下的设备，则调用函数device_destroy，最后使用函数unregister_chrdev_region，注销掉当前的字符设备编号
 
-
-
-关于操作LED灯字符设备的方式，实现方式如下，具体介绍可以参阅LED灯字符设备章节的内容。
-
-
+关于操作LED灯字符设备的方式，实现方式如下，这里只做简单介绍，具体介绍可以参阅LED灯字符设备章节的内容。
 
 .. code-block:: c
     :caption: led灯的字符设备框架(位于../base_code/linux_driver/platform_driver/led_pdrv.c)
@@ -854,6 +834,10 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
 
     };
 
+- 第1-29行是led_cdev_open函数的内容主要就是对硬件进行初始化。
+- 第31-34行的led_cdev_release函数的作用是为了防止警告产生。
+- 第36-54行对GPIO引脚进行置位控制
+- 第58-63行，对file_operations结构体进行填充
 
 
 最后，我们只需要将我们实现好的内容，填充到platform_driver类型的结构体，并使用platform_driver_register函数注册即可。
@@ -898,11 +882,11 @@ DEFINE_RES_MEM用于定义IORESOURCE_MEM类型的资源，我们只需要传入�
     MODULE_LICENSE("GPL");
     MODULE_DESCRIPTION("the example for platform driver");
 
-
-
-我们在led_pdrv中定义了两种匹配模式，在平台总线匹配过程中，只会根据id_table中的name值进行匹配，若和平台设备的name值相等，则表示匹配成功；
-反之，则匹配不成功，表明当前内核没有该驱动能够支持的设备。在模块的初始化函数led_pdrv_init中，我们调用函数class_create，来创建一个led类，并且调用函数platform_driver_register，
-注册我们的平台驱动结构体，这样当加载该内核模块时，就会有新的平台驱动加入到内核中。模块的注销函数led_pdrv_exit，则是初始化函数的逆过程。
+- 第1-6行，在led_pdrv中定义了两种匹配模式，在平台总线匹配过程中，只会根据id_table中的name值进行匹配，若和平台设备的name值相等，则表示匹配成功；
+  反之，则匹配不成功，表明当前内核没有该驱动能够支持的设备。
+- 第8-18行，调用函数class_create，来创建一个led类，并且调用函数platform_driver_register，注册我们的平台驱动结构体，这样当加载该内核模块时，
+  就会有新的平台驱动加入到内核中。
+- 第20-27行，注销函数led_pdrv_exit，则是初始化函数的逆过程。
 
 
 编译led_pdrv.c和led_pdev.c的Makefile如下所示，编写该Makefile时，只需要根据实际情况修改变量KERNEL_DIR和obj-m即可。
