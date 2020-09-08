@@ -13,13 +13,29 @@
 
 5、 输入“df -h”命令查看TF卡被ubuntu系统识别成了哪一个设备，我的是/dev/sdc1设备。
 
+.. code:: bash
+
+    df -h
+
+
 .. image:: media/img_modify000.PNG
    :align: center
    :alt: 未找到图片00|
 
 6、 输入“sudo mount -t vfat /dev/sdc1 /mnt/”命令将TF卡设备挂载到系统的/mnt目录下，注意我的TF卡被系统识别为/dev/sdc1设备，你需根据自己的情况而定。
 
+.. code:: bash
+
+    sudo mount -t vfat /dev/sdc1 /mnt/
+
+
 7、 输入“parted imx6ull-debian-buster-console-armhf-2020-05-19-2gb.img”命令进入GNU Parted以查看imx6ull-debian-buster-console-armhf-2020-05-19-2gb.img镜像的分区情况，然后输入“print”打印出镜像分区信息。
+
+.. code:: bash
+
+    parted imx6ull-debian-buster-console-armhf-2020-05-19-2gb.img
+    print
+
 
 .. image:: media/img_modify001.PNG
    :align: center
@@ -33,6 +49,11 @@
 
 9、 输入“sudo mount -o loop,offset=46137344 /mnt/imx6ull-debian-buster-console-armhf-2020-05-19-2gb.img ./img”命令，将imx6ull-debian-buster-console-armhf-2020-05-19-2gb.img镜像中的文件系统分区部分挂载到刚刚创建的img目录下。其中offset=46137344参数表示要挂载的偏移地址，也就是我们镜像中文件系统分区的起始地址，挂载成功后在img目录下输入“ls”命令可以看到文件系统的内容了。
 
+.. code:: bash
+
+    sudo mount -o loop,offset=46137344 /mnt/imx6ull-debian-buster-console-armhf-2020-05-19-2gb.img ./img
+
+
 .. image:: media/img_modify002.PNG
    :align: center
    :alt: 未找到图片02|
@@ -40,6 +61,10 @@
 10、 接着就是修该你要修改的文件了，比如添加自己的app，我这里简单的添加了一个adctest.sh脚本，该脚本的功能是实现adc检测，然后输出adc信息到终端，它被保存到了刚刚挂载的文件系统/home/debian目录下。
 
 11、 修改完成之后记得取消挂载，输入“umount ./img”命令以取消镜像的文件系统挂载，输入“umount /mnt”以取消TF卡设备的挂载。
+
+.. code:: bash
+
+    umount ./img
 
 12、 取出读卡器，将刚刚修改过内容的TF卡插入开发板的TF卡槽并拨动拨码开关以SD卡方式启动，进入系统后可以看到/home/debian目录下有我们增加的adctest.sh脚本，修改脚本的可执行权限后，执行该脚本，可以看到终端打印ADC检测的信息，说明.img镜像修改成功。
 
