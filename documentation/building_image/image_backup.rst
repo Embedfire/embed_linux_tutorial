@@ -40,8 +40,10 @@
    :align: center
    :alt: 未找到图片00|
 
+下面介绍两种备份SD卡镜像的方法，一种是使用dd命令来备份SD卡镜像，该方法的优点是备份的镜像大小比较小，缺点是容易制作失败；另一种是使用Win32磁盘映像工具备份镜像，
+该方法的有点是比较简单直接，在windows下操作，不容易出错，缺点是备份的镜像太大，备份时间长，它备份整个SD卡作为镜像。
 
-制作Debian系统镜像(将带镜像SD卡的内容打包成镜像文件.img)
+使用dd命令制作Debian系统镜像(将带镜像SD卡的内容打包成镜像文件.img)
 '''''''
 
 将已经搭建好环境的SD卡从imx6ull mini开发板取出并插到读卡器上，然后将读卡器接入PC机（ubuntu中），
@@ -86,8 +88,7 @@
    :align: center
    :alt: 未找到图片00|
 
-使用dd命令拷贝的时候要注意拷贝的大小尽量大于SD卡中镜像的大小，我这里拷贝了1.1G，镜像大小为445M，保证整个镜像都被完整的拷贝出来而没有遗漏，到此镜像制作完毕，你可以将备份的镜像烧录到其他SD卡中。(若备份的镜像仍无法正常运行，
-请尝试将count、bs、conv这三个参数去掉重新备份.img)
+使用dd命令拷贝的时候要注意拷贝的大小尽量大于SD卡中镜像的大小，我这里拷贝了1.1G，镜像大小为445M，保证整个镜像都被完整的拷贝出来而没有遗漏，到此镜像制作完毕，你可以将备份的镜像烧录到其他SD卡中。(若备份的镜像仍无法正常运行，请将bs=1024k改为bs=1M并去掉conv参数)
 
 上图dd命令参数的含义：
 
@@ -113,8 +114,7 @@
    :align: center
    :alt: 未找到图片00|
 
-接着我们再使用dd命令将备份在ubuntu中的imx6ull_bakcup.img镜像拷贝到空的SD卡中。(若备份的镜像仍无法正常运行，
-请尝试将count、bs、conv这三个参数去掉.img)
+接着我们再使用dd命令将备份在ubuntu中的imx6ull_bakcup.img镜像拷贝到空的SD卡中。(若备份的镜像仍无法正常运行，请将bs=1024k改为bs=1M并去掉conv参数)
 
 .. code:: bash
 
@@ -146,6 +146,29 @@
 
 .. _fire-config工具简介: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/linux_basis/fire-config_brief.html
 
+
+使用Win32磁盘映像工具制作Debian系统镜像(将带镜像SD卡的内容打包成镜像文件.img)
+'''''''
+
+首先在桌面右键，新建一个空的.img文件，例如我创建的是backup.img 
+
+.. image:: media/image_backup035.png
+   :align: center
+   :alt: 未找到图片35|
+
+接着插入你的带镜像的SD卡到windows并打开Win32磁盘映像工具，找到你的SD卡盘符，我的是H盘（请仔细确认自己的SD卡盘符），然后点击文件夹图标，找到刚刚在桌面创建的backup.img文件并确认，
+之后取消“仅读取已分配区”的勾选，最后点击读取按钮，如果弹出是否覆盖backup.img的对话框，点击是即可，等待镜像备份完毕，备份好的镜像就是backup.img。
+
+.. image:: media/image_backup036.png
+   :align: center
+   :alt: 未找到图片36|
+
+接着取下带镜像的SD卡，插入另外一张被格式化成FAT32格式的空的SD卡，打开Win32磁盘映像工具，选择backup.img镜像，选择你的SD卡盘符，最后点击写入按钮即可，注意被烧录的SD卡大小必须大于等于镜像的大小。
+
+.. image:: media/image_backup037.png
+   :align: center
+   :alt: 未找到图片37|
+   
 
 备份emmc或nand中的环境(须支持SD卡启动)
 ~~~~~
