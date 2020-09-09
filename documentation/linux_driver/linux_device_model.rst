@@ -106,7 +106,19 @@ Linux的设备模型
     :linenos: 
 
     int bus_register(struct bus_type *bus);
+
+
+- 参数bus：为bus_type类型的结构体指针
+- 返回值：成功返回0，失败则返回-ENOMEM
+
+.. code-block:: c 
+    :caption: 注册/注销总线API（内核源码/drivers/base/bus.c）
+    :linenos: 
+
     void bus_unregister(struct bus_type *bus);
+
+- 参数bus：为bus_type类型的结构体指针
+- 返回值：无返回值
 
 当我们成功注册总线时，会在/sys/bus/目录下创建一个新目录，目录名为我们新注册的总线名。bus目录中包含了当前系统中已经注册了的所有总线，例如i2c，spi，platform等。我们看到每个总线目录都拥有两个子目录devices和drivers，
 分别记录着挂载在该总线的所有设备以及驱动。
@@ -165,7 +177,21 @@ Linux的设备模型
     :linenos: 
 
     int device_register(struct device *dev);
+
+- 参数dev：为struct device结构体类型指针
+- 返回值：成功返回0，失败则返回-EINVAL
+
+
+
+.. code-block:: c 
+    :caption: 内核注册/注销设备(内核源码/driver/base/core.c）
+    :linenos: 
+
     void device_unregister(struct device *dev);
+
+- 参数dev：为struct device结构体类型指针
+- 返回值：无返回值
+
 
 在讲解总线的时候，我们说过，当成功注册总线时，会在/sys/bus目录下创建对应总线的目录，该目录下有两个子目录，分别是drivers和devices，
 我们使用device_register注册的设备从属于某个总线时，该总线的devices目录下便会存在该设备文件。
@@ -216,7 +242,20 @@ Linux的设备模型
     :linenos: 
 
     int driver_register(struct device_driver *drv);
+
+- 参数dev：为struct device_driver结构体类型指针
+- 返回值：成功返回0，失败则返回-EINVAL
+
+
+.. code-block:: c 
+    :caption: device_driver结构体(内核源码/include/linux/device.h）
+    :linenos: 
+
     void driver_unregister(struct device_driver *drv);
+
+- 参数dev：为struct device_driver结构体类型指针
+- 返回值：无返回值
+
 
 到为止简单地介绍了总线、设备、驱动的数据结构以及注册/注销接口函数。下图是总线关联上设备与驱动之后的数据结构关系图
 
@@ -237,6 +276,8 @@ Linux的设备模型
 
 attribute属性文件
 ~~~~~~~~~~~~
+
+
 
 /sys目录有各种子目录以及文件，前面讲过当我们注册新的总线、设备或驱动时，内核会在对应的地方创建一个新的目录，目录名为各自结构体的name成员，
 每个子目录下的文件，都是内核导出到用户空间，用于控制我们的设备的。内核中以attribute结构体来描述/sys目录下的文件，如下所示：
@@ -293,17 +334,18 @@ bus_type、device、device_driver结构体中都包含了一种数据类型struc
     extern void device_remove_file(struct device *dev,
                     const struct device_attribute *attr);   
 
-DEVICE_ATTR宏定义用于定义一个device_attribute类型的变量，##表示将##左右两边的标签拼接在一起，因此，我们得到变量的名称应该是带有dev_attr_前缀的。
-该宏定义需要传入四个参数_name，_mode，_show，_store，分别代表了文件名，文件权限，show回调函数，store回调函数。show回调函数以及store回调函数分别对应着用户层的cat和echo命令，
-当我们使用cat命令，来获取/sys目录下某个文件时，最终会执行show回调函数；使用echo命令，则会执行store回调函数。
-参数_mode的值，可以使用S_IRUSR、S_IWUSR、S_IXUSR等宏定义，更多选项可以查看读写文件章节关于文件权限的内容。
+- DEVICE_ATTR宏定义用于定义一个device_attribute类型的变量，##表示将##左右两边的标签拼接在一起，因此，
+  我们得到变量的名称应该是带有dev_attr_前缀的。该宏定义需要传入四个参数_name，_mode，_show，_store，分别代表了文件名，
+  文件权限，show回调函数，store回调函数。show回调函数以及store回调函数分别对应着用户层的cat和echo命令，
+  当我们使用cat命令，来获取/sys目录下某个文件时，最终会执行show回调函数；使用echo命令，则会执行store回调函数。
+  参数_mode的值，可以使用S_IRUSR、S_IWUSR、S_IXUSR等宏定义，更多选项可以查看读写文件章节关于文件权限的内容。
 
-device_create_file函数用于创建文件，它有两个参数成员，第一个参数表示的是设备，前面讲解device结构体时，其成员中有个bus_type变量，
-用于指定设备挂载在某个总线上，并且会在总线的devices子目录创建一个属于该设备的目录，device参数可以理解为在哪个设备目录下，创建设备文件。
-第二个参数则是我们自己定义的device_attribute类型变量。
+- device_create_file函数用于创建文件，它有两个参数成员，第一个参数表示的是设备，前面讲解device结构体时，其成员中有个bus_type变量，
+  用于指定设备挂载在某个总线上，并且会在总线的devices子目录创建一个属于该设备的目录，device参数可以理解为在哪个设备目录下，创建设备文件。
+  第二个参数则是我们自己定义的device_attribute类型变量。
 
-device_remove_file函数用于删除文件，当我们的驱动注销时，对应目录以及文件都需要被移除。
-其参数和device_create_file函数的参数是一样，这里就不进行解释。
+- device_remove_file函数用于删除文件，当我们的驱动注销时，对应目录以及文件都需要被移除。
+  其参数和device_create_file函数的参数是一样。
 
 
 驱动属性文件
@@ -333,11 +375,13 @@ device_remove_file函数用于删除文件，当我们的驱动注销时，对�
     extern void driver_remove_file(struct device_driver *driver,
                     const struct driver_attribute *attr);
 
-DRIVER_ATTR_RW、DRIVER_ATTR_RO以及DRIVER_ATTR_WO宏定义用于定义一个driver_attribute类型的变量，带有driver_attr_的前缀，区别在于文件权限不同，RW后缀表示文件可读写，RO后缀表示文件仅可读，
-WO后缀表示文件仅可写。而且你会发现，DRIVER_ATTR类型的宏定义没有参数来设置show和store回调函数，那如何设置这两个参数呢？在写驱动代码时，只需要你提供xxx_store以及xxx_show这两个函数，
-并确保两个函数的xxx和DRIVER_ATTR类型的宏定义中名字是一致的即可。
+- DRIVER_ATTR_RW、DRIVER_ATTR_RO以及DRIVER_ATTR_WO宏定义用于定义一个driver_attribute类型的变量，带有driver_attr_的前缀，区别在于文件权限不同，
+  RW后缀表示文件可读写，RO后缀表示文件仅可读，WO后缀表示文件仅可写。而且你会发现，DRIVER_ATTR类型的宏定义没有参数来设置show和store回调函数，
+  那如何设置这两个参数呢？在写驱动代码时，只需要你提供xxx_store以及xxx_show这两个函数，
+  并确保两个函数的xxx和DRIVER_ATTR类型的宏定义中名字是一致的即可。
 
-driver_create_file和driver_remove_file函数用于创建和移除文件，使用driver_create_file函数，会在/sys/bus/<bus-name>/drivers/<driver-name>/目录下创建文件。
+- driver_create_file和driver_remove_file函数用于创建和移除文件，使用driver_create_file函数，
+  会在/sys/bus/<bus-name>/drivers/<driver-name>/目录下创建文件。
 
 
 总线属性文件
@@ -359,8 +403,9 @@ driver_create_file和driver_remove_file函数用于创建和移除文件，使�
                         struct bus_attribute *);
     extern void bus_remove_file(struct bus_type *, struct bus_attribute *);
 
-BUS_ATTR宏定义用于定义一个bus_attribute变量，使用bus_create_file函数，会在/sys/bus/<bus-name>下创建对应的文件。
-bus_remove_file则用于移除该文件。
+- BUS_ATTR宏定义用于定义一个bus_attribute变量，
+- 使用bus_create_file函数，会在/sys/bus/<bus-name>下创建对应的文件。
+- bus_remove_file则用于移除该文件。
 
 实验
 ~~~~~~~~
@@ -419,9 +464,10 @@ Makefile
     };
     EXPORT_SYMBOL(xbus);
 
-代码中定义了一种新的总线，名为xbus，总线结构体中最重要的一个成员，便是match回调函数，这个函数负责总线下的设备以及驱动匹配，
-没有这个函数，设备与驱动便不可以进行匹配。这里，我们使用字符串比较的方式，通过对比驱动以及设备的名字来确定是否匹配，如果相同，
-则说明匹配成功，返回1；反之，则返回0。
+- 第11-15行：定义了一个名为xbus的总线总线结构体中最重要的一个成员，便是match回调函数，这个函数负责总线下的设备以及驱动匹配，
+  没有这个函数，设备与驱动便不可以进行匹配。
+- 第1-9行：我们使用字符串比较的方式，通过对比驱动以及设备的名字来确定是否匹配，如果相同，则说明匹配成功，返回1；反之，则返回0。
+
 
 导出总线属性文件
 ^^^^^^^^^^^^^^^^^^^^^
@@ -440,8 +486,8 @@ Makefile
 
     BUS_ATTR(xbus_test, S_IRUSR, xbus_test_show, NULL);
 
-代码中，定义了一个bus_name变量，存放了该总线的名字，并且提供show回调函数，这样用户便可以通过cat命令，
-来查询总线的名称，并且设置该文件的文件权限为文件拥有者可读，组内成员以及其他成员不可操作。
+- 第1行：定义了一个bus_name变量，存放了该总线的名字，
+- 第3-8行：提供show回调函数，这样用户便可以通过cat命令，来查询总线的名称，并且设置该文件的文件权限为文件拥有者可读，组内成员以及其他成员不可操作。
 
 注册总线
 ^^^^^^^^^^^^^^^^^^^^^
@@ -473,7 +519,10 @@ Makefile
     MODULE_AUTHOR("embedfire");
     MODULE_LICENSE("GPL");
 
-这样的代码，就完成了总线的注册，当我们成功加载该内核模块时，内核便会出现一种新的总线xbus,如图所示：
+- 第1-9行：实现总线的装载函数，注册总线并将总线属性文件导出。
+- 第11-17行，实现总线的卸载函数，注销总线并将总线属性文件删除。
+
+当我们成功加载该内核模块时，内核便会出现一种新的总线xbus,如图所示：
 
 .. image:: ./media/xbus.jpg
    :align: center
@@ -509,8 +558,11 @@ Linux设备模型中，总线已经注册好了，还缺少设备和驱动。注
         .release = xdev_release,
     };
 
-代码中，定义了一个名为xdev的设备，其挂载在xbus上，这里写了一个release函数，防止卸载模块时会报错。相对于注册总线来说，
-还是相对比较简单。
+- 第1行：声明了外部的总线变量xbus。
+- 第3-6行：编写release函数，防止卸载模块时会报错。
+- 第8-12行：定义了一个名为xdev的设备，将其挂载在xbus上。
+
+相对于注册总线来说，还是相对比较简单。
 
 导出设备属性文件
 ^^^^^^^^^^^^^^^^^^^^^
@@ -536,10 +588,11 @@ Linux设备模型中，总线已经注册好了，还缺少设备和驱动。注
 
     DEVICE_ATTR(xdev_id, S_IRUSR|S_IWUSR, xdev_id_show, xdev_id_store);
 
+- 第1-13行：show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。store回调函数则是利用kstrtoul函数，该函数有三个参数，
+  其中第二个参数是采用几进制的方式，这里我们传入的是10，意味着buf中的内容将转换为10进制的数传递给id，实现了通过sysfs修改驱动的目的。
+- 第15行：使用DEVICE_ATTR宏定义定义了xdev_id，并且设置该文件的文件权限是文件拥有者可读可写，组内成员以及其他成员不可操作。
 
-使用DEVICE_ATTR宏定义定义了xdev_id，并且设置该文件的文件权限是文件拥有者可读可写，组内成员以及其他成员不可操作。
-show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。store回调函数则是利用kstrtoul函数，该函数有三个参数，其中第二个参数是采用几进制的方式，
-这里我们传入的是10，意味着buf中的内容将转换为10进制的数传递给id，实现了通过sysfs修改驱动的目的。
+
 
 注册设备
 ^^^^^^^^^^^^^^^^^^^^^
@@ -569,6 +622,9 @@ show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。stor
 
     MODULE_AUTHOR("embedfire");
     MODULE_LICENSE("GPL");
+
+- 第1-8行：实现模块的装载函数，注册设备并将设备属性文件导出。
+- 第10-16行：实现模块的卸载函数，注销设备并将设备属性文件删除。
 
 加载内核模块后，我们可以看到在/sys/bus/xbus/devices/中多了个设备xdev，它是个链接文件，最终指向了/sys/devices中的设备。
 
@@ -620,9 +676,12 @@ show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。stor
         .remove = xdrv_remove,
     };
 
-代码中定义了一个驱动结构体xdrv，名字需要和设备的名字相同，否则就不能成功匹配。该驱动挂载在已经注册好的总线xbus下。
-当驱动和设备匹配成功之后，便会执行驱动的probe函数，这里只是在终端上打印当前的文件以及函数名。
-xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能等，这里也只是打印出当前的文件名以及函数名。
+- 第1行：声明了外部的总线变量xbus。
+- 第3-7行：当驱动和设备匹配成功之后，便会执行驱动的probe函数，这里只是在终端上打印当前的文件以及函数名。
+- 第9-13行：xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能等，这里也只是打印出当前的文件名以及函数名。
+- 第15-20行：定义了一个驱动结构体xdrv，.name成员需要和设备的.name相同，否则就不能成功匹配。该驱动挂载在已经注册好的总线xbus下。
+  
+
 
 导出驱动属性文件
 ^^^^^^^^^^^^^^^^^^^^^
@@ -639,8 +698,10 @@ xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能
 
     DRIVER_ATTR_RO(drvname);
 
-在讲驱动属性文件时，我们讲到DRIVER_ATTR_RO定义驱动属性文件时，没有参数可以设置show和store回调函数，我们只要保证store和show函数的前缀与驱动属性文件一致即可。
-如代码所示，定义了一个drvname属性文件，show回调函数的函数名则为drvname_show，这样便可以完成两者之间的关联。
+- 在讲驱动属性文件时，我们讲到DRIVER_ATTR_RO定义驱动属性文件时，没有参数可以设置show和store回调函数，
+  我们只要保证store和show函数的前缀与驱动属性文件一致即可。如代码所示，定义了一个drvname属性文件，
+  show回调函数的函数名则为drvname_show，这样便可以完成两者之间的关联。
+
 
 注册驱动
 ^^^^^^^^^^^^^^^^^^^^^
@@ -669,6 +730,9 @@ xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能
 
     MODULE_AUTHOR("embedfire");
     MODULE_LICENSE("GPL");
+
+- 第1-8行：实现模块的装载函数，注册驱动并将驱动属性文件导出。
+- 第10-16行：实现模块的卸载函数，注销驱动并将驱动属性文件删除。
 
 成功加载驱动后，可以看到/sys/bus/xbus/driver多了个驱动xdev目录，如图所示：在该目录下存在一个我们自定义的属性文件，
 使用cat命令读该文件的内容，终端会打印字符串“xdrv”。
