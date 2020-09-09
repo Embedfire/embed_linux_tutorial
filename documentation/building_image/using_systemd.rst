@@ -415,7 +415,7 @@ unit--配置文件
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 上一章节和大家介绍了init进程的配置文件/etc/inittab，与此类似，systemd的unit也有一个配置文件，
-systemd的配置文件默认会存放于文件系统中的/etc/systemd/system目录下，我们输入“ls -al”命令查看一下该目录的内容。
+systemd的配置文件默认会存放于文件系统中的/etc/systemd/system或/usr/lib/systemd/system目录下，我们输入“ls -al”命令查看一下该目录的内容。
 
 .. image:: media/systemd_pre023.PNG
    :align: center
@@ -492,5 +492,174 @@ Systemd 统一管理所有 Unit 的启动日志。带来的好处就是，可以
     # 指定日志文件占据的最大空间
     $ sudo journalctl --vacuum-size=8M
 
-关于systemd的知识点还有很多，这里做简单介绍，主要是让大家了解systemd的基本用法，
+
+Systemd--实例分析
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+启动顺序及依赖
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+前面我们讲到了服务的配置文件，系统上电后，systemd便会读取每个服务地配置文件，然后根据配置文件执行每个系统服务，配置文件详细地描述了一个服务是如何启动的.
+我们以ssh服务为例，详细分析其配置文件。在/etc/systemd/system目录下找到sshd.service文件，它描述了如何启动一个ssh服务，使用vim.tiny打开该配置文件，如下图所示：
+
+.. image:: media/systemd_pre027.png
+   :align: center
+   :alt: 未找到图片27| 
+
+可以看到，配置文件一共有三个区块，分别是Unit、Service、Install，每个区块又包含了许多键值对。
+
+其中Unit区块中，Description描述了当前服务，Documentation字段给出了文档位置，紧接着的是比较重要的After字段，
+它指定了服务的启动顺序，但是不涉及依赖关系，与之对应的是Before字段。以本配置文件为例，After表示的是当前服务需要在
+network.target及auditd.service两个服务之后启动。而Wants和Requires字段只涉及依赖关系，他与启动顺序是无关的，默认为同时启动。
+如果想要设置服务之间的依赖关系，及使用Wants和Requires字段即可，Wants为“弱依赖”，Requires为“强依赖”。
+
+启动命令
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+EnvironmentFile字段指定了当前服务的环境参数文件，注意等号后面的“-”，它表示如果/etc/default/ssh文件不存在也不会抛出错误，ExecStart是配置文件最重要的字段，它定义了启动一个进程需要执行的命令。
+图中执行的命令是“/usr/sbin/sshd -D $SSHD_OPTS”，其中的变量$SSHD_OPTS就是来自于EnvironmentFile字段所指定的环境参数文件。
+ExecStartPre字段表示启动服务之前需要执行的命令。
+
+启动类型与行为
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Type字段指定了服务的启动类型，它的类型如下所示。
+
+ - simple（默认值）：ExecStart字段启动的进程为主进程
+
+ - forking：ExecStart字段将以fork()方式启动，此时父进程将会退出，子进程将成为主进程
+
+ - oneshot：类似于simple，但只执行一次，Systemd 会等它执行完，才启动其他服务
+
+ - dbus：类似于simple，但会等待 D-Bus 信号后启动
+
+ - notify：类似于simple，启动结束后会发出通知信号，然后 Systemd 再启动其他服务
+
+ - idle：类似于simple，但是要等到其他任务都执行完，才会启动该服务。一种使用场合是为让该服务的输出，不与其他服务的输出相混合
+
+
+2. KillMode字段定义了systemd如何停止ssh服务，本例设置为process，表示只停止主进程，但不停止sshd的子进程。
+
+3. Restart字段定义了sshd退出后，systemd的重启方式，Restart设为on-failure，表示任何意外的失败，就将重启sshd。如果sshd正常停止（如执行systemctl stop命令），它就不会重启。其可设置成下面值。
+
+ - no（默认值）：退出后不会重启
+
+ - on-success：只有正常退出时（退出状态码为0），才会重启
+
+ - on-failure：非正常退出时（退出状态码非0），包括被信号终止和超时，才会重启
+
+ - on-abnormal：只有被信号终止和超时，才会重启
+
+ - on-abort：只有在收到没有捕捉到的信号终止时，才会重启
+
+ - on-watchdog：超时退出，才会重启
+
+ - always：不管是什么退出原因，总是重启
+
+安装方式
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+WantedBy字段表示当前服务所在的Target,Target表示的是服务组，sshd所在的服务组为multi-user.target。当执行“systemctl enable sshd.service”命令的时候，sshd.service的一个符号链接，就会放在/etc/systemd/system目录下面的multi-user.target.wants子目录之中。
+
+如果我们修改了配置文件，就需要重新加载配置文件，然后重启该服务。
+
+.. code-block:: sh
+
+    # 重新加载配置文件
+    $ sudo systemctl daemon-reload
+
+    # 重启相关服务
+    $ sudo systemctl restart ssh
+
+
+actlogo.service
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+介绍完sshd服务，再看看我们的另外一个服务actlogo.service，该服务默认的自启动将本为/opt/scripts/boot/psplash_quit.sh。
+
+.. image:: media/systemd_pre028.png
+   :align: center
+   :alt: 未找到图片28| 
+
+自启动脚本最后会去启动我们的qt-app应用程序，这样便实现可开机自启动功能。
+
+.. image:: media/systemd_pre029.png
+   :align: center
+   :alt: 未找到图片29| 
+
+
+
+Systemd--创建自己的Systemd服务
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+我们经常有这样的需求，自己写好一个应用，想要它实现开机自启动的功能，那么我们可以通过创建一个Systemd服务服务来实现。下面我以创建一个简单的hello.service服务为例子，教大家如何创建自己的Systemd服务。
+
+编写脚本
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+cd进入/opt/scripts/boot目录下，使用vim编写一个hello.sh脚本。
+
+.. image:: media/systemd_pre030.png
+   :align: center
+   :alt: 未找到图片30| 
+
+该脚本实现的功能是每隔2秒就打印“Hello Embedfire”字符串到/tmp/hello.log文件中。编写好后记得赋予hello.sh可执行权限。
+
+.. code-block:: sh
+
+    sudo chmod 0755 hello.sh
+
+创建配置文件
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+在/etc/systemd/system/目录下创建一个hello.service配置文件，内容如下。
+
+.. image:: media/systemd_pre031.png
+   :align: center
+   :alt: 未找到图片31| 
+
+其中ExecStart字段定义了hello.service服务的自启动脚本为/opt/scripts/boot/hello.sh，当我们使能了hello.service开机自启功能，在开机后便会执行/opt/scripts/boot/hello.sh。
+Restart = always表示指进程或服务意外故障的时候可以自动重启的模式。Type = simple为默认的，可以不填。
+
+使能hello.service开机自启功能
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+输入命令“sudo systemctl list-unit-files --type=service | grep hello”查看hello.service是否被添加到了服务列表。
+
+.. code-block:: sh
+
+    sudo systemctl list-unit-files --type=service | grep hello
+
+
+.. image:: media/systemd_pre032.png
+   :align: center
+   :alt: 未找到图片32| 
+
+可以看到hello.service处于disable状态，如果你输入上面命令后没有任何显示，那你创建的服务就处理问题，需要仔细排查。
+我们输入下面命令使hello.service开机自启动。
+
+.. code-block:: sh
+
+    sudo systemctl enable hello
+    sudo systemctl start hello
+
+然后按下复位按键，重启系统，启动系统后输入“sudo systemctl status hello”命令即可看到hello.service处于运行状态。
+
+.. code-block:: sh
+
+    sudo systemctl status hello
+
+
+.. image:: media/systemd_pre033.png
+   :align: center
+   :alt: 未找到图片33| 
+
+输入下面命令可以看到日志文件已经有了打印信息。
+
+.. image:: media/systemd_pre034.png
+   :align: center
+   :alt: 未找到图片34| 
+
+关于systemd的知识点还有很多，这里做简单介绍，主要是让大家了解systemd的基本用法及启动服务的流程，
 感兴趣的可以在网上查阅相关文档。
