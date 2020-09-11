@@ -509,3 +509,42 @@ LED 等的状态实时显示在网页上。
     led off
     led on
 
+
+使用systemd-network设置静态ip
+--------------------
+
+在之前的章节中我们介绍过Systemd的启动方式和传统的启动方式的区别。Systemd已成为了大多数发行版的标准配置，
+使用了Systemd，就不需要再用init了。Systemd 取代了initd，成为系统的第一个进程（PID 等于 1），其他进程都是它的子进程。
+这里简单介绍如何使用systemd-network来设置静态ip
+
+步骤一
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+在板子上执行下面两条命令
+
+.. code:: shell
+
+    mv /etc/network/interfaces /etc/network/interfaces.save
+
+    systemctl enable systemd-networkd
+
+- 第一条指令将之前/etc/network/interfaces文件重命名为interfaces.save
+- 第二条指令使能systemd-networkd服务
+
+步骤二
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+在/etc/systemd/network目录下增加需要配置的网卡配置信息文件，文件以.network后缀作为结尾。如新建一个配置网卡eth1文件
+eth1.network，文件内容如下：
+
+.. code:: shell
+
+    [Match]
+    Name=eth1
+
+    [Network]
+    Address=192.168.1.20/24
+    Gateway=192.168.1.1
+    DNS=192.168.1.1	
+
+如需配置多个网卡信息，新建多个网卡的配置信息文件即可。
