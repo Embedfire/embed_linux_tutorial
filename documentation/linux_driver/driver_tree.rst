@@ -173,8 +173,8 @@ A-Z  大写字母
 ,    英文逗号
 .    英文句号
 \_   下划线
-+    加号
--    减号 
+\+    加号
+\-    减号 
 ==== ========
 
 另外，节点名应当使用大写或小写字母开头，并且能够描述设备类别。注意，根节点没有节点名，它直接使用“/”指代这是一个根节点。
@@ -521,14 +521,14 @@ name和device_type
     :linenos:
 
     cpus {
-    		#address-cells = <1>;
-    		#size-cells = <0>;
+        #address-cells = <1>;
+        #size-cells = <0>;
     
-    		cpu0: cpu@0 {
-    			compatible = "arm,cortex-a7";
-    			device_type = "cpu";
-    			reg = <0>;
-
+        cpu0: cpu@0 {
+        compatible = "arm,cortex-a7";
+        device_type = "cpu";
+        reg = <0>;
+    }
 
 
 这两个属性很少用（已经被废弃），不推荐使用。name用于指定节点名，在旧的设备树中它用于确定节点名，
@@ -552,7 +552,6 @@ name和device_type
 
 根据之前讲解，我们的系统默认使用的是“ebf-buster-linux/arch/arm/boot/dts/imx6ull-seeed-npi.dts”设备树，
 我们就在这个设备树里尝试增加一个设备节点，如下所示。
-
 
 
 .. code-block:: dts  
@@ -617,66 +616,48 @@ name和device_type
 
 
 
-
-
-
 如果在内核源码中执行了make distclean 则必须执行第一条命令，它用于生成默认配置文件，
-如果执行过一次就没有必要再次执行，当然再次执行也没有什么问题。第二条命令开始编译设备树，
-参数“-j4”指定多少个线程编译，根据自己电脑实际情况设置，越大编译越快，当然也可以不设置，设备树编译本来就很快。
+执行过一次即可，下次再编译设备树就可以不用执行了。第二条命令开始编译设备树，
+参数“-j4”指定多少个线程编译，根据自己电脑实际情况设置，越大编译越快，也可以不设置，设备树编译本来就很快。
 
 编译成功后生成的设备树文件（.dtb）位于源码目录下的“./arch/arm/boot/dts”文件名为“imx6ull-seeed-npi.dtb”
 
 下载设备树
 *************
 
-设备树“下载”有两种方法。第一种，像刷系统那样使用MFG工具将设备树烧写到开发板，这种方法比较繁琐但适用于SD卡、emmc、nand。
-第二种，将设备树使用nfs共享文件夹拷贝到开发板（其他工具也可以），挂载设备树和内核所在的磁盘，然后用新的设备树替换掉旧的。
-这种方法我们只测试了emmc，SD卡和nand暂不支持使用这种方式。
-
-使用MFG工具烧录
+设备树“下载”有两种方法。第一种，像刷系统那样使用MFG工具将设备树烧写到开发板。
+第二种，将设备树使用nfs共享文件夹拷贝到开发板（其他工具也可以），替换掉/boot/dtbs/4.19.71-imx-r1/目录下旧的设备树。
 
 
-将编译生成的设备树imx6ull-seeed-npi.dtb拷贝得到MFG工具的相应目录（如果文件已存在则替换掉旧的），
+1、使用MFG工具烧录，将编译生成的设备树imx6ull-seeed-npi.dtb拷贝得到MFG工具的相应目录（如果文件已存在则替换掉旧的），
 注意修改mfg工具的“cfg.ini”文件，具体烧录过程和使用MFG工具烧系统完全一致，这里不再介绍。
 
-在开发板中更新设备树文件
-
-
-如果使用emmc，推荐使用这种方式，将生成的设备树imx6ull-seeed-npi.dtb拷贝到开发板，
-然后执行如下命令挂载设备树所在磁盘。
-
-命令：
-
+2、在开发板中更新设备树文件，推荐使用这种方式简单方便，将生成的设备树imx6ull-seeed-npi.dtb拷贝到开发板替换原设备树文件即可，
+在主机下执行以下指令将我们新编译的设备树文件拷到共享文件夹下
 
 .. code-block:: sh  
 
-    mount /dev/mmcblk1p1 /mnt
+    cp arch/arm/boot/dts/imx6ull-seeed-npi.dtb /home/Embedfire/wokdfir
 
+在开发板上执行如下命令挂载nfs共享文件夹到开发板上，替换/boot/dtbs/4.19.71-imx-r1/文件夹下的设备树文件,并重启开发板使新
+设备树生效。
 
-以上命令将mmcblk1p1磁盘挂载到“/mnt”目录下，mmcblk1p1磁盘保存的是内核和设备树，
-挂载成功后打开“/mnt”目录。如下所示。
-
-
-
-
-.. image:: ./media/driver002.png
-   :align: center
-   :alt: 找不到图片02|
-
-将我们编译生成的设备树重命名为“imx6ull-14x14-evk.dtb”替换掉“/mnt”目录下设备树文件即可。
-替换之后记得取消挂载，或者重新打开、关闭 “/mnt”目录，这样更改之后的内容会立即写入磁盘，重新启动即可。
-取消挂载命令如下：
-
-命令
 
 .. code-block:: sh  
+    
+    #挂载nfs共享文件夹
+    sudo mount -f nfs 192.168.0.231:/home/Embedfire/wokdfir  /mnt
 
-    umount /dev/mmcblk1p1
+    #复制设备树到共享文件夹
+    cp /mnt/imx6ull-seeed-npi.dtb  /boot/dtbs/4.19.71-imx-r1/
 
-实验结果
+    #重启开发板
+    reboot
 
 
-设备树中的设备树节点在文件系统中有与之对应的文件，位于“/proc/device-tree”目录。进入“/proc/device-tree”目录如下所示。
+
+
+实验结果如下，设备树中的设备树节点在文件系统中有与之对应的文件，位于“/proc/device-tree”目录。进入“/proc/device-tree”目录如下所示。
 
 .. image:: ./media/driver003.png
    :align: center
@@ -730,7 +711,7 @@ name和device_type
 .. code-block:: C  
     :linenos:
 
-    struct device_node *of_find_node_by_path(const char *path)
+    struct device_node *of_find_node_by_path(const char *path);
 
 - 参数path：指定节点在设备树中的路径。
 - 返回值：如果查找失败则返回NULL，否则返回device_node类型的结构体指针，它保存着设备节点的信息。
@@ -784,25 +765,27 @@ device_node机构体如下所示。
 
 .. code-block:: C  
 
-    struct device_node *of_find_node_by_type(struct device_node *from,const char *type)
+    struct device_node *of_find_node_by_type(struct device_node *from,const char *type);
 
-- 类似of_find_node_by_name函数。
 - 参数from：指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
 - 参数type：要查找节点的类型，这个类型就是device_node-> type。
 - 返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
+- 类似of_find_node_by_name函数。
+
 
 根据节点类型和compatible属性寻找节点函数，
 函数原型：
 
 .. code-block:: C  
 
-    struct device_node *of_find_compatible_node(struct device_node *from,const char *type, const char *compatible)
+    struct device_node *of_find_compatible_node(struct device_node *from,const char *type, const char *compatible);
 
-- 相比of_find_node_by_name函数增加了一个compatible属性作为筛选条件。
 - 参数from：指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
 - 参数type：要查找节点的类型，这个类型就是device_node-> type。
 - 参数compatible：要查找节点的compatible属性。
 - 返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
+- 相比of_find_node_by_name函数增加了一个compatible属性作为筛选条件。
+
 
 根据匹配表寻找节点函数，
 函数原型：
@@ -810,9 +793,9 @@ device_node机构体如下所示。
 .. code-block:: C  
 
     static inline struct device_node *of_find_matching_node_and_match(
-    struct device_node *from,
-    const struct of_device_id *matches,
-    const struct of_device_id **match)
+                                                struct device_node *from,
+                                                const struct of_device_id *matches,
+                                                const struct of_device_id **match);
 
 - 参数from：指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
 - 参数matches：源匹配表，查找与该匹配表想匹配的设备节点。
@@ -844,7 +827,7 @@ device_node机构体如下所示。
 
 .. code-block:: c  
 
-    struct device_node *of_get_parent(const struct device_node *node)
+    struct device_node *of_get_parent(const struct device_node *node);
 
 - 参数node：指定谁（节点）要查找父节点。
 - 返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
@@ -856,7 +839,7 @@ device_node机构体如下所示。
 .. code-block:: c  
 
     struct device_node *of_get_next_child(const struct device_node *node,
-    struct device_node *prev)
+                                          struct device_node *prev);
 
 - 参数node：指定谁（节点）要查找它的子节点。
 - 参数prev：前一个子节点，寻找的是prev节点之后的节点。这是一个迭代寻找过程，例如寻找第二个子节点，这里就要填第一个子节点。参数为NULL 表示寻找第一个子节点。
@@ -876,7 +859,7 @@ device_node机构体如下所示。
 
 .. code-block:: c  
 
-    struct property *of_find_property(const struct device_node *np,const char *name,int *lenp)
+    struct property *of_find_property(const struct device_node *np,const char *name,int *lenp);
 
 - 参数np：指定要获取那个设备节点的属性信息。
 - 参数name：属性名。
@@ -915,21 +898,22 @@ device_node机构体如下所示。
 
     //8位整数读取函数
     int of_property_read_u8_array(const struct device_node *np, const char *propname,
-    u8 *out_values, size_t sz)
+                                    u8 *out_values, size_t sz);
 
     //16位整数读取函数
     int of_property_read_u16_array(const struct device_node *np, const char *propname,
-    u16 *out_values, size_t sz)
+                                    u16 *out_values, size_t sz);
 
     //32位整数读取函数
     int of_property_read_u32_array(const struct device_node *np, const char *propname,
-    u32 *out_values, size_t sz)
+                                    u32 *out_values, size_t sz);
 
     //64位整数读取函数
     int of_property_read_u64_array(const struct device_node *np, const char *propname,
-    u64 *out_values, size_t sz)
+                                    u64 *out_values, size_t sz);
 
 这几个函数结构和用法是相同的，以8位读取为例介绍如下：
+
 - 参数np：指定要读取那个设备节点结构体，也就是说读取那个设备节点的数据。
 - 参数propname：指定要获取设备节点的哪个属性。
 - 参数out_values：这是一个输出参数，是函数的“返回值”，保存读取得到的数据。
@@ -944,20 +928,24 @@ device_node机构体如下所示。
 .. code-block:: C  
 
     //8位整数读取函数
-    int of_property_read_u8 (const struct device_node *np, const char *propname,
-    u8 *out_values)
+    int of_property_read_u8 (const struct device_node *np, 
+                            const char *propname,
+                            u8 *out_values);
 
     //16位整数读取函数
-    int of_property_read_u16 (const struct device_node *np, const char *propname,
-    u16 *out_values)
+    int of_property_read_u16 (const struct device_node *np, 
+                            const char *propname,
+                            u16 *out_values);
 
     //32位整数读取函数
-    int of_property_read_u32 (const struct device_node *np, const char *propname,
-    u32 *out_values)
+    int of_property_read_u32 (const struct device_node *np, 
+                                const char *propname,
+                                u32 *out_values);
 
     //64位整数读取函数
-    int of_property_read_u64 (const struct device_node *np, const char *propname,
-    u64 *out_values)
+    int of_property_read_u64 (const struct device_node *np, 
+                            const char *propname,
+                            u64 *out_values);
 
 
 读取字符串属性函数
@@ -967,11 +955,13 @@ device_node机构体如下所示。
 
 .. code-block:: C  
 
-    int of_property_read_string(const struct device_node *np,const char *propname,
-    const char **out_string)
+    int of_property_read_string(const struct device_node *np,
+                                const char *propname,
+                                const char **out_string);
 
-    int of_property_read_string_index(const struct device_node *np,const char *propname,
-    int index,const char **out_string)
+    int of_property_read_string_index(const struct device_node *np,
+                                      const char *propname,
+                                      int index,const char **out_string);
 
 第一个函数，介绍如下：
 
@@ -994,7 +984,7 @@ device_node机构体如下所示。
 .. code-block:: C  
 
     static inline bool of_property_read_bool(const struct device_node *np,
-    const char *propname)：
+                                            const char *propname);
 
 - 参数np：指定要获取那个设备节点的属性信息。
 - 参数propname：属性名。
@@ -1009,7 +999,7 @@ device_node机构体如下所示。
 
 .. code-block:: C  
 
-    void __iomem *of_iomap(struct device_node *np, int index)
+    void __iomem *of_iomap(struct device_node *np, int index);
 
 - 参数np：指定要获取那个设备节点的属性信息。
 - 参数index：通常情况下reg属性包含多段，index 用于指定映射那一段，标号从0开始。；
@@ -1020,7 +1010,7 @@ device_node机构体如下所示。
 
 .. code-block:: C  
 
-    int of_address_to_resource(struct device_node *dev, int index, struct resource *r)
+    int of_address_to_resource(struct device_node *dev, int index, struct resource *r);
 
 - 参数np：指定要获取那个设备节点的属性信息。
 - 参数index：通常情况下reg属性包含多段，index 用于指定映射那一段，标号从0开始。
