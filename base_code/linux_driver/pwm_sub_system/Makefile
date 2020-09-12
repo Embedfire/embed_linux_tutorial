@@ -1,7 +1,8 @@
-#KERNEL_DIR = /home/new_kernel2/ebf-buster-linux
-KERNEL_DIR = /home/gulun/fire/kernel/ebf-buster-linux
+KERNEL_DIR=../ebf-buster-linux/build_image/build
 
-obj-m := pwm_sub_system.o
+ARCH=arm
+CROSS_COMPILE=arm-linux-gnueabihf-
+export  ARCH  CROSS_COMPILE
 
 all:
 	$(MAKE) EXTRA_CFLAGS=-fno-pic -C $(KERNEL_DIR) M=$(CURDIR) modules

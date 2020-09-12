@@ -1,5 +1,8 @@
-#KERNEL_DIR = /home/new_kernel2/ebf-buster-linux
-KERNEL_DIR = /home/gulun/fire/kernel/ebf-buster-linux
+KERNEL_DIR=../ebf-buster-linux/build_image/build
+
+ARCH=arm
+CROSS_COMPILE=arm-linux-gnueabihf-
+export  ARCH  CROSS_COMPILE
 
 obj-m := ecspi_oled.o
 

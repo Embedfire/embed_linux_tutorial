@@ -1,4 +1,8 @@
-KERNEL_DIR = /home/fire2/ebf-buster-linux
+KERNEL_DIR=../..//ebf-buster-linux/build_image/build
+
+ARCH=arm
+CROSS_COMPILE=arm-linux-gnueabihf-
+export  ARCH  CROSS_COMPILE
 
 obj-m := of_function_test.o
 
