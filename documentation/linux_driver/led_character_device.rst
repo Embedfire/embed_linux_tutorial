@@ -39,36 +39,27 @@ cdev结构体和file_operations结构体非常重要，希望大家着重掌握�
 这在STM32的开发中很常见，也相对比较简单。
 
 2）有操作系统时的设备驱动
-反观有操作系统时，首先，驱动的硬件操作工作的的部分仍然是必不可少的，其次，我们还需要将设备驱动融入内核。
+反观有操作系统时，首先，驱动硬件工作的的部分仍然是必不可少的，其次，我们还需要将设备驱动融入内核。
 为了实现这种融合，必须在所有的设备驱动中设计面向操作系统内核的接口，这样的接口由操作系统规定，对一类设备而言结构一致，独立于具体的设备。
 
 由此可见，当系统中存在操作系统的时候，设备驱动变成了连接硬件和内核的桥梁。操作系统的存在势必要求设备驱动附加更多的代码和功能，
 把单一的驱动变成了操作系统内与硬件交互的模块，它对外呈现为操作系统的API。
 
-首先，一个复杂的软件系统需要处理多个并发的任务，没有操作系统，想完成多任务并发是很困难的。
+操作系统的存在究竟带来了什么好处呢？
 
-其次，操作系统给我们提供内存管理机制。一个典型的例子是，对于多数含MMU的处理器而言，Windows、Linux 等操作系统可以让每个进程都独立地访问 4GB的内存空间。
-
-
-操作系统的存在给设备驱动究竟带来了什么好处呢？
-
-简而言之，操作系统通过给设备驱动制造麻烦来达到给上层应用提供便利的目的。如果设备驱动都按照操作系统给出的独立于设备的接口而设计，
-应用程序将可使用统一的系统调用接口来访问各种设备。对于类UNIX的VxWorks、Linux等操作系统而言，
-应用程序通过write()、read()等函数读写文件就可以访问各种字符设备和块设备，而不用管设备的具体类型和工作方式，是非常方便的。
-
-不管有无操作系统，不管是SerialSend，或者write，访问设备都需要对寄存器进行读写操作，比如串口，在dev目录下有个ttys0结点，
-我们可以通过ioctl函数对其进行读写操作，当然，write、read更为直接咯。而上层的应用可以对这些函数进行封装，定义不同的接口，从而实现更多的功能
-
+首先操作系统完成了多任务并发；
+其次操作系统为我们提供了内存管理机制，32位Linux操作系统可以让每个进程都能独立访问4GB的内存空间；
+对于应用程序来说，应用程序将可使用统一的系统调用接口来访问各种设备，
+通过write()、read()等函数读写文件就可以访问各种字符设备和块设备，而不用管设备的具体类型和工作方式。
 
 内存管理单元MMU
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+在linux环境直接访问物理内存是很危险的，如果用户不小心修改了内存中的数据，很有可能造成错误甚至系统崩溃。
+为了解决这些问题内核便引入了MMU，
 
 MMU的功能
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-前面我们已经学习了通过汇编或者C的方式直接操作寄存器，从而达到控制LED的目的，那本小结与之前的有什么区别么？
-当然有很大的区别，在linux环境直接访问物理内存是很危险的，如果用户不小心修改了内存中的数据，很有可能造成错误甚至系统崩溃。
-为了解决这些问题内核便引入了MMU，MMU为编程提供了方便统一的内存空间抽象，其实我们的程序中所写的变量地址是虚拟内存当中的地址，
+MMU为编程提供了方便统一的内存空间抽象，其实我们的程序中所写的变量地址是虚拟内存当中的地址，
 倘若处理器想要访问这个地址的时候，MMU便会将此虚拟地址（Virtual Address）翻译成实际的物理地址（Physical Address），
 之后处理器才去操作实际的物理地址。MMU是一个实际的硬件，并不是一个软件程序。他的主要作用是将虚拟地址翻译成真实的物理地址同时管理和保护内存，
 不同的进程有各自的虚拟地址空间，某个进程中的程序不能修改另外一个进程所使用的物理地址，以此使得进程之间互不干扰，相互隔离。
@@ -76,13 +67,16 @@ MMU的功能
 比如uCOS、FreeRTOS、uCLinux，以前想CPU也运行linux系统必须要该CPU具备MMU，但现在Linux也可以在不带MMU的CPU中运行了。
 总体而言MMU具有如下功能：
 
-- 保护内存。MMU给一些指定的内存块设置了读、写以及可执行的权限，这些权限存储在页表当中，MMU会检查CPU当前所处的是特权模式还是用户模式，如果和操作系统所设置的权限匹配则可以访问，如果CPU要访问一段虚拟地址，则将虚拟地址转换成物理地址，否则将产生异常，防止内存被恶意地修改。
+- 保护内存。MMU给一些指定的内存块设置了读、写以及可执行的权限，这些权限存储在页表当中，MMU会检查CPU当前所处的是特权模式还是用户模式，
+  如果和操作系统所设置的权限匹配则可以访问，如果CPU要访问一段虚拟地址，则将虚拟地址转换成物理地址，否则将产生异常，防止内存被恶意地修改。
 
-- 提供方便统一的内存空间抽象，实现虚拟地址到物理地址的转换。CPU可以运行在虚拟的内存当中，虚拟内存一般要比实际的物理内存大很多，使得CPU可以运行比较大的应用程序。
+- 提供方便统一的内存空间抽象，实现虚拟地址到物理地址的转换。CPU可以运行在虚拟的内存当中，
+  虚拟内存一般要比实际的物理内存大很多，使得CPU可以运行比较大的应用程序。
 
-那么，小朋友！你是否有很多问号？到底什么是虚拟地址什么是物理地址？当没有启用MMU的时候，
-CPU在读取指令或者访问内存时便会将地址直接输出到芯片的引脚上，此地址直接被内存接收，
-这段地址称为物理地址，如下图所示。
+到底什么是虚拟地址什么是物理地址？
+
+当没有启用MMU的时候，CPU在读取指令或者访问内存时便会将地址直接输出到芯片的引脚上，此地址直接被内存接收，这段地址称为物理地址，
+如下图所示。
 
 .. image:: ./media/MMU02.PNG
    :align: center
@@ -100,46 +94,51 @@ CPU在读取指令或者访问内存时便会将地址直接输出到芯片的�
    :alt: 找不到图片03|
 
 对于I.MX 6ULL 这种32位处理器而言，其虚拟地址空间共有4G(2^32),一旦CPU开启了MMU，
-任何时候CPU发出的地址都是虚拟地址，为了实现虚拟地址到物理地址之间的映射，MMU内部有一个专门存放页表的页表地址寄存器，
-该寄存器存放着页表的具体位置，用ioremap映射一段地址意味着使用户空间的一段地址关联到设备内存上，
+任何时候CPU发出的地址都是虚拟地址，为了实现虚拟地址到物理地址之间的映射，
+MMU内部有一个专门存放页表的页表地址寄存器，该寄存器存放着页表的具体位置，
+用ioremap映射一段地址意味着使用户空间的一段地址关联到设备内存上，
 这使得只要程序在被分配的虚拟地址范围内进行读写操作，实际上就是对设备（寄存器）的访问。 
+
+TLB的作用
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+讲到MMU我又忍不住和大家说下TLB（Translation Lookaside Buffer）的作用。
+由上面的地址转换过程可知，当只有一级页表进行地址转换的时候，CPU每次读写数据都需要访问两次内存，
+第一次是访问内存中的页表，第二次是根据页表找到真正需要读写数据的内存地址；
+如果使用两级了表，那么CPU每次读写数据都需要访问3次内存，这样岂不是显得非常繁琐且耗费CPU的性能，
+
+那有什么更好的解决办法呢？答案是肯定的，为了解决这个问题，TLB便孕育而生。
+在CPU传出一个虚拟地址时，MMU最先访问TLB，假设TLB中包含可以直接转换此虚拟地址的地址描述符，
+则会直接使用这个地址描述符检查权限和地址转换，如果TLB中没有这个地址描述符，
+MMU才会去访问页表并找到地址描述符之后进行权限检查和地址转换，
+然后再将这个描述符填入到TLB中以便下次使用，实际上TLB并不是很大，
+那TLB被填满了怎么办呢？如果TLB被填满，则会使用round-robin算法找到一个条目并覆盖此条目。
+
 由于MMU非常复杂，在此我们不做过于深入的了解，大家只要大概知道它的作用即可，
 感兴趣的同学可以到网上查阅相关资料，对于初学者，还是建议先掌握全局，然后再深挖其中重要的细节，
 千万不能在汪洋大海中迷失了方向。本小结我们主要用到的是MMU的地址转换功能，在linux环境中，
 我们开启了MMU之后想要读写具体的寄存器（物理地址），就必须用到物理地址到虚拟地址的转换函数。
 
-TLB的作用
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-讲到MMU我又忍不住和大家说下TLB（Translation Lookaside Buffer）的作用，希望大家能够多学点知识，
-技多不压身。由上面的地址转换过程可知，当只有一级页表进行地址转换的时候，CPU每次读写数据都需要访问两次内存，
-第一次是访问内存中的页表，第二次是根据页表找到真正需要读写数据的内存地址；如果使用两级了表，
-那么CPU每次读写数据都需要访问3此内存，这样岂不是显得非常繁琐且耗费CPU的性能，
-那有什么更好的解决办法呢？答案是肯定的，为了解决这个问题，TLB便孕育而生。在CPU传出一个虚拟地址时，
-MMU最先访问TLB，假设TLB中包含可以直接转换此虚拟地址的地址描述符，则会直接使用这个地址描述符检查权限和地址转换，
-如果TLB中没有这个地址描述符，MMU才会去访问页表并找到地址描述符之后进行权限检查和地址转换，
-然后再将这个描述符填入到TLB中以便下次使用，实际上TLB并不是很大，
-那TLB被填满了怎么办呢？如果TLB被填满，则会使用round-robin算法找到一个条目并覆盖此条目。
-
-
 地址转换函数
-~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+上面提到了物理地址到虚拟地址的转换函数。包括ioremap()地址映射和取消地址映射iounmap()函数。
 
 ioremap函数
-^^^^^^^^^^^
-ioremap函数在arch/arm/include/asm/io.h（linux4.19）中定义如下：
-
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ioremap(),函数在ebf-buster-linux/arch/arc/mm/ioremap.c中定义：
 
 .. code-block:: c 
+    :caption: 地址映射函数 ebf-buster-linux/arch/arc/mm/ioremap.c
     :linenos:
 
-    void __iomem *ioremap(resource_size_t res_cookie, size_t size);
+    void __iomem *ioremap(phys_addr_t paddr, unsigned long size)
     #define ioremap ioremap
 
-ioremap函数有两个参数：res_cookie、size 和 一个__iomem类型指针的返回值。
+ioremap函数有两个参数：paddr、size 和 一个__iomem类型指针的返回值。
 
-- res_cookie:被映射的IO起始地址（物理地址）；
+- paddr:被映射的IO起始地址（物理地址）；
 - size:需要映射的空间大小，以字节为单位；
-- （__iomem *）：一个指向__iomem类型的指针，当映射成功后便返回一段虚拟地址空间的起始地址，我们可以通过访问这段虚拟地址来实现实际物理地址的读写操作。
+- （__iomem \*）：一个指向__iomem类型的指针，当映射成功后便返回一段虚拟地址空间的起始地址，
+  我们可以通过访问这段虚拟地址来实现实际物理地址的读写操作。
 
 ioremap函数是依靠__ioremap函数来实现的，只是在__ioremap当中其最后一个要映射的I/O空间和权限有关的标志flag为0。
 在使用ioremap函数将物理地址转换成虚拟地址之后，理论上我们便可以直接读写I/O内存，但是为了符合驱动的跨平台以及可移植性，
@@ -160,12 +159,12 @@ ioremap函数是依靠__ioremap函数来实现的，只是在__ioremap当中其�
 
 
 对于读I/O而言，他们都只有一个__iomem类型指针的参数，指向被映射后的地址，返回值为读取到的数据据；
-对于写I/O而言他们都有两个参数，第一个为要写入的数据，第二个参数为
-要写入的地址，返回值为空。与这些函数相似的还有writeb、writew、writel、readb、readw、readl等，
+对于写I/O而言他们都有两个参数，第一个为要写入的数据，第二个参数为要写入的地址，返回值为空。
+与这些函数相似的还有writeb、writew、writel、readb、readw、readl等，
 在ARM架构下，writex（readx）函数与iowritex（ioreadx）有一些区别，
 writex（readx）不进行端序的检查，而iowritex（ioreadx）会进行端序的检查。
 
-说了社么多，大家可能还是不太理解，那么我们来举个栗子，比如我们需要操作RGB灯中的蓝色led中的数据寄存器，
+说了这么多，大家可能还是不太理解，那么我们来举个栗子，比如我们需要操作RGB灯中的蓝色led中的数据寄存器，
 在51或者STM32当中我们是直接看手册查找对应的寄存器，然后往寄存器相应的位写入数据0或1便可以实现LED的亮灭（假设已配置好了输出模式以及上下拉等）。
 前面我们在不带linux的环境下也是用的类似的方法，但是当我们在linux环境且开启了MMU之后，
 我们就要将LED灯引脚对应的数据寄存器（物理地址）映射到程序的虚拟地址空间当中，
@@ -185,19 +184,19 @@ writex（readx）不进行端序的检查，而iowritex（ioreadx）会进行端
     iowrite32(val, va_dr);		//把修改后的值重新写入到被映射后的虚拟地址当中，实际是往寄存器中写入了数据
 
 iounmap函数
-^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 iounmap函数定义如下：
 
-
 .. code-block:: c 
+    :caption: 取消地址映射函数 ebf-buster-linux/arch/arc/mm/ioremap.c
     :linenos:
 
-    void iounmap(volatile void __iomem *iomem_cookie);
+    void iounmap(void *addr)
     #define iounmap iounmap
 
-iounmap函数只有一个参数iomem_cookie，用于取消ioremap所映射的地址映射。
+iounmap函数只有一个参数addr，用于取消ioremap所映射的地址映射。
 
-- iomem_cookie:需要取消ioremap映射之后的起始地址（虚拟地址）。
+- addr:需要取消ioremap映射之后的起始地址（虚拟地址）。
 
 例如我们要取消一段被ioremap映射后的地址可以用下面的写法。
 
@@ -208,10 +207,15 @@ iounmap函数只有一个参数iomem_cookie，用于取消ioremap所映射的地
 
 
 编写驱动程序
-~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+从第一章内核模块再到第二章字符设备驱动，从理论到实验，总算是一切准备就绪，让我们开始着手写LED的驱动代码吧。
+首先我们需要一个LED字符设备结构体，它应该包含我们要操作的寄存器地址。
+其次是模块的加载卸载函数，加载函数需要注册设备，卸载函数则需要释放申请的资源。
+然后就是file_operations结构体以及open，write，read相关接口的实现。
+LED驱动代码位于../base_code/linux_driver/EmbedCharDev/led_cdev/led_cdev.c。
 
 编写LED字符设备结构体且初始化
-^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
     :caption: led字符设备结构体
@@ -251,9 +255,8 @@ iounmap函数只有一个参数iomem_cookie，用于取消ioremap所映射的地
 因为我们开发板上面共有3个RGB灯，所以代码中DEV_CNT为3。在初始化结构体的时候我们以“.”+“变量名字”
 的形式来访问且初始化结构体变量的，初始化结构体变量的时候要以“，”隔开，使用这种方式简单明了，方便管理数据结构中的成员。
 
-
-实现内核RGB模块的加载和卸载函数
-^^^^^^^^^^^
+内核RGB模块的加载和卸载函数
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
     :caption: 内核RGB模块的加载和卸载函数
@@ -266,18 +269,18 @@ iounmap函数只有一个参数iomem_cookie，用于取消ioremap所映射的地
     	
     	printk("led chrdev init\n");
     	
-    	alloc_chrdev_region(&devno, 0, DEV_CNT, DEV_NAME);	//向动态申请一个设备号
+    	alloc_chrdev_region(&devno, 0, DEV_CNT, DEV_NAME);//向动态申请一个设备号
     	
-    	led_chrdev_class = class_create(THIS_MODULE, "led_chrdev");	//创建设备类
+    	led_chrdev_class = class_create(THIS_MODULE, "led_chrdev");//创建设备类
     	
     	for (; i < DEV_CNT; i++) {
-    		cdev_init(&led_cdev[i].dev, &led_chrdev_fops);	//绑定led_cdev与led_chrdev_fops
+    		cdev_init(&led_cdev[i].dev, &led_chrdev_fops);//绑定led_cdev与led_chrdev_fops
     		led_cdev[i].dev.owner = THIS_MODULE;
     	
-    		cur_dev = MKDEV(MAJOR(devno), MINOR(devno) + i);	//注册设备
+    		cur_dev = MKDEV(MAJOR(devno), MINOR(devno) + i);//注册设备
     		cdev_add(&led_cdev[i].dev, cur_dev, 1);
     		device_create(led_chrdev_class, NULL, cur_dev, NULL,
-    			      DEV_NAME "%d", i);	//创建设备
+    			      DEV_NAME "%d", i);//创建设备
     	}
     	
     	return 0;
@@ -320,7 +323,7 @@ iounmap函数只有一个参数iomem_cookie，用于取消ioremap所映射的地
 从上面代代码中我们可以看出这三个LED都使用的同一个主设备号，只是他们的次设备号有所区别而已。
 
 file_operations结构体成员函数的实现
-^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
     :caption: file_operations中open函数的实现
@@ -373,22 +376,15 @@ file_operations中open函数的实现函数很重要，下面我们来详细分�
    :align: center
    :alt: 找不到图片03|
 
-在Linux驱动编程当中我们会经常和container_of()这个函数打交道，所以特意拿出来和大家分享一下，其实这个函数功能不多，但是如果单靠自己去阅读内核源代码分析，那
-可能非常难以理解，编写内核源代码的大牛随便两行代码都会让我们看的云深不知处，分析内核源代码需要我们有很好的知识积累以及技术沉淀。
+在Linux驱动编程当中我们会经常和container_of()这个函数打交道，所以特意拿出来和大家分享一下，其实这个函数功能不多，
+但是如果单靠自己去阅读内核源代码分析，那可能非常难以理解，编写内核源代码的大牛随便两行代码都会让我们看的云深不知处，
+分析内核源代码需要我们有很好的知识积累以及技术沉淀。
 下面我简单跟大家讲解一下container_of()函数的大致工作内容，其宏定义实现如下所示：
 
 .. code-block:: c 
-    :caption: container_of()函数
+    :caption: container_of()函数 （位于../ebf-buster-linux/driver/gpu/drm/mkregtable.c）
     :linenos:
 
-    /**
-     * container_of - cast a member of a structure out to the containing structure
-     *
-     * @ptr:        the pointer to the member.
-     * @type:       the type of the container struct this is embedded in.
-     * @member:     the name of the member within the struct.
-     *
-     */
     #define container_of(ptr, type, member) ({                      \
             const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
             (type *)( (char *)__mptr - offsetof(type,member) );})
@@ -398,7 +394,7 @@ file_operations中open函数的实现函数很重要，下面我们来详细分�
 原理其实很简单，就是通过已知类型type的成员member的地址ptr，计算出结构体type的首地址。
 type的首地址 = ptr - size ，需要注意的是它们的大小都是以字节为单位计算的，container_of()函数的如下：
 
-- 判断ptr 与 member 是否为同意类型；
+- 判断ptr 与 member 是否为同一类型；
 - 计算size大小，结构体的起始地址 = (type *)((char *)ptr - size)  (注：强转为该结构体指针)。
 
 通过此函数我们便可以轻松地获取led_chrdev结构体的首地址了。
@@ -411,9 +407,11 @@ type的首地址 = ptr - size ，需要注意的是它们的大小都是以字�
 
 3、通过ioremap()函数实现地址的映射:
 
-其实ioremap()函数我们之前分析过了，在led_chrdev_open()函数的作用都是一样的，只是分别对LED灯所用到的CCM_CCGRx时钟控制寄存器、端口复用寄存器、电气属性配置寄存器、
-数据寄存器以及输入输出方向寄存器都做了地址映射，这样我们便可以通过操作程序中的虚拟地址来间接的控制物理寄存器，我们在驱动程序描述寄存器不利于驱动模块的灵活使用，
-后几个章节我们会带领大家通过设备树（设备树插件）的方式去描述寄存器及其相关属性，在此先埋下伏笔，循序渐进，顺腾摸瓜，使大家能够真正理解并掌握linux驱动的精髓。
+其实ioremap()函数我们之前分析过了，在led_chrdev_open()函数的作用都是一样的，
+只是分别对LED灯所用到的CCM_CCGRx时钟控制寄存器、端口复用寄存器、电气属性配置寄存器、数据寄存器以及输入输出方向寄存器都做了地址映射，
+这样我们便可以通过操作程序中的虚拟地址来间接的控制物理寄存器，我们在驱动程序描述寄存器不利于驱动模块的灵活使用，
+后几个章节我们会带领大家通过设备树（设备树插件）的方式去描述寄存器及其相关属性，
+在此先埋下伏笔，循序渐进，顺腾摸瓜，使大家能够真正理解并掌握linux驱动的精髓。
 
 4、通过ioread32()和iowrite32()等函数操作寄存器:
 
@@ -421,7 +419,6 @@ type的首地址 = ptr - size ，需要注意的是它们的大小都是以字�
 一般我们访问某个地址时都是先将该地址的数据读取到一个变量中然后修改该变量，最后再将该变量写入到原来的地址当中。
 注意我们在操作这段被映射后的地址空间时应该使用linux提供的I/O访问函数（如：iowrite8()、iowrite16()、iowrite32()、
 ioread8()、ioread16()、ioread32()等），这里再强调一遍，即使理论上可以直接操作这段虚拟地址了但是Linux并不建议这么做。
-
 
 下面我们接着分析一下file_operations中write函数的实现：
 
@@ -451,28 +448,11 @@ ioread8()、ioread16()、ioread32()等），这里再强调一遍，即使理论
 1、kstrtoul_from_user()函数:
 
 再分析该函数之前，我们先分析一下内核中提供的kstrtoul()函数，理解kstrtoul()函数之后再分析kstrtoul_from_user()就信手拈来了。
-kstrtoul()在linux4.19的include/linux/kernel.h中有如下定义。
 
 .. code-block:: c 
-    :caption: kstrtoul()函数解析
+    :caption: kstrtoul()函数解析 （位于../ebf-buster-linux/include/linux/kernel.h）
     :linenos:
 
-    /**
-     * kstrtoul - convert a string to an unsigned long
-     * @s: The start of the string. The string must be null-terminated, and may also
-     *  include a single newline before its terminating null. The first character
-     *  may also be a plus sign, but not a minus sign.
-     * @base: The number base to use. The maximum supported base is 16. If base is
-     *  given as 0, then the base of the string is automatically detected with the
-     *  conventional semantics - If it begins with 0x the number will be parsed as a
-     *  hexadecimal (case insensitive), if it otherwise begins with 0, it will be
-     *  parsed as an octal number. Otherwise it will be parsed as a decimal.
-     * @res: Where to write the result of the conversion on success.
-     *
-     * Returns 0 on success, -ERANGE on overflow and -EINVAL on parsing error.
-     * Used as a replacement for the obsolete simple_strtoull. Return code must
-     * be checked.
-    */
     static inline int __must_check kstrtoul(const char *s, unsigned int base, unsigned long *res)
     {
     	/*
@@ -493,10 +473,10 @@ kstrtoul()在linux4.19的include/linux/kernel.h中有如下定义。
 - res：一个指向被转换成功后的结果的地址。
 
 该函数转换成功后返回0，溢出将返回-ERANGE，解析出错返回-EINVAL。理解完kstrtoul()函数后想必大家已经知道kstrtoul_from_user()函数的大致用法了，
-kstrtoul_from_user()函数在include/linux/kernel.h中定义如下：
+kstrtoul_from_user()函数定义如下：
 
 .. code-block:: c 
-    :caption: kstrtoul_from_user()函数
+    :caption: kstrtoul_from_user()函数 （位于../ebf-buster-linux/include/linux/kernel.h）
     :linenos:
 
     int __must_check kstrtoul_from_user(const char __user *s, size_t count, unsigned int base, unsigned long *res);
@@ -529,16 +509,15 @@ kstrtoul_from_user()函数在include/linux/kernel.h中定义如下：
 
 当最后一个打开设备的用户进程执行close()系统调用的时候，内核将调用驱动程序release()函数，
 release函数的主要任务是清理未结束的输入输出操作，释放资源，用户自定义排他标志的复位等。
-前面我们用ioremap()将物理地址空间映射到了虚拟地址空间，当我们使用完该虚拟地址空间时应该记得使用iounmap()函数
-将它释放掉。
+前面我们用ioremap()将物理地址空间映射到了虚拟地址空间，当我们使用完该虚拟地址空间时应该记得使用iounmap()函数将它释放掉。
 
 LED驱动完整代码
-^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 到这里我们的代码已经分析完成了，下面时本驱动的完整代码（由于前面已经带领大家详细的分析了一遍，所以我把完整代码的注释给去掉了，希望你能够会想起每个函数的具体作用）：
 
 .. code-block:: c 
-    :caption: 完整代码
+    :caption: 完整代码 （位于../base_code/linux_driver/EmbedCharDev/led_cdev/led_cdev.c）
     :linenos:
 
     #include <linux/init.h>
@@ -722,73 +701,73 @@ LED驱动完整代码
 
 
 LED驱动Makefile
-^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: makefile
     :caption: LED驱动Makefile
     :linenos:
 
-    obj-m := led_cdev.o
-    
-    NATIVE ?= true
-    
-    ifeq ($(NATIVE), false)
-    	KERNEL_DIR = /home/book/embedfire/imx6ull/linuxcore/ebf-buster-linux-master
-    else
-    	KERNEL_DIR = /lib/modules/$(shell uname -r)/build
-    endif
-    
-    all:modules
-    modules clean:
-    	$(MAKE) -C $(KERNEL_DIR) M=$(shell pwd) $@
+	KERNEL_DIR=../ebf-buster-linux/build_image/build
+	ARCH=arm
+	CROSS_COMPILE=arm-linux-gnueabihf-
+	export  ARCH  CROSS_COMPILE
 
+	obj-m := led_cdev.o
+	out =  led_cdev_test
+
+	all:
+		$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) modules
+		$(CROSS_COMPILE)gcc -o $(out) led_test.c
+
+	.PHONE:clean copy
+
+	clean:
+		$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) clean	
+		rm $(out)
+
+上面MakeFile编译了LED驱动和LED驱动测试程序。
 
 下载验证
-~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+执行make编译,会生成ked_cdev.ko和led_cdev_test。
 
-驱动程序和应用程序编译命令如下所示：
-
-驱动编译命令：
-
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-
-应用程序编译命令：
-
-arm-linux-gnueabihf-gcc <源文件名> –o <输出文件名>
-
-进入要加载的.ko文件目录并查看/dev目录下已存在的模块，确认是否重复，如下所示。
-
-.. image:: ./media/led_cdev001.PNG
+.. image:: ./media/led_cdev001.png
    :align: center
    :alt: 找不到图片04|
 
-执行下面的命令加载驱动：
+通过scp或者nfs将上面的两个文件拷贝到开发板中，执行下面的命令加载驱动：
 
-命令：
+安装LED驱动
+sudo insmod led_cdev.ko
 
-insmod led_cdev.ko
+然后我们可以在/dev/目录下找到 led_chrdev0 led_chrdev1 led_chrdev2 这三个设备，
+我们可以通过直接给设备写入1/0来控制LED的亮灭，也可以通过我们的测试程序来控制LED。
 
-在驱动程序中，我们在.probe函数中注册字符设备并创建了设备文件，设备和驱动匹配成功后.probe函数已经执行，所以正常情况下在“/dev/”目录下已经生成了“led_chrdev0”、“led_chrdev1”、“led_chrdev2”三个设备节点，如下所示。
+sudo sh -c 'echo 0 >/dev/led_chrdev0' 红灯亮
+sudo sh -c 'echo 1 >/dev/led_chrdev0' 红灯灭
 
-.. image:: ./media/led_cdev002.PNG
+运行LED测试程序
+sudo ./led_cdev_test LED呈现三种光
+
+.. image:: ./media/led_cdev002.png
    :align: center
-   :alt: 找不到图片04|
+   :alt: 找不到图片02
 
-驱动加载成功后直接运行应用程序如下所示。
-
-命令：
-
-./test_ledcdevApp <设备路径> <命令>
-
-执行结果如下：
-
-.. image:: ./media/led_cdev003.PNG
+.. image:: ./media/led_cdev003.jpg
    :align: center
-   :alt: 找不到图片05|
-
-运行完命令后我们便会看到绿色LED灯被成功点亮了,如下图所示。
+   :alt: 找不到图片03
 
 .. image:: ./media/led_cdev004.jpg
    :align: center
-   :alt: 找不到图片05|
+   :alt: 找不到图片04
+
+这个时候我们在回味一下设备驱动的作用。
+当我们开发一款嵌入式产品时，产品的设备硬件发生变动的时候，我们就只需要更改驱动程序以提供相同的API，
+而不用去变动应用程序，就能达到同样的效果，这将减少多少开发成本呢。
+
+.. image:: ./media/led_cdev005.jpg
+   :align: center
+   :alt: 找不到图片05
+
+
 

@@ -2,17 +2,19 @@
 ------------------------------------
 上一章节我们了解到什么是内核模块，模块的加载\卸载详细过程以及内核模块的使用等内容。
 本章，我们将学习驱动相关的概念，理解字符设备驱动程序的基本本框架，并从源码上分析字符设备驱动实现和管理。
-主要内容有如下四点：
+主要内容有如下五点：
 
-1. 字符设备框架，了解什么是字符设备、字符设备的基本概念以及相关数据结构；
+1. Linux设备分类；
 
-2. 字符设备的设计思路，分别从硬件原理到驱动层原理再到文件系统原理。自下而上一层一层分析字符设备的设计思路。
+2. 字符设备的抽象，字符设备设计思路；
 
-3. 分析内核源码，例如内核是如何管理设备号的；系统保存、调用file_operation接口，open函数所涉及的一切知识等等。
+3. 字符设备相关的概念以及数据结构，了解设备号等基本概念以及file_operations、file、inode相关数据结构；
 
-4. 字符设备驱动程序实验
+4. 字符字符设备驱动程序框架，例如内核是如何管理设备号的；系统关联、调用file_operation接口，open函数所涉及的知识等等。
 
-Linux设备
+5. 设备驱动程序实验。
+
+Linux设备分类
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 linux是文件型系统，所有硬件都会在对应的目录(/dev)下面用相应的文件表示。
 在windows系统中，设备大家很好理解，象硬盘，磁盘指的是实实在在硬件。
@@ -27,7 +29,6 @@ linux是文件型系统，所有硬件都会在对应的目录(/dev)下面用相
 例如，键盘这种设备提供的就是一个数据流，当你敲入“cnblogs”这个字 符串时，
 键盘驱动程序会按照和输入完全相同的顺序返回这个由七个字符组成的数据流。它们是顺序的，先返回c，最后是s。
 
-
 块设备通常支持随机存取和寻址，并使用缓存器。
 操作系统为输入输出分配了缓存以存储一块数据。当程序向设备发送了读取或者写入数据的请求时，
 系统把数据中的每一个字符存储在适当的缓存中。当缓存被填满时，会采取适当的操作（把数据传走），
@@ -37,19 +38,48 @@ linux是文件型系统，所有硬件都会在对应的目录(/dev)下面用相
 
 网络设备：是一种特殊设备，它并不存在于/dev下面，主要用于网络数据的收发。
 
+Linux内核中处处体现面向对象的设计思想，为了统一形形色色的设备，Linux系统将设备分别抽象为struct cdev,
+struct block_device,struct net_devce三个对象，具体的设备都可以包含着三种对象从而继承和三种对象属性和操作，
+并通过各自的对象添加到相应的驱动模型中，从而进行统一的管理和操作
+
 字符设备驱动程序适合于大多数简单的硬件设备，而且比起块设备或网络驱动更加容易理解，
 因此我们选择从字符设备开始，从最初的模仿，到慢慢熟悉，最终成长为驱动界的高手。
 
-相关概念和数据结构
+
+字符设备抽象
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-有句成语工欲善其事,必先利其器，在学习字符设备的原理之前我们先梳理相关的概念和数据结构。
+Linux内核中将字符设备抽象成一个具体的数据结构(struct cdev),我们可以理解为字符设备对象，
+cdev记录了字符设备的相关信息（设备号、内核对象），字符设备的打开、读写、关闭等操作接口（file_operations），
+在我们想要添加一个字符设备时，就是将这个对象注册到内核中，通过创建一个文件（设备节点）绑定对象的cdev，
+当我们对这个文件进行读写操作时，就可以通过虚拟文件系统，在内核中找到这个对象及其操作接口，从而控制设备。
+
+C语言中没有面向对象语言的继承的语法，但是我们可以通过结构体的包含来实现继承，这种抽象提取了设备的共性，
+为上层提供了统一接口，使得管理和操作设备变得很容易。
+
+.. image:: media/characprog004.png
+   :align: center
+   :alt: device_number
+
+在硬件层，我们可以通过查看硬件的原理图、芯片的数据手册，确定底层需要配置的寄存器，这类似于裸机开发。
+将对底层寄存器的配置，读写操作放在文件操作接口里面，也就是实现file_operations结构体。
+
+其次在驱动层，我们将文件操作接口注册到内核，内核通过内部散列表来登记记录主次设备号。
+
+在文件系统层，新建一个文件绑定该文件操作接口，应用程序通过操作指定文件的文件操作接口来设置底层寄存器
+
+实际上，在Linux上写驱动程序，都是做一些“填空题”。因为Linux给我们提供了一个基本的框架，
+我们只需要按照这个框架来写驱动，内核就能很好的接收并且按我们所要求的那样工作。有句成语工欲善其事,必先利其器，
+在理解这个框架之前我们得花点时间来学习字符设备驱动相关概念及数据结构。
+
+
+字符设备驱动相关概念及数据结构
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 在linux中，我们使用设备编号来表示设备，主设备号区分设备类别，次设备号标识具体的设备。
-cdev结构体被内核用来记录设备号，而在使用设备时，会通过inode结构体、file结构体最终找到file_operations结构体
-，并从file_operations结构体中找到操作设备的具体方法。
+cdev结构体被内核用来记录设备号，而在使用设备时，我们通常会打开设备节点，通过设备节点的inode结构体、
+file结构体最终找到file_operations结构体，并从file_operations结构体中得到操作设备的具体方法。
 
-设备编号
+设备号
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 对于字符的访问是通过文件系统的名称进行的，这些名称被称为特殊文件、设备文件，或者简单称为文件系统树的节点，
 Linux根目录下有/dev这个文件夹，专门用来存放设备中的驱动程序，我们可以使用ls -l 以列表的形式列出系统中的所有设备。
 其中，每一行表示一个设备，每一行的第一个字符表示设备的类型。
@@ -89,7 +119,6 @@ loop0 是一个块设备，它的主设备号是7，次所备案为0，同时可
    #define MKDEV(ma,mi)	(((ma) << MINORBITS) | (mi))
 
 
-
 cdev结构体
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 内核通过一个散列表(哈希表)来记录设备编号。
@@ -110,40 +139,54 @@ cdev结构体
    :linenos:
 
    struct cdev {
-   struct kobject kobj;
-   struct module *owner;
-   const struct file_operations *ops;
-   struct list_head list;
-   dev_t dev;
-   unsigned int count;
+      struct kobject kobj;
+      struct module *owner;
+      const struct file_operations *ops;
+      struct list_head list;
+      dev_t dev;
+      unsigned int count;
    };
 
--  kobj：内核数据对象，用于管理该结构体。obj_lookup函
-   数中从cdev_map中得到该成员，由该成员便可以得到相应的字符设备结构体。
+- struct kobject kobj
+   内嵌的内核对象，通过它将设备统一加入到“Linux设备驱动模型”中管理（如对象的引用计数、电源管理、热插拔、生命周期、与用户通信等）。
+- struct module \*owner
+   字符设备驱动程序所在的内核模块对象的指针。
+- const struct file_operations \*ops
+   文件操作，是字符设备驱动中非常重要的数据结构，在应用程序通过文件系统（VFS）呼叫到设备设备驱动程序中实现的
+   文件操作类函数过程中，ops起着桥梁纽带作用，VFS与文件系统及设备文件之间的接口是file_operations结构体成员函数，
+   这个结构体包含了对文件进行打开、关闭、读写、控制等一系列成员函数。
+- struct list_head list
+   用于将系统中的字符设备形成链表（这是个内核链表的一个链接因子，可以再内核很多结构体中看到这种结构的身影）。
+- dev_t dev
+   字符设备的设备号，有主设备和次设备号构成。
+- unsigned int count
+   属于同一主设备好的次设备号的个数，用于表示设备驱动程序控制的实际同类设备的数量。
 
--  owner：指向了关联该设备的内核模块，实际上就是关联了驱动程序，通常设置为THIS_MODULE。
+设备节点
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+设备节点（设备文件）：Linux中设备节点是通过“mknod”命令来创建的。一个设备节点其实就是一个文件，
+Linux中称为设备文件。有一点必要说明的是，在Linux中，所有的设备访问都是通过文件的方式，
+一般的数据文件程序普通文件，设备节点称为设备文件。
 
--  ops：该结构体中最重要的一部分，也是我们实现字符设备驱动的关键一步，用于存放所有操作该设备的函数指针。
-
--  list：实现一个链表，用于包含与该结构体对应的字符设备文件inode的成员i_devices 的链表。
-
--  dev：记录了字符设备的设备号。
-
--  count：记录了与该字符设备使用的次设备号的个数。
-
-注册设备编号仅仅是驱动代码必须进行的诸多任务中的第一个。驱动程序还需要将设备编号与内部函数连接起来，
-在这些内部函数的讲解之前，我们需要对其中涉及的数据结构进行了解，了解才能够做大量感兴趣的事情。
+设备节点被创建在/dev下，是连接内核与用户层的枢纽，就是设备是接到对应哪种接口的哪个ID 上。 
+相当于硬盘的inode一样的东西，记录了硬件设备的位置和信息在Linux中，所有设备都以文件的形式存放在/dev目录下，
+都是通过文件的方式进行访问，设备节点是Linux内核对设备的抽象，一个设备节点就是一个文件。
+应用程序通过一组标准化的调用执行访问设备，这些调用独立于任何特定的驱动程序。而驱动程序负责将这些标准调用映射到实际硬件的特有操作。
 
 
 数据结构
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 在驱动开发过程中，不可避免要涉及到三个重要的的内核数据结构分别包括文件操作方式（file_operations），
 文件描述结构体（struct file）以及inode结构体，在我们开始阅读编写驱动程序的代码之前，有必要先了解这三个结构体。
 
 file_operations结构体
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 file_operation就是把系统调用和驱动程序关联起来的关键数据结构。这个结构的每一个成员都对应着一个系统调用。
 读取file_operation中相应的函数指针，接着把控制权转交给函数指针指向的函数，从而完成了Linux设备驱动程序的工作。
+
+.. image:: media/characprog002.png
+   :align: center
+   :alt: 字符设备散列表
 
 在系统内部，I/O设备的存取操作通过特定的入口点来进行，而这组特定的入口点恰恰是由设备驱动程序提供的。
 通常这组设备驱动程序接口是由结构file_operations结构体向系统说明的，它定义在ebf_buster_linux/include/linux/fs.h中。
@@ -157,13 +200,13 @@ file_operation就是把系统调用和驱动程序关联起来的关键数据结
    :linenos:
 
    struct file_operations {
-   struct module *owner;
-   loff_t (*llseek) (struct file *, loff_t, int);
-   ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
-   ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
-   long (*unlocked_ioctl) (struct file *, unsigned int, unsigned long);
-   int (*open) (struct inode *, struct file *)
-   int (*release) (struct inode *, struct file *);
+      struct module *owner;
+      loff_t (*llseek) (struct file *, loff_t, int);
+      ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
+      ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+      long (*unlocked_ioctl) (struct file *, unsigned int, unsigned long);
+      int (*open) (struct inode *, struct file *)
+      int (*release) (struct inode *, struct file *);
    };
 
 -  llseek：用于修改文件的当前读写位置，并返回偏移后的位置。参数file传入了对应的文件指针，
@@ -205,7 +248,7 @@ file_operation就是把系统调用和驱动程序关联起来的关键数据结
 -  n：指定写入/读取数据的字节数。
 
 file结构体
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 内核中用file结构体来表示每个打开的文件，每打开一个文件，内核会创建一个结构体，并将对该文件上的操作函数传递给
 该结构体的成员变量f_op，当文件所有实例被关闭后，内核会释放这个结构体。如下代码中，只列出了我们本章需要了解的成员变量。
@@ -227,7 +270,7 @@ file结构体
 
 
 inode结构体
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 VFS inode 包含文件访问权限、属主、组、大小、生成时间、访问时间、最后修改时间等信息。
 它是Linux 管理文件系统的最基本单位，也是文件系统连接任何子目录、文件的桥梁。
 内核使用inode结构体在内核内部表示一个文件。因此，它与表示一个已经打开的文件描述符的结构体(即file 文件结构)是不同的，
@@ -237,39 +280,279 @@ inode结构体包含了一大堆文件相关的信息，但是就针对驱动代
 
 - dev_t i_rdev
 
-   表示设备文件的结点，这个域实际上包含了设备号。
+  表示设备文件的结点，这个域实际上包含了设备号。
 
 - struct cdev \*i_cdev
 
-   struct cdev是内核的一个内部结构，它是用来表示字符设备的，
-   
-   当inode结点指向一个字符设备文件时，此域为一个指向inode结构的指针。
+  struct cdev是内核的一个内部结构，它是用来表示字符设备的，
+  当inode结点指向一个字符设备文件时，此域为一个指向inode结构的指针。
 
-
-open函数到底做了什么
+字符设备驱动程序框架
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-我们了解了基本的数据结构和一些基本概念，是不是有些跃跃欲试呢，首先我们来看看open函数吧。
-使用设备之前我们通常都需要调用open函数，这个函数一般用于设备专有数据的初始化，申请相关资源及进行设备的初始化等工作，
-对于简单的设备而言，open函数可以不做具体的工作，你在应用层通过系统调用open打开设备时，
-如果打开正常，就会得到该设备的文件描述符，之后，我们就可以通过该描述符对设备进行read和write等操作；
-open函数到底做了些什么工作？下图中列出了open函数执行的大致过程。
+讲了很多次字符设备驱动程序框架，那到底什么是字符文件程序框架呢？我可以从下面的思维导图来看解读内核源码。
 
-.. image:: media/character_ready014.png
+.. image:: media/characprog001.png
+   :align: center
+   :alt: 字符设备散列表
+
+我们创建一个字符设备的时候，首先要的到一个设备号，分配设备号的途径有静态分配和动态分配；
+拿到设备的唯一ID，我们需要实现file_operation并保存到cdev中，实现cdev的初始化；
+然后我们需要将我们所做的工作告诉内核，使用cdev_add()注册cdev；
+最后我们还需要创建设备节点，以便我们后面调用file_operation接口。
+
+注销设备时我们需释放内核中的cdev，归还申请的设备号，删除创建的设备节点。
+
+在实现设备操作这一段，我们可以看看看open函数到底做了什么。
+
+
+
+驱动初始化和注销
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+设备号的申请和归还
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Linux内核提供了两种方式来定义字符设备，如下所示。
+
+.. code-block:: c
+   :caption: 定义字符设备
+   :linenos:
+
+   //第一种方式
+   static struct cdev chrdev;
+   //第二种方式
+   struct cdev *cdev_alloc(void);
+
+第一种方式，就是我们常见的变量定义；第二种方式，是内核提供的动态分配方式，调用该函数之
+后，会返回一个struct cdev类型的指针，用于描述字符设备。
+
+从内核中移除某个字符设备，则需要调用cdev_del函数，如下所示。
+
+.. code-block:: c
+   :caption: cdev_del函数
+   :linenos:
+
+   void cdev_del(struct cdev *p)
+
+该函数需要将我们的字符设备结构体的地址作为实参传递进去，就可以从内核中移除该字符设备了。
+
+
+register_chrdev_region函数
+'''''''''''''''''''''''''''''''''''
+
+register_chrdev_region函数用于静态地为一个字符设备申请一个或多个设备编号。该函数在分配
+成功时，会返回0；失败则会返回相应的错误码，函数原型如下所示。
+
+.. code-block:: c
+   :caption: register_chrdev_region函数原型
+   :linenos:
+
+   int register_chrdev_region(dev_t from, unsigned count, const char *name)
+
+参数说明：
+
+-  from：dev_t类型的变量，用于指定字符设备的起始设备号，如果要注册的设备号已经被其他的设备注册了，那么就会导致注册失败。
+
+-  count：指定要申请的设备号个数，count的值不可以太大，否则会与下一个主设备号重叠。
+
+-  name：用于指定该设备的名称，我们可以在/proc/devices中看到该设备。
+
+register_chrdev_region函数使用时需要指定一个设备编号， Linux内核为我们提供了生成设备号的宏定义MKDEV，
+用于将主设备号和次设备号合成一个设备号，主设备可以通过查阅内核源码的Documentation/devices.txt文件，
+而次设备号通常是从编号0开始。除此之外，内核还提供了另外两个宏定义MAJOR和MINOR，
+可以根据设备的设备号来获取设备的主设备号和次设备号。
+
+.. code-block:: c
+   :caption: 合成设备号MKDEV（位于 ebf-busrer-linux/include/linux/kdev_t.h）
+   :linenos:
+
+   #define MINORBITS 20
+   #define MINORMASK ((1U << MINORBITS) - 1)
+   #define MAJOR(dev) ((unsigned int) ((dev) >> MINORBITS))
+   #define MINOR(dev) ((unsigned int) ((dev) & MINORMASK))
+   #define MKDEV(ma,mi) (((ma) << MINORBITS) \| (mi))
+
+alloc_chrdev_region函数
+'''''''''''''''''''''''''''''''''''
+
+使用register_chrdev_region函数时，都需要去查阅内核源码的Documentation/devices.txt文件，
+这就十分不方便。因此，内核又为我们提供了一种能够动态分配设备编号的方式：alloc_chrdev_region。
+
+调用alloc_chrdev_region函数，内核会自动分配给我们一个尚未使用的主设备号。
+我们可以通过命令“cat /proc/devices”查询内核分配的主设备号。
+
+.. code-block:: c
+   :caption: alloc_chrdev_region函数原型
+   :linenos:
+
+   int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count, const char *name)
+
+参数说明如下：
+
+-  dev：指向dev_t类型数据的指针变量，用于存放分配到的设备编号的起始值；
+
+-  baseminor：次设备号的起始值，通常情况下，设置为0；
+
+-  count、name：同register_chrdev_region类型，用于指定需要分配的设备编号的个数以及设备的名称。
+
+unregister_chrdev_region函数
+'''''''''''''''''''''''''''''''''''
+
+当我们删除字符设备时候，我们需要把分配的设备编号交还给内核，对于使用register_chrdev_region函数
+以及alloc_chrdev_region函数分配得到的设备编号，可以使用unregister_chrdev_region函数实现该功能。
+
+.. code-block:: c
+   :caption: unregister_chrdev_region函数（位于ebf-busrer-linux/fs/char_dev.c）
+   :linenos:
+
+   void unregister_chrdev_region(dev_t from, unsigned count)
+
+-  from：指定需要注销的字符设备的设备编号起始值，我们一般将定义的dev_t变量作为实参。
+
+-  count：指定需要注销的字符设备编号的个数，该值应与申请函数的count值相等，通常采用宏定义进行管理。
+
+register_chrdev函数
+'''''''''''''''''''''''''''''''''''
+
+除了上述的两种，内核还提供了register_chrdev函数用于分配设备号。该函数是一个内联函数，它不
+仅支持静态申请设备号，也支持动态申请设备号，并将主设备号返回，函数原型如下所示。
+
+.. code-block:: c
+   :caption: register_chrdev函数原型（位于 ebf-busrer-linux/include/linux/fs.h文件）
+   :linenos:
+
+   static inline int register_chrdev(unsigned int major, const char *name,
+   const struct file_operations *fops)
+   {
+      return __register_chrdev(major, 0, 256, name, fops);
+   }
+
+参数说明：
+
+-  major：用于指定要申请的字符设备的主设备号，等价于register_chrdev_region函数，当设置为0时，内核会自动分配一个未使用的主设备号。
+
+-  name：用于指定字符设备的名称
+
+-  fops：用于操作该设备的函数接口指针。
+
+我们从以上代码中可以看到，使用register_chrdev函数向内核申请设备号，同一类字
+符设备（即主设备号相同），会在内核中申请了256个，通常情况下，我们不需要用到这么多个设备，这就造成了极大的资源浪费。
+
+unregister_chrdev函数
+'''''''''''''''''''''''''''''''''''
+使用register函数申请的设备号，则应该使用unregister_chrdev函数进行注销。
+
+.. code-block:: c
+   :caption: unregister_chrdev函数（位于ebf-busrer-linux/include/linux/fs.h）
+   :linenos:
+
+   static inline void unregister_chrdev(unsigned int major, const char *name)
+   {
+   __unregister_chrdev(major, 0, 256, name);
+   }
+
+-  major：指定需要释放的字符设备的主设备号，一般使用register_chrdev函数的返回值作为实参。
+
+-  name：执行需要释放的字符设备的名称。
+
+初始化cdev
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+前面我们已经提到过了，编写一个字符设备最重要的事情，就是要实现file_operations这个结构体中的函数。
+实现之后，如何将该结构体与我们的字符设备结构体相关联呢？内核提供了cdev_init函数，来实现这个过程。
+
+.. code-block:: c
+   :caption: cdev_init函数（位于 ebf-busrer-linux/fs/char_dev.c）
+   :linenos:
+
+   void cdev_init(struct cdev *cdev, const struct file_operations *fops)
+
+-  cdev：struct cdev类型的指针变量，指向需要关联的字符设备结构体；
+
+-  fops：file_operations类型的结构体指针变量，一般将实现操作该设备的结构体file_operations结构体作为实参。
+
+.. image:: media/characprog003.png
+   :align: center
+   :alt: file_operations的实现
+
+设备注册和注销
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+cdev_add函数用于向内核的cdev_map散列表添加一个新的字符设备，如下所示。
+
+.. code-block:: c
+   :caption: cdev_add函数（位于 ebf-busrer-linux/fs/char_dev.c）
+   :linenos:
+
+   int cdev_add(struct cdev *p, dev_t dev, unsigned count)
+
+-  p：struct cdev类型的指针，用于指定需要添加的字符设备；
+
+-  dev：dev_t类型变量，用于指定设备的起始编号；
+
+-  count：指定注册多少个设备。
+
+
+从系统中删除cdev，cdev设备将无法再打开，但任何已经打开的cdev将保持不变，
+即使在cdev_del返回后，它们的FOP仍然可以调用。
+
+.. code-block:: c
+   :caption: cdev_del函数（位于 ebf-busrer-linux/fs/char_dev.c）
+   :linenos:
+   
+   void cdev_del(struct cdev *p)
+
+-  p：struct cdev类型的指针，用于指定需要删除的字符设备；
+
+设备节点的创建和销毁
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+创建一个设备并将其注册到文件系统
+
+.. code-block:: c
+   :caption: device_create函数（位于 ebf-busrer-linux/drivers/base/core.c）
+   :linenos:
+
+   struct device *device_create(struct class *class, struct device *parent,
+               dev_t devt, void *drvdata, const char *fmt, ...)
+
+-  class：指向这个设备应该注册到的struct类的指针；
+
+-  parent：指向此新设备的父结构设备（如果有）的指针；
+
+-  devt：要添加的char设备的开发；
+
+-  drvdata：要添加到设备进行回调的数据；
+
+-  fmt：输入设备名称。
+
+删除使用device_create函数创建的设备
+
+.. code-block:: c
+   :caption: device_destroy函数（位于 ebf-busrer-linux/drivers/base/core.c）
+   :linenos:
+
+   void device_destroy(struct class *class, dev_t devt)
+
+-  class：指向注册此设备的struct类的指针；
+
+-  devt：以前注册的设备的开发；
+
+除了使用代码创建设备节点，还可以使用mknod命令创建设备节点。
+
+用法：mknod 设备名 设备类型 主设备号 次设备号
+
+当类型为"p"时可不指定主设备号和次设备号，否则它们是必须指定的。
+如果主设备号和次设备号以"0x"或"0X"开头，它们会被视作十六进制数来解析；如果以"0"开头，则被视作八进制数；
+其余情况下被视作十进制数。可用的类型包括：
+
+- b      创建(有缓冲的)区块特殊文件
+- c, u   创建(没有缓冲的)字符特殊文件
+- p      创建先进先出(FIFO)特殊文件
+
+如：mkmod /dev/test c 2 0
+
+创建一个字符设备/dev/test，其主设备号为2，次设备号为0。
+
+.. image:: media/characprog005.png
    :align: center
    :alt: open函数的执行过程
-
-户空间使用open()系统调用函数打开一个字符设备时(int fd = open("dev/xxx", O_RDWR))大致有以下过程：
-   - 在虚拟文件系统VFS中的查找对应与字符设备对应 struct inode节点
-   - 遍历散列表cdev_map，根据inod节点中的 cdev_t设备号找到cdev对象
-   - 创建struct file对象（系统采用一个数组来管理一个进程中的多个被打开的设备，每个文件秒速符作为数组下标标识了一个设备对象）
-   - 初始化struct file对象，将 struct file对象中的 file_operations成员指向 struct cdev对象中的 file_operations成员（file->fops =  cdev->fops）
-   - 回调file->fops->open函数
-
-设备文件通常在开机启动时自动创建的，不过，我们仍然可以使用命令mknod来创建一个新的设备文件，
-命令的基本语法如下：
-::
-
-   mknod 设备名 设备类型 主设备号 次设备号
 
 当我们使用上述命令，创建了一个字符设备文件时，实际上就是创建了一个设备节点inode结构体，
 并且将该设备的设备编号记录在成员i_rdev，将成员f_op指针指向了def_chr_fops结构体。
@@ -297,8 +580,10 @@ open函数到底做了些什么工作？下图中列出了open函数执行的大
       return inode;
    }
 
+mknod命令最终执行init_special_inode函数
+
 .. code-block:: c
-   :caption: 创建字符设备 (位于 ebf-busrer-linux/fs/inode.c)
+   :caption: init_special_inode函数（位于 ebf-busrer-linux/fs/inode.c）
    :linenos:
 
    void init_special_inode(struct inode *inode, umode_t mode, dev_t rdev)
@@ -307,11 +592,40 @@ open函数到底做了些什么工作？下图中列出了open函数执行的大
       if (S_ISCHR(mode)) {
          inode->i_fop = &def_chr_fops;
          inode->i_rdev = rdev;
-      }
-      ....
+      } else if (S_ISBLK(mode)) {
+         inode->i_fop = &def_blk_fops;
+         inode->i_rdev = rdev;
+      } else if (S_ISFIFO(mode))
+         inode->i_fop = &pipefifo_fops;
+      else if (S_ISSOCK(mode))
+         ;	/* leave it no_open_fops */
+      else
+         printk(KERN_DEBUG "init_special_inode: bogus i_mode (%o) for"
+               " inode %s:%lu\n", mode, inode->i_sb->s_id,
+               inode->i_ino);
    }
 
-命令mknod最终会调用init_special_inode函数，由于我们创建的是字符设备，因此，会执行S_ISCHR(mode)里面的代码。这样就完成了上图的内容。
+判断文件的inode类型，如果是字符设备类型，则把def_chr_fops作为该文件的操作接口，并把设备号记录在inode->i_rdev。
+inode上的file_operation并不是自己构造的file_operation，而是字符设备通用的def_chr_fops，
+那么自己构建的file_operation等在应用程序调用open函数之后，才会绑定在文件上。接下来我们再看open函数到底做了什么。
+
+open函数到底做了什么
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+使用设备之前我们通常都需要调用open函数，这个函数一般用于设备专有数据的初始化，申请相关资源及进行设备的初始化等工作，
+对于简单的设备而言，open函数可以不做具体的工作，你在应用层通过系统调用open打开设备时，
+如果打开正常，就会得到该设备的文件描述符，之后，我们就可以通过该描述符对设备进行read和write等操作；
+open函数到底做了些什么工作？下图中列出了open函数执行的大致过程。
+
+.. image:: media/character_ready014.png
+   :align: center
+   :alt: open函数的执行过程
+
+户空间使用open()系统调用函数打开一个字符设备时(int fd = open("dev/xxx", O_RDWR))大致有以下过程：
+   - 在虚拟文件系统VFS中的查找对应与字符设备对应 struct inode节点
+   - 遍历散列表cdev_map，根据inod节点中的 cdev_t设备号找到cdev对象
+   - 创建struct file对象（系统采用一个数组来管理一个进程中的多个被打开的设备，每个文件秒速符作为数组下标标识了一个设备对象）
+   - 初始化struct file对象，将 struct file对象中的 file_operations成员指向 struct cdev对象中的 file_operations成员（file->fops =  cdev->fops）
+   - 回调file->fops->open函数
 
 我们使用的open函数在内核中对应的是sys_open函数，sys_open函数又会调用do_sys_open函数。在do_sys_open函数中，
 首先调用函数get_unused_fd_flags来获取一个未被使用的文件描述符fd，该文件描述符就是我们最终通过open函数得到的值。
@@ -425,227 +739,6 @@ open函数到底做了些什么工作？下图中列出了open函数执行的大
 总结一下整个过程，当我们使用open函数，打开设备文件时，会根据该设备的文件的设备号找到相应的设备结构体，
 从而得到了操作该设备的方法。也就是说如果我们要添加一个新设备的话，我们需要提供一个设备号，
 一个设备结构体以及操作该设备的方法（file_operations结构体）。接下来，我们将介绍以上的三个内容。
-
-
-字符设备驱动程序框架
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-前面我们已经讲解了一些相关的数据结构，但是各个结构体要如何进行联系？答案肯定是通过函数。
-因此，本节我们开始讲解关于字符设备的驱动程序框架。关于框架，我们在内核模块那章也讲了一个内核模块的框架，
-实际上，在Linux上写驱动程序，都是做一些“填空题”。因为Linux给我们提供了一个基本的框架，
-如果你不按照这个框架写驱动，那么你写的驱动程序是不能被内核所接纳的。
-
-初始化/移除字符设备
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Linux内核提供了两种方式来定义字符设备，如下所示。
-
-.. code-block:: c
-   :caption: 定义字符设备
-   :linenos:
-
-   //第一种方式
-   static struct cdev chrdev;
-   //第二种方式
-   struct cdev *cdev_alloc(void);
-
-第一种方式，就是我们常见的变量定义；第二种方式，是内核提供的动态分配方式，调用该函数之
-后，会返回一个struct cdev类型的指针，用于描述字符设备。
-
-从内核中移除某个字符设备，则需要调用cdev_del函数，如下所示。
-
-.. code-block:: c
-   :caption: cdev_del函数
-   :linenos:
-
-   void cdev_del(struct cdev *p)
-
-该函数需要将我们的字符设备结构体的地址作为实参传递进去，就可以从内核中移除该字符设备了。
-
-分配/注销设备号
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Linux的各种设备都以文件的形式存放在/dev目录下，为了管理这些设备，系统为各个设备进行编号，
-每个设备号又分为主设备号和次设备号。主设备号用来区分不同种类的设备，如USB，tty等，次设备号用来区分同一类型的多个设备，
-如tty0，tty1……下图列出了部分tty设备，他们的主设备号都是4，而不同的次设备号分别对应一个tty设备。
-
-.. image:: media/charac005.jpg
-   :align: center
-   :alt: 未找到图片05|
-
-内核提供了一种数据类型：dev_t，用于记录设备编号，该数据类型实际上是一个无符号32位整型，
-其中的12位用于表示主设备号，剩余的20位则用于表示次设备号。
-
-实际上，内核将一部分主设备号分配给了一些常见的设备。
-在内核源码的Documentation/devices.txt文件中可以找到这些设备以及这部分设备占据的主设备号。
-
-.. image:: media/charac006.jpg
-   :align: center
-   :alt: 未找到图片06|
-
-devices文件大致上分成了上图的四个部分：
-
-1. 这一部分的内容，主要记录了当前内核所占据的所有字符设备的主设备号，
-   我们通过检查这一列的内容，便可以知道当前的主设备号是否被内核占用。
-
-2. 第二部分的内容，主要记录了设备的类型，主要分为块设备（block）以及字符设备（char），我们这里只关心字符设备即可。
-
-3. 第三部分的内容，记录了每个次设备号对应的设备。
-
-4. 第四部分的内容，则是对每个设备的概述。
-
-根据上一节提到的，创建一个新的字符设备之前，我们需要为新的字符设备注册一个新的设备号，就好像
-每个人都有一个身份证号，用来标识自己。内核提供了三种方式，来完成这项工作。
-
-register_chrdev_region函数
-''''''''''''''''''''''''
-register_chrdev_region函数用于静态地为一个字符设备申请一个或多个设备编号。该函数在分配
-成功时，会返回0；失败则会返回相应的错误码，函数原型如下所示。
-
-.. code-block:: c
-   :caption: register_chrdev_region函数原型
-   :linenos:
-
-   int register_chrdev_region(dev_t from, unsigned count, const char *name)
-
-参数说明：
-
--  from：dev_t类型的变量，用于指定字符设备的起始设备号，如果要注册的设备号已经被其他的设备注册了，那么就会导致注册失败。
-
--  count：指定要申请的设备号个数，count的值不可以太大，否则会与下一个主设备号重叠。
-
--  name：用于指定该设备的名称，我们可以在/proc/devices中看到该设备。
-
-register_chrdev_region函数使用时需要指定一个设备编号， Linux内核为我们提供了生成设备号的宏定义MKDEV，
-用于将主设备号和次设备号合成一个设备号，主设备可以通过查阅内核源码的Documentation/devices.txt文件，
-而次设备号通常是从编号0开始。除此之外，内核还提供了另外两个宏定义MAJOR和MINOR，
-可以根据设备的设备号来获取设备的主设备号和次设备号。
-
-.. code-block:: c
-   :caption: 合成设备号MKDEV（位于 ebf-busrer-linux/include/linux/kdev_t.h）
-   :linenos:
-
-   #define MINORBITS 20
-   #define MINORMASK ((1U << MINORBITS) - 1)
-   #define MAJOR(dev) ((unsigned int) ((dev) >> MINORBITS))
-   #define MINOR(dev) ((unsigned int) ((dev) & MINORMASK))
-   #define MKDEV(ma,mi) (((ma) << MINORBITS) \| (mi))
-
-alloc_chrdev_region函数
-'''''''''''''''''''''''''''''''''''
-使用register_chrdev_region函数时，都需要去查阅内核源码的Documentation/devices.txt文件，
-这就十分不方便。因此，内核又为我们提供了一种能够动态分配设备编号的方式：alloc_chrdev_region。
-
-调用alloc_chrdev_region函数，内核会自动分配给我们一个尚未使用的主设备号。
-我们可以通过命令“cat /proc/devices”查询内核分配的主设备号。
-
-.. code-block:: c
-   :caption: alloc_chrdev_region函数原型
-   :linenos:
-
-   int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count, const char *name)
-
-参数说明如下：
-
--  dev：指向dev_t类型数据的指针变量，用于存放分配到的设备编号的起始值；
-
--  baseminor：次设备号的起始值，通常情况下，设置为0；
-
--  count、name：同register_chrdev_region类型，用于指定需要分配的设备编号的个数以及设备的名称。
-
-unregister_chrdev_region函数
-'''''''''''''''''''''''''''''''''''
-
-当我们删除字符设备时候，我们需要把分配的设备编号交还给内核，对于使用register_chrdev_region函数
-以及alloc_chrdev_region函数分配得到的设备编号，可以使用unregister_chrdev_region函数实现该功能。
-
-.. code-block:: c
-   :caption: unregister_chrdev_region函数（位于ebf-busrer-linux/fs/char_dev.c）
-   :linenos:
-
-   void unregister_chrdev_region(dev_t from, unsigned count)
-
--  from：指定需要注销的字符设备的设备编号起始值，我们一般将定义的dev_t变量作为实参。
-
--  count：指定需要注销的字符设备编号的个数，该值应与申请函数的count值相等，通常采用宏定义进行管理。
-
-register_chrdev函数
-'''''''''''''''''''''''''''''''''''
-
-除了上述的两种，内核还提供了register_chrdev函数用于分配设备号。该函数是一个内联函数，它不
-仅支持静态申请设备号，也支持动态申请设备号，并将主设备号返回，函数原型如下所示。
-
-.. code-block:: c
-   :caption: register_chrdev函数原型（位于 ebf-busrer-linux/include/linux/fs.h文件）
-   :linenos:
-
-   static inline int register_chrdev(unsigned int major, const char *name,
-   const struct file_operations *fops)
-   {
-      return __register_chrdev(major, 0, 256, name, fops);
-   }
-
-参数说明：
-
--  major：用于指定要申请的字符设备的主设备号，等价于register_chrdev_region函数，当设置为0时，内核会自动分配一个未使用的主设备号。
-
--  name：用于指定字符设备的名称
-
--  fops：用于操作该设备的函数接口指针。
-
-我们从以上代码中可以看到，使用register_chrdev函数向内核申请设备号，同一类字
-符设备（即主设备号相同），会在内核中申请了256个，通常情况下，我们不需要用到这么多个设备，这就造成了极大的资源浪费。
-
-unregister_chrdev函数
-'''''''''''''''''''''''''''''''''''
-使用register函数申请的设备号，则应该使用unregister_chrdev函数进行注销。
-
-.. code-block:: c
-   :caption: unregister_chrdev函数（位于ebf-busrer-linux/include/linux/fs.h）
-   :linenos:
-
-   static inline void unregister_chrdev(unsigned int major, const char *name)
-   {
-   __unregister_chrdev(major, 0, 256, name);
-   }
-
--  major：指定需要释放的字符设备的主设备号，一般使用register_chrdev函数的返回值作为实参。
-
--  name：执行需要释放的字符设备的名称。
-
-关联设备的操作方式
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-前面我们已经提到过了，编写一个字符设备最重要的事情，就是要实现file_operations这个结
-构体中的函数。实现之后，如何将该结构体与我们的字符设备结构相关联呢？内核提供了cdev_init函数，来实现这个工程。
-
-.. code-block:: c
-   :caption: cdev_init函数（位于 ebf-busrer-linux/fs/char_dev.c）
-   :linenos:
-
-   void cdev_init(struct cdev *cdev, const struct file_operations *fops)
-
--  cdev：struct cdev类型的指针变量，指向需要关联的字符设备结构体；
-
--  fops：file_operations类型的结构体指针变量，一般将实现操作该设备的结构体file_operations结构体作为实参。
-
-注册设备
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-cdev_add函数用于向内核的cdev_map散列表添加一个新的字符设备，如下所示。
-
-.. code-block:: c
-   :caption: cdev_add函数（位于 ebf-busrer-linux/fs/char_dev.c）
-   :linenos:
-
-   int cdev_add(struct cdev *p, dev_t dev, unsigned count)
-
--  p：struct cdev类型的指针，用于指定需要添加的字符设备；
-
--  dev：dev_t类型变量，用于指定设备的起始编号；
-
--  count：指定注册多少个设备。
-
 
 字符设备驱动程序实验
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1032,7 +1125,7 @@ cat /dev/chrdev2
 
 .. image:: media/charac011.png
    :align: center
-   :alt: 未找到图片11|
+   :alt: 未找到图片11
 
 可以看到设备chrdev1中保存了字符串“hello world”，而设备chrdev2中保存了字符串“123456”。
 只需要几行代码，就可以实现一个驱动程序，控制多个设备。
