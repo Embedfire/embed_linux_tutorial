@@ -1,5 +1,11 @@
+
+.. vim: syntax=rst
+
 驱动章节实验环境搭建
-------------------------------------
+==============================
+
+引言
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 本章主要目的是搭建驱动章节的实验环境，方便后续章节不在实验环境上耗费太多时间，
 而是集中精力理解设备驱动的原理。
 
@@ -15,7 +21,9 @@
 使用交叉编译工具编译内核源码，最终再依赖编译好的内核编译我们的程序。
 
 环境准备
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+安装工具
+------------------------------
 在编译源码之前我们需要先准备好交叉编译的环境，安装必要的依赖和工具，
 
 - gcc-arm-linux-gnueabihf  交叉编译器
@@ -25,22 +33,25 @@
 - lzop LZO压缩库的压缩软件
 
 执行下面的命令即可：
+
 ::
 
    sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop
 
 编译内核
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------
 开发板内核使用 Linux npi 4.19.71-imx-r1 版本，可以使用命令'uname -a'查看。
 我们可以从github或者gitee上克隆开发板的Debian镜像内核源码，
 国内推荐使用gitee下载，当然首先需要安装git工具。
 
 github:
+
 ::
 
    git clone https://gitee.com/Embedfire/ebf-buster-linux.git
 
 gitee:
+
 ::
 
    git clone https://gitee.com/Embedfire/ebf-buster-linux.git
@@ -55,16 +66,16 @@ gitee:
 
 .. image:: media/exper_env001.png
    :align: center
-   :alt: 内核模块信息
+   :name: 内核模块信息
 
 .. image:: media/exper_env002.png
    :align: center
-   :alt: 内核模块信息
+   :name: 内核模块信息
 
 接下来我们不妨简单了解一些内核的构建原理。
 
 内核的构建原理
-'''''''''''''''''''''''''''
+------------------------------
 首先是make_deb.sh脚本
 
 .. code:: bash
@@ -95,22 +106,24 @@ gitee:
 
 
 编译程序
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 获取内核模块示例源码，将配套代码解压到内核代码同级目录，这里以Linux内核模块章节的hellomodule实验为例。
 实验代码位于：/base_code/linux_driver/module/hellomodule。
 
 github:
+
 ::
 
    git clone https://github.com/Embedfire-imx6/embed_linux_tutorial
 
 gitee:
+
 ::
 
    git clone https://gitee.com/Embedfire-imx6/embed_linux_tutorial
 
 在内核源码外编译
-'''''''''''''''''''''''''''
+------------------------------
 内核模块对象所需的构建步骤和编译很复杂，它利用了linux内核构建系统的强大功能，
 当然我们不需要深入了解这部分知识，利用简单的Make工具就能编译出我们想要的内核模块。
 ::
@@ -120,9 +133,11 @@ gitee:
 
 .. image:: media/exper_env003.jpg
    :align: center
+   :name: 实验环境
 
 .. image:: media/exper_env004.jpg
    :align: center
+   :name: 实验环境
 
 注意该目录下的Makefile中 "KERNEL_DIR=../ebf-buster-linux/build_image/build"要与前面编译的内核所在目录一致。
 
@@ -169,4 +184,4 @@ clean 就是删除后面这些由make生成的文件。
 
 
 和内核源码一起编译
-'''''''''''''''''''''''''''
+------------------------------
