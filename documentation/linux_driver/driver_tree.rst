@@ -335,7 +335,6 @@ compatible属性
 
 .. code-block:: dts  
     :caption: compatible属性
-    :emphasize-lines: 1,3
     :linenos:
 
     compatible = "fsl,imx6ull-14x14-evk", "fsl,imx6ull";
