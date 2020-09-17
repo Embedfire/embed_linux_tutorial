@@ -1,10 +1,9 @@
 .. vim: syntax=rst
 
+
 字符设备驱动——点亮LED灯
 ==============================
 
-引言
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 通过字符设备章节的学习，我们已经了解了字符设备驱动程序的基本框架，主要是掌握如何申请及释放设备号、
 添加以及注销设备，初始化、添加与删除cdev结构体，并通过cdev_init函数建立cdev和file_operations之间的关联，
 cdev结构体和file_operations结构体非常重要，希望大家着重掌握。
@@ -17,7 +16,6 @@ cdev结构体和file_operations结构体非常重要，希望大家着重掌握�
 
 
 
-
 设备驱动的作用与本质
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 直接操作寄存器点亮LED和通过驱动程序点亮LED最本质的区别就是有无使用操作系统。
@@ -26,7 +24,7 @@ cdev结构体和file_operations结构体非常重要，希望大家着重掌握�
 这将大大提高我们应用程序的可移植性和开发效率。
 
 
-一、驱动的作用
+驱动的作用
 ------------------------------
 设备驱动与底层硬件直接打交道，按照硬件设备的具体工作方式读写设备寄存器，
 完成设备的轮询、中断处理、DMA通信，进行物理内存向虚拟内存的映射，最终使通信设备能够收发数据，
@@ -37,7 +35,7 @@ cdev结构体和file_operations结构体非常重要，希望大家着重掌握�
 如在本次实验中必须设计file_operations的接口。这样，设备驱动才能良好地整合到操作系统的内核中。
 
 
-二、有无操作系统的区别
+有无操作系统的区别
 ------------------------------
 1）无操作系统（即裸机）时的设备驱动
 也就是直接操作寄存器的方式控制硬件，在这样的系统中，虽然不存在操作系统，但是设备驱动是必须存在的。
@@ -74,11 +72,9 @@ MMU为编程提供了方便统一的内存空间抽象，其实我们的程序�
 比如uCOS、FreeRTOS、uCLinux，以前想CPU也运行linux系统必须要该CPU具备MMU，但现在Linux也可以在不带MMU的CPU中运行了。
 总体而言MMU具有如下功能：
 
-- 保护内存。MMU给一些指定的内存块设置了读、写以及可执行的权限，这些权限存储在页表当中，MMU会检查CPU当前所处的是特权模式还是用户模式，
-  如果和操作系统所设置的权限匹配则可以访问，如果CPU要访问一段虚拟地址，则将虚拟地址转换成物理地址，否则将产生异常，防止内存被恶意地修改。
+- **保护内存：** MMU给一些指定的内存块设置了读、写以及可执行的权限，这些权限存储在页表当中，MMU会检查CPU当前所处的是特权模式还是用户模式，如果和操作系统所设置的权限匹配则可以访问，如果CPU要访问一段虚拟地址，则将虚拟地址转换成物理地址，否则将产生异常，防止内存被恶意地修改。
 
-- 提供方便统一的内存空间抽象，实现虚拟地址到物理地址的转换。CPU可以运行在虚拟的内存当中，
-  虚拟内存一般要比实际的物理内存大很多，使得CPU可以运行比较大的应用程序。
+- **提供方便统一的内存空间抽象，实现虚拟地址到物理地址的转换：** CPU可以运行在虚拟的内存当中，虚拟内存一般要比实际的物理内存大很多，使得CPU可以运行比较大的应用程序。
 
 到底什么是虚拟地址什么是物理地址？
 
@@ -132,21 +128,22 @@ MMU才会去访问页表并找到地址描述符之后进行权限检查和地�
 
 ioremap函数
 ------------------------------
-ioremap(),函数在ebf-buster-linux/arch/arc/mm/ioremap.c中定义：
 
 .. code-block:: c 
-    :caption: 地址映射函数 ebf-buster-linux/arch/arc/mm/ioremap.c
+    :caption: 地址映射函数 (内核源码/arch/arc/mm/ioremap.c)
     :linenos:
 
     void __iomem *ioremap(phys_addr_t paddr, unsigned long size)
     #define ioremap ioremap
 
-ioremap函数有两个参数：paddr、size 和 一个__iomem类型指针的返回值。
+函数参数和返回值如下：
 
-- paddr:被映射的IO起始地址（物理地址）；
-- size:需要映射的空间大小，以字节为单位；
-- （__iomem \*）：一个指向__iomem类型的指针，当映射成功后便返回一段虚拟地址空间的起始地址，
-  我们可以通过访问这段虚拟地址来实现实际物理地址的读写操作。
+**参数：**
+
+- **paddr：** 被映射的IO起始地址（物理地址）；
+- **size：** 需要映射的空间大小，以字节为单位；
+
+**返回值：** 一个指向__iomem类型的指针，当映射成功后便返回一段虚拟地址空间的起始地址，我们可以通过访问这段虚拟地址来实现实际物理地址的读写操作。
 
 ioremap函数是依靠__ioremap函数来实现的，只是在__ioremap当中其最后一个要映射的I/O空间和权限有关的标志flag为0。
 在使用ioremap函数将物理地址转换成虚拟地址之后，理论上我们便可以直接读写I/O内存，但是为了符合驱动的跨平台以及可移植性，
@@ -157,14 +154,20 @@ ioremap函数是依靠__ioremap函数来实现的，只是在__ioremap当中其�
     :caption: 读写I/O函数
     :linenos:
     
-    unsigned int ioread8(void __iomem *addr)	//读取一个字节（8bit）
-    unsigned int ioread16(void __iomem *addr)	//读取一个字（16bit）
-    unsigned int ioread32(void __iomem *addr)	//读取一个双字（32bit）
+    unsigned int ioread8(void __iomem *addr)
+    unsigned int ioread16(void __iomem *addr)
+    unsigned int ioread32(void __iomem *addr)
          
-    void iowrite8(u8 b, void __iomem *addr)		//写入一个字节（8bit）
-    void iowrite16(u16 b, void __iomem *addr)	//写入一个字（16bit）
-    void iowrite32(u32 b, void __iomem *addr)	//写入一个双字（32bit）
+    void iowrite8(u8 b, void __iomem *addr)	
+    void iowrite16(u16 b, void __iomem *addr)
+    void iowrite32(u32 b, void __iomem *addr)
 
+- 第1行：读取一个字节（8bit）
+- 第2行：读取一个字（16bit）
+- 第3行：读取一个双字（32bit）
+- 第5行：写入一个字节（8bit）
+- 第6行：写入一个字（16bit）
+- 第7行：写入一个双字（32bit）
 
 对于读I/O而言，他们都只有一个__iomem类型指针的参数，指向被映射后的地址，返回值为读取到的数据据；
 对于写I/O而言他们都有两个参数，第一个为要写入的数据，第二个参数为要写入的地址，返回值为空。
@@ -175,146 +178,157 @@ writex（readx）不进行端序的检查，而iowritex（ioreadx）会进行端
 说了这么多，大家可能还是不太理解，那么我们来举个栗子，比如我们需要操作RGB灯中的蓝色led中的数据寄存器，
 在51或者STM32当中我们是直接看手册查找对应的寄存器，然后往寄存器相应的位写入数据0或1便可以实现LED的亮灭（假设已配置好了输出模式以及上下拉等）。
 前面我们在不带linux的环境下也是用的类似的方法，但是当我们在linux环境且开启了MMU之后，
-我们就要将LED灯引脚对应的数据寄存器（物理地址）映射到程序的虚拟地址空间当中，
-然后我们就可以像操作寄存器一样去操作我们的虚拟地址啦！其具体代码如下所示。
+我们就要将LED灯引脚对应的数据寄存器（物理地址）映射到程序的虚拟地址空间当中，然后我们就可以像操作寄存器一样去操作我们的虚拟地址啦！其具体代码如下所示。
 
 .. code-block:: c 
+    :caption: 地址映射
     :linenos:
-
-    unsigned long pa_dr = 0x20A8000 + 0x00; //Address: Base address + 0h offset
-    unsigned int __iomem *va_dr;	//定义一个__iomem类型的指针
+	
+	unsigned long pa_dr = 0x20A8000 + 0x00; 
+    unsigned int __iomem *va_dr;
     unsigned int val;
-    
-    va_dr = ioremap(pa_dr, 4);		//将va_dr指针指向映射后的虚拟地址起始处，这段地址大小为4个字节
-    
-    val = ioread32(va_dr);		//读取被映射后虚拟地址的的数据，此地址的数据是实际数据寄存器（物理地址）的数据
-    val &= ~(0x01 << 19);		//将蓝色LED灯引脚对应的位清零
-    iowrite32(val, va_dr);		//把修改后的值重新写入到被映射后的虚拟地址当中，实际是往寄存器中写入了数据
+    va_dr = ioremap(pa_dr, 4);	
+    val = ioread32(va_dr);
+    val &= ~(0x01 << 19);
+    iowrite32(val, va_dr);
+
+- 第1行：Address: Base address + 0h offset
+- 第2行：定义一个__iomem类型的指针
+- 第4行：将va_dr指针指向映射后的虚拟地址起始处，这段地址大小为4个字节
+- 第5行：读取被映射后虚拟地址的的数据，此地址的数据是实际数据寄存器（物理地址）的数据
+- 第7行：将蓝色LED灯引脚对应的位清零
+- 第8行：把修改后的值重新写入到被映射后的虚拟地址当中，实际是往寄存器中写入了数据
 
 iounmap函数
 ------------------------------
 iounmap函数定义如下：
 
 .. code-block:: c 
-    :caption: 取消地址映射函数 ebf-buster-linux/arch/arc/mm/ioremap.c
+    :caption: 取消地址映射函数 (内核源码/arch/arc/mm/ioremap.c)
     :linenos:
 
     void iounmap(void *addr)
     #define iounmap iounmap
 
-iounmap函数只有一个参数addr，用于取消ioremap所映射的地址映射。
+函数参数和返回值如下：
 
-- addr:需要取消ioremap映射之后的起始地址（虚拟地址）。
+**参数：**
+
+- **addr：** 需要取消ioremap映射之后的起始地址（虚拟地址）。
+
+**返回值：** 无
 
 例如我们要取消一段被ioremap映射后的地址可以用下面的写法。
 
 .. code-block:: c 
-    :linenos:
+    :caption: 取消ioremap映射地址
+	:linenos:
 
-    iounmap(va_dr);				//释放掉ioremap映射之后的起始地址（虚拟地址）
+    iounmap(va_dr);	//释放掉ioremap映射之后的起始地址（虚拟地址）
 
 
-编写驱动程序
+点亮LED灯实验
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 从第一章内核模块再到第二章字符设备驱动，从理论到实验，总算是一切准备就绪，让我们开始着手写LED的驱动代码吧。
 首先我们需要一个LED字符设备结构体，它应该包含我们要操作的寄存器地址。
 其次是模块的加载卸载函数，加载函数需要注册设备，卸载函数则需要释放申请的资源。
 然后就是file_operations结构体以及open，write，read相关接口的实现。
-LED驱动代码位于../base_code/linux_driver/EmbedCharDev/led_cdev/led_cdev.c。
+
+实验说明
+------------------------------
+
+硬件介绍
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+本节实验使用到 EBF6ULL-PRO 开发板上的 RGB 彩灯
+
+硬件原理图分析
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+了解RGB灯的实物后，可打开相应的原理图文档来查看硬件连接，即《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》，具体见下图。
+
+.. image:: ./media/iarled011.png
+   :align: center
+   :alt: 找不到图片03|
+
+经查阅，我们把以上连接LED灯的各个i.MX 6U芯片引脚总结出如下表所示，它展示了各个LED灯的连接信息及相应引脚的GPIO端口和引脚号。
+
+.. csv-table::  
+    :header: "LED灯", "原理图的标号","具体引脚名","GPIO端口及引脚编号"
+    :widths: 15, 15,15,15
+
+	"R灯",	"GPIO_4",	"GPIO1_IO04",	"GPIO1_IO04"
+	"G灯",	"CSI_HSYNC",	"CSI_HSYNC",	"GPIO4_IO20"
+	"B灯",	"CSI_VSYNC",	"CSI_VSYNC",	"GPIO4_IO19"
+
+代码讲解
+------------------------------
+
+**本章的示例代码目录为：base_code/linux_driver/EmbedCharDev/led_cdev/**
+
+
 
 编写LED字符设备结构体且初始化
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
     :caption: led字符设备结构体
     :linenos:
 
     struct led_chrdev {
-    	struct cdev dev;	//描述一个字符设备的结构体
-    	unsigned int __iomem *va_dr;	//数据寄存器虚拟地址指针
-    	unsigned int __iomem *va_gdir;	//输入输出方向寄存器虚拟地址指针
-    	unsigned int __iomem *va_iomuxc_mux;	//端口复用寄存器虚拟地址指针
-    	unsigned int __iomem *va_ccm_ccgrx;	//时钟寄存器虚拟地址指针
-    	unsigned int __iomem *va_iomux_pad;	//电气属性寄存器虚拟地址指针
+    	struct cdev dev;
+		unsigned int __iomem *va_dr;
+    	unsigned int __iomem *va_gdir;
+    	unsigned int __iomem *va_iomuxc_mux;
+    	unsigned int __iomem *va_ccm_ccgrx;	
+    	unsigned int __iomem *va_iomux_pad;	
 	
-    	unsigned long pa_dr;	//装载数据寄存器（物理地址）的变量
-    	unsigned long pa_gdir;	//装载输出方向寄存器（物理地址）的变量
-    	unsigned long pa_iomuxc_mux;	//装载端口复用寄存器（物理地址）的变量
-    	unsigned long pa_ccm_ccgrx;	//装载时钟寄存器（物理地址）的变量
-    	unsigned long pa_iomux_pad;	//装载电气属性寄存器（物理地址）的变量
+    	unsigned long pa_dr;
+    	unsigned long pa_gdir;
+    	unsigned long pa_iomuxc_mux;
+    	unsigned long pa_ccm_ccgrx;	
+    	unsigned long pa_iomux_pad;	
 	
-    	unsigned int led_pin;	//LED的引脚
-    	unsigned int clock_offset;	//时钟偏移地址（相对于CCM_CCGRx）
+    	unsigned int led_pin;
+    	unsigned int clock_offset;
     };
 
     static struct led_chrdev led_cdev[DEV_CNT] = {
     	{.pa_dr = 0x0209C000,.pa_gdir = 0x0209C004,.pa_iomuxc_mux =
     	0x20E006C,.pa_ccm_ccgrx = 0x20C406C,.pa_iomux_pad =
-    	0x20E02F8,.led_pin = 4,.clock_offset = 26},	//初始化红灯结构体成员变量
+    	0x20E02F8,.led_pin = 4,.clock_offset = 26},	
     	{.pa_dr = 0x20A8000,.pa_gdir = 0x20A8004,.pa_iomuxc_mux =
     	0x20E01E0,.pa_ccm_ccgrx = 0x20C4074,.pa_iomux_pad =
-    	0x20E046C,.led_pin = 20,.clock_offset = 12},	//初始化绿灯结构体成员变量
+    	0x20E046C,.led_pin = 20,.clock_offset = 12},
     	{.pa_dr = 0x20A8000,.pa_gdir = 0x20A8004,.pa_iomuxc_mux =
     	0x20E01DC,.pa_ccm_ccgrx = 0x20C4074,.pa_iomux_pad =
-    	0x20E0468,.led_pin = 19,.clock_offset = 12},	//初始化蓝灯结构体成员变量
+    	0x20E0468,.led_pin = 19,.clock_offset = 12},
     };
 
 在上面的代码中我们定义了一个RGB灯的结构体，并且定义且初始化了一个RGB灯的结构体数组，
-因为我们开发板上面共有3个RGB灯，所以代码中DEV_CNT为3。在初始化结构体的时候我们以“.”+“变量名字”
-的形式来访问且初始化结构体变量的，初始化结构体变量的时候要以“，”隔开，使用这种方式简单明了，方便管理数据结构中的成员。
+因为我们开发板上面共有3个RGB灯，所以代码中DEV_CNT为3。
+在初始化结构体的时候我们以“.”+“变量名字”的形式来访问且初始化结构体变量的，
+初始化结构体变量的时候要以“，”隔开，使用这种方式简单明了，方便管理数据结构中的成员。
+
+- 第2行：描述一个字符设备的结构体
+- 第3行：数据寄存器虚拟地址指针
+- 第4行：输入输出方向寄存器虚拟地址指针
+- 第5行：端口复用寄存器虚拟地址指针
+- 第6行：时钟寄存器虚拟地址指针
+- 第7行：电气属性寄存器虚拟地址指针
+- 第9行：装载数据寄存器（物理地址）的变量
+- 第10行：装载输出方向寄存器（物理地址）的变量
+- 第11行：装载端口复用寄存器（物理地址）的变量
+- 第12行：装载时钟寄存器（物理地址）的变量
+- 第13行：装载电气属性寄存器（物理地址）的变量
+- 第15行：LED的引脚
+- 第16行：时钟偏移地址（相对于CCM_CCGRx）
+- 第20-22行：初始化红灯结构体成员变量
+- 第23-25行：初始化绿灯结构体成员变量
+- 第26-28行：初始化蓝灯结构体成员变量
+
 
 内核RGB模块的加载和卸载函数
-------------------------------
-
-.. code-block:: c 
-    :caption: 内核RGB模块的加载和卸载函数
-    :linenos:
-
-    static __init int led_chrdev_init(void)
-    {
-    	int i = 0;
-    	dev_t cur_dev;
-    	
-    	printk("led chrdev init\n");
-    	
-    	alloc_chrdev_region(&devno, 0, DEV_CNT, DEV_NAME);//向动态申请一个设备号
-    	
-    	led_chrdev_class = class_create(THIS_MODULE, "led_chrdev");//创建设备类
-    	
-    	for (; i < DEV_CNT; i++) {
-    		cdev_init(&led_cdev[i].dev, &led_chrdev_fops);//绑定led_cdev与led_chrdev_fops
-    		led_cdev[i].dev.owner = THIS_MODULE;
-    	
-    		cur_dev = MKDEV(MAJOR(devno), MINOR(devno) + i);//注册设备
-    		cdev_add(&led_cdev[i].dev, cur_dev, 1);
-    		device_create(led_chrdev_class, NULL, cur_dev, NULL,
-    			      DEV_NAME "%d", i);//创建设备
-    	}
-    	
-    	return 0;
-    }
-
-    module_init(led_chrdev_init);	//模块加载
-    
-    static __exit void led_chrdev_exit(void)
-    {
-    	int i;
-    	dev_t cur_dev;
-    	
-    	printk("led chrdev exit\n");
-    	
-    	for (i = 0; i < DEV_CNT; i++) {
-    		cur_dev = MKDEV(MAJOR(devno), MINOR(devno) + i);	//计算出设备号
-    		device_destroy(led_chrdev_class, cur_dev);	//删除设备
-    		cdev_del(&led_cdev[i].dev);	//注销设备
-    	}
-    
-    	unregister_chrdev_region(devno, DEV_CNT);	//释放被占用的设备号
-    	class_destroy(led_chrdev_class);	//删除设备类
-    }
-
-    module_exit(led_chrdev_exit);	//模块卸载
-
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 第一部分为内核RGB模块的加载函数，其主要完成了以下任务：
 
@@ -328,10 +342,60 @@ LED驱动代码位于../base_code/linux_driver/EmbedCharDev/led_cdev/led_cdev.c�
 - 调用cdev_del()函数来释放散列表中的对象以及cdev结构本身；
 - 释放被占用的设备号以及删除设备类。
 
-从上面代代码中我们可以看出这三个LED都使用的同一个主设备号，只是他们的次设备号有所区别而已。
+从下面代码中我们可以看出这三个LED都使用的同一个主设备号，只是他们的次设备号有所区别而已。
+
+.. code-block:: c 
+    :caption: 内核RGB模块的加载和卸载函数
+    :linenos:
+
+    static __init int led_chrdev_init(void)
+    {
+    	int i = 0;
+    	dev_t cur_dev;
+    	printk("led chrdev init\n");
+    	alloc_chrdev_region(&devno, 0, DEV_CNT, DEV_NAME);
+    	led_chrdev_class = class_create(THIS_MODULE, "led_chrdev");
+    	for (; i < DEV_CNT; i++) {
+    		cdev_init(&led_cdev[i].dev, &led_chrdev_fops);
+    		led_cdev[i].dev.owner = THIS_MODULE;
+    		cur_dev = MKDEV(MAJOR(devno), MINOR(devno) + i);
+    		cdev_add(&led_cdev[i].dev, cur_dev, 1);
+    		device_create(led_chrdev_class, NULL, cur_dev, NULL,DEV_NAME "%d", i);
+    	}
+    	return 0;
+    }
+    module_init(led_chrdev_init);
+    
+    static __exit void led_chrdev_exit(void)
+    {
+    	int i;
+    	dev_t cur_dev;
+    	printk("led chrdev exit\n");
+    	for (i = 0; i < DEV_CNT; i++) {
+    		cur_dev = MKDEV(MAJOR(devno), MINOR(devno) + i);
+    		device_destroy(led_chrdev_class, cur_dev);
+    		cdev_del(&led_cdev[i].dev);	
+    	}
+    	unregister_chrdev_region(devno, DEV_CNT);
+    	class_destroy(led_chrdev_class);
+    }
+    module_exit(led_chrdev_exit);
+
+- 第5行：向动态申请一个设备号
+- 第6行：创建设备类
+- 第8行：绑定led_cdev与led_chrdev_fops
+- 第11行：注册设备
+- 第15行：创建设备
+- 第19行：模块加载
+- 第25行：计算出设备号
+- 第26行：删除设备
+- 第29行：注销设备
+- 第30行：释放被占用的设备号
+- 第32行：模块卸载
+
 
 file_operations结构体成员函数的实现
-------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c 
     :caption: file_operations中open函数的实现
@@ -341,11 +405,8 @@ file_operations结构体成员函数的实现
     static int led_chrdev_open(struct inode *inode, struct file *filp)
     {
     	unsigned int val = 0;
-    	/* 通过led_chrdev结构变量中dev成员的地址找到这个结构体变量的首地址 */
-    	struct led_chrdev *led_cdev =
-    	    (struct led_chrdev *)container_of(inode->i_cdev, struct led_chrdev,
-    					      dev);	
-    	filp->private_data = led_cdev;	//把文件的私有数据private_data指向设备结构体led_cdev
+    	struct led_chrdev *led_cdev =(struct led_chrdev *)container_of(inode->i_cdev, struct led_chrdev,dev);	
+    	filp->private_data = led_cdev;	
     	
     	printk("open\n");
     	/* 实现地址映射 */
@@ -359,9 +420,7 @@ file_operations结构体成员函数的实现
     	val &= ~(3 << led_cdev->clock_offset);
     	val |= (3 << led_cdev->clock_offset);	//置位对应的时钟位
     	iowrite32(val, led_cdev->va_ccm_ccgrx);	//重新将数据写入寄存器
-    	
     	iowrite32(5, led_cdev->va_iomuxc_mux);	//复用位普通I/O口
-    	
     	iowrite32(0x1F838, led_cdev->va_iomux_pad);
     	
     	val = ioread32(led_cdev->va_gdir);
@@ -376,13 +435,18 @@ file_operations结构体成员函数的实现
     	return 0;
     }
 
+- 第4行：通过led_chrdev结构变量中dev成员的地址找到这个结构体变量的首地址 
+- 第5行：把文件的私有数据private_data指向设备结构体led_cdev
+- 第9-13行：实现地址映射
+- 第15-21行：配置寄存器
+
 file_operations中open函数的实现函数很重要，下面我们来详细分析一下该函数具体做了哪些工作。
 
 1、container_of()函数:
 
 .. image:: ./media/container_of001.PNG
    :align: center
-   :name: 找不到图片03|
+   :alt: 找不到图片03|
 
 在Linux驱动编程当中我们会经常和container_of()这个函数打交道，所以特意拿出来和大家分享一下，其实这个函数功能不多，
 但是如果单靠自己去阅读内核源代码分析，那可能非常难以理解，编写内核源代码的大牛随便两行代码都会让我们看的云深不知处，
@@ -397,13 +461,21 @@ file_operations中open函数的实现函数很重要，下面我们来详细分�
             const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
             (type *)( (char *)__mptr - offsetof(type,member) );})
 
+函数参数和返回值如下：
 
-该函数共有三个输入参数，分别是ptr（结构体变量中某个成员的地址）、type（结构体类型）和member（该结构体变量的具体名字），
+**参数：**
+
+- **ptr：** 结构体变量中某个成员的地址
+- **type：** 结构体类型
+- **member：** 该结构体变量的具体名字
+
+**返回值：** 结构体type的首地址
+
 原理其实很简单，就是通过已知类型type的成员member的地址ptr，计算出结构体type的首地址。
 type的首地址 = ptr - size ，需要注意的是它们的大小都是以字节为单位计算的，container_of()函数的如下：
 
 - 判断ptr 与 member 是否为同一类型
-- 计算size大小，结构体的起始地址 = (type *)((char *)ptr - size)  (注：强转为该结构体指针)
+- 计算size大小，结构体的起始地址 = (type \*)((char \*)ptr - size)  (注：强转为该结构体指针)
 
 通过此函数我们便可以轻松地获取led_chrdev结构体的首地址了。
 
@@ -433,32 +505,36 @@ ioread8()、ioread16()、ioread32()等），这里再强调一遍，即使理论
 .. code-block:: c 
     :caption: file_operations中write函数的实现
     :linenos:
-    
-	/* 向RGB LED设备写入数据函数 */
-    static ssize_t led_chrdev_write(struct file *filp, const char __user * buf,
-    				size_t count, loff_t * ppos)
+
+    static ssize_t led_chrdev_write(struct file *filp, const char __user * buf, size_t count, loff_t * ppos)/* 向RGB LED设备写入数据函数 */
     {
     	unsigned long val = 0;
     	unsigned long ret = 0;
     	int tmp = count;
-    	kstrtoul_from_user(buf, tmp, 10, &ret);	//将用户空间缓存区复制到内核空间
-    	struct led_chrdev *led_cdev = (struct led_chrdev *)filp->private_data;	//将文件的私有数据地址赋给led_cdev结构体指针
-    	val = ioread32(led_cdev->va_dr);	//间接读取数据寄存器中的数据
+    	kstrtoul_from_user(buf, tmp, 10, &ret);
+    	struct led_chrdev *led_cdev = (struct led_chrdev *)filp->private_data;
+    	val = ioread32(led_cdev->va_dr);
     	if (ret == 0)
-    		val &= ~(0x01 << led_cdev->led_pin);	//点亮LED
+    		val &= ~(0x01 << led_cdev->led_pin);
     	else
-    		val |= (0x01 << led_cdev->led_pin);	//熄灭LED
-    	iowrite32(val, led_cdev->va_dr);	//将数据重新写入寄存器中
+    		val |= (0x01 << led_cdev->led_pin);	
+    	iowrite32(val, led_cdev->va_dr);
     	*ppos += tmp;
     	return tmp;
     }
+
+- 第6行：将用户空间缓存区复制到内核空间
+- 第7行：文件的私有数据地址赋给led_cdev结构体指针
+- 第8行：间接读取数据寄存器中的数据
+- 第9-13行：将数据重新写入寄存器中,控制LED亮灭
+
 
 1、kstrtoul_from_user()函数:
 
 再分析该函数之前，我们先分析一下内核中提供的kstrtoul()函数，理解kstrtoul()函数之后再分析kstrtoul_from_user()就信手拈来了。
 
 .. code-block:: c 
-    :caption: kstrtoul()函数解析 （位于../ebf-buster-linux/include/linux/kernel.h）
+    :caption: kstrtoul()函数解析 （内核源码/include/linux/kernel.h）
     :linenos:
 
     static inline int __must_check kstrtoul(const char *s, unsigned int base, unsigned long *res)
@@ -474,29 +550,45 @@ ioread8()、ioread16()、ioread32()等），这里再强调一遍，即使理论
     		return _kstrtoul(s, base, res);
     }
 
-该函数的功能是将一个字符串转换成一个无符号长整型的数据，它一共有三个参数，各个参数详细描述如下：
+该函数的功能是将一个字符串转换成一个无符号长整型的数据。
 
-- s：字符串的起始地址，该字符串必须以空字符结尾；
-- base：转换基数，如果base=0，则函数会自动判断字符串的类型，且按十进制输出，比如“0xa”就会被当做十进制处理（大小写都一样），输出为10。如果是以0开头则会被解析为八进制数，否则将会被解析成小数；
-- res：一个指向被转换成功后的结果的地址。
+函数参数和返回值如下：
 
-该函数转换成功后返回0，溢出将返回-ERANGE，解析出错返回-EINVAL。理解完kstrtoul()函数后想必大家已经知道kstrtoul_from_user()函数的大致用法了，
+**参数：** 
+
+- **s：** 字符串的起始地址，该字符串必须以空字符结尾；
+- **base：** 转换基数，如果base=0，则函数会自动判断字符串的类型，且按十进制输出，比如“0xa”就会被当做十进制处理（大小写都一样），输出为10。如果是以0开头则会被解析为八进制数，否则将会被解析成小数；
+- **res：** 一个指向被转换成功后的结果的地址。
+
+**返回值：** 该函数转换成功后返回0，溢出将返回-ERANGE，解析出错返回-EINVAL。理解完kstrtoul()函数后想必大家已经知道kstrtoul_from_user()函数的大致用法了，
+
 kstrtoul_from_user()函数定义如下：
 
 .. code-block:: c 
-    :caption: kstrtoul_from_user()函数 （位于../ebf-buster-linux/include/linux/kernel.h）
+    :caption: kstrtoul_from_user()函数 （内核源码/include/linux/kernel.h）
     :linenos:
 
     int __must_check kstrtoul_from_user(const char __user *s, size_t count, unsigned int base, unsigned long *res);
 
-该函数相比kstrtoul()多了一个参数count，count为要转换数据的大小，因为用户空间是不可以直接访问内核空间的，所以内核提供了kstrtoul_from_user()函数以实现用户缓冲区到内核缓冲区的拷贝，与之相似的还有copy_to_user()，copy_to_user()
+函数参数和返回值如下：
+
+**参数：** 
+
+- **s：** 字符串的起始地址，该字符串必须以空字符结尾；
+- **count：** count为要转换数据的大小；
+- **base：** 转换基数，如果base=0，则函数会自动判断字符串的类型，且按十进制输出，比如“0xa”就会被当做十进制处理（大小写都一样），输出为10。如果是以0开头则会被解析为八进制数，否则将会被解析成小数；
+- **res：** 一个指向被转换成功后的结果的地址。
+
+**返回值：**
+
+该函数相比kstrtoul()多了一个参数count，因为用户空间是不可以直接访问内核空间的，所以内核提供了kstrtoul_from_user()函数以实现用户缓冲区到内核缓冲区的拷贝，与之相似的还有copy_to_user()，copy_to_user()
 完成的是内核空间缓冲区到用户空io间的拷贝。如果你使用的内存类型没那么复杂，便可以选择使用put_user()或者get_user()函数。
 
-最后我们再回到file_operations中write函数的实现中的第九行代码，该代码我们在前面已经说过了，就是将在open函数实现中存储在文件的私有数据重新拿出来用而已，后面10~15行代码便是
-根据文件的私有数据来进行I/O读写访问的。
-
-
 最后分析一下file_operations中release函数的实现：
+
+当最后一个打开设备的用户进程执行close()系统调用的时候，内核将调用驱动程序release()函数，
+release函数的主要任务是清理未结束的输入输出操作，释放资源，用户自定义排他标志的复位等。
+前面我们用ioremap()将物理地址空间映射到了虚拟地址空间，当我们使用完该虚拟地址空间时应该记得使用iounmap()函数将它释放掉。
 
 .. code-block:: c 
     :caption: file_operations中release函数的实现
@@ -504,8 +596,7 @@ kstrtoul_from_user()函数定义如下：
 
     static int led_chrdev_release(struct inode *inode, struct file *filp)
     {
-    	struct led_chrdev *led_cdev = 
-			(struct led_chrdev *)container_of(inode->i_cdev, struct led_chrdev, dev);	//将文件的私有数据地址赋给led_cdev结构体指针
+    	struct led_chrdev *led_cdev = (struct led_chrdev *)container_of(inode->i_cdev, struct led_chrdev, dev);	
     	/* 释放ioremap后的虚拟地址空间 */
     	iounmap(led_cdev->va_dr);	//释放数据寄存器虚拟地址
     	iounmap(led_cdev->va_gdir);	//释放输入输出方向寄存器虚拟地址
@@ -515,22 +606,16 @@ kstrtoul_from_user()函数定义如下：
     	return 0;
     }
 
-当最后一个打开设备的用户进程执行close()系统调用的时候，内核将调用驱动程序release()函数，
-release函数的主要任务是清理未结束的输入输出操作，释放资源，用户自定义排他标志的复位等。
-前面我们用ioremap()将物理地址空间映射到了虚拟地址空间，当我们使用完该虚拟地址空间时应该记得使用iounmap()函数将它释放掉。
-
-
+- 第3行：将文件的私有数据地址赋给led_cdev结构体指针
+- 第5-9行：释放ioremap后的虚拟地址空间 
 
 LED驱动完整代码
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 到这里我们的代码已经分析完成了，下面时本驱动的完整代码（由于前面已经带领大家详细的分析了一遍，
 所以我把完整代码的注释给去掉了，希望你能够会想起每个函数的具体作用）。
 
-**本章的示例代码目录为：base_code/linux_driver/EmbedCharDev/led_cdev/**
 
-
-led_cdev.c
-------------------------------
+**led_cdev.c**
 
 .. code-block:: c 
     :caption: 完整代码 （位于../base_code/linux_driver/EmbedCharDev/led_cdev/led_cdev.c）
@@ -715,8 +800,11 @@ led_cdev.c
     MODULE_LICENSE("GPL");
 
 
-LED驱动Makefile
+实验准备
 ------------------------------
+
+LED驱动Makefile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: makefile
     :caption: LED驱动Makefile
@@ -740,17 +828,25 @@ LED驱动Makefile
 		$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) clean	
 		rm $(out)
 
-上面MakeFile编译了LED驱动和LED驱动测试程序。
+Makefile与前面的相差不大，定义了led_cdev这个内核模组和led_cdev_test应用程序。
 
+编译命令说明
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-下载验证
-------------------------------
-执行make编译,会生成ked_cdev.ko和led_cdev_test。
+在实验目录下输入如下命令来编译驱动模块：
+
+.. code:: bash
+
+    make
+
+编译成功后，实验目录下会生成"led_cdev.ko"的驱动模块文件和"led_cdev_test"的应用程序。
 
 .. image:: ./media/led_cdev001.png
    :align: center
-   :name: 找不到图片04|
+   :alt: 找不到图片04|
 
+程序运行结果
+------------------------------
 通过scp或者nfs将上面的两个文件拷贝到开发板中，执行下面的命令加载驱动：
 
 安装LED驱动
@@ -763,33 +859,34 @@ LED驱动Makefile
 我们可以通过直接给设备写入1/0来控制LED的亮灭，也可以通过我们的测试程序来控制LED。
 
 ::
-
-	sudo sh -c 'echo 0 >/dev/led_chrdev0' 红灯亮
-
-	sudo sh -c 'echo 1 >/dev/led_chrdev0' 红灯灭
+	
+	#红灯亮
+	sudo sh -c 'echo 0 >/dev/led_chrdev0' 
+	#红灯灭
+	sudo sh -c 'echo 1 >/dev/led_chrdev0' 
 
 运行LED测试程序
 sudo ./led_cdev_test LED呈现三种光
 
 .. image:: ./media/led_cdev002.png
    :align: center
-   :name: 找不到图片02
+   :alt: 找不到图片02
 
 .. image:: ./media/led_cdev003.jpg
    :align: center
-   :name: 找不到图片03
+   :alt: 找不到图片03
 
 .. image:: ./media/led_cdev004.jpg
    :align: center
-   :name: 找不到图片04
+   :alt: 找不到图片04
 
-这个时候我们在回味一下设备驱动的作用。
+这个时候我们再回味一下设备驱动的作用。
 当我们开发一款嵌入式产品时，产品的设备硬件发生变动的时候，我们就只需要更改驱动程序以提供相同的API，
 而不用去变动应用程序，就能达到同样的效果，这将减少多少开发成本呢。
 
 .. image:: ./media/led_cdev005.jpg
    :align: center
-   :name: 找不到图片05
+   :alt: 找不到图片05
 
 
 

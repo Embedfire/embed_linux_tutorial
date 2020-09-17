@@ -1,11 +1,9 @@
-
 .. vim: syntax=rst
+
 
 驱动章节实验环境搭建
 ==============================
 
-引言
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 本章主要目的是搭建驱动章节的实验环境，方便后续章节不在实验环境上耗费太多时间，
 而是集中精力理解设备驱动的原理。
 
@@ -66,11 +64,11 @@ gitee:
 
 .. image:: media/exper_env001.png
    :align: center
-   :name: 内核模块信息
+   :alt: 内核模块信息
 
 .. image:: media/exper_env002.png
    :align: center
-   :name: 内核模块信息
+   :alt: 内核模块信息
 
 接下来我们不妨简单了解一些内核的构建原理。
 
@@ -133,11 +131,11 @@ gitee:
 
 .. image:: media/exper_env003.jpg
    :align: center
-   :name: 实验环境
+   :alt: 实验环境
 
 .. image:: media/exper_env004.jpg
    :align: center
-   :name: 实验环境
+   :alt: 实验环境
 
 注意该目录下的Makefile中 "KERNEL_DIR=../ebf-buster-linux/build_image/build"要与前面编译的内核所在目录一致。
 
