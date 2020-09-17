@@ -1026,7 +1026,26 @@ makefile修改说明
 拷贝驱动程序、应用程序到共享文件夹
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-....待补充
+.. code:: bash
+
+    #在Ubuntu上执行
+    #拷贝驱动程序、应用程序到共享文件夹中
+    cp *.ko  /home/Embedfire/workdir
+
+
+    #在开发板上执行
+    #将共享文件夹挂载到开发板上，将192.168.0.35:/home/Embedfire/workdir的共享文件夹路径替换成自己的
+    sudo mount -t nfs 192.168.0.35:/home/Embedfire/workdir /mnt
+
+    #将共享文件中的.ok文件拷贝到自己的板子目录下防止加载出错，这里直接拷贝到/home目录下
+    cp /mnt/*.ko  /home
+
+
+
+
+
+
+
 
 
 程序运行结果
