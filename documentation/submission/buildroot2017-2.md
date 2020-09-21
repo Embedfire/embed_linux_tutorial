@@ -1,5 +1,7 @@
 ## 制作buildroot根文件系统(二)：使用tinyalsa播放音频
 
+** 本小节的文章为网友投稿，仅供参考 **
+
 
 - 主机环境：ubuntu16.04-64bit
 - 硬件版本：野火imx6ull-pro emmc
