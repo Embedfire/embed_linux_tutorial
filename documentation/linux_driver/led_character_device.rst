@@ -246,7 +246,7 @@ iounmap函数定义如下：
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 了解RGB灯的实物后，可打开相应的原理图文档来查看硬件连接，即《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》，具体见下图。
 
-.. image:: ./media/iarled011.png
+.. image:: ./media/asembl010.png
    :align: center
    :alt: 找不到图片03|
 
