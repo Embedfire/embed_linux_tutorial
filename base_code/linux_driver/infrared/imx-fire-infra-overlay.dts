@@ -1,0 +1,46 @@
+/*
+ * Copyright (C) 2019 - All Rights Reserved by 
+ * filename : imx-fire-led-overlay.dts
+ * brief : Device Tree overlay for EBF6ull led device
+ * author : embedfire
+ * date : 2019-11-15 
+ * version : A001
+ */
+ /dts-v1/;
+ /plugin/;
+#include "imx6ul-pinfunc.h"
+#include "dt-bindings/gpio/gpio.h"
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+ / {
+
+
+		fragment@0 {
+			target = <&iomuxc>;
+				__overlay__ { 
+					pinctrl_infra: infragrp {
+					fsl,pins = <
+						MX6UL_PAD_UART2_RX_DATA__GPIO1_IO21	0xF080	/*infra*/
+					>;
+				}; 
+			};
+		};    
+
+		fragment@1 {
+			target-path = "/";
+			__overlay__ {
+				infra {
+					#address-cells = <1>;
+					#size-cells = <1>;
+					pinctrl-names = "default";
+					compatible = "fire,InfraredRay";
+                    linux,open-drain;
+					pinctrl-0 = <&pinctrl_infra>;
+					infra_pin = <&gpio1 21 GPIO_ACTIVE_HIGH>;	/*infra pin*/
+					/*interrupts-extended = <&gpio1 5 1>, <&intc2 1 0>;*/
+					interrupt-parent = <&gpio1>;
+					interrupts = <21 IRQ_TYPE_EDGE_FALLING>; /* FALLING RISING */
+					status = "okay";
+				};
+			};
+		};
+ };
