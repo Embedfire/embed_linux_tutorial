@@ -1,19 +1,12 @@
+KERNEL_DIR=../ebf-buster-linux/build_image/build
 
-
-NATIVE ?= true
-
-
-ifeq ($(NATIVE), false)
-	KERNEL_DIR = /home/embedfire/linux4.19
-else
-	KERNEL_DIR = /lib/modules/$(shell uname -r)/build
-endif
+ARCH=arm
+CROSS_COMPILE=arm-linux-gnueabihf-
+export  ARCH  CROSS_COMPILE
 
 obj-m := led_pdev.o led_pdrv.o
 
-all:modules
+all:
+	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) modules
 modules clean:
-	$(MAKE) -C $(KERNEL_DIR) M=$(shell pwd) $@
-
-
-
+	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) clean	
