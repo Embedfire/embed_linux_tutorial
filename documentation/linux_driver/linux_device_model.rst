@@ -3,38 +3,94 @@
 
 Linux的设备模型
 ==================
-到目前为止，我们已经接触了如何编写内核模块以及简单的字符设备驱动了，算是半只脚踏进Linux的大门了。
-但着这会这些内容，还远远不够。通过前面两章的学习，我们发现，Linux的驱动代码不能够让我们随心所欲地写，它都具有一定的“套路”，
-比如某个函数负责初始化，某个函数负责注册设备等等。虽然如此，但是却也给我们带来了极大的便利。我们可以不需要关心内核是如何工作的，
-只需要编写好我们的驱动文件，然后加载进内核，这样就可以使我们的设备开始工作，当然啦，前提肯定是驱动是正确无误。因此，在Linux开发驱动，
-只要能够掌握了这些“套路”，开发一个驱动便不是难事。当然，我们不提倡自己从零开始写一个设备驱动，在内核源码的drivers中存放了大量的设备驱动代码，
-说不定可以在这些目录找到想要的驱动代码，如图所示：
+
+在前面写的驱动中，我们发现编写驱动有个固定的模式只有往里面套代码就可以了，它们之间的大致流程可以总结如下：
+
+- 实现入口函数xxx_init()和卸载函数xxx_exit()
+- 申请设备号 register_chrdev_region()
+- 初始化字符设备，cdev_init函数、cdev_add函数
+- 硬件初始化，如时钟寄存器配置使能，GPIO设置为输入输出模式等。
+- 构建file_operation结构体内容，实现硬件各个相关的操作
+- 在终端上使用mknod根据设备号来进行创建设备文件(节点)
+  (也可以在驱动使用class_create创建设备类、在类的下面device_create创建设备节点)
+
+因此，在Linux开发驱动，只要能够掌握了这些“套路”，开发一个驱动便不是难事。在内核源码的drivers中存放了大量的设备驱动代码，
+在我们写驱动之前先查看这里的内容，说不定可以在这些目录找到想要的驱动代码。如图所示：
 
 .. image:: ./media/code_drivers.jpg
    :align: center
    :alt: 内核提供的驱动代码
 
-
-本章节，我们主要讲解Linux的设备模型，在旧版本的Linux代码中，内核无法知道：当前系统中存在什么设备、各个设备的电源管理方式、设备挂载在哪个总线上等信息。
-为此，Linux2.6版本开始提出了Linux设备模型（Linux device model），该设备模型通过几个数据结构来反映当前系统中总线、设备以及驱动的工作状况，提出了以下几个重要概念：
-
-- 设备(device)：挂载在某个总线的物理设备；
-- 驱动(driver)：与特定设备相关的软件，负责初始化该设备以及提供一些操作该设备的操作方式；
-- 总线（bus)：负责管理挂载对应总线的设备以及驱动；
-- 类(class)：对于具有相同功能的设备，归结到一种类别，进行分类管理；
-
-
-无论以后学习平台设备驱动、块设备驱动或者是其他总线设备，都跟Linux设备模型息息相关。此外，关于Linux设备模型与sysfs的关系，在讲解Linux文件目录结构时，提到过sysfs文件系统，该文件系统用于把内核的设备驱动导出到用户空间，用户便可通过访问sys目录及其下的文件，来查看甚至控制内核的一些驱动设备。
-学完本章的内容，我们也可以将我们驱动的某个控制变量，导出到用户空间。
+只要这样根据步骤来编写我们的驱动代码简单粗暴，但是这存在着问题，我们将硬件的信息都写进了驱动里了，
+根据某个硬件编写的驱动只要修改了一下引脚接口，这个驱动代码就得重新修改才能使用，这显然是不合理的，
+那有没有合适的解决方案呢？答案是肯定的，Linux引入了设备驱动模型分层的概念，
+将我们编写的驱动代码分成了两块：设备与驱动。设备负责提供硬件资源而驱动代码负责去使用这些设备提供的硬件资源。
+并由总线将它们联系起来。这样子就构成以下图形中的关系。
 
 
 
+.. image:: ./media/linux_device_model.png
+   :align: center
+   :alt: 设备驱动模型
+
+
+
+设备模型通过几个数据结构来反映当前系统中总线、设备以及驱动的工作状况，提出了以下几个重要概念：
+
+- **设备(device)** ：挂载在某个总线的物理设备；
+- **驱动(driver)** ：与特定设备相关的软件，负责初始化该设备以及提供一些操作该设备的操作方式；
+- **总线（bus)** ：负责管理挂载对应总线的设备以及驱动；
+- **类(class)** ：对于具有相同功能的设备，归结到一种类别，进行分类管理；
+
+
+我们知道在Linux中一切皆“文件”，在根文件系统中有个/sys文件目录，里面记录各个设备之间的关系。
+下面介绍/sys下几个较为重要目录的作用。
+
+/sys/bus目录下的每个子目录都是注册好了的总线类型。这里是设备按照总线类型分层放置的目录结构，
+每个子目录(总线类型)下包含两个子目录——devices和drivers文件夹；其中devices下是该总线类型下的所有设备，
+而这些设备都是符号链接，它们分别指向真正的设备(/sys/devices/下)；如下图bus下的usb总线中的device则是Devices目
+录下/pci()/dev 0:10/usb2的符号链接。而drivers下是所有注册在这个总线上的驱动，每个driver子目录下
+是一些可以观察和修改的driver参数。
+
+/sys/devices目录下是全局设备结构体系，包含所有被发现的注册在各种总线上的各种物理设备。一般来说，
+所有的物理设备都按其在总线上的拓扑结构来显示。/sys/devices是内核对系统中所有设备的分层次表达模型，
+也是/sys文件系统管理设备的最重要的目录结构。
+
+/sys/class目录下则是包含所有注册在kernel里面的设备类型，这是按照设备功能分类的设备模型，
+我们知道每种设备都具有自己特定的功能，比如：鼠标的功能是作为人机交互的输入，按照设备功能分类无论它
+挂载在哪条总线上都是归类到/sys/class/input下。
+
+.. image:: ./media/linux_device_model01.png
+   :align: center
+   :alt: 设备驱动模型
+
+
+将它们统一起来就形成了上面的拓扑图，记录着设备与设备之间的关系。而我们这章的重心则放在bus文件夹目录下，创建自己的总线类型以及devices和drivers。
+
+了解上面设备与设备的拓扑图之后，让我们再回来“总线-设备-驱动”模型中来。“总线-设备-驱动”它们之间是如何相互配合工作的呢？
+
+.. image:: ./media/linux_device_model02.png
+   :align: center
+   :alt: 设备驱动模型
+
+在总线上管理着两个链表，分别管理着设备和驱动，当我们向系统注册一个驱动时，便会向驱动的管理链表插入我们的新驱动，
+同样当我们向系统注册一个设备时，便会向设备的管理链表插入我们的新设备。在插入的同时总线会执行一个bus_type结构体中match的方法对新插入的设备/驱动进行匹配。
+(它们之间最简单的匹配方式则是对比名字，存在名字相同的设备/驱动便成功匹配)。
+在匹配成功的时候会调用驱动device_driver结构体中probe方法(通常在probe中获取设备资源，具体的功能可由驱动编写人员自定义)，
+并且在移除设备或驱动时，会调用device_driver结构体中remove方法。
+
+以上只是设备驱动模型的 **机制** ，上面的match、probe、remove等方法需要我们来实现需要的功能。看到这里相信我们都已经对设备驱动模型有了粗略的整体认识。
+无论以后学习平台设备驱动、块设备驱动或者是其他总线设备，都跟Linux设备模型息息相关。sysfs文件系统用于把内核的设备驱动导出到用户空间，
+用户便可通过访问sys目录及其下的文件，来查看甚至控制内核的一些驱动设备。
+接下来对总线、驱动、设备进行进一步的了解了，具体了解如何使用代码来实现创建自己的总线并在自己的总线上创建设备及驱动。
+同时也可以将我们驱动的某个控制变量，导出到用户空间。
 
 
 总线
 ~~~~
-总线是连接处理器和设备之间的桥梁，我们接触到的设备大部分是依靠总线来进行通信的，它们之间的物理连接如图所示，对于野火开发板而言，触摸芯片是依赖于I2C，鼠标、键盘等HID设备，
-则是依赖于USB。从功能上讲，这些设备都是将文字、字符、控制命令或采集的数据等信息输入到计算机。
+
+总线是连接处理器和设备之间的桥梁，总线代表着同类设备需要共同遵守的工作时序，是连接处理器和设备之间的桥梁。我们接触到的设备大部分是依靠总线来进行通信的，
+它们之间的物理连接如图所示，对于野火开发板而言，触摸芯片是依赖于I2C，鼠标、键盘等HID设备，则是依赖于USB。从功能上讲，这些设备都是将文字、字符、控制命令或采集的数据等信息输入到计算机。
 
 .. image:: ./media/LDM.jpg
    :align: center
@@ -73,24 +129,50 @@ Linux的设备模型
 
     };
 
-- name : 指定总线的名称，当新注册一种总线类型时，会在/sys/bus目录创建一个新的目录，目录名就是该参数的值；
-- drv_groups 、dev_groups 、bus_groups: 分别表示驱动、设备以及总线的属性。这些属性可以是内部变量、字符串等等。通常会在对应的/sys目录下在以文件的形式存在，对于驱动而言，在目录/sys/bus/<bus-name>/driver/<driver-name>存放了设备的默认属性；设备则在目录/sys/bus/<bus-name>/devices/<driver-name>中。这些文件一般是可读写的，用户可以通过读写操作来获取和设置这些attribute的值。
-- match : 当向总线注册一个新的设备或者是新的驱动时，会调用该回调函数。该回调函数主要负责判断是否有注册了的驱动适合新的设备，或者新的驱动能否驱动总线上已注册但没有驱动匹配的设备；
-- uevent：总线上的设备发生添加、移除或者其它动作时，就会调用该函数，来通知驱动做出相应的对策。
-- probe : 当总线将设备以及驱动相匹配之后，执行该回调函数,最终会调用驱动提供的probe函数。
-- remove : 当设备从总线移除时，调用该回调函数；
-- suspend、resume : 电源管理的相关函数，当总线进入睡眠模式时，会调用suspend回调函数；而resume回调函数则是在唤醒总线的状态下执行；
-- pm : 电源管理的结构体，存放了一系列跟总线电源管理有关的函数，与device_driver结构体中的pm_ops有关；
-- p：该结构体用于存放特定的私有数据，其成员klist_devices和klist_drivers记录了挂载在该总线的设备和驱动；
+- **name** :指定总线的名称，当新注册一种总线类型时，会在/sys/bus目录创建一个新的目录，目录名就是该参数的值；
+- **drv_groups、dev_groups、bus_groups** :分别表示驱动、设备以及总线的属性。这些属性可以是内部变量、字符串等等。通常会在对应的/sys目录下在以文件的形式存在，对于驱动而言，在目录/sys/bus/<bus-name>/driver/<driver-name>存放了设备的默认属性；设备则在目录/sys/bus/<bus-name>/devices/<driver-name>中。这些文件一般是可读写的，用户可以通过读写操作来获取和设置这些attribute的值。
+- **match** :当向总线注册一个新的设备或者是新的驱动时，会调用该回调函数。该回调函数主要负责判断是否有注册了的驱动适合新的设备，或者新的驱动能否驱动总线上已注册但没有驱动匹配的设备；
+- **uevent** :总线上的设备发生添加、移除或者其它动作时，就会调用该函数，来通知驱动做出相应的对策。
+- **probe** :当总线将设备以及驱动相匹配之后，执行该回调函数,最终会调用驱动提供的probe函数。
+- **remove** :当设备从总线移除时，调用该回调函数；
+- **suspend、resume** :电源管理的相关函数，当总线进入睡眠模式时，会调用suspend回调函数；而resume回调函数则是在唤醒总线的状态下执行；
+- **pm** :电源管理的结构体，存放了一系列跟总线电源管理有关的函数，与device_driver结构体中的pm_ops有关；
+- **p** :该结构体用于存放特定的私有数据，其成员klist_devices和klist_drivers记录了挂载在该总线的设备和驱动；
 
-Linux内核已经为我们写好了大部分总线驱动，我们一般不会去注册一个新的总线，内核中提供了bus_register函数来注册总线，以及bus_unregister函数来注销总线，其函数原型如下：
+在实际编写linux驱动模块时，Linux内核已经为我们写好了大部分总线驱动，正常情况下我们一般不会去注册一个新的总线，
+内核中提供了bus_register函数来注册总线，以及bus_unregister函数来注销总线，其函数原型如下：
 
 .. code-block:: c 
     :caption: 注册/注销总线API（内核源码/drivers/base/bus.c）
     :linenos: 
 
     int bus_register(struct bus_type *bus);
+
+**参数：** **bus**: bus_type类型的结构体指针
+
+**返回值：**
+
+- **成功：** 0
+- **失败：** 负数
+
+
+
+
+.. code-block:: c 
+    :caption: 注册/注销总线API（内核源码/drivers/base/bus.c）
+    :linenos: 
+
     void bus_unregister(struct bus_type *bus);
+
+
+**参数：** **bus** :bus_type类型的结构体指针
+
+**返回值：** **无**
+
+
+
+
+
 
 当我们成功注册总线时，会在/sys/bus/目录下创建一个新目录，目录名为我们新注册的总线名。bus目录中包含了当前系统中已经注册了的所有总线，例如i2c，spi，platform等。我们看到每个总线目录都拥有两个子目录devices和drivers，
 分别记录着挂载在该总线的所有设备以及驱动。
@@ -128,18 +210,19 @@ Linux内核已经为我们写好了大部分总线驱动，我们一般不会去
 		struct class		*class;
         void (*release)(struct device *dev);
 		const struct attribute_group **groups;	/* optional groups */
+        struct device_private	*p;
 	};	
 
-- init_name：指定该设备的名称，总线匹配时，一般会根据比较名字，来进行配对；
-- parent：表示该设备的父对象，前面提到过，旧版本的设备之间没有任何关联，引入Linux设备模型之后，设备之间呈树状结构，便于管理各种设备；
-- bus：表示该设备依赖于哪个总线，当我们注册设备时，内核便会将该设备注册到对应的总线。
-- of_node：存放设备树中匹配的设备节点。当内核使能设备树，总线负责将驱动的of_match_table以及设备树的compatible属性进行比较之后，将匹配的节点保存到该变量。
-- platform_data：特定设备的私有数据，通常定义在板级文件中；
-- driver_data：同上，驱动层可通过dev_set/get_drvdata函数来获取该成员；
-- class：指向了该设备对应类，开篇我们提到的触摸，鼠标以及键盘等设备，对于计算机而言，他们都具有相同的功能，都归属于输入设备。我们可以在/sys/class目录下对应的类找到该设备，如input、leds、pwm等目录;
-- dev：dev_t类型变量，字符设备章节提及过，它是用于标识设备的设备号，该变量主要用于向/sys目录中导出对应的设备。
-- release：回调函数，当设备被注销时，会调用该函数。如果我们没定义该函数时，移除设备时，会提示“Device 'xxxx' does not have a release() function, it is broken and must be fixed”的错误。
-- group：指向struct attribute_group类型的指针，指定该设备的属性；
+- **init_name** :指定该设备的名称，总线匹配时，一般会根据比较名字，来进行配对；
+- **parent** :表示该设备的父对象，前面提到过，旧版本的设备之间没有任何关联，引入Linux设备模型之后，设备之间呈树状结构，便于管理各种设备；
+- **bus** :表示该设备依赖于哪个总线，当我们注册设备时，内核便会将该设备注册到对应的总线。
+- **of_node** :存放设备树中匹配的设备节点。当内核使能设备树，总线负责将驱动的of_match_table以及设备树的compatible属性进行比较之后，将匹配的节点保存到该变量。
+- **platform_data** :特定设备的私有数据，通常定义在板级文件中；
+- **driver_data** :同上，驱动层可通过dev_set/get_drvdata函数来获取该成员；
+- **class** :指向了该设备对应类，开篇我们提到的触摸，鼠标以及键盘等设备，对于计算机而言，他们都具有相同的功能，都归属于输入设备。我们可以在/sys/class目录下对应的类找到该设备，如input、leds、pwm等目录;
+- **dev** :dev_t类型变量，字符设备章节提及过，它是用于标识设备的设备号，该变量主要用于向/sys目录中导出对应的设备。
+- **release** :回调函数，当设备被注销时，会调用该函数。如果我们没定义该函数时，移除设备时，会提示“Device 'xxxx' does not have a release() function, it is broken and must be fixed”的错误。
+- **group** :指向struct attribute_group类型的指针，指定该设备的属性；
 
 内核也提供相关的API来注册和注销设备，如下所示：
 
@@ -148,7 +231,28 @@ Linux内核已经为我们写好了大部分总线驱动，我们一般不会去
     :linenos: 
 
     int device_register(struct device *dev);
+
+
+**参数：** **dev** :struct device结构体类型指针
+
+**返回值：**
+
+- **成功：** 0
+- **失败：** 负数
+
+
+
+.. code-block:: c 
+    :caption: 内核注册/注销设备(内核源码/driver/base/core.c）
+    :linenos: 
+
     void device_unregister(struct device *dev);
+
+**参数：** **dev** :struct device结构体类型指针
+
+**返回值：** **无**
+
+
 
 在讲解总线的时候，我们说过，当成功注册总线时，会在/sys/bus目录下创建对应总线的目录，该目录下有两个子目录，分别是drivers和devices，
 我们使用device_register注册的设备从属于某个总线时，该总线的devices目录下便会存在该设备文件。
@@ -178,16 +282,18 @@ Linux内核已经为我们写好了大部分总线驱动，我们一般不会去
 		int (*remove) (struct device *dev);
 
 		const struct attribute_group **groups;
+		struct driver_private *p;
+    
 	};	
 
-- name：指定驱动名称，总线进行匹配时，利用该成员与设备名进行比较；
-- bus：表示该驱动依赖于哪个总线，内核需要保证在驱动执行之前，对应的总线能够正常工作；
-- suppress_bind_attrs：布尔量，用于指定是否通过sysfs导出bind与unbind文件，bind与unbind文件是驱动用于绑定/解绑关联的设备。
-- owner：表示该驱动的拥有者，一般设置为THIS_MODULE；
-- of_match_table：指定该驱动支持的设备类型。当内核使能设备树时，会利用该成员与设备树中的compatible属性进行比较。
-- remove：当设备从操作系统中拔出或者是系统重启时，会调用该回调函数；
-- probe：当驱动以及设备匹配后，会执行该回调函数，对设备进行初始化。通常的代码，都是以main函数开始执行的，但是在内核的驱动代码，都是从probe函数开始的。
-- group：指向struct attribute_group类型的指针，指定该驱动的属性；
+- **name** :指定驱动名称，总线进行匹配时，利用该成员与设备名进行比较；
+- **bus** :表示该驱动依赖于哪个总线，内核需要保证在驱动执行之前，对应的总线能够正常工作；
+- **suppress_bind_attrs** :布尔量，用于指定是否通过sysfs导出bind与unbind文件，bind与unbind文件是驱动用于绑定/解绑关联的设备。
+- **owner** :表示该驱动的拥有者，一般设置为THIS_MODULE；
+- **of_match_table** :指定该驱动支持的设备类型。当内核使能设备树时，会利用该成员与设备树中的compatible属性进行比较。
+- **remove** :当设备从操作系统中拔出或者是系统重启时，会调用该回调函数；
+- **probe** :当驱动以及设备匹配后，会执行该回调函数，对设备进行初始化。通常的代码，都是以main函数开始执行的，但是在内核的驱动代码，都是从probe函数开始的。
+- **group** :指向struct attribute_group类型的指针，指定该驱动的属性；
 
 内核提供了driver_register函数以及driver_unregister函数来注册/注销驱动，成功注册的驱动会记录在/sys/bus/<bus>/drivers目录，
 函数原型如下所示：
@@ -197,10 +303,53 @@ Linux内核已经为我们写好了大部分总线驱动，我们一般不会去
     :linenos: 
 
     int driver_register(struct device_driver *drv);
+
+
+**参数：** **drv** :struct device_driver结构体类型指针
+
+**返回值：**
+
+- **成功：** 0
+- **失败：** 负数
+
+
+
+
+.. code-block:: c 
+    :caption: device_driver结构体(内核源码/include/linux/device.h）
+    :linenos: 
+
     void driver_unregister(struct device_driver *drv);
+
+**参数：** **drv** :struct device_drive结构体类型指针
+
+**返回值：** **无**
+
+
+
+
+到为止简单地介绍了总线、设备、驱动的数据结构以及注册/注销接口函数。下图是总线关联上设备与驱动之后的数据结构关系图
+
+.. image:: ./media/linux_device_modle000.png
+   :align: center
+   :alt: /sys/bus目录
+
+大致注册流程如下
+
+.. image:: ./media/linux_device_modle003.png
+   :align: center
+   :alt: /sys/bus目录
+
+系统启动之后会调用buses_init函数创建/sys/bus文件目录，这部分系统在开机时已经帮我们准备好了，
+接下去就是通过总线注册函数bus_register进行总线注册，注册完总线后在总线的目录下生成devices文件夹和drivers文件夹，
+最后分别通过device_register以及driver_register函数注册相对应的设备和驱动。
+
 
 attribute属性文件
 ~~~~~~~~~~~~
+
+
+
 /sys目录有各种子目录以及文件，前面讲过当我们注册新的总线、设备或驱动时，内核会在对应的地方创建一个新的目录，目录名为各自结构体的name成员，
 每个子目录下的文件，都是内核导出到用户空间，用于控制我们的设备的。内核中以attribute结构体来描述/sys目录下的文件，如下所示：
 
@@ -213,8 +362,8 @@ attribute属性文件
         umode_t			mode;        
     };
 
-- name：指定文件的文件名；
-- mode：指定文件的权限，
+- **name** :指定文件的文件名；
+- **mode** :指定文件的权限，
 
 bus_type、device、device_driver结构体中都包含了一种数据类型struct attribute_group，如下所示，它是多个attribute文件的集合，
 利用它进行初始化，可以避免一个个注册attribute。
@@ -233,7 +382,8 @@ bus_type、device、device_driver结构体中都包含了一种数据类型struc
 
 
 设备属性文件
-------------
+>>>>>>>>>>>>>>>>
+
 在开发单片机的时候，如果想要读取某个寄存器的值，你可能需要加入一些新的代码，并重新编译。但对于Linux内核来讲，每次都需要编译一遍源码，
 实在太浪费时间和精力了。为此，Linux提供以下接口，来注册和注销一个设备属性文件。我们可以通过这些接口直接在用户层进行查询/修改，避免了重新编译内核的麻烦。
 
@@ -256,21 +406,24 @@ bus_type、device、device_driver结构体中都包含了一种数据类型struc
     extern void device_remove_file(struct device *dev,
                     const struct device_attribute *attr);   
 
-DEVICE_ATTR宏定义用于定义一个device_attribute类型的变量，##表示将##左右两边的标签拼接在一起，因此，我们得到变量的名称应该是带有dev_attr_前缀的。
-该宏定义需要传入四个参数_name，_mode，_show，_store，分别代表了文件名，文件权限，show回调函数，store回调函数。show回调函数以及store回调函数分别对应着用户层的cat和echo命令，
-当我们使用cat命令，来获取/sys目录下某个文件时，最终会执行show回调函数；使用echo命令，则会执行store回调函数。
-参数_mode的值，可以使用S_IRUSR、S_IWUSR、S_IXUSR等宏定义，更多选项可以查看读写文件章节关于文件权限的内容。
+- **DEVICE_ATTR宏** 定义用于定义一个device_attribute类型的变量，##表示将##左右两边的标签拼接在一起，因此，
+  我们得到变量的名称应该是带有dev_attr_前缀的。该宏定义需要传入四个参数_name，_mode，_show，_store，分别代表了文件名，
+  文件权限，show回调函数，store回调函数。show回调函数以及store回调函数分别对应着用户层的cat和echo命令，
+  当我们使用cat命令，来获取/sys目录下某个文件时，最终会执行show回调函数；使用echo命令，则会执行store回调函数。
+  参数_mode的值，可以使用S_IRUSR、S_IWUSR、S_IXUSR等宏定义，更多选项可以查看读写文件章节关于文件权限的内容。
 
-device_create_file函数用于创建文件，它有两个参数成员，第一个参数表示的是设备，前面讲解device结构体时，其成员中有个bus_type变量，
-用于指定设备挂载在某个总线上，并且会在总线的devices子目录创建一个属于该设备的目录，device参数可以理解为在哪个设备目录下，创建设备文件。
-第二个参数则是我们自己定义的device_attribute类型变量。
+- **device_create_file** 函数用于创建文件，它有两个参数成员，第一个参数表示的是设备，前面讲解device结构体时，其成员中有个bus_type变量，
+  用于指定设备挂载在某个总线上，并且会在总线的devices子目录创建一个属于该设备的目录，device参数可以理解为在哪个设备目录下，创建设备文件。
+  第二个参数则是我们自己定义的device_attribute类型变量。
 
-device_remove_file函数用于删除文件，当我们的驱动注销时，对应目录以及文件都需要被移除。
-其参数和device_create_file函数的参数是一样，这里就不进行解释。
+- **device_remove_file** 函数用于删除文件，当我们的驱动注销时，对应目录以及文件都需要被移除。
+  其参数和device_create_file函数的参数是一样。
 
 
 驱动属性文件
-------------
+>>>>>>>>>>>>>>>>
+
+
 驱动属性文件，和设备属性文件的作用是一样，唯一的区别在于函数参数的不同，函数接口如下：
 
 .. code-block:: c 
@@ -296,15 +449,19 @@ device_remove_file函数用于删除文件，当我们的驱动注销时，对�
     extern void driver_remove_file(struct device_driver *driver,
                     const struct driver_attribute *attr);
 
-DRIVER_ATTR_RW、DRIVER_ATTR_RO以及DRIVER_ATTR_WO宏定义用于定义一个driver_attribute类型的变量，带有driver_attr_的前缀，区别在于文件权限不同，RW后缀表示文件可读写，RO后缀表示文件仅可读，
-WO后缀表示文件仅可写。而且你会发现，DRIVER_ATTR类型的宏定义没有参数来设置show和store回调函数，那如何设置这两个参数呢？在写驱动代码时，只需要你提供xxx_store以及xxx_show这两个函数，
-并确保两个函数的xxx和DRIVER_ATTR类型的宏定义中名字是一致的即可。
+- **DRIVER_ATTR_RW、DRIVER_ATTR_RO** 以及 **DRIVER_ATTR_WO** 宏定义用于定义一个driver_attribute类型的变量，带有driver_attr_的前缀，区别在于文件权限不同，
+  RW后缀表示文件可读写，RO后缀表示文件仅可读，WO后缀表示文件仅可写。而且你会发现，DRIVER_ATTR类型的宏定义没有参数来设置show和store回调函数，
+  那如何设置这两个参数呢？在写驱动代码时，只需要你提供xxx_store以及xxx_show这两个函数，
+  并确保两个函数的xxx和DRIVER_ATTR类型的宏定义中名字是一致的即可。
 
-driver_create_file和driver_remove_file函数用于创建和移除文件，使用driver_create_file函数，会在/sys/bus/<bus-name>/drivers/<driver-name>/目录下创建文件。
+- **driver_create_file** 和 **driver_remove_file** 函数用于创建和移除文件，使用driver_create_file函数，
+  会在/sys/bus/<bus-name>/drivers/<driver-name>/目录下创建文件。
 
 
 总线属性文件
------------
+>>>>>>>>>>>>>>>>
+
+
 同样的，Linux也为总线通过了相应的函数接口，如下所示：
 
 .. code-block:: c 
@@ -322,48 +479,72 @@ driver_create_file和driver_remove_file函数用于创建和移除文件，使�
                         struct bus_attribute *);
     extern void bus_remove_file(struct bus_type *, struct bus_attribute *);
 
-BUS_ATTR宏定义用于定义一个bus_attribute变量，使用bus_create_file函数，会在/sys/bus/<bus-name>下创建对应的文件。
-bus_remove_file则用于移除该文件。
+- BUS_ATTR宏定义用于定义一个bus_attribute变量，
+- 使用bus_create_file函数，会在/sys/bus/<bus-name>下创建对应的文件。
+- bus_remove_file则用于移除该文件。
 
-实验
-~~~~~~~~
-下面，我们利用前面学到的理论知识，来创建一个虚拟的总线xbus，分别挂载了驱动xdrv以及设备xdev。
+驱动设备模型实验说明
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+硬件介绍
+>>>>>>>>>>>>>>>>
+
+无
+
+硬件原理图介绍
+>>>>>>>>>>>>>>>>
+
+无
+
+
+实验代码讲解
+~~~~~~~~~~~~~~~~~~~~
+
+
 
 **本章的示例代码目录为：base_code/linux_driver/linux_device_model**
+利用前面学到的理论知识，来创建一个虚拟的总线xbus，分别挂载了驱动xdrv以及设备xdev。
+
+编程思路
+>>>>>>>>>>>>>>>>>>>>>
+
+1. 编写Makefile文件
+1. 声明一个总线结构体并创建一个总线xbus，实现match方法，对设备和驱动进行匹配
+2. 声明一个设备结构体，挂载到我们的xbus总线中
+3. 声明一个驱动结构体，挂载到xbus总线，实现probe、remove方法
+4. 将总线、设备、驱动导出属性文件到用户空间。
+
+
+
+
 
 Makefile
-------
+>>>>>>>>>>>>>>>>>>>>>
 工欲善其事必先利其器，在开始写程序之前，我们需要先准备好我们的Makefile。针对当前开发板使用的是debian的镜像，那么我们便可以直接在开发板上进行编译，
 前提是板子上已经安装了gcc以及make工具。
 
-
+.. code-block:: makefile
    :caption: Makefile(位于../base_code/linux_driver/linux_device_model/Makefile)
-   :language: makefile
-   :linenos: 	
-	
-	NATIVE ?= true
+   :linenos: 
 
+    NATIVE ?= true
+    ifeq ($(NATIVE), false)
+        KERNEL_DIR = /home/embedfire/linux4.19
+    else
+        KERNEL_DIR = /lib/modules/$(shell uname -r)/build
+    endif
+    obj-m := xdev.o xbus.o xdrv.o
 
-	ifeq ($(NATIVE), false)
-		KERNEL_DIR = /home/embedfire/linux4.19
-	else
-		KERNEL_DIR = /lib/modules/$(shell uname -r)/build
-	endif
+    all:modules
+    modules clean:
+        $(MAKE) -C $(KERNEL_DIR) M=$(shell pwd) $@
 
-
-
-
-	obj-m := xdev.o xbus.o xdrv.o
-
-	all:modules
-	modules clean:
-		$(MAKE) -C $(KERNEL_DIR) M=$(shell pwd) $@
 
 我们通过变量NATIVE来控制我们的编译环境，该Makefile默认设置是在开发板进行编译，对于想要在PC机进行交叉编译的读者，需要指定变量KERNEL_DIR为自己内核源码的路径，
 再执行命令“make NATIVE=false”，完成编译。
 
 总线
---------
+>>>>>>>>>>>>>>>>>>>>>
 
 定义新的总线
 ^^^^^^^^^^^^^^^^^^^^^
@@ -388,9 +569,10 @@ Makefile
     };
     EXPORT_SYMBOL(xbus);
 
-代码中定义了一种新的总线，名为xbus，总线结构体中最重要的一个成员，便是match回调函数，这个函数负责总线下的设备以及驱动匹配，
-没有这个函数，设备与驱动便不可以进行匹配。这里，我们使用字符串比较的方式，通过对比驱动以及设备的名字来确定是否匹配，如果相同，
-则说明匹配成功，返回1；反之，则返回0。
+- 第11-15行：定义了一个名为xbus的总线总线结构体中最重要的一个成员，便是match回调函数，这个函数负责总线下的设备以及驱动匹配，
+  没有这个函数，设备与驱动便不可以进行匹配。
+- 第1-9行：我们使用字符串比较的方式，通过对比驱动以及设备的名字来确定是否匹配，如果相同，则说明匹配成功，返回1；反之，则返回0。
+
 
 导出总线属性文件
 ^^^^^^^^^^^^^^^^^^^^^
@@ -409,8 +591,8 @@ Makefile
 
     BUS_ATTR(xbus_test, S_IRUSR, xbus_test_show, NULL);
 
-代码中，定义了一个bus_name变量，存放了该总线的名字，并且提供show回调函数，这样用户便可以通过cat命令，
-来查询总线的名称，并且设置该文件的文件权限为文件拥有者可读，组内成员以及其他成员不可操作。
+- 第1行：定义了一个bus_name变量，存放了该总线的名字，
+- 第3-8行：提供show回调函数，这样用户便可以通过cat命令，来查询总线的名称，并且设置该文件的文件权限为文件拥有者可读，组内成员以及其他成员不可操作。
 
 注册总线
 ^^^^^^^^^^^^^^^^^^^^^
@@ -442,7 +624,10 @@ Makefile
     MODULE_AUTHOR("embedfire");
     MODULE_LICENSE("GPL");
 
-这样的代码，就完成了总线的注册，当我们成功加载该内核模块时，内核便会出现一种新的总线xbus,如图所示：
+- 第1-9行：实现总线的装载函数，注册总线并将总线属性文件导出。
+- 第11-17行，实现总线的卸载函数，注销总线并将总线属性文件删除。
+
+当我们成功加载该内核模块时，内核便会出现一种新的总线xbus,如图所示：
 
 .. image:: ./media/xbus.jpg
    :align: center
@@ -451,7 +636,8 @@ Makefile
 我们可以看到，总线的devices和drivers目录都是空的，并没有什么设备和驱动挂载在该总线下。红框处便是我们自定义的总线属性文件，当我们执行命令“cat    xbus_test”时，可以看到终端上会打印一行字符串：xbus。
 
 设备
---------
+>>>>>>>>>>>>>>>>>>>>>
+
 Linux设备模型中，总线已经注册好了，还缺少设备和驱动。注册一个新的设备，主要完成这两个工作：一个是名字，
 这是总相匹配的依据；另一个就是总线，该设备挂载在哪个总线上，不能张冠李戴。
 
@@ -478,8 +664,11 @@ Linux设备模型中，总线已经注册好了，还缺少设备和驱动。注
         .release = xdev_release,
     };
 
-代码中，定义了一个名为xdev的设备，其挂载在xbus上，这里写了一个release函数，防止卸载模块时会报错。相对于注册总线来说，
-还是相对比较简单。
+- 第1行：声明了外部的总线变量xbus。
+- 第3-6行：编写release函数，防止卸载模块时会报错。
+- 第8-12行：定义了一个名为xdev的设备，将其挂载在xbus上。
+
+相对于注册总线来说，还是相对比较简单。
 
 导出设备属性文件
 ^^^^^^^^^^^^^^^^^^^^^
@@ -505,10 +694,11 @@ Linux设备模型中，总线已经注册好了，还缺少设备和驱动。注
 
     DEVICE_ATTR(xdev_id, S_IRUSR|S_IWUSR, xdev_id_show, xdev_id_store);
 
+- 第1-13行：show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。store回调函数则是利用kstrtoul函数，该函数有三个参数，
+  其中第二个参数是采用几进制的方式，这里我们传入的是10，意味着buf中的内容将转换为10进制的数传递给id，实现了通过sysfs修改驱动的目的。
+- 第15行：使用DEVICE_ATTR宏定义定义了xdev_id，并且设置该文件的文件权限是文件拥有者可读可写，组内成员以及其他成员不可操作。
 
-使用DEVICE_ATTR宏定义定义了xdev_id，并且设置该文件的文件权限是文件拥有者可读可写，组内成员以及其他成员不可操作。
-show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。store回调函数则是利用kstrtoul函数，该函数有三个参数，其中第二个参数是采用几进制的方式，
-这里我们传入的是10，意味着buf中的内容将转换为10进制的数传递给id，实现了通过sysfs修改驱动的目的。
+
 
 注册设备
 ^^^^^^^^^^^^^^^^^^^^^
@@ -539,6 +729,9 @@ show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。stor
     MODULE_AUTHOR("embedfire");
     MODULE_LICENSE("GPL");
 
+- 第1-8行：实现模块的装载函数，注册设备并将设备属性文件导出。
+- 第10-16行：实现模块的卸载函数，注销设备并将设备属性文件删除。
+
 加载内核模块后，我们可以看到在/sys/bus/xbus/devices/中多了个设备xdev，它是个链接文件，最终指向了/sys/devices中的设备。
 
 .. image:: ./media/xdev.jpg
@@ -558,7 +751,8 @@ show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。stor
    :alt: 修改xdev_id文件
 
 驱动
--------
+>>>>>>>>>>>>>>>>>>>>>
+
 关于驱动的部分，由于本章实验没有具体的物理设备，因此，没有涉及到设备初始化、设备的函数接口等内容。
 
 定义新的驱动
@@ -589,9 +783,12 @@ show回调函数中，直接将id的值通过sprintf函数拷贝至buf中。stor
         .remove = xdrv_remove,
     };
 
-代码中定义了一个驱动结构体xdrv，名字需要和设备的名字相同，否则就不能成功匹配。该驱动挂载在已经注册好的总线xbus下。
-当驱动和设备匹配成功之后，便会执行驱动的probe函数，这里只是在终端上打印当前的文件以及函数名。
-xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能等，这里也只是打印出当前的文件名以及函数名。
+- 第1行：声明了外部的总线变量xbus。
+- 第3-7行：当驱动和设备匹配成功之后，便会执行驱动的probe函数，这里只是在终端上打印当前的文件以及函数名。
+- 第9-13行：xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能等，这里也只是打印出当前的文件名以及函数名。
+- 第15-20行：定义了一个驱动结构体xdrv，.name成员需要和设备的.name相同，否则就不能成功匹配。该驱动挂载在已经注册好的总线xbus下。
+  
+
 
 导出驱动属性文件
 ^^^^^^^^^^^^^^^^^^^^^
@@ -608,8 +805,10 @@ xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能
 
     DRIVER_ATTR_RO(drvname);
 
-在讲驱动属性文件时，我们讲到DRIVER_ATTR_RO定义驱动属性文件时，没有参数可以设置show和store回调函数，我们只要保证store和show函数的前缀与驱动属性文件一致即可。
-如代码所示，定义了一个drvname属性文件，show回调函数的函数名则为drvname_show，这样便可以完成两者之间的关联。
+- 在讲驱动属性文件时，我们讲到DRIVER_ATTR_RO定义驱动属性文件时，没有参数可以设置show和store回调函数，
+  我们只要保证store和show函数的前缀与驱动属性文件一致即可。如代码所示，定义了一个drvname属性文件，
+  show回调函数的函数名则为drvname_show，这样便可以完成两者之间的关联。
+
 
 注册驱动
 ^^^^^^^^^^^^^^^^^^^^^
@@ -638,6 +837,9 @@ xdrv_remove函数，当注销驱动时，需要关闭物理设备的某些功能
 
     MODULE_AUTHOR("embedfire");
     MODULE_LICENSE("GPL");
+
+- 第1-8行：实现模块的装载函数，注册驱动并将驱动属性文件导出。
+- 第10-16行：实现模块的卸载函数，注销驱动并将驱动属性文件删除。
 
 成功加载驱动后，可以看到/sys/bus/xbus/driver多了个驱动xdev目录，如图所示：在该目录下存在一个我们自定义的属性文件，
 使用cat命令读该文件的内容，终端会打印字符串“xdrv”。

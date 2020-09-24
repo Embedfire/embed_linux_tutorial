@@ -3,44 +3,52 @@
 Linux设备树
 --------------------------------
 
-Linux3.x以后的版本才引入了设备树，设备树用于描述一个硬件平台的板级细节。
-在早些的linux内核，这些“硬件平台的板级细节”保存在linux内核目录“/arch”，
-以ARM平台为例“硬件平台的板级细节”保存在“/arch/arm/plat-xxx”和“/arch/arm/mach-xxx”目录下。
-随着处理器数量的增多用于描述“硬件平台板级细节”的文件越来越多导致Linux内核非常臃肿，
-Linux之父发现这个问题之后决定使用设备树解决这个问题。设备树简单、易用、可重用性强，linux3.x之后大多采用设备树编写驱动。
+在Linux内核源码未引入设备树之前，相关的BSP代码中充斥大量的平台设备的代码，而这些代码大多都是重复的杂乱的。
+举个例子，有20家的厂商对im6ull都做了自己的评估板，那么内核中就有20个针对im6ull的板级细节描述代码，
+这些代码充斥在/arch/arm/plat-xxx和/arch/arm/mach-xxx目录，而这单单只是im6ull一个处理器，
+随着处理器数量的增多用于描述“硬件平台板级细节”的文件越来越多导致Linux内核非常臃肿。
+为了解决这个问题在Linux3.x以后的版本引入设备树。设备树用于描述一个硬件平台的板级细节。设备树的主要优势在于对于同一SOC的不同主板，
+只需更换设备树文件.dtb即可实现不同主板的无差异支持，而无需更换内核文件。
+可见设备树简单、易用、可重用性强，因此linux3.x之后大多采用设备树编写驱动。
 
 关于设备树的详细请参考：https://www.devicetree.org/
 
 设备树简介
 ~~~~~~~~~~~~~~~~~~~~
 
-设备树的作用就是描述一个硬件平台的硬件资源。这个“设备树”可以被bootloader(uboot)传递到内核，
-内核可以从设备树中获取硬件信息。
+设备树的作用在于描述一个硬件平台的硬件资源。这个“设备树”被bootloader(uboot)传递到内核，
+而内核可以从设备树中获取硬件信息。
 
 设备树描述硬件资源时有两个特点。
 
--   第一，以“树状”结构描述硬件资源。例如本地总线为树的“主干”在设备树里面称为“根节点”，
-    挂载到本地总线的IIC总线、SPI总线、UART总线为树的“枝干”在设备树里称为“根节点的子节点”，
-    IIC 总线下的IIC设备不止一个，这些“枝干”又可以再分。
+- 第一，以“树状”结构描述硬件资源。例如本地总线为树的“主干”在设备树里面称为“根节点”，
+  挂载到本地总线的IIC总线、SPI总线、UART总线为树的“枝干”在设备树里称为“根节点的子节点”，
+  IIC总线下的IIC设备不止一个，这些“枝干”又可以再分。
 
--   第二，设备树可以像头文件（.h文件）那样，一个设备树文件引用另外一个设备树文件，
-    这样可以实现“代码”的重用。例如多个硬件平台都使用i.MX6ULL作为主控芯片，
-    那么我们可以将i.MX6ULL芯片的硬件资源写到一个单独的设备树文件里面一般使用“.dtsi”后缀，
-    其他设备树文件直接使用“# includexxx”引用即可。
+.. image:: ./media/device_tree_001.png
+   :align: center
+   :alt: 找不到图片01
+
+- 第二，设备树可以像头文件（.h文件）那样，一个设备树文件引用另外一个设备树文件，
+  这样可以实现“代码”的重用。例如多个硬件平台都使用i.MX6ULL作为主控芯片，
+  那么我们可以将i.MX6ULL芯片的硬件资源写到一个单独的设备树文件里面一般使用“.dtsi”后缀，
+  其他设备树文件直接使用“# includexxx”引用即可。
+
+
 
 DTS、DTC和DTB它们是文档中常见的几个缩写。
 
--   DTS是指.dts格式的文件，是一种ASII 文本格式的设备树描述，也是我们要编写的设备树源码，
-    一般一个.dts文件对应一个硬件平台，位于Linux源码的“/arch/arm/boot/dts”目录下。
--   DTC是指编译设备树源码的工具，一般情况下我们需要手动安装这个编译工具。
--   DTB是设备树源码编译生成的文件，类似于我们C语言中“.C”文件编译生成“.bin”文件。
+- DTS是指.dts格式的文件，是一种ASII 文本格式的设备树描述，也是我们要编写的设备树源码，
+  一般一个.dts文件对应一个硬件平台，位于Linux源码的“/arch/arm/boot/dts”目录下。
+- DTC是指编译设备树源码的工具，一般情况下我们需要手动安装这个编译工具。
+- DTB是设备树源码编译生成的文件，类似于我们C语言中“.C”文件编译生成“.bin”文件。
+
 
 设备树语法讲解及源码分析
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-上一小节我们简单了解了设备树的作用，到现在为止我们还不知道“设备树”是什么样子。
-考虑到直接讲解设备树语法可能会让人摸不着头脑，下面内容将以我们现在使用的设备树源码为例逐步分析设备树，
-在分析过程中讲解设备树基本语法。
+上面我们简单了解了设备树的概念，到现在为止我们还不知道“设备树”长什么样。
+下面内容将以我们现在使用的设备树源码为例逐步分析设备树，在分析过程中讲解设备树基本语法。
 
 本教程使用的设备树位于内核源码“ebf-buster-linux/arch/arm/boot/dts/imx6ull-seeed-npi.dts”。
 我们也拷贝了一份到教程配套代码的目录中：“base_code/linux_driver/device_tree”,
@@ -114,7 +122,7 @@ DTS、DTC和DTB它们是文档中常见的几个缩写。
 
 设备树源码分为三部分，介绍如下：
 
--   第一部分，头文件。根据之前讲解设备树是可以像C语言那样使用“#include”引用头文件。
+-   第一部分，头文件。上面一小节讲解设备树是可以像C语言那样使用“#include”引用头文件。
     标号①处并不是我们常见的“.h”头文件，它也是一个imx6ull平台“共用”的设备树文件，它由NXP官方提供，
     稍后我们会以imx6ull.dtsi文件为例分析设备树头文件。
 
@@ -145,17 +153,11 @@ DTS、DTC和DTB它们是文档中常见的几个缩写。
     :linenos:
 
     node-name@unit-address{
-    
     属性1 = …
-    
     属性2 = …
-    
-    属性13= …
-    
+    属性3= …
     子节点…
-    
     }
-
 
 node-name 节点名
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -171,13 +173,11 @@ A-Z  大写字母
 ,    英文逗号
 .    英文句号
 \_   下划线
-+    加号
--    减号 
+\+    加号
+\-    减号 
 ==== ========
 
-另外，节点名应当使用大写或小写字母开头，并且能够描述设备类别。
-
-注意，根节点没有节点名，它直接使用“/”指代这是一个根节点。
+另外，节点名应当使用大写或小写字母开头，并且能够描述设备类别。注意，根节点没有节点名，它直接使用“/”指代这是一个根节点。
 
 @unit-address
 ''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -199,8 +199,9 @@ A-Z  大写字母
 设备树中的一些基本概念
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-下面我们以实际工程中的设备树，讲解一下设备树节点具有一些前面没有讲解到的特性和使用方式，
-初学者可能感到疑惑，这一小节就学习一下这些“不同之处”。
+前面了解了一下设备树中的外部框架，重要的是内部的细节以及我们应该怎么去添加自己的设备树节点。
+下面我们以实际工程中的设备树，讲解一下设备树节点具有一些前面没有讲解到的特性和使用方式。
+
 
 我们打开内核源码：“ebf-buster-linux/arch/arm/boot/dts/imx6ull.dtsi” 设备树头文件，可看到如下片段。
 
@@ -223,23 +224,23 @@ A-Z  大写字母
 
 
 节点标签
-^^^^^^^^^^^^^^^^
+''''''''''''''''''''''''
 
-在上面代码段第4行，节点名“cpu”前面多了个“cpu0”,这个“cpu0”就是我们所说的节点标签。
+在上面代码段第5行，节点名“cpu”前面多了个“cpu0”,这个“cpu0”就是我们所说的节点标签。
 通常节点标签是节点名的简写，所以它的作用是当其它位置需要引用时可以使用节点标签来向该节点中追加内容。
 
 节点路径
-^^^^^^^^^^^^^^^^^^^^
+''''''''''''''''''''''''
 
 通过指定从根节点到所需节点的完整路径，可以唯一地标识设备树中的节点，
 ``不同层次的设备树节点名字可以相同，同层次的设备树节点要唯一。`` 
 这有点类似于我们Windows上的文件，一个路径唯一标识一个文件或文件夹，不同目录下的文件文件名可以相同。
-例如在 节点标签与节点路径_ 代码片段中，文件内的cpu节点的路径标识为“/cpus/cpu”，
+例如在 节点标签与节点路径_ 代码片段中，文件内的cpu节点的路径标识为“/cpus/cpu0”，
 如果在驱动中要获取CPU属性我们就会用到这个路径，
 当然我们也可以为cpu节点定义一个别名（稍后会介绍），直接通过这个别名访问它。
 
 向已存在的节点追加内容
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+''''''''''''''''''''''''
 
 在我们编写的设备树源码“~/ebf-buster-linux/arch/arm/boot/dts/imx6ull-seeed-npi.dts”中存在如下所示的内容（大约120行的位置）。
 
@@ -247,11 +248,11 @@ A-Z  大写字母
 
 .. code-block:: dts  
     :caption: 向节点追加内容
-    :linenos:
+    :linenos: 
 
     &cpu0 {
-    	dc-supply = <&reg_gpio_dvfs>;
-    	clock-frequency = <800000000>;
+        dc-supply = <&reg_gpio_dvfs>;
+        clock-frequency = <800000000>;
     };
 
 这些源码并不包含在根节点“/{…}”内，它们不是一个新的节点，而是向原有节点追加内容。
@@ -262,7 +263,7 @@ A-Z  大写字母
 
 
 别名子节点
-^^^^^^^^^^^^^^^
+''''''''''''''''''''''''
 
 别名子节点的作用就是为其他节点起一个别名，如下所示。
 
@@ -295,7 +296,7 @@ A-Z  大写字母
 也可以使用别名“一步到位”找到节点。
 
 chosen自节点
-^^^^^^^^^^^^^^
+''''''''''''''''''''''''
 
 chosen子节点位于根节点下，如下所示
 
@@ -314,7 +315,7 @@ chosen子节点不代表实际硬件，它主要用于给内核传递参数。
 我们在Uboot中设置的参数就是通过这个节点传递到内核的，
 这部分内容是uboot和内核自动完成的，作为初学者我们不必深究。
 
-.. _节点属性-1:
+
 
 节点属性
 ~~~~~~~~
@@ -334,17 +335,16 @@ compatible属性
 
 .. code-block:: dts  
     :caption: compatible属性
-    :emphasize-lines: 1,3
     :linenos:
 
     compatible = "fsl,imx6ull-14x14-evk", "fsl,imx6ull";
 
     intc: interrupt-controller@a01000 {
-    	compatible = "arm,cortex-a7-gic";
-    	#interrupt-cells = <3>;
-    	interrupt-controller;
-    	reg = <0xa01000 0x1000>,
-    	      <0xa02000 0x100>;
+        compatible = "arm,cortex-a7-gic";
+        #interrupt-cells = <3>;
+        interrupt-controller;
+        reg = <0xa01000 0x1000>,
+              <0xa02000 0x100>;
     };
 
 
@@ -503,9 +503,7 @@ name和device_type
 
 属性值类型：字符串。
 
-示例：
-
-name和device_type
+示例：name和device_type
 
 
 .. code-block:: dts  
@@ -522,14 +520,14 @@ name和device_type
     :linenos:
 
     cpus {
-    		#address-cells = <1>;
-    		#size-cells = <0>;
+        #address-cells = <1>;
+        #size-cells = <0>;
     
-    		cpu0: cpu@0 {
-    			compatible = "arm,cortex-a7";
-    			device_type = "cpu";
-    			reg = <0>;
-
+        cpu0: cpu@0 {
+        compatible = "arm,cortex-a7";
+        device_type = "cpu";
+        reg = <0>;
+    }
 
 
 这两个属性很少用（已经被废弃），不推荐使用。name用于指定节点名，在旧的设备树中它用于确定节点名，
@@ -539,7 +537,7 @@ name和device_type
 在中断、时钟部分也有自己的节点标准属性，随着深入的学习我们会详细介绍这些节点标准属性。
 
 在设备树中添加设备节点实验
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
 
 通常情况下我们几乎不会从零开始写一个设备树，因为一个功能完善的设备树通常比较庞大，
 例如本教程引用的NXP官方编写的设备树“imx6ull.dtsi”就多达1000行，
@@ -549,11 +547,10 @@ name和device_type
 这一小节不需要编写驱动程序，开发板上的系统保持不变。
 
 添加节点
-^^^^^^^^
+'''''''''''''''''''''
 
 根据之前讲解，我们的系统默认使用的是“ebf-buster-linux/arch/arm/boot/dts/imx6ull-seeed-npi.dts”设备树，
 我们就在这个设备树里尝试增加一个设备节点，如下所示。
-
 
 
 .. code-block:: dts  
@@ -588,9 +585,6 @@ name和device_type
     };
 
 
-
-
-
 在我们在imx6ull-seeed-npi.dts设备树文件的根节点末尾新增了一个节点名为“led”的节点，
 里面只添加了几个基本属性，我们这里只是学习添加一个设备节点。
 
@@ -604,70 +598,65 @@ name和device_type
 0x00000020表示的是地址长度。“rgb_led_red@0x0209C000”中的单元的地址0x0209C000要和reg属性的第一个地址一致。
 
 编译下载设备树
-^^^^^^^^^^^^^^
+'''''''''''''''''''''
 
 编译设备树
-''''''''''
+*************************
 
 编译内核时会自动编译设备树，但是编译内核很耗时，所以我们推荐使用如下命令只编译设备树。
 
 命令：
 
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- npi_v7_defconfig
 
-make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf- dtbs
+.. code-block:: sh
+
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- npi_v7_defconfig
+    make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf- dtbs
+
+
 
 如果在内核源码中执行了make distclean 则必须执行第一条命令，它用于生成默认配置文件，
-如果执行过一次就没有必要再次执行，当然再次执行也没有什么问题。第二条命令开始编译设备树，
-参数“-j4”指定多少个线程编译，根据自己电脑实际情况设置，越大编译越快，当然也可以不设置，设备树编译本来就很快。
+执行过一次即可，下次再编译设备树就可以不用执行了。第二条命令开始编译设备树，
+参数“-j4”指定多少个线程编译，根据自己电脑实际情况设置，越大编译越快，也可以不设置，设备树编译本来就很快。
 
 编译成功后生成的设备树文件（.dtb）位于源码目录下的“./arch/arm/boot/dts”文件名为“imx6ull-seeed-npi.dtb”
 
 下载设备树
-'''''''''''''''
+*************
 
-设备树“下载”有两种方法。第一种，像刷系统那样使用MFG工具将设备树烧写到开发板，这种方法比较繁琐但适用于SD卡、emmc、nand。
-第二种，将设备树使用nfs共享文件夹拷贝到开发板（其他工具也可以），挂载设备树和内核所在的磁盘，然后用新的设备树替换掉旧的。
-这种方法我们只测试了emmc，SD卡和nand暂不支持使用这种方式。
-
-使用MFG工具烧录
+设备树“下载”有两种方法。第一种，像刷系统那样使用MFG工具将设备树烧写到开发板。
+第二种，将设备树使用nfs共享文件夹拷贝到开发板（其他工具也可以），替换掉/boot/dtbs/4.19.71-imx-r1/目录下旧的设备树。
 
 
-将编译生成的设备树imx6ull-seeed-npi.dtb拷贝得到MFG工具的相应目录（如果文件已存在则替换掉旧的），
+1、使用MFG工具烧录，将编译生成的设备树imx6ull-seeed-npi.dtb拷贝得到MFG工具的相应目录（如果文件已存在则替换掉旧的），
 注意修改mfg工具的“cfg.ini”文件，具体烧录过程和使用MFG工具烧系统完全一致，这里不再介绍。
 
-在开发板中更新设备树文件
+2、在开发板中更新设备树文件，推荐使用这种方式简单方便，将生成的设备树imx6ull-seeed-npi.dtb拷贝到开发板替换原设备树文件即可，
+在主机下执行以下指令将我们新编译的设备树文件拷到共享文件夹下
+
+.. code-block:: sh  
+
+    cp arch/arm/boot/dts/imx6ull-seeed-npi.dtb /home/Embedfire/wokdfir
+
+在开发板上执行如下命令挂载nfs共享文件夹到开发板上，替换/boot/dtbs/4.19.71-imx-r1/文件夹下的设备树文件,并重启开发板使新
+设备树生效。
 
 
-如果使用emmc，推荐使用这种方式，将生成的设备树imx6ull-seeed-npi.dtb拷贝到开发板，
-然后执行如下命令挂载设备树所在磁盘。
+.. code-block:: sh  
+    
+    #挂载nfs共享文件夹
+    sudo mount -f nfs 192.168.0.231:/home/Embedfire/wokdfir  /mnt
 
-命令：
+    #复制设备树到共享文件夹
+    cp /mnt/imx6ull-seeed-npi.dtb  /boot/dtbs/4.19.71-imx-r1/
 
-mount /dev/mmcblk1p1 /mnt
-
-以上命令将mmcblk1p1磁盘挂载到“/mnt”目录下，mmcblk1p1磁盘保存的是内核和设备树，
-挂载成功后打开“/mnt”目录。如下所示。
-
-
-
-
-.. image:: ./media/driver002.png
-   :align: center
-   :alt: 找不到图片02|
-
-将我们编译生成的设备树重命名为“imx6ull-14x14-evk.dtb”替换掉“/mnt”目录下设备树文件即可。
-替换之后记得取消挂载，或者重新打开、关闭 “/mnt”目录，这样更改之后的内容会立即写入磁盘，重新启动即可。
-取消挂载命令如下：
-
-命令
-
-umount /dev/mmcblk1p1
-
-实验结果
+    #重启开发板
+    reboot
 
 
-设备树中的设备树节点在文件系统中有与之对应的文件，位于“/proc/device-tree”目录。进入“/proc/device-tree”目录如下所示。
+
+
+实验结果如下，设备树中的设备树节点在文件系统中有与之对应的文件，位于“/proc/device-tree”目录。进入“/proc/device-tree”目录如下所示。
 
 .. image:: ./media/driver003.png
    :align: center
@@ -716,22 +705,19 @@ umount /dev/mmcblk1p1
 查找节点函数
 ''''''
 
-根据节点路径寻找节点函数
+根据节点路径寻找节点函数。函数原型：
 
+.. code-block:: C  
+    :linenos:
 
-函数原型：
+    struct device_node *of_find_node_by_path(const char *path);
 
-struct device_node \*of_find_node_by_path(const char \*path)
-
-参数“path”，指定节点在设备树中的路径。
-
-返回值“device_node”结构体指针，如果查找失败则返回NULL，否则返回device_node类型的结构体指针，它保存着设备节点的信息。
+- 参数path：指定节点在设备树中的路径。
+- 返回值：如果查找失败则返回NULL，否则返回device_node类型的结构体指针，它保存着设备节点的信息。
 
 device_node机构体如下所示。
 
-
-
-.. code-block:: dts  
+.. code-block:: C  
     :caption: device_node结构体
     :linenos:
 
@@ -760,75 +746,64 @@ device_node机构体如下所示。
     };
 
 
-
 得到device_node结构体之后我们就可以使用其他of 函数获取节点的详细信息。
 
-根据节点名字寻找节点函数
-
-
+根据节点名字寻找节点函数，
 函数原型：
 
-struct device_node \*of_find_node_by_name(struct device_node \*from,const char \*name);
+.. code-block:: C  
 
-参数from，指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
+    struct device_node *of_find_node_by_name(struct device_node *from,const char *name);
 
-参数name，要寻找的节点名。
+- 参数from：指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
+- 参数name：要寻找的节点名。
+- 返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
 
-返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
-
-根据节点类型寻找节点函数
-
-
+根据节点类型寻找节点函数，
 函数原型：
 
-struct device_node \*of_find_node_by_type(struct device_node \*from,const char \*type)
+.. code-block:: C  
 
-类似of_find_node_by_name函数。
+    struct device_node *of_find_node_by_type(struct device_node *from,const char *type);
 
-参数from，指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
-
-参数type，要查找节点的类型，这个类型就是device_node-> type。
-
-返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
-
-根据节点类型和compatible属性寻找节点函数
+- 参数from：指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
+- 参数type：要查找节点的类型，这个类型就是device_node-> type。
+- 返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
+- 类似of_find_node_by_name函数。
 
 
+根据节点类型和compatible属性寻找节点函数，
 函数原型：
 
-struct device_node \*of_find_compatible_node(struct device_node \*from,const char \*type, const char \*compatible)
+.. code-block:: C  
 
-相比of_find_node_by_name函数增加了一个compatible属性作为筛选条件。
+    struct device_node *of_find_compatible_node(struct device_node *from,const char *type, const char *compatible);
 
-参数from，指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
-
-参数type，要查找节点的类型，这个类型就是device_node-> type。
-
-参数compatible，要查找节点的compatible属性。
-
-返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
-
-根据匹配表寻找节点函数
+- 参数from：指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
+- 参数type：要查找节点的类型，这个类型就是device_node-> type。
+- 参数compatible：要查找节点的compatible属性。
+- 返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
+- 相比of_find_node_by_name函数增加了一个compatible属性作为筛选条件。
 
 
+根据匹配表寻找节点函数，
 函数原型：
 
-static inline struct device_node \*of_find_matching_node_and_match(
+.. code-block:: C  
 
-struct device_node \*from,
+    static inline struct device_node *of_find_matching_node_and_match(
+                                                struct device_node *from,
+                                                const struct of_device_id *matches,
+                                                const struct of_device_id **match);
 
-const struct of_device_id \*matches,
-
-const struct of_device_id \*\*match)
-
-参数from，指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
-
-参数matches，源匹配表，查找与该匹配表想匹配的设备节点。
+- 参数from：指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。
+- 参数matches：源匹配表，查找与该匹配表想匹配的设备节点。
+- 参数match，查找得到的结果。
+- 返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
 
 结构体struct of_device_id如下所示。
 
-
-.. code-block:: dts  
+.. code-block:: C  
     :caption: of_device_id结构体
     :linenos:
 
@@ -843,39 +818,31 @@ const struct of_device_id \*\*match)
    };
 
 
-
-
 可以看到，该结构体包含了更多的匹配参数，也就是说相比前三个寻找节点函数，这个函数匹配的参数更多，对节点的筛选更细。
 
-参数match，查找得到的结果。
 
-返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
-
-寻找父节点函数
-
-
+寻找父节点函数，
 函数原型
 
-struct device_node \*of_get_parent(const struct device_node \*node)
+.. code-block:: c  
 
-参数node，指定谁（节点）要查找父节点。
+    struct device_node *of_get_parent(const struct device_node *node);
 
-返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
+- 参数node：指定谁（节点）要查找父节点。
+- 返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
 
-寻找子节点函数
 
-
+寻找子节点函数，
 函数原型
 
-struct device_node \*of_get_next_child(const struct device_node \*node,
+.. code-block:: c  
 
-struct device_node \*prev)
+    struct device_node *of_get_next_child(const struct device_node *node,
+                                          struct device_node *prev);
 
-参数node，指定谁（节点）要查找它的子节点。
-
-参数prev，前一个子节点，寻找的是prev节点之后的节点。这是一个迭代寻找过程，例如寻找第二个子节点，这里就要填第一个子节点。参数为NULL 表示寻找第一个子节点。
-
-返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
+- 参数node：指定谁（节点）要查找它的子节点。
+- 参数prev：前一个子节点，寻找的是prev节点之后的节点。这是一个迭代寻找过程，例如寻找第二个子节点，这里就要填第一个子节点。参数为NULL 表示寻找第一个子节点。
+- 返回值：device_node类型的结构体指针，保存获取得到的节点。同样，如果失败返回NULL。
 
 这里介绍了7个寻找节点函数，这7个函数有一个共同特点——返回值类型相同。只要找到了节点就会返回节点对应的device_node结构体，在驱动程序中我们就是通过这个device_node获取设备节点的属性信息、顺藤摸瓜查找它的父、子节点等等。第一函数of_find_node_by_path与后面六个不
 同，它是通过节点路径寻找节点的，“节点路径”是从设备树源文件(.dts)中的到的。而中间四个函数是根据节点属性在某一个节点之后查找符合要求的设备节点，这个“某一个节点”是设备节点结构体（device_node），也就是说这个节点是已经找到的。最后两个函数与中间四个类似，只不过最后两个没有使用节点属性
@@ -887,24 +854,19 @@ struct device_node \*prev)
 上一小节我们讲解了7个查找节点的函数，它们有一个共同特点，找到一个设备节点就会返回这个设备节点对应的结构体指针（device_node*）。这个过程可以理解为把设备树中的设备节点“获取”到驱动中。“获取”成功后我们再通过一组of函数从设备节点结构体（device_node）中获取我们想要的设备节点属
 性信息。
 
-查找节点属性函数
+查找节点属性函数，函数原型
+
+.. code-block:: c  
+
+    struct property *of_find_property(const struct device_node *np,const char *name,int *lenp);
+
+- 参数np：指定要获取那个设备节点的属性信息。
+- 参数name：属性名。
+- 参数lenp：获取得到的属性值的大小，这个指针作为输出参数，这个参数“带回”的值是实际获取得到的属性大小。
+- 返回值：获取得到的属性。这是一个结构体，我们把它称为节点属性结构体，如下所示。失败返回NULL。
 
 
-函数原型
-
-struct property \*of_find_property(const struct device_node \*np,const char \*name,int \*lenp)
-
-参数np，指定要获取那个设备节点的属性信息。
-
-参数name，属性名。
-
-参数lenp，获取得到的属性值的大小，这个指针作为输出参数，这个参数“带回”的值是实际获取得到的属性大小。
-
-返回值：获取得到的属性。这是一个结构体，我们把它称为节点属性结构体，如下所示。失败返回NULL。
-
-
-
-.. code-block:: dts  
+.. code-block:: C  
     :caption: property属性结构体
     :linenos:
 
@@ -929,149 +891,133 @@ struct property \*of_find_property(const struct device_node \*np,const char \*na
 
 读取整型属性函数
 
+读取属性函数是一组函数，分别为读取8、16、32、64位数据，函数原型有以下几种：
 
-读取属性函数是一组函数，分别为读取8、16、32、64位数据。
+.. code-block:: C  
 
-函数原型：
+    //8位整数读取函数
+    int of_property_read_u8_array(const struct device_node *np, const char *propname,
+                                    u8 *out_values, size_t sz);
 
-//8位整数读取函数
+    //16位整数读取函数
+    int of_property_read_u16_array(const struct device_node *np, const char *propname,
+                                    u16 *out_values, size_t sz);
 
-int of_property_read_u8_array(const struct device_node \*np, const char \*propname,
+    //32位整数读取函数
+    int of_property_read_u32_array(const struct device_node *np, const char *propname,
+                                    u32 *out_values, size_t sz);
 
-u8 \*out_values, size_t sz)
-
-//16位整数读取函数
-
-int of_property_read_u16_array(const struct device_node \*np, const char \*propname,
-
-u16 \*out_values, size_t sz)
-
-//32位整数读取函数
-
-int of_property_read_u32_array(const struct device_node \*np, const char \*propname,
-
-u32 \*out_values, size_t sz)
-
-//64位整数读取函数
-
-int of_property_read_u64_array(const struct device_node \*np, const char \*propname,
-
-u64 \*out_values, size_t sz)
+    //64位整数读取函数
+    int of_property_read_u64_array(const struct device_node *np, const char *propname,
+                                    u64 *out_values, size_t sz);
 
 这几个函数结构和用法是相同的，以8位读取为例介绍如下：
 
-参数np，指定要读取那个设备节点结构体，也就是说读取那个设备节点的数据。
-
-参数propname，指定要获取设备节点的哪个属性。
-
-参数out_values，这是一个输出参数，是函数的“返回值”，保存读取得到的数据。
-
-参数sz，这是一个输入参数，它用于设置读取的长度。
-
-返回值，成功返回0，错误返回错误状态码（非零值），-EINVAL（属性不存在），-ENODATA（没有要读取的数据），-EOVERFLOW（属性值列表太小）。
+- 参数np：指定要读取那个设备节点结构体，也就是说读取那个设备节点的数据。
+- 参数propname：指定要获取设备节点的哪个属性。
+- 参数out_values：这是一个输出参数，是函数的“返回值”，保存读取得到的数据。
+- 参数sz：这是一个输入参数，它用于设置读取的长度。
+- 返回值：成功返回0，错误返回错误状态码（非零值），-EINVAL（属性不存在），-ENODATA（没有要读取的数据），-EOVERFLOW（属性值列表太小）。
 
 简化后的读取整型属性函数
 
-
-这里的函数是对读取整型属性函数的简单封装，将读取长度设置为1。用法与读取属性函数完全一致，这里不再赘述。
-
+这里的函数是对读取整型属性函数的简单封装，将读取长度设置为1。用法与读取属性函数完全一致，这里不再赘述，
 函数原型：
 
-//8位整数读取函数
+.. code-block:: C  
 
-int of_property_read_u8 (const struct device_node \*np, const char \*propname,
+    //8位整数读取函数
+    int of_property_read_u8 (const struct device_node *np, 
+                            const char *propname,
+                            u8 *out_values);
 
-u8 \*out_values)
+    //16位整数读取函数
+    int of_property_read_u16 (const struct device_node *np, 
+                            const char *propname,
+                            u16 *out_values);
 
-//16位整数读取函数
+    //32位整数读取函数
+    int of_property_read_u32 (const struct device_node *np, 
+                                const char *propname,
+                                u32 *out_values);
 
-int of_property_read_u16 (const struct device_node \*np, const char \*propname,
+    //64位整数读取函数
+    int of_property_read_u64 (const struct device_node *np, 
+                            const char *propname,
+                            u64 *out_values);
 
-u16 \*out_values)
-
-//32位整数读取函数
-
-int of_property_read_u32 (const struct device_node \*np, const char \*propname,
-
-u32 \*out_values)
-
-//64位整数读取函数
-
-int of_property_read_u64 (const struct device_node \*np, const char \*propname,
-
-u64 \*out_values)
 
 读取字符串属性函数
 
+在设备节点中存在很多字符串属性，例如compatible、status、type等等，这些属性可以使用查找节点属性函数of_find_property来获取，但是这样比较繁琐。
+内核提供了一组用于读取字符串属性的函数，介绍如下：
 
-在设备节点中存在很多字符串属性，例如compatible、status、type等等，这些属性可以使用查找节点属性函数of_find_property来获取，但是这样比较繁琐。内核提供了一组用于读取字符串属性的函数，介绍如下：
+.. code-block:: C  
 
-int of_property_read_string(const struct device_node \*np,const char \*propname,
+    int of_property_read_string(const struct device_node *np,
+                                const char *propname,
+                                const char **out_string);
 
-const char \*\*out_string)
-
-int of_property_read_string_index(const struct device_node \*np,const char \*propname,
-
-int index,const char \**out_string)
+    int of_property_read_string_index(const struct device_node *np,
+                                      const char *propname,
+                                      int index,const char **out_string);
 
 第一个函数，介绍如下：
 
-参数np，指定要获取那个设备节点的属性信息。
-
-参数propname，属性名。
-
-参数out_string，获取得到字符串指针，这是一个“输出”参数，带回一个字符串指针。也就是字符串属性值的首地址。这个地址是“属性值”在内存中的真实位置，也就是说我们可以通过对地址操作获取整个字符串属性（一个字符串属性可能包含多个字符串，这些字符串在内存中连续存储，使用’\0’分隔），这个函数使用
-相对繁琐，推荐使用第二个。
-
-返回值：成功返回0，失败返回错误状态码。
+- 参数np：指定要获取那个设备节点的属性信息。
+- 参数propname：属性名。
+- 参数out_string：获取得到字符串指针，这是一个“输出”参数，带回一个字符串指针。也就是字符串属性值的首地址。这个地址是“属性值”在内存中的真实位置，
+  也就是说我们可以通过对地址操作获取整个字符串属性（一个字符串属性可能包含多个字符串，这些字符串在内存中连续存储，使用’\0’分隔），这个函数使用
+  相对繁琐，推荐使用第二个。
+- 返回值：成功返回0，失败返回错误状态码。
 
 第二个函数介绍如下：
 
-相比第一函数增加了参数index，它用于指定读取属性值中第几个字符串，index从零开始计数。第一个函数只能得到属性值所在地址，也就是第一个字符串的地址，其他字符串需要我们手动修改移动地址，非常麻烦，推荐使用第二个函数。
-
-读取布尔型属性函数
+- 相比第一函数增加了参数index，它用于指定读取属性值中第几个字符串，index从零开始计数。第一个函数只能得到属性值所在地址，
+  也就是第一个字符串的地址，其他字符串需要我们手动修改移动地址，非常麻烦，推荐使用第二个函数。
+  读取布尔型属性函数
 
 
 在设备节点中一些属性是BOOL型，当然内核会提供读取BOOL型属性的函数，介绍如下：
 
-static inline bool of_property_read_bool(const struct device_node \*np,
+.. code-block:: C  
 
-const char \*propname)：
+    static inline bool of_property_read_bool(const struct device_node *np,
+                                            const char *propname);
 
-参数np，指定要获取那个设备节点的属性信息。
-
-参数propname，属性名。
-
-返回值：true ,属性存在。false,其他。
-
-这个函数不按套路出牌，它不是读取某个布尔型属性的值，仅仅是读取这个属性存在或者不存在。如果想要或取值，可以使用之前讲解的“全能”函数查找节点属性函数of_find_property。
+- 参数np：指定要获取那个设备节点的属性信息。
+- 参数propname：属性名。
+- 返回值：true ,属性存在。false,其他。
+- 这个函数不按套路出牌，它不是读取某个布尔型属性的值，仅仅是读取这个属性存在或者不存在。如果想要或取值，可以使用之前讲解的“全能”函数查找节点属性函数of_find_property。
 
 内存映射相关of函数
 ''''''''''
 
-在设备树的设备节点中大多会包含一些内存相关的属性，比如常用的reg属性。通常情况下，得到寄存器地址之后我们还要通过ioremap函数将物理地址转化为虚拟地址。现在内核提供了of函数，自动完成物理地址到虚拟地址的转换。介绍如下：
+在设备树的设备节点中大多会包含一些内存相关的属性，比如常用的reg属性。通常情况下，得到寄存器地址之后我们还要通过ioremap函数将物理地址转化为虚拟地址。
+现在内核提供了of函数，自动完成物理地址到虚拟地址的转换。介绍如下：
 
-void \__iomem \*of_iomap(struct device_node \*np, int index)
+.. code-block:: C  
 
-参数np，指定要获取那个设备节点的属性信息。
+    void __iomem *of_iomap(struct device_node *np, int index);
 
-参数index，通常情况下reg属性包含多段，index 用于指定映射那一段，标号从0开始。；
+- 参数np：指定要获取那个设备节点的属性信息。
+- 参数index：通常情况下reg属性包含多段，index 用于指定映射那一段，标号从0开始。；
+- 返回值：成功，得到转换得到的地址。失败返回NULL。
 
-返回值：成功，得到转换得到的地址。失败返回NULL。
 
 内核也提供了常规获取地址的of函数，这些函数得到的值就是我们在设备树中设置的地址值。介绍如下：
 
-int of_address_to_resource(struct device_node \*dev, int index, struct resource \*r)
+.. code-block:: C  
 
-参数np，指定要获取那个设备节点的属性信息。
+    int of_address_to_resource(struct device_node *dev, int index, struct resource *r);
 
-参数index，通常情况下reg属性包含多段，index 用于指定映射那一段，标号从0开始。
+- 参数np：指定要获取那个设备节点的属性信息。
+- 参数index：通常情况下reg属性包含多段，index 用于指定映射那一段，标号从0开始。
+- 参数r：这是一个resource结构体，是“输出参数”用于返回得到的地址信息。resource结构体如下所示：
 
-参数r，这是一个resource结构体，是“输出参数”用于返回得到的地址信息。resource结构体如下所示：
 
 
-
-.. code-block:: dts  
+.. code-block:: C  
     :caption: resource属性结构体
     :linenos:
 
@@ -1084,10 +1030,8 @@ int of_address_to_resource(struct device_node \*dev, int index, struct resource 
     	struct resource *parent, *sibling, *child;
     };
 
-
-从这个结构体比较简单，很容从中得到获取得到的具体信息。这里不再赘述。
-
-返回值，成功返回0，失败返回错误状态码。
+- 从这个结构体比较简单，很容从中得到获取得到的具体信息。这里不再赘述。
+- 返回值：成功返回0，失败返回错误状态码。
 
 这里介绍了三类常用的of函数，这些基本满足我们的需求，其他of函数后续如果使用到我们在详细介绍。
 
@@ -1104,94 +1048,90 @@ int of_address_to_resource(struct device_node \*dev, int index, struct resource 
 程序源码如下所示，这里只列出了.open函数中的内容，其他与字符设备驱动类似，完整内容请参考本章配套源码“补充”。
 
 
-
-.. code-block:: dts  
+.. code-block:: C  
     :caption: 获取节点属性实验
     :linenos:
 
-   /*-------------------第一部分------------------*/
-   struct device_node	*led_device_node; //led的设备树节点
-   struct device_node  *rgb_led_red_device_node; //rgb_led_red 红灯节点
-   struct property     *rgb_led_red_property;    //定义属性结构体指针
-   int size = 0 ;
-   unsigned int out_values[18];  //保存读取得到的REG 属性值
-   
-   
-   
-   /*.open 函数*/
-   static int led_chr_dev_open(struct inode *inode, struct file *filp)
-   {
-       int error_status = -1;
-   
-       printk("\n open form device \n");
-   
-   
-   /*-------------------第二部分------------------*/
-       /*of 测试函数*/
-       led_device_node = of_find_node_by_path("/led");
-       if(led_device_node == NULL)
-       {
-           printk(KERN_EMERG "\n get led_device_node failed ! \n");
-           return -1;
-       }
-       /*根据 led_device_node 设备节点结构体输出节点的基本信息*/
-       printk(KERN_EMERG "name: %s",led_device_node->name); //输出节点名
-       printk(KERN_EMERG "child name: %s",led_device_node->child->name);  //输出子节点的节点名
-   
-   
-   /*-------------------第三部分------------------*/
-       /*获取 rgb_led_red_device_node 的子节点*/ 
-       rgb_led_red_device_node = of_get_next_child(led_device_node,NULL); 
-       if(rgb_led_red_device_node == NULL)
-       {
-           printk(KERN_EMERG "\n get rgb_led_red_device_node failed ! \n");
-           return -1;
-       }
-       printk(KERN_EMERG "name: %s",rgb_led_red_device_node->name); //输出节点名
-       printk(KERN_EMERG "parent name: %s",rgb_led_red_device_node->parent->name);  //输出父节点的节点名
-   
-   
-   /*-------------------第四部分------------------*/
-       /*获取 rgb_led_red_device_node 节点  的"compatible" 属性 */ 
-       rgb_led_red_property = of_find_property(rgb_led_red_device_node,"compatible",&size);
-       if(rgb_led_red_property == NULL)
-       {
-           printk(KERN_EMERG "\n get rgb_led_red_property failed ! \n");
-           return -1;
-       }
-       printk(KERN_EMERG "size = : %d",size);                      //实际读取得到的长度
-       printk(KERN_EMERG "name: %s",rgb_led_red_property->name);   //输出属性名
-       printk(KERN_EMERG "length: %d",rgb_led_red_property->length);        //输出属性长度
-       printk(KERN_EMERG "value : %s",(char*)rgb_led_red_property->value);  //属性值
-   
-   
-   /*-------------------第五部分------------------*/
-       /*获取 reg 地址属性*/
-       error_status = of_property_read_u32_array(rgb_led_red_device_node,"reg",out_values, 2);
-       if(error_status != 0)
-       {
-           printk(KERN_EMERG "\n get out_values failed ! \n");
-           return -1;
-       }
-       printk(KERN_EMERG"0x%08X ", out_values[0]);
-       printk(KERN_EMERG"0x%08X ", out_values[1]);
-   
-       return 0;
-   }
+    /*-------------------第一部分------------------*/
+    struct device_node	*led_device_node; //led的设备树节点
+    struct device_node  *rgb_led_red_device_node; //rgb_led_red 红灯节点
+    struct property     *rgb_led_red_property;    //定义属性结构体指针
+    int size = 0 ;
+    unsigned int out_values[18];  //保存读取得到的REG 属性值
+        
+        
+    /*.open 函数*/
+    static int led_chr_dev_open(struct inode *inode, struct file *filp)
+    {
+        int error_status = -1;
+        
+        printk("\n open form device \n");
+    
+    /*-------------------第二部分------------------*/
+        /*of 测试函数*/
+        led_device_node = of_find_node_by_path("/led");
+        if(led_device_node == NULL)
+        {
+            printk(KERN_EMERG "\n get led_device_node failed ! \n");
+            return -1;
+        }
+        /*根据 led_device_node 设备节点结构体输出节点的基本信息*/
+        printk(KERN_EMERG "name: %s",led_device_node->name); //输出节点名
+        printk(KERN_EMERG "child name: %s",led_device_node->child->name);  //输出子节点的节点名
+        
+        
+    /*-------------------第三部分------------------*/
+        /*获取 rgb_led_red_device_node 的子节点*/ 
+        rgb_led_red_device_node = of_get_next_child(led_device_node,NULL); 
+        if(rgb_led_red_device_node == NULL)
+        {
+            printk(KERN_EMERG "\n get rgb_led_red_device_node failed ! \n");
+            return -1;
+        }
+        printk(KERN_EMERG "name: %s",rgb_led_red_device_node->name); //输出节点名
+        printk(KERN_EMERG "parent name: %s",rgb_led_red_device_node->parent->name);  //输出父节点的节点名
+        
+        
+    /*-------------------第四部分------------------*/
+        /*获取 rgb_led_red_device_node 节点  的"compatible" 属性 */ 
+        rgb_led_red_property = of_find_property(rgb_led_red_device_node,"compatible",&size);
+        if(rgb_led_red_property == NULL)
+        {
+            printk(KERN_EMERG "\n get rgb_led_red_property failed ! \n");
+            return -1;
+        }
+        printk(KERN_EMERG "size = : %d",size);                      //实际读取得到的长度
+        printk(KERN_EMERG "name: %s",rgb_led_red_property->name);   //输出属性名
+        printk(KERN_EMERG "length: %d",rgb_led_red_property->length);        //输出属性长度
+        printk(KERN_EMERG "value : %s",(char*)rgb_led_red_property->value);  //属性值
+        
+        
+    /*-------------------第五部分------------------*/
+        /*获取 reg 地址属性*/
+        error_status = of_property_read_u32_array(rgb_led_red_device_node,"reg",out_values, 2);
+        if(error_status != 0)
+        {
+            printk(KERN_EMERG "\n get out_values failed ! \n");
+            return -1;
+        }
+        printk(KERN_EMERG"0x%08X ", out_values[0]);
+        printk(KERN_EMERG"0x%08X ", out_values[1]);
+        
+        return 0;
+    }
+
 
 
 
 测试代码大致分为5部分，介绍如下。
 
-第一部分，定义一些变量，用于保存读取得到的数据，在讲解of 函数时已经介绍了这些结构体这不再赘述。
-
-第二部分，使用“of_find_node_by_path”函数寻找“led”设备节点。参数是“led”的设备节点路径。获取成功后得到的是一个device_node类型的结构体指针，然后我们就可以从这个结构体中获得我们想要的数据。获取完整的属性信息可能还需要使用其他of函数。
-
-第三部分，获取 “led”节点的子节点。在第二部分我们得到了“led”节点的“设备节点结构体”这里就可以使用“of_get_next_child”函数获取它的子节点。当然我们也可以从“led”节点的“设备节点结构体”中直接读取得到它的第一个子节点。
-
-第四部分，使用“of_find_property”函数获取“rgb_led_red”节点的“compatible”属性。
-
-第五部分，使用“of_property_read_u32_array”函数获取reg属性，
+- 第一部分，定义一些变量，用于保存读取得到的数据，在讲解of 函数时已经介绍了这些结构体这不再赘述。
+- 第二部分，使用“of_find_node_by_path”函数寻找“led”设备节点。参数是“led”的设备节点路径。获取成功后得到的是一个device_node类型的结构体指针，然后我们就可以从这个结构体中获得我们想要的数据。
+  获取完整的属性信息可能还需要使用其他of函数。
+- 第三部分，获取 “led”节点的子节点。在第二部分我们得到了“led”节点的“设备节点结构体”这里就可以使用“of_get_next_child”函数获取它的子节点。
+  当然我们也可以从“led”节点的“设备节点结构体”中直接读取得到它的第一个子节点。
+- 第四部分，使用“of_find_property”函数获取“rgb_led_red”节点的“compatible”属性。
+- 第五部分，使用“of_property_read_u32_array”函数获取reg属性，
 
 下载验证
 ^^^^
@@ -1200,13 +1140,17 @@ int of_address_to_resource(struct device_node \*dev, int index, struct resource 
 
 命令：
 
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+.. code-block:: sh
+
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
 
 使用如下命名编译测试应用程序：
 
 命令：
 
-arm-linux-gnueabihf-gcc <源文件路径> -o <目标文件路径>
+.. code-block:: sh  
+
+    arm-linux-gnueabihf-gcc <源文件路径> -o <目标文件路径>
 
 编译成功后将驱动.ko和应用程序拷贝到开发板，以例程为例如下所示。
 

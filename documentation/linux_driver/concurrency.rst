@@ -73,7 +73,7 @@ linux驱动并发与竞态
 
 .. code-block:: c
 
-   atomic_t data = ATOMIC_INIT(int i)
+   atomic_t data = ATOMIC_INIT(int i);
 
 **说明**：
 
@@ -85,7 +85,7 @@ linux驱动并发与竞态
 
 .. code-block:: c
 
-   atomic_set(atomic_t\* v,int i)
+   atomic_set(atomic_t* v,int i)
 
 **说明**：
 
@@ -105,7 +105,7 @@ linux驱动并发与竞态
 
 .. code-block:: c
 
-   atomic_read(atomic_t\* v)
+   atomic_read(atomic_t* v)
 
 **说明**：
 
@@ -115,22 +115,22 @@ linux驱动并发与竞态
 
 .. code-block:: c
 
-   static inline void atomic_add(int i, atomic_t \*v) //整型原子变量加i
-   static inline void atomic_sub(int i, atomic_t \*v) //整型原子变量减i
+   static inline void atomic_add(int i, atomic_t *v); //整型原子变量加i
+   static inline void atomic_sub(int i, atomic_t *v); //整型原子变量减i
 
 5. 整型原子变量自增/自减
 
 .. code-block:: c
 
-   static inline void atomic_inc(atomic_t \*v) //整型原子变量自增1
-   static inline void atomic_dec(atomic_t \*v)//整型原子变量自减1
+   static inline void atomic_inc(atomic_t *v); //整型原子变量自增1
+   static inline void atomic_dec(atomic_t *v);//整型原子变量自减1
 
 6. 整型原子变量操作返回函数（宏定义）
 
 .. code-block:: c
 
-   int atomic_sub_return(int i, atomic_t \*v) //返回增加后的结果
-   int atomic_sub_return(int i, atomic_t \*v) //返回减少后的结果
+   int atomic_sub_return(int i, atomic_t *v); //返回增加后的结果
+   int atomic_sub_return(int i, atomic_t *v); //返回减少后的结果
    #define atomic_dec_return(v) atomic_sub_return(1, (v)) //返回自减1的结
    #define atomic_inc_return(v) atomic_add_return(1, (v))//返回自增1的结果
 
@@ -152,7 +152,7 @@ linux驱动并发与竞态
 
 .. code-block:: c
 
-   set_bit(int nr, unsigned long \*addr)
+   set_bit(int nr, unsigned long *addr)
 
 **说明**：
 
@@ -166,7 +166,7 @@ linux驱动并发与竞态
 
 .. code-block:: c
 
-   clear_bit(int nr, unsigned long \*addr)
+   clear_bit(int nr, unsigned long *addr);
 
 **说明**：
 
@@ -176,7 +176,7 @@ linux驱动并发与竞态
 
 .. code-block:: c
 
-   change_bit(int nr, unsigned long \*addr)
+   change_bit(int nr, unsigned long *addr);
 
 改变位就是反转某一位的值，是0就变为1，是1就变为0。
 
@@ -184,7 +184,7 @@ linux驱动并发与竞态
 
 .. code-block:: c
 
-   int test_bit(int nr, unsigned long \*addr)
+   int test_bit(int nr, unsigned long *addr);
 
 返回nr 位的值
 
@@ -194,11 +194,11 @@ linux驱动并发与竞态
 
    /*测试并设置位*/
 
-   int test_and_set_bit(int nr, volatile unsigned long \*addr)
+   int test_and_set_bit(int nr, volatile unsigned long *addr);
    /*测试并清除位*/
-   int test_and_clear_bit(int nr, volatile unsigned long \*addr)
+   int test_and_clear_bit(int nr, volatile unsigned long *addr);
    /*测试并反转位*/
-   int test_and_change_bit(int nr, volatile unsigned long \*addr)
+   int test_and_change_bit(int nr, volatile unsigned long *addr);
 
 上述函数等同于先执行test_bit函数然后再执行xxx_bit函数（xxx,指 set、clear、change）
 
@@ -460,7 +460,7 @@ spinlock_t，是一个结构体，具体内容我们不必关心，使用自旋�
 
 **参数：**
 
-\_lock ，spinlock_t类型变量，既我们要初始化的自旋锁。定义自旋锁只用之前首先要使用该函数（宏定义）初始化自旋锁。
+_lock ，spinlock_t类型变量，既我们要初始化的自旋锁。定义自旋锁只用之前首先要使用该函数（宏定义）初始化自旋锁。
 
 获取自旋锁
 
@@ -471,7 +471,7 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   void spin_lock(spinlock_t \*lock)
+   void spin_lock(spinlock_t *lock);
 
 获取自旋锁成功则继续向下执行，否则进行将会一直轮询检测直到获取成功。
 
@@ -479,7 +479,7 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   int spin_trylock(spinlock_t \*lock)
+   int spin_trylock(spinlock_t *lock);
 
 相比获取自旋锁函数，尝试获取自旋锁函数拥有返回值，获取成功返回“true”,获取失败返回“false”。无论结果如何程序都会继续向下执行。
 
@@ -488,7 +488,7 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   void spin_unlock(spinlock_t \*lock)
+   void spin_unlock(spinlock_t *lock);
 
 释放自旋锁函数和获取自旋锁函数一般成对存在。
 
@@ -499,7 +499,7 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   void spin_lock_irq(spinlock_t \*lock)
+   void spin_lock_irq(spinlock_t *lock);
 
 此函数相当于同时执行获取自旋锁函数“spin_lock”和关中断函数“local_irq_disable”。
 
@@ -508,7 +508,7 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   void spin_unlock_irq(spinlock_t \*lock)
+   void spin_unlock_irq(spinlock_t *lock);
 
 此函数与上一个函数“spin_lock_irq”成对存在，用法相似。
 
@@ -848,7 +848,11 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   struct semaphore 
+   struct semaphore {
+   raw_spinlock_t    lock;
+   unsigned int      count;
+   struct list_head  wait_list;
+   };
 
 用于定义信号量。
 
@@ -856,7 +860,7 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   static inline void sema_init(struct semaphore \*sem, int val)
+   static inline void sema_init(struct semaphore *sem, int val);
 
 说明：
 
@@ -868,8 +872,8 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   void down(struct semaphore \*sem);
-   int down_interruptible(struct semaphore \*sem)
+   void down(struct semaphore *sem);
+   int down_interruptible(struct semaphore *sem);
 
 **说明：**
 
@@ -880,7 +884,7 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   int down_trylock(struct semaphore \*sem)
+   int down_trylock(struct semaphore *sem);
 
 与获取信号量相比，它有返回值。如果获取成功则返回0，否则会返回非零值。该函数不会导致进程休眠，可以用在中断的上下文中。
 
@@ -888,7 +892,7 @@ linux提供了两种获得自旋锁的方法，介绍如下：
 
 .. code-block:: c
 
-   void up(struct semaphore \*sem)
+   void up(struct semaphore *sem);
 
 释放信号量，信号量加一。
 
@@ -1021,7 +1025,7 @@ Makefile文件只需要修改目标文件名，和源文件（.c文件）名对�
 
 .. code-block:: c
 
-   mutex_init(struct mutex \*lock)
+   mutex_init(struct mutex *lock)
 
 说明：
 
@@ -1031,8 +1035,8 @@ Makefile文件只需要修改目标文件名，和源文件（.c文件）名对�
 
 .. code-block:: c
 
-   void \__sched mutex_lock(struct mutex \*lock)。
-   int \__sched mutex_lock_interruptible(struct mutex \*lock)。
+   void __sched mutex_lock(struct mutex *lock);
+   int __sched mutex_lock_interruptible(struct mutex *lock);
 
 参数lock，指定要获取的互斥体，执行该函数相当于“上锁”，释放之前其他线程无法再次获取。获取失败进程将会休眠并且不能被信号打断，该函数不能用在中断的上下文中。函数mutex_lock_interruptible获取信号量失败同样会进入休眠，但是休眠可以被信号打断，并且函数会返回非0值，该函数可以用
 在中断的上下文中而函数mutex_lock不可以。
@@ -1041,7 +1045,7 @@ Makefile文件只需要修改目标文件名，和源文件（.c文件）名对�
 
 .. code-block:: c
 
-   int \__sched mutex_trylock(struct mutex \*lock)。
+   int __sched mutex_trylock(struct mutex *lock);
 
 与获取互斥体相比，它有返回值。如果获取成功则返回0，否则会返回非零值。该函数不会导致进程休眠，可以用在中断的上下文中。
 
@@ -1050,7 +1054,7 @@ Makefile文件只需要修改目标文件名，和源文件（.c文件）名对�
 
 .. code-block:: c
 
-   void mutex_unlock (struct semaphore \*sem)
+   void mutex_unlock (struct semaphore *sem);
 
 互斥体测试实验
 ^^^^^^^
