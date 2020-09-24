@@ -1,4 +1,4 @@
-KERNEL_DIR=../ebf-buster-linux/build_image/build
+KERNEL_DIR=../../ebf-buster-linux/build_image/build
 
 ARCH=arm
 CROSS_COMPILE=arm-linux-gnueabihf-

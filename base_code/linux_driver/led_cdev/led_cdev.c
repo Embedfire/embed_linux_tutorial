@@ -31,7 +31,6 @@ struct led_chrdev {
 
 static int led_chrdev_open(struct inode *inode, struct file *filp)
 {
-
 	unsigned int val = 0;
 	struct led_chrdev *led_cdev =
 	    (struct led_chrdev *)container_of(inode->i_cdev, struct led_chrdev,
