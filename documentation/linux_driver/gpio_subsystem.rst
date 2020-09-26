@@ -12,8 +12,6 @@ pinctrl子系统
 引脚和特定功能引脚）数量是有限的，为充分发挥芯片性能，提高硬件设计的灵活性，通常情况下每个外设的功能引脚有多个外部引脚可选，以IIC1为例，如下图所示。
 
 
-
-
 .. image:: ./media/gpiosu002.png
    :align: center
    :alt: 总线结构02|
@@ -24,7 +22,7 @@ IIC的SCL和SDA都有三个引脚可选，在设计硬件时我们可以根据�
 在pinctrl子系统出现之前，在驱动程序中我们需要手动设置每个引脚的复用功能，这样不仅增加了工作量而且编写的驱动程序不方便移植，可重用性差。更糟糕的是由于缺乏对引脚的统一管理，容易出现引脚的重复定义。还以I2C1为例，假设我们在I2C1的驱动中将UART4_RX_DATA引脚和UART4_TX_D
 ATA引脚复用为SCL和 SDA，恰好在编写UART4驱动驱动时没有注意到UART4_RX_DATA引脚和UART4_TX_DATA引脚已经被使用，在驱动中又将其初始化为UART4_RX和UART4_TX，这样IIC1驱动将不能正常工作，并且这种错误很难被发现。
 
-简单来说pinctrl子系统用于帮助我们管理芯片引脚并自动完成引脚的初始化，而我们要做的只是在设备树中按照规定的格式写出想要的配置参数。
+简单来说pinctrl子系统是由芯片厂商来实现的,用于帮助我们管理芯片引脚并自动完成引脚的初始化，而我们要做的只是在设备树中按照规定的格式写出想要的配置参数。
 
 pinctrl子系统编写格式以及引脚属性详解
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -315,7 +313,6 @@ GPIO子系统
 命令：
 
 .. code-block:: sh
-   :emphasize-lines: 1
    :linenos:
 
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
@@ -326,12 +323,10 @@ GPIO子系统
 
 
 .. code-block:: sh
-   :emphasize-lines: 1
    :linenos:
 
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- npi_v7_defconfig
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
-
 
 编译成功后会在“/ebf-buster-linux/arch/arm/boot/dts”目录下生成“imx6ull-seeed-npi.dtb”将其烧录到开发板，使用新的设备树启动之后正常情况下会在开发板的“/proc/driver-tree”目录下生成“rgb_led”设备树节点。如下所示。
 
@@ -349,146 +344,146 @@ GPIO子系统常用API函数讲解
 
 GPIO子系统大多数API函数会用到GPIO编号。GPIO编号是of_get_named_gpio函数从设备树中获取的。
 
-**函数原型：**
 
-.. code-block:: sh
-   :emphasize-lines: 1
+.. code-block:: c
+   :caption: of_get_named_gpio函数(内核源码include/linux/of_gpio.h)
    :linenos:
 
-   int of_get_named_gpio(struct device_node \*np, const char \*propname, int index)
+    static inline int of_get_named_gpio(struct device_node *np, const char *propname, int index)
 
-**函数参数：**
+**参数：**
 
-np：指定设备节点。
-
-propname：GPIO属性名，与设备树中定义的属性名对应。
-
-index：引脚索引值，在设备树中一条引脚属性可以包含多个引脚，该参数用于指定获取那个引脚。
+- **np：** 指定设备节点。
+- **propname：** GPIO属性名，与设备树中定义的属性名对应。
+- **index：** 引脚索引值，在设备树中一条引脚属性可以包含多个引脚，该参数用于指定获取那个引脚。
 
 **返回值：**
 
-成功，返回获取的GPIO编号（这里的GPIO编号是根据引脚属性生成的一个非负整数），失败返回负数。
+- **成功：** 获取的GPIO编号（这里的GPIO编号是根据引脚属性生成的一个非负整数），
+- **失败:** 返回负数。
 
 **2. GPIO申请函数gpio_request**
 
-**函数原型：**
+
 
 .. code-block:: c
-   :emphasize-lines: 1
+   :caption: gpio_request函数(内核源码drivers/gpio/gpiolib-legacy.c)
    :linenos:
 
-   static inline int gpio_request(unsigned gpio, const char \*label);
+   static inline int gpio_request(unsigned gpio, const char *label);
 
-**函数参数：**
+**参数：**
 
-gpio，要申请的GPIO编号，该值是函数of_get_named_gpio的返回值。
-
-label，引脚名字，相当于为申请得到的引脚取了个别名。
+- **gpio:** 要申请的GPIO编号，该值是函数of_get_named_gpio的返回值。
+- **label:** 引脚名字，相当于为申请得到的引脚取了个别名。
 
 **返回值：**
 
-成功，返回0，失败返回负数。
+- **成功:** 返回0，
+- **失败:** 返回负数。
 
 **3. GPIO释放函数**
 
-**函数原型：**
+
 
 .. code-block:: c
-   :emphasize-lines: 1
    :linenos:
+   :caption: gpio_free函数(内核源码drivers/gpio/gpiolib-legacy.c)
 
    static inline void gpio_free(unsigned gpio);
 
 该函数与gpio_request是一对，一个申请，一个释放。一个GPIO只能被申请一次，所以不再使用某一个引脚时一定要调用gpio_request函数将其释放掉。
 
-**函数参数：**
+**参数：**
 
-gpio：要释放的GPIO编号。
+- **gpio：** 要释放的GPIO编号。
+
+**返回值：** **无**
 
 **4. GPIO输出设置函数gpio_direction_output**
 
 函数用于将引脚设置为输出模式。
 
-**函数原型：**
 
 .. code-block:: c 
-   :emphasize-lines: 1
    :linenos:
-
-   static inline int gpio_direction_output(unsigned gpio , int value)；
+   :caption: gpio_direction_output函数(内核源码include/asm-generic/gpio.h)
+   
+   static inline int gpio_direction_output(unsigned gpio , int value);
 
 **函数参数：**
 
-gpio，要设置的GPIO的编号。
-
-value，输出值，1，表示高电平。0表示低电平。
+- **gpio:** 要设置的GPIO的编号。
+- **value:** 输出值，1，表示高电平。0表示低电平。
 
 **返回值：**
 
-成功，返回0，失败返回负数。
+- **成功:** 返回0
+- **失败:** 返回负数。
 
 **5. GPIO输入设置函数gpio_direction_input**
 
 gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为输出，后者用于将引脚设置为输入。
 
-**函数原型：**
-
 
 .. code-block:: c
-   :emphasize-lines: 1
    :linenos:
+   :caption: gpio_direction_input函数(内核源码include/asm-generic/gpio.h)
 
    static inline int gpio_direction_input(unsigned gpio)
 
 **函数参数：**
 
-gpio，要设置的GPIO的编号。
+- **gpio:** 要设置的GPIO的编号。
 
 **返回值：**
 
-成功，返回0，失败返回负数。
+- **成功:** 返回0
+- **失败:** 返回负数。
 
 **6. 获取GPIO引脚值函数gpio_get_value**
 
 无论引脚被设置为输出或者输入都可以用该函数获取引脚的当前状态。
 
-**函数原型：**
 
 .. code-block:: c
-   :emphasize-lines: 1
    :linenos:
+   :caption: gpio_get_value函数(内核源码include/asm-generic/gpio.h)
 
    static inline int gpio_get_value(unsigned gpio);
 
 **函数参数：**
 
-gpio，要获取的GPIO的编号。
+- **gpio:** 要获取的GPIO的编号。
 
 **返回值：**
 
-大于等于零，表示获取得到的引脚状态。小于零，获取失败。
+- **成功:** 获取得到的引脚状态
+- **失败:** 返回负数
+
 
 **7. 设置GPIO输出值gpio_set_value**
 
-该函数只用于哪些设置为输出模式的GPIO.
+该函数只用于那些设置为输出模式的GPIO.
 
-**函数原型：**
 
 .. code-block:: c
-   :emphasize-lines: 1
    :linenos:
+   :caption: gpio_direction_output函数(内核源码include/asm-generic/gpio.h)
 
-   static inline int gpio_direction_output(unsigned gpio , int value)；
+   static inline int gpio_direction_output(unsigned gpio, int value);
 
 **函数参数**
 
-gpio，设置的GPIO的编号。
-
-value，设置的输出值，为1输出高电平，为0输出低电平。
+- **gpio：** 设置的GPIO的编号。
+- **value：** 设置的输出值，为1输出高电平，为0输出低电平。
 
 **返回值：**
 
-成功，返回0，失败返回负数。
+- **成功:** 返回0
+- **失败:** 返回负数
+
+
 
 我们使用以上函数就可以在驱动程序中控制IO口了。
 
@@ -782,7 +777,6 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
 命令：
 
 .. code-block:: sh
-   :emphasize-lines: 1
    :linenos:
 
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
@@ -857,7 +851,6 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
 命令：
 
 .. code-block:: sh
-   :emphasize-lines: 1
    :linenos:
 
    arm-linux-gnueabihf-gcc <源文件名> –o <输出文件名>
@@ -867,7 +860,6 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
 命令：
 
 .. code-block:: sh
-   :emphasize-lines: 1
    :linenos:
 
    arm-linux-gnueabihf-gcc rgb_leds_app.c –o rgb_leds_app
@@ -886,7 +878,6 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
 命令：
 
 .. code-block:: sh
-   :emphasize-lines: 1
    :linenos:
 
    insmod ./rgb-leds.ko
@@ -908,7 +899,6 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
 命令：
 
 .. code-block:: sh
-   :emphasize-lines: 1
    :linenos:
 
    ./rgb_leds_app <命令>
