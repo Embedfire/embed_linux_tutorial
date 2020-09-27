@@ -98,7 +98,8 @@ imx6ull.dtsi这个文件是芯片厂商官方将芯片的通用的部分单独�
 
 - 第2-3行：“pinctrl-names”标识，指定PIN的状态列表，默认设置为“default”。
   “pinctrl-0 = <&pinctrl_hog_1>”的意思的在默认设置下，将使用pinctrl_hog_1这个设备节点来设置我们的GPIO端口状态，
-  pinctrl_hog_1内容是支持热插拔相关的我们暂时不用理会。一个引脚可能有多种状态，以上面串口举例，在正常使用的时候我们将引脚设置为发送引脚、接收引脚，而在系统进入休眠模式时，
+  pinctrl_hog_1内容是支持热插拔相关的我们暂时不用理会。一个引脚可能有多种状态，以上面串口举例，
+  在正常使用的时候我们将引脚设置为发送引脚、接收引脚，而在系统进入休眠模式时，
   为了节省功耗，我们可以将这两个引脚设置为其他模式，如设置为GPIO功能并设置为高电平等。如下代码所示。
 - 其余源码都是pinctrl子节点，它们都是按照一定的格式规范来编写。
 
@@ -192,17 +193,10 @@ pinctrl子节点格式规范，格式框架如下:
 
    <mux_reg    conf_reg    input_reg   mux_mode    input_val>
    0x0084       0x0310      0x0000        0x0          0x0
-<<<<<<< HEAD
 
 如果将宏定义展开则在设备树中每条配置信息实际是6个参数，由于第6个参数设置较为复杂需要根据实际需要设置
 因此并没有把它放到宏定义里面。以MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX为例，宏定义中5个参数参数介绍如下：
 
-=======
-
-如果将宏定义展开则在设备树中每条配置信息实际是6个参数，由于第6个参数设置较为复杂需要根据实际需要设置
-因此并没有把它放到宏定义里面。以MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX为例，宏定义中5个参数参数介绍如下：
-
->>>>>>> remotes/origin/zqh_version
 
 1. **mux_reg** 和 **mux_mode** :mux_reg是引脚复用选择寄存器偏移地址，mux_mode是引脚复用选择寄存器模式选择位的值。
 UART1_TX引脚复用选择寄存器IOMUXC_SW_MUX_CTL_PAD_UART1_TX_DATA定义如下所示。
@@ -282,6 +276,7 @@ rgb_led_blue: CSI_VSYNC
 其他的两个引脚最终得到的结果如下：
 
 
+
 CSI_HSYNC：MX6UL_PAD_CSI_HSYNC__GPIO4_IO20
 
 CSI_VSYNC：MX6UL_PAD_CSI_VSYNC__GPIO4_IO19
@@ -307,6 +302,8 @@ CSI_VSYNC：MX6UL_PAD_CSI_VSYNC__GPIO4_IO19
 ''''''''''''''''''''''
 
 添加子节点很简单，我们只需要将前面选择好的配置信息按照之前讲解的格式写入到设备树中即可，添加完成后如下所示。
+
+
 
 .. code-block:: c 
     :caption: 新增pinctrl子节点
@@ -369,7 +366,8 @@ GPIO子系统
 - **#gpio-cells** ：表示有多少个cells来描述GPIO引脚
 - **interrupt-controller** ：表示gpio4也是个中断控制器
 - **#interrupt-cells** :表示用多少个cells来描述一个中断
-- **gpio-ranges** ：将gpio编号转换成pin引脚，<&iomuxc 0 94 17>，表示将gpio4的第0个引脚引脚映射为97，17表示的是引脚的个数。
+- **gpio-ranges** ：将gpio编号转换成pin引脚，<&iomuxc 0 94 17>，表示将gpio4的第0个引脚引脚映射为97，
+  17表示的是引脚的个数。
 
 gpio4这个节点对整个gpio4进行了描述。使用GPIO子系统时需要往设备树中添加设备节点，在驱动程序中使用GPIO子系统提供的API
 实现控制GPIO的效果。
@@ -433,20 +431,12 @@ gpio4这个节点对整个gpio4进行了描述。使用GPIO子系统时需要往
 
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 
-<<<<<<< HEAD
-=======
-
-如果执行了“make distclean”清理了内核，那么就需要在内核目录下执行如下命令重新配置内核（如果编译设备树出错也可以先清理内核然后执行如下命令尝试重新编译）。
->>>>>>> remotes/origin/zqh_version
 
 如果执行了“make distclean”清理了内核，那么就需要在内核目录下执行如下命令重新配置内核
 （如果编译设备树出错也可以先清理内核然后执行如下命令尝试重新编译）。
 
-<<<<<<< HEAD
 命令：
 
-=======
->>>>>>> remotes/origin/zqh_version
 .. code-block:: sh
    :linenos:
 
@@ -454,12 +444,8 @@ gpio4这个节点对整个gpio4进行了描述。使用GPIO子系统时需要往
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 
 
-<<<<<<< HEAD
 编译成功后会在“./arch/arm/boot/dts”目录下生成“imx6ull-seeed-npi.dtb”将其烧录到开发板，
 使用新的设备树启动之后正常情况下会在开发板的“/proc/driver-tree”目录下生成“rgb_led”设备树节点。如下所示。
-=======
-编译成功后会在“./arch/arm/boot/dts”目录下生成“imx6ull-seeed-npi.dtb”将其烧录到开发板，使用新的设备树启动之后正常情况下会在开发板的“/proc/driver-tree”目录下生成“rgb_led”设备树节点。如下所示。
->>>>>>> remotes/origin/zqh_version
 
 .. image:: ./media/gpiosu013.png
    :align: center
@@ -690,9 +676,8 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
 
 在平台驱动结构体中我们仅实现.probe函数和.driver，当驱动和设备匹配成功后会执行该函数，这个函数的函数实现我们在后面介绍。
 .driver描述这个驱动的属性，包括.name驱动的名字，.owner驱动的所有者,.of_match_table
-驱动匹配表，用于匹配驱动和设备。驱动设备匹配表定义为“rgb_led”在这个表里只有一个匹配值
-“.compatible = “fire,rgb-led””这个值要与我
-们在设备树中rgb_led设备树节点的“compatible”属性相同。
+驱动匹配表，用于匹配驱动和设备。驱动设备匹配表定义为“rgb_led”在这个表里只有一个匹配值“.compatible = “fire,rgb-led” ”
+这个值要与我们在设备树中rgb_led设备树节点的“compatible”属性相同。
 
 **平台驱动.probe函数实现**
 
@@ -785,9 +770,8 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
 参数“/rgb_led”是要获取的设备树节点在设备树中的路径，由于rgb_led设备树节点在根节点下，所以路径为“/rgb_led”，
 如果要获取的节点嵌套在其他子节点中需要写出节点所在的完整路径。
 
-第二部分，使用函数of_get_named_gpio函数获取GPIO号，以“rgb_led_red = of_get_named_gpio(rgb_led_device_node,
- “rgb_led_red”,
-0);”为例，读取成功则返回读取得到的GPIO号。“rgb_led_device_node”是我们使用函数“of_find_node_by_path”得到
+第二部分，使用函数of_get_named_gpio函数获取GPIO号，以“rgb_led_red = of_get_named_gpio(rgb_led_device_node, “rgb_led_red”,0);”
+为例，读取成功则返回读取得到的GPIO号。“rgb_led_device_node”是我们使用函数“of_find_node_by_path”得到
 的设备节点。“rgb_led_red”指定GPIO的名字，这个参数要与rgb_led设备树节点中GPIO属性名对应，如下所示
 
 
@@ -888,9 +872,9 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
 第二部分，实现open函数，在平台驱动的prob函数中已经初始化了GPIO,这里不用做任何操作，
 当然我们也可以将GPIO初始化部分代码移动到这里。
 
-第三部分，实现write函数。write函数的主要任务是根据应用程序传递来的命令控制RGB三个灯的亮、灭。
-这里存在一个问题，我们怎么解析命令？ 在程序中规定“命令”是一个“unsigned char”类型的数据，
-数据的后三位从高到低分别代表红、绿、蓝。为“1”表示亮为“0”表示灭。
+第三部分，实现write函数。write函数的主要任务是根据应用程序传递来的命令控制RGB三个灯的亮、灭。这里存在一个问题，
+我们怎么解析命令？ 在程序中规定“命令”是一个“unsigned char”类型的数据，数据的后三位从高到低分别代表红、绿、蓝。
+为“1”表示亮为“0”表示灭。
 
 write函数实现也很简单，首先使用“copy_from_user”函数将来自应用层的数据“拷贝”内核层。得到命令后就依次检查
 后三位，根据命令值使用“gpio_direction_output”函数控制RGB灯的亮灭。
