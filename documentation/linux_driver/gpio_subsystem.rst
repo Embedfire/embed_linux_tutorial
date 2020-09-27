@@ -275,7 +275,6 @@ rgb_led_blue: CSI_VSYNC
 其他的两个引脚最终得到的结果如下：
 
 
-
 CSI_HSYNC：MX6UL_PAD_CSI_HSYNC__GPIO4_IO20
 
 CSI_VSYNC：MX6UL_PAD_CSI_VSYNC__GPIO4_IO19
@@ -301,8 +300,6 @@ CSI_VSYNC：MX6UL_PAD_CSI_VSYNC__GPIO4_IO19
 ''''''''''''''''''''''
 
 添加子节点很简单，我们只需要将前面选择好的配置信息按照之前讲解的格式写入到设备树中即可，添加完成后如下所示。
-
-
 
 .. code-block:: c 
     :caption: 新增pinctrl子节点
