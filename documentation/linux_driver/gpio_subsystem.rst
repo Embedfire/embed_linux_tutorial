@@ -54,7 +54,7 @@ iomuxc节点介绍
 - **reg：** 表示的是引脚配置寄存器的基地址。
 
 imx6ull.dtsi这个文件是芯片厂商官方将芯片的通用的部分单独提出来的一些设备树配置。
-在iomuxc节点中汇总了所需引脚的配置信息，pinctrl子系统存储并使用着iomux节点信息。
+在iomuxc节点中汇总了所需引脚的配置信息，pinctrl子系统存储使用着iomux节点信息。
 
 
 我们的设备树主要的配置文件在./arch/arm/boot/dts/imx6ull-seeed-npi.dts中，
@@ -416,13 +416,11 @@ gpio4这个节点对整个gpio4进行了描述。使用GPIO子系统时需要往
 编译、下载设备树验证修改结果
 ^^^^^^^^^^^^^^
 
-前两小节我们分别在设备树中将RGB灯使用的引脚添加到pinctrl子系统，然
-后又在设备树中添加了rgb_led设备树节点。这一小节将会编译、下载修改后的设备树，用新的设备树启动系统，
-然后检查是否有rgb_led设备树节点产生。
+前两小节我们分别在设备树中将RGB灯使用的引脚添加到pinctrl子系统，然后又在设备树中添加了rgb_led设备树节点。
+这一小节将会编译、下载修改后的设备树，用新的设备树启动系统，然后检查是否有rgb_led设备树节点产生。
 
 编译内核时会自动编译设备树，我们可以直接重新编译内核，这样做的缺点是编译时间会很长。
-如果内核已经成功编译过一次并且没有执行“make distclean”命令清理内核，我们可以
-直接在内核目录下（~/ebf-buster-linux）执行如下命令，只编译设备树：
+在内核目录下（~/ebf-buster-linux）执行如下命令，只编译设备树：
 
 命令：
 
@@ -444,8 +442,28 @@ gpio4这个节点对整个gpio4进行了描述。使用GPIO子系统时需要往
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 
 
-编译成功后会在“./arch/arm/boot/dts”目录下生成“imx6ull-seeed-npi.dtb”将其烧录到开发板，
-使用新的设备树启动之后正常情况下会在开发板的“/proc/driver-tree”目录下生成“rgb_led”设备树节点。如下所示。
+编译成功后会在“./arch/arm/boot/dts”目录下生成“imx6ull-seeed-npi.dtb”文件，将其替换掉板子/boot/dtbs/4.19.71-imx-r1/
+目录下的imx6ull-seeed-npi.dtb文件并重启开发板。
+
+.. code-block:: sh
+   :linenos:
+
+   #这里操作命令仅作为参考，实际根据自己电脑情况进行修改
+
+   #将生成的设备树拷贝到共享文件夹
+   cp arch/arm/boot/dts/imx6ull-seeed-npi.dtb /home/Embedfire/wokdfir
+
+   #挂载nfs共享文件夹(在开发板上)
+   sudo mount -f nfs 192.168.0.231:/home/Embedfire/wokdfir  /mnt
+
+   #复制设备树到共享文件夹(在开发板上)
+   cp /mnt/imx6ull-seeed-npi.dtb  /boot/dtbs/4.19.71-imx-r1/
+
+   #重启开发板
+   reboot
+
+
+使用新的设备树重新启动之后正常情况下会在开发板的“/proc/driver-tree”目录下生成“rgb_led”设备树节点。如下所示。
 
 .. image:: ./media/gpiosu013.png
    :align: center
@@ -454,14 +472,12 @@ gpio4这个节点对整个gpio4进行了描述。使用GPIO子系统时需要往
 GPIO子系统常用API函数讲解
 ^^^^^^^^^^^^^^^^
 
-之前两小节我们修改设备树并编译、下载到开开发板。设备树部分已经完成了，这里介绍GPIO子系统常用的几个API函数，
+之前两小节我们修改设备树并编译、下载到开发板。设备树部分已经完成了，这里介绍GPIO子系统常用的几个API函数，
 然后就可以使用GPIO子系统编写RGB驱动了。
 
 **1. 获取GPIO编号函数of_get_named_gpio**
 
-
-GPIO子系统大多数API函数会用到GPIO编号。GPIO编号是of_get_named_gpio函数从设备树中获取的。
-
+GPIO子系统大多数API函数会用到GPIO编号。GPIO编号可以通过of_get_named_gpio函数从设备树中获取。
 
 .. code-block:: c
    :caption: of_get_named_gpio函数(内核源码include/linux/of_gpio.h)
@@ -480,9 +496,11 @@ GPIO子系统大多数API函数会用到GPIO编号。GPIO编号是of_get_named_g
 - **成功：** 获取的GPIO编号（这里的GPIO编号是根据引脚属性生成的一个非负整数），
 - **失败:** 返回负数。
 
+
+
+
+
 **2. GPIO申请函数gpio_request**
-
-
 
 .. code-block:: c
    :caption: gpio_request函数(内核源码drivers/gpio/gpiolib-legacy.c)
@@ -500,9 +518,10 @@ GPIO子系统大多数API函数会用到GPIO编号。GPIO编号是of_get_named_g
 - **成功:** 返回0，
 - **失败:** 返回负数。
 
+
+
+
 **3. GPIO释放函数**
-
-
 
 .. code-block:: c
    :linenos:
@@ -510,8 +529,8 @@ GPIO子系统大多数API函数会用到GPIO编号。GPIO编号是of_get_named_g
 
    static inline void gpio_free(unsigned gpio);
 
-该函数与gpio_request是一对，一个申请，一个释放。一个GPIO只能被申请一次，
-所以不再使用某一个引脚时一定要调用gpio_request函数将其释放掉。
+gpio_free函数与gpio_request是一对相反的函数，一个申请，一个释放。一个GPIO只能被申请一次，
+当不再使用某一个引脚时记得将其释放掉。
 
 **参数：**
 
@@ -519,10 +538,13 @@ GPIO子系统大多数API函数会用到GPIO编号。GPIO编号是of_get_named_g
 
 **返回值：** **无**
 
+
+
+
+
 **4. GPIO输出设置函数gpio_direction_output**
 
-函数用于将引脚设置为输出模式。
-
+用于将引脚设置为输出模式。
 
 .. code-block:: c 
    :linenos:
@@ -540,10 +562,12 @@ GPIO子系统大多数API函数会用到GPIO编号。GPIO编号是of_get_named_g
 - **成功:** 返回0
 - **失败:** 返回负数。
 
+
+
+
 **5. GPIO输入设置函数gpio_direction_input**
 
-gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为输出，后者用于将引脚设置为输入。
-
+用于将引脚设置为输入模式。
 
 .. code-block:: c
    :linenos:
@@ -560,10 +584,12 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
 - **成功:** 返回0
 - **失败:** 返回负数。
 
+
+
+
 **6. 获取GPIO引脚值函数gpio_get_value**
 
-无论引脚被设置为输出或者输入都可以用该函数获取引脚的当前状态。
-
+用于获取引脚的当前状态。无论引脚被设置为输出或者输入都可以用该函数获取引脚的当前状态。
 
 .. code-block:: c
    :linenos:
@@ -585,7 +611,6 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
 
 该函数只用于那些设置为输出模式的GPIO.
 
-
 .. code-block:: c
    :linenos:
    :caption: gpio_direction_output函数(内核源码include/asm-generic/gpio.h)
@@ -602,9 +627,7 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
 - **成功:** 返回0
 - **失败:** 返回负数
 
-
-
-我们使用以上函数就可以在驱动程序中控制IO口了。
+根据上面这些函数我们就可以在驱动程序中控制IO口了。
 
 基于GPIO子系统的RGB程序编写
 ~~~~~~~~~~~~~~~~~
@@ -612,7 +635,7 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
 程序包含两部分，第一部分是驱动程序，驱动程序在平台总线基础上编写。第二部分是一个简单的测试程序，用于测试驱动是否正常。
 
 驱动程序编写
-^^^^^^
+^^^^^^^^^^^
 
 驱动程序大致分为三个部分，第一部分，编写平台设备驱动的入口和出口函数。第二部分，编写平台设备的.probe函数,
 在probe函数中实现字符设备的注册和RGB灯的初始化。第三部分，编写字符设备函数集，实现open和write函数。
@@ -671,21 +694,17 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
     MODULE_LICENSE("GPL");
 
 
-以上代码分为三部分，第二、三部分是平台设备的入口和出口函数，函数实现很简单，在入口函数中注册平台驱动，
-在出口函数中注销平台驱动。我们重点介绍第一部分，平台驱动结构体。
+- 第2-15行：为代码的第一部分，仅实现.probe函数和.driver，当驱动和设备匹配成功后会执行该函数，
+  这个函数的函数实现我们在后面介绍。.driver描述这个驱动的属性，包括.name驱动的名字，.owner驱动的所有者,
+  .of_match_table驱动匹配表，用于匹配驱动和设备。驱动设备匹配表定义为“rgb_led”在这个表里只有一个匹配值 
+  “.compatible = “fire,rgb-led” ”这个值要与我们在设备树中rgb_led设备树节点的“compatible”属性相同。
+- 第17-40行：第二、三部分是平台设备的入口和出口函数，函数实现很简单，在入口函数中注册平台驱动，在出口函数中注销平台驱动。
 
-在平台驱动结构体中我们仅实现.probe函数和.driver，当驱动和设备匹配成功后会执行该函数，这个函数的函数实现我们在后面介绍。
-.driver描述这个驱动的属性，包括.name驱动的名字，.owner驱动的所有者,.of_match_table
-驱动匹配表，用于匹配驱动和设备。驱动设备匹配表定义为“rgb_led”在这个表里只有一个匹配值“.compatible = “fire,rgb-led” ”
-这个值要与我们在设备树中rgb_led设备树节点的“compatible”属性相同。
 
 **平台驱动.probe函数实现**
 
-
 当驱动和设备匹配后首先会probe函数，我们在probe函数中实现RGB的初始化、注册一个字符设备。
 后面将会在字符设备操作函数（open、write）中实现对RGB等的控制。函数源码如下所示。
-
-
 
 .. code-block:: c 
     :caption: probe函数实现
@@ -693,8 +712,8 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
 
     static int led_probe(struct platform_device *pdv)
     {
-        unsigned int  register_data = 0;  //用于保存读取得到的寄存器值
-    	int ret = 0;  //用于保存申请设备号的结果
+      unsigned int  register_data = 0;  //用于保存读取得到的寄存器值
+      int ret = 0;  //用于保存申请设备号的结果
         
     	printk(KERN_EMERG "\t  match successed  \n");
     
@@ -761,43 +780,23 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
     	return -1;
     }
 
+- 第10-14行：使用of_find_node_by_path函数找到并获取rgb_led在设备树中的设备节点。
+  参数“/rgb_led”是要获取的设备树节点在设备树中的路径，如果要获取的节点嵌套在其他子节点中需要写出节点所在的完整路径。
+
+- 第17-22行：使用函数of_get_named_gpio函数获取GPIO号，读取成功则返回读取得到的GPIO号。
+  “rgb_led_red”指定GPIO的名字，这个参数要与rgb_led设备树节点中GPIO属性名对应，
+  参数“0”指定引脚索引，我们的设备树中一条属性中只定义了一个引脚，我们只有一个所以设置为0。
+
+- 第25-27行，将GPIO设置为输出模式，默认输出电平为高电平。
+
+- 第32-65行，字符设备相关内容，这部分内容在字符设备章节已经详细介绍这里不再赘述。
 
 
 
-前三部分是RGB灯初始化部分，第四部分是字符设备相关内容，这部分内容在字符设备章节已经详细介绍这里不再赘述。
-
-第一部分，使用of_find_node_by_path函数找到并获取rgb_led在设备树中的设备节点。
-参数“/rgb_led”是要获取的设备树节点在设备树中的路径，由于rgb_led设备树节点在根节点下，所以路径为“/rgb_led”，
-如果要获取的节点嵌套在其他子节点中需要写出节点所在的完整路径。
-
-第二部分，使用函数of_get_named_gpio函数获取GPIO号，以“rgb_led_red = of_get_named_gpio(rgb_led_device_node, “rgb_led_red”,0);”
-为例，读取成功则返回读取得到的GPIO号。“rgb_led_device_node”是我们使用函数“of_find_node_by_path”得到
-的设备节点。“rgb_led_red”指定GPIO的名字，这个参数要与rgb_led设备树节点中GPIO属性名对应，如下所示
-
-
-
-.. code-block:: c 
-    :caption: 设备树中GPIO属性定义部分
-    :linenos:
-
-    rgb_led_red = <&gpio1 4 GPIO_ACTIVE_LOW>;
-    rgb_led_green = <&gpio4 20 GPIO_ACTIVE_LOW>;
-    rgb_led_blue = <&gpio4 19 GPIO_ACTIVE_LOW>;
-
-参数“0”指定引脚索引，我们的设备树中一条属性中只定义了一个引脚，当然也可以定义多个，
-如果定义多个则该参数就用于指定获取的哪一个（从零开始），我们只有一个所以设置为0.
-
-第三部分，将GPIO设置为输出模式，默认输出电平为高电平。上一步我们已经获取了引脚编号，
-这里直接使用GPIO子系统提供的API函数操作GPIO即可。
 
 **实现字符设备函数**
 
-
 字符设备函数我们只需要实现open函数和write函数。函数源码如下。
-
-
-
-
 
 .. code-block:: c 
     :caption: open函数和write函数实现
@@ -864,27 +863,16 @@ gpio_direction_output与gpio_direction_input是一对，前者将引脚设置为
     	return 0;
     }
 
+- 代码3-8行:定义字符设备操作函数集，这里主要实现open和write函数即可。
+- 代码12-16行：实现open函数，在平台驱动的prob函数中已经初始化了GPIO,这里不用做任何操作
+- 代码20-60行：write函数实现也很简单，首先使用“copy_from_user”函数将来自应用层的数据“拷贝”内核层。
+  得到命令后就依次检查后三位，根据命令值使用“gpio_direction_output”函数控制RGB灯的亮灭。
 
-代码共分为三部分，结合代码介绍如下：
 
-第一部分，定义字符设备操作函数集，这里我们只实现open和write函数即可。
-
-第二部分，实现open函数，在平台驱动的prob函数中已经初始化了GPIO,这里不用做任何操作，
-当然我们也可以将GPIO初始化部分代码移动到这里。
-
-第三部分，实现write函数。write函数的主要任务是根据应用程序传递来的命令控制RGB三个灯的亮、灭。这里存在一个问题，
-我们怎么解析命令？ 在程序中规定“命令”是一个“unsigned char”类型的数据，数据的后三位从高到低分别代表红、绿、蓝。
-为“1”表示亮为“0”表示灭。
-
-write函数实现也很简单，首先使用“copy_from_user”函数将来自应用层的数据“拷贝”内核层。得到命令后就依次检查
-后三位，根据命令值使用“gpio_direction_output”函数控制RGB灯的亮灭。
 
 **修改Makefile并编译生成驱动程序**
 
-
 Makefile程序并没有大的变化，修改后的Makefile如下所示。
-
-
 
 .. code-block:: c 
     :caption: Makefile文件
@@ -901,9 +889,8 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
     clean:
     	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) clean
 
-
-需要注意的是第二行，变量“KERNEL_DIR”保存的是内核所在路径，这个需要根据自己内核所在位置设定。
-第四行“obj-m := rgb-leds.o”中的“rgb-leds.o”要与驱动源码名对应。Makefiel 修改完成后执行如下命令编译驱动。
+- 代码第2行：变量“KERNEL_DIR”保存的是内核所在路径，这个需要根据自己内核所在位置设定。
+- 代码第4行：“obj-m := rgb-leds.o”中的“rgb-leds.o”要与驱动源码名对应。Makefiel 修改完成后执行如下命令编译驱动。
 
 命令：
 
@@ -914,15 +901,13 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
 
 正常情况下会在当前目录生成.ko驱动文件。
 
+
 应用程序编写
 ^^^^^^
 
 应用程序实现
 
-
 应用程序编写比较简单，我们只需要打开设备节点文件，写入命令然后关闭设备节点文件即可。源码如下所示。
-
-
 
 .. code-block:: c 
     :caption: Makefile文件
@@ -965,18 +950,14 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
         return 0;
     }
 
-
 结合代码各部分说明如下：
 
-第一部分，判断命令是否有效。再运行应用程序时我们要传递一个控制命令，所以参数长度是2。
-
-第二部分，打开设备文件。参数“/dev/rgb-leds”用于指定设备节点文件，设备节点文件名是在驱动程序中设置的，
-这里保证与驱动一致即可。
-
-第三部分，由于从main函数中获取的参数是字符串，这里首先要将其转化为数字。最后条用write函数写入命令然后关闭文件即可。
+- 代码4-8行：判断命令是否有效。再运行应用程序时我们要传递一个控制命令，所以参数长度是2。
+- 代码11-16行：打开设备文件。参数“/dev/rgb-leds”用于指定设备节点文件，设备节点文件名是在驱动程序中设置的，
+  这里保证与驱动一致即可。
+- 代码18-35行：由于从main函数中获取的参数是字符串，这里首先要将其转化为数字。最后条用write函数写入命令然后关闭文件即可。
 
 编译应用程序
-
 
 进入应用程序所在目录“~/gpio_subsystem_rgb_led/”执行如下命令：
 
@@ -997,7 +978,7 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
    arm-linux-gnueabihf-gcc rgb_leds_app.c –o rgb_leds_app
 
 下载验证
-^^^^
+^^^^^^^^^
 
 前两小节我们已经编译出了.ko驱动和应用程序，将驱动程序和应用程序添加到开发板中（推荐使用之前讲解的NFS共享文件夹），
 驱动程序和应用程序在开发板中的存放位置没有限制。我们将驱动和应用都放到开发板的“/home/nfs_share”目录下，如下所示。
