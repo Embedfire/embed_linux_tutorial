@@ -8,40 +8,66 @@ pinctrl子系统和gpio子系统
 pinctrl子系统
 ~~~~~~~~~~
 
-从名字不难看出pinctrl子系统主要用于管理芯片（以下简称SOC）的引脚（pin）。imx6ull芯片拥有众多的片上外设，而大多数外设需要通过芯片的PIN（引脚）与外部设备（器件）相连进而实现特定的功能。例如我们熟悉的IIC、SPI、LCD、USDHC、等等。imx6ull芯片的可用引脚（除去电源
-引脚和特定功能引脚）数量是有限的，为充分发挥芯片性能，提高硬件设计的灵活性，通常情况下每个外设的功能引脚有多个外部引脚可选，以IIC1为例，如下图所示。
+
+pinctrl子系统主要用于管理芯片的引脚。imx6ull芯片拥有众多的片上外设，
+大多数外设需要通过芯片的引脚与外部设备（器件）相连实现相对应的控制，例如我们熟悉的I2C、SPI、LCD、USDHC等等。
+而我们知道芯片的可用引脚（除去电源引脚和特定功能引脚）数量是有限的，芯片的设计厂商为了提高硬件设计的灵活性，
+一个芯片引脚往往可以做为多个片上外设的功能引脚，以IIC1所对应的引脚为例，如下图所示。
 
 
 .. image:: ./media/gpiosu002.png
    :align: center
    :alt: 总线结构02|
 
-IIC的SCL和SDA都有三个引脚可选，在设计硬件时我们可以根据需要灵活的选择其中的一个。硬件设计完成后片上外设使用的引脚就已经确定了，假设在硬件设计中IIC1的SCL和SDA分别连接到UART4_TX_DATA和UART4_RX_DATA，从引脚名字可以看出这两个引脚是UART4的接收、发送引脚并
-不是用作IIC1的SCL和SDA，无论是裸机还是驱动，一般首先要设置引脚的复用功能并且设置引脚的PAD属性（驱动能力、上下拉等等）。
+I2C1的SCL和SDA的功能引脚不单单只可以使用在I2C上，也可以作为多个外设的功能引脚，如普通的GPIO引脚，串口的接收发送引脚等，
+在设计硬件时我们可以根据需要灵活的选择其中的一个。设计完硬件后每个引脚的功能就确定下来了，假设我们将上面的两个引脚连接
+到其他用串口控制的外部设备上，那么这两个引脚功能就做为了UART4的接收、发送引脚。在编程过程中，无论是裸机还是驱动，
+一般首先要设置引脚的复用功能并且设置引脚的PAD属性（驱动能力、上下拉等等）。
 
-在pinctrl子系统出现之前，在驱动程序中我们需要手动设置每个引脚的复用功能，这样不仅增加了工作量而且编写的驱动程序不方便移植，可重用性差。更糟糕的是由于缺乏对引脚的统一管理，容易出现引脚的重复定义。还以I2C1为例，假设我们在I2C1的驱动中将UART4_RX_DATA引脚和UART4_TX_D
-ATA引脚复用为SCL和 SDA，恰好在编写UART4驱动驱动时没有注意到UART4_RX_DATA引脚和UART4_TX_DATA引脚已经被使用，在驱动中又将其初始化为UART4_RX和UART4_TX，这样IIC1驱动将不能正常工作，并且这种错误很难被发现。
+在驱动程序中我们需要手动设置每个引脚的复用功能，不仅增加了工作量，编写的驱动程序不方便移植，
+可重用性差等。更糟糕的是缺乏对引脚的统一管理，容易出现引脚的重复定义。
+假设我们在I2C1的驱动中将UART4_RX_DATA引脚和UART4_TX_DATA引脚复用为SCL和SDA，
+恰好在编写UART4驱动驱动时没有注意到UART4_RX_DATA引脚和UART4_TX_DATA引脚已经被使用，
+在驱动中又将其初始化为UART4_RX和UART4_TX，这样IIC1驱动将不能正常工作，并且这种错误很难被发现。
 
-简单来说pinctrl子系统是由芯片厂商来实现的,用于帮助我们管理芯片引脚并自动完成引脚的初始化，而我们要做的只是在设备树中按照规定的格式写出想要的配置参数。
+pinctrl子系统是由芯片厂商来实现的,简单来说用于帮助我们管理芯片引脚并自动完成引脚的初始化，
+而我们要做的只是在设备树中按照规定的格式写出想要的配置参数即可。
 
 pinctrl子系统编写格式以及引脚属性详解
 ^^^^^^^^^^^^^^^^^^^^^^
 
-本章使用的内核以及设备树与上一章相同，首先我们会介绍如何将RGB灯的三个引脚添加到pinctrl子系统中，以及各个参数的含义，修改完成后编译并下载到开发板验证修改是否成功。
+iomuxc节点介绍
+''''''''''''''''''''
 
-本小节使用的设备树位于“~/ebf-buster-linux/arch/arm/boot/dts/imx6ull-seeed-npi.dts”。打开imx6ull-seeed-npi.dts，在文件中搜索“&iomuxc”找到设备树中引用“iomuxc”节点的位置如下所示。
+首先我们在/ebf-buster-linux/arch/arm/boot/dts/imx6ull.dtsi文件中查找iomuxc节点，可以看到如下定义
 
+.. code-block:: dts 
+   :caption: imx6ull.dtsi中iomuxc部分
+   :linenos:
+
+   iomuxc: iomuxc@20e0000 {
+                  compatible = "fsl,imx6ul-iomuxc";
+                  reg = <0x20e0000 0x4000>;
+                  };
+
+- **compatible：** 修饰的是与平台驱动做匹配的名字,这里则是与pinctrl子系统的平台驱动做匹配。
+- **reg：** 表示的是引脚配置寄存器的基地址。
+
+imx6ull.dtsi这个文件是芯片厂商官方将芯片的通用的部分单独提出来的一些设备树配置。
+在iomuxc节点中汇总了所需引脚的配置信息，pinctrl子系统存储并使用着iomux节点信息。
+
+
+我们的设备树主要的配置文件在./arch/arm/boot/dts/imx6ull-seeed-npi.dts中，
+打开imx6ull-seeed-npi.dts，在文件中搜索“&iomuxc”找到设备树中引用“iomuxc”节点的位置如下所示。
 
 
 .. code-block:: c 
-    :caption: imx6ull-seeed-npi.dts中iomuxc部分
+    :caption: imx6ull-seeed-npi.dts中&iomuxc部分内容
     :linenos:
 
     &iomuxc {
     	pinctrl-names = "default";
     	pinctrl-0 = <&pinctrl_hog_1>;
-    
-    
     
     	pinctrl_gpmi_nand: gpmi-nand {
     			fsl,pins = <
@@ -60,23 +86,6 @@ pinctrl子系统编写格式以及引脚属性详解
     		>;
     	};
     
-    	pinctrl_enet1: enet1grp {
-    		fsl,pins = <
-    			MX6UL_PAD_ENET1_RX_EN__ENET1_RX_EN	0x1b0b0
-    			MX6UL_PAD_ENET1_RX_ER__ENET1_RX_ER	0x1b0b0
-    			MX6UL_PAD_ENET1_RX_DATA0__ENET1_RDATA00	0x1b0b0
-    			/*------------以下省略-----------------*/
-    		>;
-    	};
-    
-    	pinctrl_enet2: enet2grp {
-    		fsl,pins = <
-    			MX6UL_PAD_GPIO1_IO07__ENET2_MDC		0x1b0b0
-    			MX6UL_PAD_GPIO1_IO06__ENET2_MDIO	0x1b0b0
-                /*------------以下省略-----------------*/
-    		>;
-    	};
-    
     	pinctrl_uart1: uart1grp {
     		fsl,pins = <
     			MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX 0x1b0b1
@@ -85,15 +94,57 @@ pinctrl子系统编写格式以及引脚属性详解
     	};
 
 
-iomuxc节点定义在imx6ull.dtsi设备树内，在这里通过“&iomuxc”在“iomuxc”节点下追加内容。结合设备树源码介绍如下：
+在这里通过“&iomuxc”在“iomuxc”节点下追加内容。结合设备树源码介绍如下：
 
-“pinctrl-names”标识，指定PIN的状态列表，默认设置为“default”。“pinctrl-0 = <&pinctrl_hog_1>”是支持热插拔相关我们暂时不用理会。其余源码就是pinctrl子节点，它们都是按照一定的格式规范编写，以源码最后“pinctrl_uart1”节点为例介绍如下：
+- 第2-3行：“pinctrl-names”标识，指定PIN的状态列表，默认设置为“default”。
+  “pinctrl-0 = <&pinctrl_hog_1>”的意思的在默认设置下，将使用pinctrl_hog_1这个设备节点来设置我们的GPIO端口状态，
+  pinctrl_hog_1内容是支持热插拔相关的我们暂时不用理会。一个引脚可能有多种状态，以上面串口举例，在正常使用的时候我们将引脚设置为发送引脚、接收引脚，而在系统进入休眠模式时，
+  为了节省功耗，我们可以将这两个引脚设置为其他模式，如设置为GPIO功能并设置为高电平等。如下代码所示。
+- 其余源码都是pinctrl子节点，它们都是按照一定的格式规范来编写。
+
+.. code-block:: c 
+   :caption: 举例说明
+   :linenos:
+
+   &iomuxc {
+      pinctrl-names = "default","sleep","init";
+      pinctrl-0 = <&pinctrl_uart1>;
+      pinctrl-1 =<&xxx>;
+      pinctrl-2 =<&yyy>;
+   ...
+      pinctrl_uart1: uart1grp {
+         fsl,pins = <
+            MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX 0x1b0b1
+            MX6UL_PAD_UART1_RX_DATA__UART1_DCE_RX 0x1b0b1
+         >;
+      };
+
+      xxx: xxx_grp {
+         ...这里设置将引脚设置为其他模式
+      }
+
+      yyy: yyy_grp {
+         ...这里设置将引脚设置为其他模式
+      }
+
+   ...
+   }
+
+- **pinctrl-names：** 定义引脚状态。
+- **pinctrl-0：** 定义第0种状态需要使用到的引脚配置，可引用其他节点标识。
+- **pinctrl-1：** 定义第1种状态需要使用到的引脚配置。
+- **pinctrl-2：** 定义第2种状态需要使用到的引脚配置。
+
+pinctrl子节点编写格式
+''''''''''''''''''''''''''
+
+接下来以“pinctrl_uart1”节点源码为例介绍pinctrl子节点格式规范编写：
 
 .. image:: ./media/gpiosu003.png
    :align: center
    :alt: 总线结构03|
 
-和其他子节点一样，“pinctrl_uart1”子节点按照固定的格式编写，提取格式框架如下所示。
+pinctrl子节点格式规范，格式框架如下:
 
 
 .. code-block:: c 
@@ -106,14 +157,17 @@ iomuxc节点定义在imx6ull.dtsi设备树内，在这里通过“&iomuxc”在�
     		引脚复用宏定义   PAD（引脚）属性
     	>;
     };    
-    
 
 
-如果我们添加自己的子节点按照上面的格式框架编写即可。我们重点讲解上图的标号3处的内容，它是我们编写的主要内容-添加PIN配
-置信息。
+这里我们需要知道每个芯片厂商的pinctrl子节点的编写格式并不相同，这不属于设备树的规范，是芯片厂商自定义的。
+如果我们想添加自己的pinctrl节点，只要依葫芦画瓢按照上面的格式编写即可。
+接下来我们重点讲解上图的标号3处的内容，也是我们编写的主要内容--添加引脚配置信息。
 
-每个引脚使用一条配置信息，每条配置信息分为两部分，直观上看第一部分是一个宏定义，暂且称为引脚
-复用宏定义，第二部分是一个16进制数，用于设置PAD属性值。以上图的第一条配置信息为例说明如下所示。
+引脚配置信息介绍
+'''''''''''''''
+
+引脚的配置信息一眼看去由两部分组成，一个宏定义和一个16进制数组成。这实际上定义已经配置
+控制引脚所需要用到的各个寄存器的地址及应写入寄存器值的信息，以上图的第一条配置信息为例说明。
 
 .. code-block:: c 
     :caption: 引脚配置信息
@@ -121,49 +175,68 @@ iomuxc节点定义在imx6ull.dtsi设备树内，在这里通过“&iomuxc”在�
 
     MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX 0x1b0b1
 
-**MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX宏定义**
-
-
-MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX是定义在“~/ebf-buster-linux/arch/arm/boot/dts/imx6ul-pinfunc.h”文件内的一个宏定义，如下图所示。
+**MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX** 是定义在“./arch/arm/boot/dts/imx6ul-pinfunc.h”文件内的一个宏定义。
 
 .. image:: ./media/gpiosu004.png
    :align: center
    :alt: 总线结构04|
 
-从上图可以看出以“MX6UL_PAD_UART1_TX_DATA__xxx”命名的宏定义共有8个，结合我们之前讲解的引脚复用选择寄存器很容易联想到这就是“UART1_TX_DATA”引脚的8个复用功能，而宏定义“MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX”将“UART
-1_TX_DATA”引脚复用为UART1的TX引脚。每个宏定义后面有5个参数，名字依次为mux_reg、conf_reg、input_reg、mux_mode、input_val。如果将宏定义展开则在设备树中每条配置信息实际是6个参数，由于第6个参数需要根据实际需要设置所以并没有把它放到宏定义里
-面。以MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX为例，宏定义中5个参数参数介绍如下：
+从上图可以看出以“**MX6UL_PAD_UART1_TX_DATA__xxx**”命名的宏定义共有8个，
+之前我们讲过引脚复用功能选择寄存器，很容易联想到这8个宏就是用来定义“UART1_TX_DATA”引脚的8个复用功能。
+宏定义“MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX”将“UART1_TX_DATA”引脚复用为UART1的TX引脚。
+每个宏定义后面有5个参数，名字依次为 **mux_reg**、**conf_reg**、**input_reg**、**mux_mode**、**input_val**。
 
-1. mux_reg和mux_mode，mux_reg是引脚复用选择寄存器偏移地址，mux_mode是引脚复用选择寄存器模式选择位的值。UART1_TX引脚复用选择寄存器IOMUXC_SW_MUX_CTL_PAD_UART1_TX_DATA定义如下所示。
+.. code-block:: c 
+   :caption: 5个参数
+   :linenos:
+
+   <mux_reg    conf_reg    input_reg   mux_mode    input_val>
+   0x0084       0x0310      0x0000        0x0          0x0
+
+如果将宏定义展开则在设备树中每条配置信息实际是6个参数，由于第6个参数设置较为复杂需要根据实际需要设置
+因此并没有把它放到宏定义里面。以MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX为例，宏定义中5个参数参数介绍如下：
+
+
+1. **mux_reg** 和 **mux_mode** :mux_reg是引脚复用选择寄存器偏移地址，mux_mode是引脚复用选择寄存器模式选择位的值。
+UART1_TX引脚复用选择寄存器IOMUXC_SW_MUX_CTL_PAD_UART1_TX_DATA定义如下所示。
 
 .. image:: ./media/gpiosu005.png
    :align: center
    :alt: 总线结构05|
 
-mux_reg = 0x0084与IM6ULL用户手册偏移地址一致, mux_mode = 0。设置复用选择寄存器IOMUXC_SW_MUX_CTL_PAD_UART1_TX_DATA[MUX_MODE] = 0，将其复用为UART1_TX功能。
+mux_reg = 0x0084与IM6ULL用户手册偏移地址一致, mux_mode = 0。
+设置复用选择寄存器IOMUXC_SW_MUX_CTL_PAD_UART1_TX_DATA[MUX_MODE] = 0，将其复用为UART1_TX功能。
 
-2. conf_reg，引脚（PAD）属性控制寄存器偏移地址。与引脚复用选择寄存器不同，引脚属性寄存器应当根据实际需要灵活的配置，所以它的值并不包含在宏定义中，它的值是我们上面所说的“第六个”参数。UART1_TX引脚属性控制寄存器IOMUXC_SW_PAD_CTL_PAD_UART1_TX
-   _DATA如下所示。
+2. **conf_reg** ，引脚（PAD）属性控制寄存器偏移地址。与引脚复用选择寄存器不同，
+引脚属性寄存器应当根据实际需要灵活的配置，所以它的值并不包含在宏定义中，
+它的值是我们上面所说的“第六个”参数。
+
 
 .. image:: ./media/gpiosu006.png
    :align: center
    :alt: 总线结构06|
 
-从上图可以看到conf_reg = 0x0310对应UART1_TX引脚的引脚属性寄存器的偏移地址。而这个寄存器包含很多配置项（上图中是部分配置项），这些配置项在裸机部分有详细介绍，寄存器的值就是上面所说的“第六个”参数。
+从上图可以看到conf_reg = 0x0310对应UART1_TX引脚的引脚属性寄存器的偏移地址。而这个寄存器包含很多配置项
+（上图中是部分配置项），这些配置项在裸机部分已有详细介绍，忘记的朋友可以回去再看下裸机部分详细解释。
 
-3. input_reg和input_val，input_reg暂且称为输入选择寄存器偏移地址。input_val是输入选择寄存器的值。这个寄存器只有某些用作输入的引脚才有，正如本例所示，UART1_TX用作输出，所以这两个参数都是零。“输入选择寄存器”理解稍微有点复杂，结合下图介绍如下。
+3. **input_reg** 和 **input_val** ，input_reg暂且称为输入选择寄存器偏移地址。input_val是输入选择寄存器的值。
+这个寄存器只有某些用作输入的引脚才有，正如本例所示，UART1_TX用作输出，所以这两个参数都是零。
+“输入选择寄存器”理解稍微有点复杂，结合下图介绍如下。
 
 .. image:: ./media/gpiosu007.png
    :align: center
    :alt: 总线结构07|
 
-从上图可以看出，如果引脚用作输出，我们我们只需要配置引脚复用选择寄存器和引脚PAD属性设置寄存器。如果用作输入时还增加了引脚输入选择寄存器，输入选择寄存器的作用也很明显，在多个可选输入中选择一个连接到片上外设。
+从上图可以看出，如果引脚用作输出，我们我们只需要配置引脚复用选择寄存器和引脚PAD属性设置寄存器。
+如果用作输入时还增加了引脚输入选择寄存器，输入选择寄存器的作用也很明显，在多个可选输入中选择一个连接到片上外设。
 
 **引脚（PAD）属性值**
 
-
-在pinctrl子系统中一条配置信息由一个宏定义和一个参数组成，将宏定义展开就是六个参数。结合上图不难发现这6个参数就是IOMUX相关的三个寄存器偏移地址和寄存器的值(引脚用作输出时实际只有四个有效，输入选择寄存器偏移地址和它的值全为0)，至于为什么要将pad属性寄存器的值单独列出，前面也说过了，pad属性配置选项非常多，配置灵活。在pinctrl子系统中添加的PAD属
-性值就是引脚（PAD）属性设置寄存器的值（16进制）。有关PAD属性设置内容已经在裸机部分GPIO章节详细介绍这里不再赘述。
+在pinctrl子系统中一条配置信息由一个宏定义和一个参数组成，将宏定义展开就是六个参数。
+结合上面分析我们知道这6个参数就是IOMUX相关的三个寄存器偏移地址和寄存器的值(引脚用作输出时实际只有四个有效，
+输入选择寄存器偏移地址和它的值全为0)，至于为什么要将pad属性寄存器的值单独列出，前面也说过了，pad属性配置选项非常多，
+配置灵活。在pinctrl子系统中添加的PAD属性值就是引脚（PAD）属性设置寄存器的值（16进制）。
+有关PAD属性设置内容已经在裸机部分GPIO章节详细介绍,忘记的同学可以回去再回顾下,这里便不再赘述了。
 
 将RGB灯引脚添加到pinctrl子系统
 ^^^^^^^^^^^^^^^^^^^^
@@ -171,7 +244,7 @@ mux_reg = 0x0084与IM6ULL用户手册偏移地址一致, mux_mode = 0。设置�
 本小节假设没有看过裸机部分RGB灯章节，我们从看原理图开始，一步步将RGB灯用到的三个引脚添加到pinctrl子系统中。
 
 查找RGB灯使用的引脚
-'''''''''''
+'''''''''''''''
 
 RGB灯对应的原理图如下所示。
 
@@ -190,7 +263,8 @@ rgb_led_blue: CSI_VSYNC
 找到引脚配置宏定义
 '''''''''
 
-这些引脚都将被复用为GPIO，用作驱动LED灯。首先要在“~/ebf-buster-linux/arch/arm/boot/dts/imx6ul-pinfunc.h”文件内找到对应的宏定义，以CSI_HSYNC引脚为例，在imx6ul-pinfunc.h中直接搜索“CSI_HSYNC”找到如下结果，
+这些引脚都将被复用为GPIO，用作驱动LED灯。首先要在“./arch/arm/boot/dts/imx6ul-pinfunc.h”文件内找到对应的宏定义，
+以CSI_HSYNC引脚为例，在imx6ul-pinfunc.h中直接搜索“CSI_HSYNC”找到如下结果，
 
 .. image:: ./media/gpiosu009.png
    :align: center
@@ -219,7 +293,9 @@ CSI_VSYNC：MX6UL_PAD_CSI_VSYNC__GPIO4_IO19
    :align: center
    :alt: 总线结构11|
 
-实际编程中我们几乎不会手动设置每一个配置项然后再将其组合成一个16进制数，通常情况下我们直接参照官方的设置，如果有需要在对个别参数进行修改。通常情况下用作GPIO的引脚PAD属性设置为“0x000010B1”
+实际编程中我们几乎不会手动设置每一个配置项然后再将其组合成一个16进制数，通常情况下我们直接参照官方的设置，
+设备树中其他的pinctrl子节点的配置就是很好的一个参考，如果有需要再对个别参数进行修改。
+通常情况下用作GPIO的引脚PAD属性设置为“0x000010B1”
 
 在iomuxc节点中添加pinctrl子节点
 ''''''''''''''''''''''
@@ -239,38 +315,69 @@ CSI_VSYNC：MX6UL_PAD_CSI_VSYNC__GPIO4_IO19
     	/*----------新添加的内容--------------*/
     	pinctrl_rgb_led:rgb_led{
     			fsl,pins = <
-    				MX6UL_PAD_GPIO1_IO04__GPIO1_IO04	0x000010B1 
-    				MX6UL_PAD_CSI_HSYNC__GPIO4_IO20	    0x000010B1 
-    				MX6UL_PAD_CSI_VSYNC__GPIO4_IO19	    0x000010B1 
+    				MX6UL_PAD_GPIO1_IO04__GPIO1_IO04    0x000010B1 
+    				MX6UL_PAD_CSI_HSYNC__GPIO4_IO20     0x000010B1 
+    				MX6UL_PAD_CSI_VSYNC__GPIO4_IO19     0x000010B1 
     			>;
     		};
 
 
 
-新增的节点名为“rgb_led”，名字任意选取，长度不要超过32个字符，最好能表达出节点的
-作用。“pinctrl_rgb_led”节点标签，“pinctrl_”是固定的格式，后面的内容自定义的，我们将通过这个标签引用这个节点。  
+新增的节点名为“rgb_led”，名字任意选取，长度不要超过32个字符，最好能表达出节点的信息。
+“pinctrl_rgb_led”节点标签，“pinctrl_”是固定的格式，后面的内容自定义的，我们将通过这个标签引用这个节点。  
+在添加完pinctrl子节点后，系统会根据我们添加的配置信息将引脚初始化为GPIO功能。
+到这里关于pinctrl子系统的使用就已经讲解完毕了，接下来介绍GPIO子系统相关的内容。
 
 
 GPIO子系统
 ~~~~~~~
 
-上一小节我们将RGB灯使用的三个引脚添加到了pinctrl子系统中，正常情况下系统会根据
-我们添加的配置信息将引脚初始化GPIO，初始化完成后就该GPIO子系统登场了。
 
-会想一下，如果没有使用GPIO子系统我们是怎样控制led灯的。首先要获取RGB灯用到
-的GPIO配置寄存器的地址（如果是物理地址还要转化为虚拟地址），然后手动的读、改、写这些寄存器实现控制RGB灯的目的。有了GPIO子系统之后这部分工作
-由GPIO子系统帮我们完成，我们只需要调用GPIO子系统提供的API函数即可。
+在没有使用GPIO子系统之前，如果我们想点亮一个LED，首先要得到led相关的配置寄存器，再手动地读、改、写这些配置寄存器实现
+控制LED的目的。有了GPIO子系统之后这部分工作由GPIO子系统帮我们完成，我们只需要调用GPIO子系统提供的API函数即可完成GPIO的
+控制动作。
 
-要使用GPIO子系统首先按照要求在设备树中添加设备节点，然后在程序中使用GPIO子系统提供的API实现特定的GPIO功能。
+
+在imx6ull.dtsi文件中的GPIO子节点记录着GPIO控制器的寄存器地址，下面我们以GPIO4为例介绍GPIO子节点相关内容
+
+.. code-block:: c 
+   :caption: imx6ull.dtbi中GPIO4节点内容
+   :linenos:
+
+   gpio4: gpio@20a8000 {
+      compatible = "fsl,imx6ul-gpio", "fsl,imx35-gpio";
+      reg = <0x20a8000 0x4000>;
+      interrupts = <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>,
+                  <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
+      clocks = <&clks IMX6UL_CLK_GPIO4>;
+      gpio-controller;
+      #gpio-cells = <2>;
+      interrupt-controller;
+      #interrupt-cells = <2>;
+      gpio-ranges = <&iomuxc 0 94 17>, <&iomuxc 17 117 12>;
+   };
+
+- **compatible** ：与GPIO子系统的平台驱动做匹配。
+- **reg** ：GPIO寄存器的基地址，GPIO4的寄存器组是的映射地址为0x20a8000-0x20ABFFF
+- **interrupts** ：描述中断相关的信息
+- **clocks** ：初始化GPIO外设时钟信息
+- **gpio-controller** ：表示gpio4是一个GPIO控制器
+- **#gpio-cells** ：表示有多少个cells来描述GPIO引脚
+- **interrupt-controller** ：表示gpio4也是个中断控制器
+- **#interrupt-cells** :表示用多少个cells来描述一个中断
+- **gpio-ranges** ：将gpio编号转换成pin引脚，<&iomuxc 0 94 17>，表示将gpio4的第0个引脚引脚映射为97，17表示的是引脚的个数。
+
+gpio4这个节点对整个gpio4进行了描述。使用GPIO子系统时需要往设备树中添加设备节点，在驱动程序中使用GPIO子系统提供的API
+实现控制GPIO的效果。
+
 
 在设备树中添加RGB灯的设备树节点
 ^^^^^^^^^^^^^^^^^
 
 
-相比之前led灯的设备树节点(没有使用GPIO子系统)，这里只需要增加GPIO属性定义。基于GPIO子系统的rgb_led设备树节点
-添加到“~/ebf-buster-linux/arch/arm/boot/dts/imx6ull-seeed-npi.dts”设备树的根节点内。
+相比之前led灯的设备树节点(没有使用GPIO子系统)，这里只需要增加GPIO属性定义，基于GPIO子系统的rgb_led设备树节点
+添加到“./arch/arm/boot/dts/imx6ull-seeed-npi.dts”设备树的根节点内。
 添加完成后的设备树如下所示。
-
 
 
 .. code-block:: c 
@@ -290,16 +397,19 @@ GPIO子系统
     	status = "okay";
     };
 
-以上代码第6行，设置“compatible”属性值，根据之前讲解这个属性值要和驱动程序中设置的一致，这样才能和驱动匹配。第7行，指定RGB灯的引脚pinctrl信息，上一小节我们定义了pinctrl节点，并且标签设置为“pinctrl_rgb_led”，在这里我们引用了这个pinctrl信息。代码
-第8到12行指定引脚使用的哪个GPIO,编写格式如下所示。
+- 第6行，设置“compatible”属性值，与led的平台驱动做匹配。
+- 第7行，指定RGB灯的引脚pinctrl信息，上一小节我们定义了pinctrl节点，并且标签设置为“pinctrl_rgb_led”，
+  在这里我们引用了这个pinctrl信息。
+- 第8-10行，指定引脚使用的哪个GPIO,编写格式如下所示。
 
 .. image:: ./media/gpiosu012.png
    :align: center
    :alt: 总线结构12|
 
-标号①，设置引脚名字，如果使用GPIO子系统提供的API操作GPIO,在驱动程序中会
-用到这个名字，名字是自定义的。标号②，指定GPIO组，标号③指定GPIO编号。编号④，这是一个宏定义，指定有效电平，低电平有效选择“GPIO_ACTIVE_LOW”高电平有效选择“GPIO_ACTIVE_HIGH”
-。
+- 标号①，设置引脚名字，如果使用GPIO子系统提供的API操作GPIO,在驱动程序中会用到这个名字，名字是自定义的。
+- 标号②，指定GPIO组。
+- 标号③，指定GPIO编号。
+- 编号④，这是一个宏定义，指定有效电平，低电平有效选择“GPIO_ACTIVE_LOW”高电平有效选择“GPIO_ACTIVE_HIGH”。
 
 编译、下载设备树验证修改结果
 ^^^^^^^^^^^^^^
@@ -317,10 +427,10 @@ GPIO子系统
 
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 
+
 如果执行了“make distclean”清理了内核，那么就需要在内核目录下执行如下命令重新配置内核（如果编译设备树出错也可以先清理内核然后执行如下命令尝试重新编译）。
 
 命令：
-
 
 .. code-block:: sh
    :linenos:
@@ -328,7 +438,8 @@ GPIO子系统
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- npi_v7_defconfig
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 
-编译成功后会在“/ebf-buster-linux/arch/arm/boot/dts”目录下生成“imx6ull-seeed-npi.dtb”将其烧录到开发板，使用新的设备树启动之后正常情况下会在开发板的“/proc/driver-tree”目录下生成“rgb_led”设备树节点。如下所示。
+
+编译成功后会在“./arch/arm/boot/dts”目录下生成“imx6ull-seeed-npi.dtb”将其烧录到开发板，使用新的设备树启动之后正常情况下会在开发板的“/proc/driver-tree”目录下生成“rgb_led”设备树节点。如下所示。
 
 .. image:: ./media/gpiosu013.png
    :align: center
