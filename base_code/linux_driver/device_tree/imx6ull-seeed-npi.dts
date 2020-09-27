@@ -12,7 +12,7 @@
 #include "imx6ull.dtsi"
 
 / {
-	model = "Embedfire i.MX6ULL Board";
+	model = "Seeed i.MX6 ULL NPi Board";
 	compatible = "fsl,imx6ull-14x14-evk", "fsl,imx6ull";
 
 	aliases {
@@ -21,6 +21,7 @@
 		pwm2 = &pwm3;
 		pwm3 = &pwm4;
 	};
+
 	chosen {
 		stdout-path = &uart1;
 	};
@@ -57,7 +58,7 @@
 			off-on-delay = <20000>;
 			enable-active-high;
 		};
-/*
+
 		reg_gpio_dvfs: regulator-gpio {
 			compatible = "regulator-gpio";
 			pinctrl-names = "default";
@@ -69,31 +70,99 @@
 			gpios = <&gpio5 3 GPIO_ACTIVE_HIGH>;
 			states = <1300000 0x1 1400000 0x0>;
 		};
-*/
 	};
 
-	leds {
-		compatible = "gpio-leds";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_led>;
+    /* External sound card */
+    sound: sound {
+        status = "disabled";
+    };
 
-		led0: cpu {
-			label = "cpu";
-			gpios = <&gpio5 3 GPIO_ACTIVE_LOW>;
-			default-state = "on";
-			linux,default-trigger = "heartbeat";
+
+/*
+*CCM_CCGR1                         0x020C406C
+*IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04  0x020E006C
+*IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04  0x020E02F8
+*GPIO1_GD                          0x0209C000
+*GPIO1_GDIR                        0x0209C004
+*/
+
+
+/*
+*CCM_CCGR3                         0x020C4074
+*IOMUXC_SW_MUX_CTL_PAD_CSI_HSYNC   0x020E01E0
+*IOMUXC_SW_PAD_CTL_PAD_CSI_HSYNC   0x020E046C
+*GPIO4_GD                          0x020A8000
+*GPIO4_GDIR                        0x020A8004
+*/
+
+
+/*
+*CCM_CCGR3                         0x020C4074
+*IOMUXC_SW_MUX_CTL_PAD_CSI_VSYNC   0x020E01DC
+*IOMUXC_SW_PAD_CTL_PAD_CSI_VSYNC   0x020E0468
+*GPIO4_GD                          0x020A8000
+*GPIO4_GDIR                        0x020A8004
+*/
+	/*添加led节点*/
+	rgb_led{
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "fire,rgb_led";
+
+		/*红灯节点*/
+		ranges;
+		rgb_led_red@0x020C406C{
+			compatible = "fire,rgb_led_red";
+			reg = <0x020C406C 0x00000004
+			       0x020E006C 0x00000004
+			       0x020E02F8 0x00000004
+				   0x0209C000 0x00000004
+			       0x0209C004 0x00000004>;
+			status = "okay";
+		};
+
+		/*绿灯节点*/
+		rgb_led_green@0x020C4074{
+			compatible = "fire,rgb_led_green";
+			reg = <0x020C4074 0x00000004
+			       0x020E01E0 0x00000004
+			       0x020E046C 0x00000004
+				   0x020A8000 0x00000004
+			       0x020A8004 0x00000004>;
+			status = "okay";
+		};
+
+		/*蓝灯节点*/
+		rgb_led_blue@0x020C4074{
+			compatible = "fire,rgb_led_blue";
+			reg = <0x020C4074 0x00000004
+			       0x020E01DC 0x00000004
+			       0x020E0468 0x00000004
+				   0x020A8000 0x00000004
+			       0x020A8004 0x00000004>;
+			status = "okay";
 		};
 	};
 
+	test_led{
+		/*-------------第一部分-----------*/
+		#address-cells = <1>;
+		#size-cells = <1>; 
 
-         /* External sound card */
-         sound: sound {
-                     status = "disabled";
-         };
+		/*-------------第二部分-----------*/
+		rgb_led_red@0x0209C000{
+			compatible = "fire,rgb_led_red";
+			reg = <0x0209C000 0x00000020>;
+			status = "okay";
+		};
+	};
 };
 
+
+
+
 &cpu0 {
-	/*dc-supply = <&reg_gpio_dvfs>;*/
+	dc-supply = <&reg_gpio_dvfs>;
 	clock-frequency = <800000000>;
 };
 
@@ -153,6 +222,14 @@
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog_1>;
+
+	pinctrl_rgb_led:rgb_led{
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO04__GPIO1_IO04	0x000010B1 /* remote control   add by pan  20200307*/
+				MX6UL_PAD_CSI_HSYNC__GPIO4_IO20	    0x000010B1 /* remote control   add by pan  20200307*/
+				MX6UL_PAD_CSI_VSYNC__GPIO4_IO19	    0x000010B1 /* remote control   add by pan  20200307*/
+			>;
+		};
 
 	pinctrl_gpmi_nand: gpmi-nand {
 			fsl,pins = <
@@ -224,13 +301,13 @@
 			MX6UL_PAD_GPIO1_IO00__ANATOP_OTG1_ID	0x17059
 		>;
 	};
-/*
+
         pinctrl_dvfs: dvfsgrp {
                 fsl,pins = <
                         MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03      0x79
                 >;
         };
-*/
+
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
 			MX6UL_PAD_SD1_CMD__USDHC1_CMD     0x17059
@@ -319,11 +396,7 @@
 			MX6UL_PAD_NAND_DATA07__USDHC2_DATA7 0x170f9
 		>;
 	};
-	pinctrl_led: ledgrp {
-			fsl,pins = <
-				MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03 0x1b0b0
-			>;
-		};
+
 };
 
 &iomuxc_snvs {
@@ -338,7 +411,7 @@
 
 
 &snvs_pwrkey {
-	status = "okay";
+	status = "disabled";
 };
 
 &pxp {
@@ -413,4 +486,3 @@
 			reg = <0x00800000 0x1F800000>;
 		};
 };
-
