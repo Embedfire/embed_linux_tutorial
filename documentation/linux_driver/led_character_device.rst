@@ -240,17 +240,27 @@ iounmap函数定义如下：
 硬件介绍
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-本节实验使用到 EBF6ULL-PRO 开发板上的 RGB 彩灯
+本节实验使用到 EBF6ULL-PRO 开发板上的 RGB 彩灯。
 
 硬件原理图分析
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-了解RGB灯的实物后，可打开相应的原理图文档来查看硬件连接，即《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》，具体见下图。
+了解RGB灯的实物后，可打开相应的原理图文档来查看硬件连接，即《野火_EBF6ULL S1 Pro 底板_V1.0_原理图》和
+《野火_EBF6ULL S1 邮票孔核心板_V1.0_原理图》，具体见下图。
 
-.. image:: ./media/asembl010.png
+.. image:: ./media/hd_principle001.png
    :align: center
-   :alt: 找不到图片03|
+   :alt: LED引脚
 
-经查阅，我们把以上连接LED灯的各个i.MX 6U芯片引脚总结出如下表所示，它展示了各个LED灯的连接信息及相应引脚的GPIO端口和引脚号。
+.. image:: ./media/hd_principle002.png
+   :align: center
+   :alt: i.MX6ULL引脚
+
+.. image:: ./media/hd_principle003.png
+   :align: center
+   :alt: 引脚复用
+
+LED_R的阴极连接到i.MX6ULL芯片上GPIO1_IO04引脚，LED_G连接到CSI_HSYNC,LED_B连接到CSI_VSYNC。
+而CSI_HSYNC和CSI_VSYNC作为摄像头的某一功能被复用为GPIO。如下表所示。
 
 .. csv-table::  
     :header: "LED灯", "原理图的标号","具体引脚名","GPIO端口及引脚编号"
@@ -260,12 +270,96 @@ iounmap函数定义如下：
 	"G灯",	"CSI_HSYNC",	"CSI_HSYNC",	"GPIO4_IO20"
 	"B灯",	"CSI_VSYNC",	"CSI_VSYNC",	"GPIO4_IO19"
 
+对于RGB灯的控制进行控制，也就是对上述GPIO的寄存器进行读写操作。可大致分为以下几个步骤：
+
+- 使能GPIO时钟
+- 设置引脚复用为GPIO
+- 设置引脚属性(上下拉、速率、驱动能力)
+- 控制GPIO引脚输出高低电平
+
+对RGB的R灯进行寄存器配置
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**GPIO时钟**
+
+跟GPIO相关的时钟主要有CCM_CCGR(0~3)寄存器。查看数据手册可以知道GPIO第26-27两位控制引脚时钟。
+
+.. image:: ./media/hd_principle004.png
+   :align: center
+   :alt: CCM_CCGR寄存器
+
+.. image:: ./media/hd_principle005.png
+   :align: center
+   :alt: CCM_CCGR寄存器
+
+两个bit的不同取值，设置GPIO时钟的不同属性如下：
+
+.. image:: ./media/hd_principle006.png
+   :align: center
+   :alt: CCM_CCGR寄存器配置
+
+- 00：所有模式下都关闭外设时钟
+- 01：只有在运行模式下打开外设时钟
+- 10：保留
+- 11：除了停止模式以外，该外设时钟全程使能
+
+CCM_CCGR1地址为 0x20C406C。
+先对CCM_CCGR1寄存器的26位、27位值清空，再赋值为11(位运算，详见示例代码)。
+
+**引脚复用GPIO**
+
+引脚复用相关的寄存器为IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO04
+
+.. image:: ./media/hd_principle007.png
+   :align: center
+   :alt: 引脚复用
+
+关于该寄存器的配置可以见下图：
+
+.. image:: ./media/hd_principle008.png
+   :align: center
+   :alt: 寄存器配置
+
+寄存器地址为0x20E006C，对该寄存器第0-3位配置为 0101时，MUX_MODE为ALT5 ，也就是该引脚复用为GPIO。
+
+**引脚属性**
+
+寄存器为 IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO04
+
+.. image:: ./media/hd_principle009.png
+   :align: center
+   :alt: 寄存器配置
+
+.. image:: ./media/hd_principle010.png
+   :align: center
+   :alt: 寄存器配置
+
+- HYS（bit16）：用来使能迟滞比较器 。
+- PUS（bit15-bit14）：用来设置上下拉电阻大小。
+- PUE（bit13）：当 IO 作为输入的时候，这个位用来设置 IO 使用上下拉还是状态保持器。
+- PKE（bit12）：用来使能或者禁止上下拉/状态保持器功能。
+- ODE（bit11）：IO 作为输出的时候，此位用来禁止或者使能开漏输出。
+- SPEED（bit7-bit6）：当 IO 用作输出的时候，此位用来设置 IO 速度。
+- DSE（bit5-bit3）：当 IO 用作输出的时候用来设置 IO 的驱动能力。
+- SRE（bit0）：设置压摆率
+
+寄存器地址为0x20E02F8，对该寄存器写入0x1F838，也就是二进制 1 1111 1000 0011 1000，对比上图了解引脚的属性。
+
+**输出电平**
+
+.. image:: ./media/hd_principle011.png
+   :align: center
+   :alt: 寄存器配置
+
+​	- 0：输入
+​	- 1：输出
+
+硬件原理以及寄存器配置到此为止，更多硬件上的信息可以查看原理图和芯片手册。
+
 代码讲解
 ------------------------------
 
-**本章的示例代码目录为：base_code/linux_driver/EmbedCharDev/led_cdev/**
-
-
+**本章的示例代码目录为：base_code/linux_driver/led_cdev/**
 
 编写LED字符设备结构体且初始化
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
