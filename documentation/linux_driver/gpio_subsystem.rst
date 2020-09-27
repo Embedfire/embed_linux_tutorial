@@ -192,10 +192,17 @@ pinctrl子节点格式规范，格式框架如下:
 
    <mux_reg    conf_reg    input_reg   mux_mode    input_val>
    0x0084       0x0310      0x0000        0x0          0x0
+<<<<<<< HEAD
 
 如果将宏定义展开则在设备树中每条配置信息实际是6个参数，由于第6个参数设置较为复杂需要根据实际需要设置
 因此并没有把它放到宏定义里面。以MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX为例，宏定义中5个参数参数介绍如下：
 
+=======
+
+如果将宏定义展开则在设备树中每条配置信息实际是6个参数，由于第6个参数设置较为复杂需要根据实际需要设置
+因此并没有把它放到宏定义里面。以MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX为例，宏定义中5个参数参数介绍如下：
+
+>>>>>>> remotes/origin/zqh_version
 
 1. **mux_reg** 和 **mux_mode** :mux_reg是引脚复用选择寄存器偏移地址，mux_mode是引脚复用选择寄存器模式选择位的值。
 UART1_TX引脚复用选择寄存器IOMUXC_SW_MUX_CTL_PAD_UART1_TX_DATA定义如下所示。
@@ -275,7 +282,6 @@ rgb_led_blue: CSI_VSYNC
 其他的两个引脚最终得到的结果如下：
 
 
-
 CSI_HSYNC：MX6UL_PAD_CSI_HSYNC__GPIO4_IO20
 
 CSI_VSYNC：MX6UL_PAD_CSI_VSYNC__GPIO4_IO19
@@ -301,8 +307,6 @@ CSI_VSYNC：MX6UL_PAD_CSI_VSYNC__GPIO4_IO19
 ''''''''''''''''''''''
 
 添加子节点很简单，我们只需要将前面选择好的配置信息按照之前讲解的格式写入到设备树中即可，添加完成后如下所示。
-
-
 
 .. code-block:: c 
     :caption: 新增pinctrl子节点
@@ -429,12 +433,20 @@ gpio4这个节点对整个gpio4进行了描述。使用GPIO子系统时需要往
 
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 
+<<<<<<< HEAD
+=======
+
+如果执行了“make distclean”清理了内核，那么就需要在内核目录下执行如下命令重新配置内核（如果编译设备树出错也可以先清理内核然后执行如下命令尝试重新编译）。
+>>>>>>> remotes/origin/zqh_version
 
 如果执行了“make distclean”清理了内核，那么就需要在内核目录下执行如下命令重新配置内核
 （如果编译设备树出错也可以先清理内核然后执行如下命令尝试重新编译）。
 
+<<<<<<< HEAD
 命令：
 
+=======
+>>>>>>> remotes/origin/zqh_version
 .. code-block:: sh
    :linenos:
 
@@ -442,8 +454,12 @@ gpio4这个节点对整个gpio4进行了描述。使用GPIO子系统时需要往
    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 
 
+<<<<<<< HEAD
 编译成功后会在“./arch/arm/boot/dts”目录下生成“imx6ull-seeed-npi.dtb”将其烧录到开发板，
 使用新的设备树启动之后正常情况下会在开发板的“/proc/driver-tree”目录下生成“rgb_led”设备树节点。如下所示。
+=======
+编译成功后会在“./arch/arm/boot/dts”目录下生成“imx6ull-seeed-npi.dtb”将其烧录到开发板，使用新的设备树启动之后正常情况下会在开发板的“/proc/driver-tree”目录下生成“rgb_led”设备树节点。如下所示。
+>>>>>>> remotes/origin/zqh_version
 
 .. image:: ./media/gpiosu013.png
    :align: center
