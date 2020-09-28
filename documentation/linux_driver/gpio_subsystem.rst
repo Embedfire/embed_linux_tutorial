@@ -629,22 +629,38 @@ gpio_free函数与gpio_request是一对相反的函数，一个申请，一个�
 
 根据上面这些函数我们就可以在驱动程序中控制IO口了。
 
-基于GPIO子系统的RGB程序编写
-~~~~~~~~~~~~~~~~~
 
-程序包含两部分，第一部分是驱动程序，驱动程序在平台总线基础上编写。第二部分是一个简单的测试程序，用于测试驱动是否正常。
+实验说明与代码讲解
+~~~~~~~~~~~~~
 
-驱动程序编写
+**硬件介绍**
+
+
+本节实验使用到 EBF6ULL-PRO 开发板上的 RGB 彩灯
+
+**硬件原理图分析**
+
+
+参考"字符设备驱动--点亮LED灯"章节
+
+
+实验代码讲解
 ^^^^^^^^^^^
+
+**本章的示例代码目录为：base_code/linux_driver/gpio_subsystem_rgb_led**
+
+程序包含两个C语言文件，一个是驱动程序，驱动程序在平台总线基础上编写。
+另一个是一个简单的测试程序，用于测试驱动是否正常。
+
+驱动程序讲解
+''''''''''''''''
 
 驱动程序大致分为三个部分，第一部分，编写平台设备驱动的入口和出口函数。第二部分，编写平台设备的.probe函数,
 在probe函数中实现字符设备的注册和RGB灯的初始化。第三部分，编写字符设备函数集，实现open和write函数。
 
 **平台驱动入口和出口函数实现**
 
-
-程序与平台驱动章节相同，源码如下：
-
+源码如下：
 
 .. code-block:: c 
     :caption: 平台驱动框架
@@ -792,8 +808,6 @@ gpio_free函数与gpio_request是一对相反的函数，一个申请，一个�
 - 第32-65行，字符设备相关内容，这部分内容在字符设备章节已经详细介绍这里不再赘述。
 
 
-
-
 **实现字符设备函数**
 
 字符设备函数我们只需要实现open函数和write函数。函数源码如下。
@@ -870,42 +884,9 @@ gpio_free函数与gpio_request是一对相反的函数，一个申请，一个�
 
 
 
-**修改Makefile并编译生成驱动程序**
 
-Makefile程序并没有大的变化，修改后的Makefile如下所示。
-
-.. code-block:: c 
-    :caption: Makefile文件
-    :linenos:
-
-    KERNEL_DIR = /home/fire2/ebf-buster-linux
-    
-    obj-m := rgb-leds.o
-    
-    all:
-    	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) modules
-    	
-    .PHONY:clean
-    clean:
-    	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) clean
-
-- 代码第2行：变量“KERNEL_DIR”保存的是内核所在路径，这个需要根据自己内核所在位置设定。
-- 代码第4行：“obj-m := rgb-leds.o”中的“rgb-leds.o”要与驱动源码名对应。Makefiel 修改完成后执行如下命令编译驱动。
-
-命令：
-
-.. code-block:: sh
-   :linenos:
-
-   make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-
-正常情况下会在当前目录生成.ko驱动文件。
-
-
-应用程序编写
-^^^^^^
-
-应用程序实现
+应用程序讲解
+'''''''''''''''''''
 
 应用程序编写比较简单，我们只需要打开设备节点文件，写入命令然后关闭设备节点文件即可。源码如下所示。
 
@@ -957,7 +938,44 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
   这里保证与驱动一致即可。
 - 代码18-35行：由于从main函数中获取的参数是字符串，这里首先要将其转化为数字。最后条用write函数写入命令然后关闭文件即可。
 
-编译应用程序
+
+
+Makefile修改说明
+^^^^^^^^^^^^^^^^^^^
+
+**修改Makefile并编译生成驱动程序**
+
+Makefile程序并没有大的变化，修改后的Makefile如下所示。
+
+.. code-block:: c 
+    :caption: Makefile文件
+    :linenos:
+
+    KERNEL_DIR = /home/fire2/ebf-buster-linux
+    
+    obj-m := rgb-leds.o
+    
+    all:
+    	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) modules
+    	
+    .PHONY:clean
+    clean:
+    	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) clean
+
+- 代码第2行：变量“KERNEL_DIR”保存的是内核所在路径，这个需要根据自己内核所在位置设定。
+- 代码第4行：“obj-m := rgb-leds.o”中的“rgb-leds.o”要与驱动源码名对应。Makefiel 修改完成后执行如下命令编译驱动。
+
+命令：
+
+.. code-block:: sh
+   :linenos:
+
+   make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+
+正常情况下会在当前目录生成.ko驱动文件。
+
+
+**编译应用程序**
 
 进入应用程序所在目录“~/gpio_subsystem_rgb_led/”执行如下命令：
 
@@ -976,6 +994,8 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
    :linenos:
 
    arm-linux-gnueabihf-gcc rgb_leds_app.c –o rgb_leds_app
+
+
 
 下载验证
 ^^^^^^^^^
@@ -1027,51 +1047,5 @@ Makefile程序并没有大的变化，修改后的Makefile如下所示。
 命令是一个“unsigned char”型数据，只有后三位有效，每一位代表一个灯，从高到低依次代表红、绿、蓝，1表示亮，0表示灭。
 例如命令=4 则亮红灯，命令=7则三个灯全亮。
 
-.. |gpiosu002| image:: media\gpiosu002.png
-   :width: 5.76806in
-   :height: 1.09722in
-.. |gpiosu003| image:: media\gpiosu003.png
-   :width: 5.76806in
-   :height: 1.55208in
-.. |gpiosu004| image:: media\gpiosu004.png
-   :width: 5.76806in
-   :height: 2.01806in
-.. |gpiosu005| image:: media\gpiosu005.png
-   :width: 5.76806in
-   :height: 4.35903in
-.. |gpiosu006| image:: media\gpiosu006.png
-   :width: 5.76806in
-   :height: 5.6125in
-.. |gpiosu007| image:: media\gpiosu007.png
-   :width: 5.76806in
-   :height: 3.31111in
-.. |gpiosu008| image:: media\gpiosu008.png
-   :width: 5.76806in
-   :height: 1.98056in
-.. |gpiosu009| image:: media\gpiosu009.png
-   :width: 5.76806in
-   :height: 1.78681in
-.. |gpiosu010| image:: media\gpiosu010.png
-   :width: 5.76806in
-   :height: 6.06111in
-.. |gpiosu011| image:: media\gpiosu011.png
-   :width: 5.76806in
-   :height: 4.81389in
-.. |gpiosu012| image:: media\gpiosu012.png
-   :width: 5.76806in
-   :height: 1.21319in
-.. |gpiosu013| image:: media\gpiosu013.png
-   :width: 5.76806in
-   :height: 1.31319in
-.. |gpiosu014| image:: media\gpiosu014.png
-   :width: 5.76806in
-   :height: 1.27708in
-.. |gpiosu015| image:: media\gpiosu015.png
-   :width: 5.76806in
-   :height: 1.48264in
-.. |gpiosu016| image:: media\gpiosu016.png
-   :width: 5.76806in
-   :height: 0.83194in
-.. |gpiosu017| image:: media\gpiosu017.png
-   :width: 5.76806in
-   :height: 1.94583in
+
+
