@@ -8,8 +8,6 @@
  */
  /dts-v1/;
  /plugin/;
-#include "imx6ul-pinfunc.h"
-#include "dt-bindings/gpio/gpio.h"
  / {
         fragment@0 {
             target-path = "/";

@@ -4,7 +4,6 @@
 #include <string.h>
 int main(int argc, char *argv[])
 {
-
     printf("led_tiny test\n");
     /*判断输入的命令是否合法*/
     if(argc != 2)
@@ -12,6 +11,7 @@ int main(int argc, char *argv[])
         printf(" commend error ! \n");
         return -1;
     }
+
 
     /*打开文件*/
     int fd = open("/dev/rgb_led", O_RDWR);
@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 
     unsigned char commend = atoi(argv[1]);  //将受到的命令值转化为数字;
 
-    /*判断命令的有效性*/
 
     /*写入命令*/
     int error = write(fd,&commend,sizeof(commend));

@@ -47,15 +47,13 @@ DTS、DTC和DTB它们是文档中常见的几个缩写。
 
 下面的内容将围绕着设备树源码，来讲解设备树框架和基本语法。
 
-.. code-block:: dts  
+.. code-block:: c
     :caption: 设备树 (内核源码/arch/arm/boot/dts/imx6ull-seeed-npi.dts)
-     :linenos:
+    :linenos:
 
-    /*-------------第一部分--------------*/
     #include <dt-bindings/input/input.h>  
     #include "imx6ull.dtsi"
 
-    /*-------------第二部分--------------*/
     / {
     	model = "Seeed i.MX6 ULL NPi Board";
     	compatible = "fsl,imx6ull-14x14-evk", "fsl,imx6ull";
@@ -88,8 +86,7 @@ DTS、DTC和DTB它们是文档中常见的几个缩写。
     	};
         /*-------------以下内容省略-------------*/
     };
-    
-    /*-------------第三部分--------------*/
+
     &cpu0 {
     	dc-supply = <&reg_gpio_dvfs>;
     	clock-frequency = <800000000>;
@@ -127,16 +124,16 @@ DTS、DTC和DTB它们是文档中常见的几个缩写。
 
 设备树源码分为三部分，介绍如下：
 
--   第一部分，头文件。设备树是可以像C语言那样使用“#include”引用“.h”后缀的头文件，也可以引用设备树“.dtsi”后缀的头文件。
+-   **第1-2行：** 头文件。设备树是可以像C语言那样使用“#include”引用“.h”后缀的头文件，也可以引用设备树“.dtsi”后缀的头文件。
     imx6ull.dtsi由NXP官方提供，是一个imx6ull平台“共用”的设备树文件。
 
--   第二部分，设备树节点。设备树给我们最直观的感受是它由一些嵌套的大括号“{}”组成，
+-   **第4-35行：**设备树节点。设备树给我们最直观的感受是它由一些嵌套的大括号“{}”组成，
     每一个“{}”都是一个“节点”。“/ {…};”表示“根节点”，每一个设备树只有一个根节点。
     如果打开“imx6ull.dtsi”文件可以发现它也有一个根节点，虽然“imx6ull-seeed-npi.dts”引用了“imx6ull.dtsi”文件，
     但这并不代表“imx6ull-seeed-npi.dts”设备树有两个根节点，因为不同文件的根节点最终会合并为一个。
     在根节点内部的“aliases {…}”、“chosen {…}”、“memory {…}”等字符，都是根节点的子节点。
 
--   第三部分，设备树节点追加内容。第三部分的子节点比根节点下的子节点多了一个“&”，
+-   **第37-53行：** 设备树节点追加内容。第三部分的子节点比根节点下的子节点多了一个“&”，
     这表示该节点在向已经存在的子节点追加数据。这些“已经存在的节点”可能定义在“imx6ull-seeed-npi.dts”文件，
     也可能定义在“imx6ull-seeed-npi.dts”文件所包含的设备树文件里。
     本代码中的“&cpu0 {…}”、“&clks {…}”、“&fec1 {…}”等等追加的目标节点，就是定义在“imx6ull.dtsi”中。
@@ -835,7 +832,7 @@ device_node结构体如下所示。
 在设备树的设备节点中大多会包含一些内存相关的属性，比如常用的reg属性。通常情况下，得到寄存器地址之后我们还要通过ioremap函数将物理地址转化为虚拟地址。现在内核提供了of函数，自动完成物理地址到虚拟地址的转换。介绍如下：
 
 .. code-block:: c 
-    :caption: of_iomap函数 (内核源码/include/linux/of.h)
+    :caption: of_iomap函数 (内核源码/drivers/of/address.c)
     :linenos:
     
     void \__iomem \*of_iomap(struct device_node \*np, int index)
@@ -853,7 +850,7 @@ device_node结构体如下所示。
 内核也提供了常规获取地址的of函数，这些函数得到的值就是我们在设备树中设置的地址值。介绍如下：
 
 .. code-block:: c 
-    :caption: of_address_to_resource函数 (内核源码/include/linux/of.h)
+    :caption: of_address_to_resource函数 (内核源码/drivers/of/address.c)
     :linenos:
     
     int of_address_to_resource(struct device_node \*dev, int index, struct resource \*r)
@@ -915,7 +912,7 @@ resource结构体如下所示：
 根据之前讲解，我们的系统默认使用的是“ebf-buster-linux/arch/arm/boot/dts/imx6ull-seeed-npi.dts”设备树，
 我们就在这个设备树里尝试增加一个设备节点，如下所示。
 
-.. code-block:: dts  
+.. code-block:: dts
     :caption: 添加子节点
     :linenos:
 
@@ -929,15 +926,12 @@ resource结构体如下所示：
     		pwm2 = &pwm3;
     		pwm3 = &pwm4;
     	};
-    	/*-----------以下代码省略-------------*/
         
     	/*添加led节点*/
         led_test{
-            /*-------------第一部分-----------*/
             #address-cells = <1>;
             #size-cells = <1>; 
 
-            /*-------------第二部分-----------*/
             rgb_led_red@0x0209C000{
                 compatible = "fire,rgb_led_red";
                 reg = <0x0209C000 0x00000020>;
@@ -971,7 +965,7 @@ resource结构体如下所示：
     make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- npi_v7_defconfig
     make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 
-编译成功后生成的设备树文件（.dtb）位于源码目录下的/arch/arm/boot/dts/文件名为“imx6ull-seeed-npi.dtb”
+编译成功后生成的设备树文件（.dtb）位于源码目录下的/arch/arm/boot/dts/，文件名为“imx6ull-seeed-npi.dtb”
 
 程序结果
 >>>>>>>>>>>>>>>>>>>>

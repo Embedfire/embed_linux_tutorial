@@ -173,11 +173,6 @@ static int led_probe(struct platform_device *pdv)
 	register_data |= (0x01 << 4);
 	writel(register_data, led_red.virtual_DR); //设置 GPIO1_04 默认输出高电平
 
-
-
-
-
-
 	/*获取rgb_led节点的绿灯子节点*/
 	led_green.device_node = of_find_node_by_name(rgb_led_device_node,"rgb_led_green");
 	if (led_green.device_node == NULL)
@@ -214,11 +209,6 @@ static int led_probe(struct platform_device *pdv)
 	register_data = readl(led_green.virtual_DR);
 	register_data |= (0x01 << 20);
 	writel(register_data, led_green.virtual_DR); //设置 GPIO4_IO20 默认输出高电平
-
-
-
-
-
 
 	/*获取rgb_led节点的蓝灯子节点*/
 	led_blue.device_node = of_find_node_by_name(rgb_led_device_node,"rgb_led_blue");
