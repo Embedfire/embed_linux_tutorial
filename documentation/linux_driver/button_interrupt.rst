@@ -1,22 +1,20 @@
 .. vim: syntax=rst
 
 中断实验
-----
+-------
 
-本章我们以按键为例讲解在驱动程序中如何使用中断，有关imx6ull中断的详细说
-明请参考本教程裸机中断章节，本章只介绍在驱动中如何使用中断。主要分
-为两部分内容，第一部分，中断驱动的实现，以及简单测试函数，第二部分，讲解常用的三种实
-现中断上、下部分的方法。
+本章我们以按键为例讲解在驱动程序中如何使用中断，有关imx6ull中断的详细说明请参考本教程裸机部分的中断章节，
+这里主要介绍在驱动中如何使用中断。
 
-
-本章配套源码和设备树插件位于“~/embed_linux_tutorial/base_code/button_interrupt”目录下。
-
-
+本章配套源码和设备树插件位于“**~/embed_linux_tutorial/base_code/button_interrupt**”目录下。
 
 在设备树中添中断信息以及中断基本函数介绍
 ~~~~~~~~~~~~~~~~~~~~
 
-中断驱动实现主要包括在设备树中添加中断信息以及中断相关的操作函数。内容不多，主要是在设备树添加中断信息的规则以及中断操作函数的使用。介绍如下。
+
+中断驱动实现包括在设备树中添加中断信息以及中断相关的操作函数，
+主要是在设备树添加中断信息的规则以及中断操作函数的使用。
+介绍如下。
 
 在设备树中添加中断信息
 ^^^^^^^^^^^
@@ -42,20 +40,20 @@
     	      <0xa02000 0x100>;
     };
 
-interrupt-controller节点是中断相关节点的“最顶层”节点，该节点的内容是由芯片决定的，我们不要去修改它。我们简单了解一下它的几个属性值。
-
-compatible属性和reg属性，compatible属性用于匹配，reg指定中断控制器相关寄存器的地址范围，多次讲到不再赘述。
-
-interrupt-controller属性，这是一个标签，声明该设设备树节点是一个中断控制器。中断控制器还要有一个属性指明它的“父”中断控制器，这个节点作为中断控制器的“最顶层”没有“父”中断控制器。
-
-#interrupt-cells属性，指定它的“子”中断控制器用几个cells表示中断，可以简单理解为用几个参数指定中断信息。注意，这个参数是指定的它的“子”中断控制器。例如该节点是中断控制器“最顶层”节点，它的下一级中断控制器节点都要指定这个节点是它们的父节点，而且用3个cells表示一条中断信息
-。这三个cells代表什么？接着向下看。
+- **interrupt-controller**：中断相关节点的“最顶层”节点，该节点的内容是由芯片决定的。我们简单了解一下它的几个属性值。
+- **compatible**：compatible属性用于平台设备驱动的匹配
+- **reg**：reg指定中断控制器相关寄存器的地址范围
+- **interrupt-controller**：这是一个标签，声明该设设备树节点是一个中断控制器。
+  中断控制器还要有一个属性指明它的“父”中断控制器，这个节点作为中断控制器的“最顶层”没有“父”中断控制器。
+- **#interrupt-cells** ：指定它的“子”中断控制器用几个cells表示中断，可以简单理解为用几个参数指定中断信息。
+  注意，这个参数是指定的它的“子”中断控制器。例如该节点是中断控制器“最顶层”节点，它的下一级中断控制器节点都要指定这个节点是它们的父节点，
+  而且用3个cells表示一条中断信息这三个cells代表什么？接着向下看。
 
 gpc一级子中断控制器
 '''''''''''
 
-在imx6ull.dtsi文件中直接搜索节点标签“intc”即可找到“一级子中断控制器”（“一级子中断控制器”这个是自定义名字，没有官方说明，）。只有一个，如下所示。
-
+在imx6ull.dtsi文件中直接搜索节点标签“intc”即可找到“一级子中断控制器”
+（“一级子中断控制器”这个是我们自定义名字，没有官方说明）。只有一个，如下所示。
 
 
 .. code-block:: c 
@@ -75,43 +73,41 @@ gpc一级子中断控制器
 
 结合以上代码介绍如下：（省略已经介绍过的属性）
 
-属性interrupt-controller，同样，只要是中断控制器都要用该标签声明。
+- **interrupt-controller**：同样，只要是中断控制器都要用该标签声明。
+- **#interrupt-cells**：指定它的子中断控制器用三个cells 描述一条中断信息。
+- **interrupt-parent**：指定该中断控制器的“父”中断控制器。除了“顶层中断控制器”其他中断控制器都要声明“父”中断控制器。
+- **interrupts**：具体的中断，属性#interrupt-cells = <n>用于设置interrupts由几个cells描述一条中断信息，
+  它们的关系可类比#address-cells、#size-cells、和reg。下面以“interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;”
+  为例介绍这三个cells代表什么。
 
-属性#interrupt-cells = <3>，指定它的子中断控制器用三个cells 描述一条中断信息。
+第一个cell,指定中断类型，有两种一种是PPI中断（CPU私有中断），共16个范围是[0-15]，
+另外一种是SPI中断（共享中断），取值范围[0-987]，但是imx6ull共有128个SPI中断中断编号范围[32-159]。
 
-属性interrupt-parent，指定该中断控制器的“父”中断控制器。除了“顶层中断控制器”其他中断控制器都要声明“父”中断控制器。
+第二个cell,中断编号，范围和第一个cell有关。PPI中断范围是[0-15]，SPI中断范围是[0-987]。
 
-属性interrupts ，它就是具体的中断，属性#interrupt-cells = <n>就是用于设置interrupts由几个cells描述一条中断信息，它们的关系可类比#address-cells、#size-cells、和reg。下面以“interrupts = <GIC_SPI 89
-IRQ_TYPE_LEVEL_HIGH>;”为例介绍这三个cells代表什么。
-
-第一个cell, 指定中断类型，有两种 一种是PPI中断（CPU私有中断），共16个范围是[0-15]，另外一种是SPI中断（共享中断），取值范围[0-987]，但是imx6ull共有128个SPI中断中断编号范围[32-159]。
-
-第二个cell, 中断编号，范围和第一个cell有关。PPI中断范围是[0-15]，SPI中断范围是[0-987]。
-
-第三个cell,指定中断触发方式，cell是一个u32类型，其中后四位[0-3]用于设置中断触发类型。每一位代表一个触发方式，可进行组合，系统提供了红顶义我么可直接使用，如下所示：
+第三个cell,指定中断触发方式，cell是一个u32类型，其中后四位[0-3]用于设置中断触发类型。
+每一位代表一个触发方式，可进行组合，系统提供了红顶义我么可直接使用，如下所示：
 
 
 .. code-block:: c 
     :caption: 中断触发方式设置
     :linenos:
 
-    #define IRQ_TYPE_NONE		0
-    #define IRQ_TYPE_EDGE_RISING	1
-    #define IRQ_TYPE_EDGE_FALLING	2
-    #define IRQ_TYPE_EDGE_BOTH	(IRQ_TYPE_EDGE_FALLING | IRQ_TYPE_EDGE_RISING)
-    #define IRQ_TYPE_LEVEL_HIGH	4
-    #define IRQ_TYPE_LEVEL_LOW	8
+    #define IRQ_TYPE_NONE           0
+    #define IRQ_TYPE_EDGE_RISING    1
+    #define IRQ_TYPE_EDGE_FALLING   2
+    #define IRQ_TYPE_EDGE_BOTH      (IRQ_TYPE_EDGE_FALLING | IRQ_TYPE_EDGE_RISING)
+    #define IRQ_TYPE_LEVEL_HIGH     4
+    #define IRQ_TYPE_LEVEL_LOW      8
 
 
-
-[8-15]位在PPI中断中用于设置“CPU屏蔽”。在多核系统中这8位用于设置PPI中断发送到那个CPU,一位代表一个CPU,为1则将PPI中断发送到CPU,否则屏蔽。imx6ull是单核，我们不用设置这些位。
+[8-15]位在PPI中断中用于设置“CPU屏蔽”。在多核系统中这8位用于设置PPI中断发送到那个CPU,一位代表一个CPU,
+为1则将PPI中断发送到CPU,否则屏蔽。imx6ull是单核，所以我们不用设置这些位。
 
 二级子中断控制器
 ''''''''
 
 同样在imx6ull.dtsi文件中直接搜索节点标签“gpc”即可找到“二级子中断控制器”如下所示。
-
-
 
 .. code-block:: c 
     :caption: 中断触发方式设置
@@ -125,11 +121,11 @@ IRQ_TYPE_LEVEL_HIGH>;”为例介绍这三个cells代表什么。
     	ranges;
 
 
+该节点是 soc 节点，soc 既片上外设“总节点”，翻阅源码可以发现该节点很长，我们使用的外设大多包含在里面。
+具体外设（例如GPIO）也可作为中断控制器，这里就声明了它们的“父”中断控制器。
 
-该节点是 soc 节点，soc 既片上外设“总节点”，翻阅源码可以发现该节点很长，我们使用的外设大多包含在里面。具体外设（例如GPIO）也可作为中断控制器，这里就声明了它们的“父”中断控制器。
-
-soc节点内包的中断控制器很多，几乎用到中断的外设都是中断控制器，我们要使用的是开发板上的按键，使用的是GPIO5_1,所以这里以GPIO5为例介绍。在imx6ull.dtsi文件中直接搜索GPIO5，找到GPIO5对应的设备树节点，如下所示。
-
+soc节点内包的中断控制器很多，几乎用到中断的外设都是中断控制器，我们要使用的是开发板上的按键，
+使用的是GPIO5_1,所以这里以GPIO5为例介绍。在imx6ull.dtsi文件中直接搜索GPIO5，找到GPIO5对应的设备树节点，如下所示。
 
 
 .. code-block:: c 
@@ -150,19 +146,17 @@ soc节点内包的中断控制器很多，几乎用到中断的外设都是中�
     };
 
 
-我们只介绍中断相关的部分。
+这里只介绍中断相关的部分。
 
-属性interrupts，指定gpio5用到的中断，cell数量为3，含义在前面已经介绍。
-
-属性interrupt-controller，指定这是一个中断控制器。
-
-属性#interrupt-cells = <2>，这是重点，这里设置以它为“父”控制器的节点使用多少个cells描述一条中断信息。这两个cell含义与之前讲解的#interrupt-cells = <3>不同。含义是什么?接着往下看。
+- **interrupts**：指定gpio5用到的中断，cell数量为3，含义在前面已经介绍。
+- **interrupt-controller**：指定这是一个中断控制器。
+- **#interrupt-cells**：这是重点，这里设置以它为“父”控制器的节点使用多少个cells描述一条中断信息。
+  这两个cell含义与之前讲解的#interrupt-cells = <3>不同。含义是什么?接着往下看。
 
 按键设备树节点
 '''''''
 
 以上三部分内容不需要我们修改，真正要我们写的是这部分内容，而这部分内容也非常简单，如下所示。
-
 
 
 .. code-block:: c 
@@ -179,38 +173,28 @@ soc节点内包的中断控制器很多，几乎用到中断的外设都是中�
     	interrupts = <1 IRQ_TYPE_EDGE_RISING>;     // 指定中断，触发方式为上升沿触发。
     };
 
-
-
 里面有很多GPIO相关的内容，这里只介绍中断相关信息。
 
-属性interrupt-parent，指定“父控制器节点 ”。需要注意的是，该节点不是一个中断控制器所以没有“interrupt-controller”标签。
-
-属性interrupts，指定一条GPIO信息。在“二级子中断控制器”既GPIO5节点中定义了“#interrupt-cells = <2>;”也就是说这里使用两个cells指定一条中断信息。这两个cells的含义介绍如下：
-
-第一个cell，指定那个gpio。属性“interrupt-parent = <&gpio5>;”已经确定了使用的是GPIO5，cell指定GPIO5的第几个脚。按键使用的是GPIO5_1,所以这里第一个参数是1.
-
-第二个cell，指定中断触发条件，例如上升沿、下降沿等等，这个参数可用定义如下：
-
+- **interrupt-parent**：指定“父控制器节点 ”。需要注意的是，该节点不是一个中断控制器所以没有“interrupt-controller”标签。
+- **interrupts**：在“二级子中断控制器”即GPIO5节点中定义了“#interrupt-cells = <2>;”
+  使用两个cells来指定使用GPIO组的第几个引脚以及中断的触发条件，触发方式宏定义如下
 
 .. code-block:: c 
     :caption: 中断触发类型设置
     :linenos:
 
-    #define IRQ_TYPE_NONE		0
-    #define IRQ_TYPE_EDGE_RISING	1
-    #define IRQ_TYPE_EDGE_FALLING	2
-    #define IRQ_TYPE_EDGE_BOTH	(IRQ_TYPE_EDGE_FALLING | IRQ_TYPE_EDGE_RISING)
-    #define IRQ_TYPE_LEVEL_HIGH	4
-    #define IRQ_TYPE_LEVEL_LOW	8
+    #define IRQ_TYPE_NONE           0
+    #define IRQ_TYPE_EDGE_RISING    1
+    #define IRQ_TYPE_EDGE_FALLING   2
+    #define IRQ_TYPE_EDGE_BOTH      (IRQ_TYPE_EDGE_FALLING | IRQ_TYPE_EDGE_RISING)
+    #define IRQ_TYPE_LEVEL_HIGH     4
+    #define IRQ_TYPE_LEVEL_LOW      8
 
-
-从设备树中获取中断函数
-^^^^^^^^^^^
 
 中断相关函数
 ^^^^^^
 
-内核提供了一组操作中断的函数，在驱动中我么将会使用这些函数完成中断驱动实验，这些函使用很简单介绍如下：
+内核提供了一组操作中断的函数，在驱动中我们将会使用这些函数完成中断驱动实验，这些函使用很简单介绍如下：
 
 中断申请和注销函数
 '''''''''
@@ -221,63 +205,47 @@ soc节点内包的中断控制器很多，几乎用到中断的外设都是中�
     :caption: 申请中断
     :linenos:
 
-    static inline int \__must_check request_irq(unsigned int irq, irq_handler_t handler, unsigned long flags, const char \*name, void \*dev)
+    static inline int __must_check request_irq(unsigned int irq, irq_handler_t handler, unsigned long flags, const char *name, void *dev)
 
-    void free_irq(unsigned int, void \*dev);
-
-我们重点介绍函数的参数和返回值，中断申请函数介绍如下：
-
-irq
+    void free_irq(unsigned int, void *dev);
 
 
-用于指定“内核中断号”，这个参数我们会从设别树中获取、转换得到。在内核空间中它代表一个唯一的中断。后面会讲到。
+**参数**：
 
-handler
+- **irq**：用于指定“内核中断号”，这个参数我们会从设别树中获取、转换得到。在内核空间中它代表一个唯一的中断。
+- **handler**：用于指定中断处理函数，中断发生后跳转到该函数去执行。
 
-
-用于指定中断处理函数，中断发生后跳转到该函数去执行。中断处理函数我们稍后会介绍。
-
-flags
-
-
-中断触发条件，也就是我们常说的上升沿触发、下降沿触发等等，与stm32类似，触发方式可以通过“|”运算组合，完成定义如下所示：
-
+- **flags**：中断触发条件，也就是我们常说的上升沿触发、下降沿触发等等，与stm32类似，触发方式可以通过“|”运算组合，完成定义如下所示：
 
 .. code-block:: c 
     :caption: 中断触发方式
     :linenos:
 
-    #define IRQF_TRIGGER_NONE	0x00000000
-    #define IRQF_TRIGGER_RISING	0x00000001
+    #define IRQF_TRIGGER_NONE	    0x00000000
+    #define IRQF_TRIGGER_RISING	    0x00000001
     #define IRQF_TRIGGER_FALLING	0x00000002
-    #define IRQF_TRIGGER_HIGH	0x00000004
-    #define IRQF_TRIGGER_LOW	0x00000008
-    #define IRQF_TRIGGER_MASK	(IRQF_TRIGGER_HIGH | IRQF_TRIGGER_LOW | \
-    				 IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING)
-    #define IRQF_TRIGGER_PROBE	0x00000010
+    #define IRQF_TRIGGER_HIGH	    0x00000004
+    #define IRQF_TRIGGER_LOW	    0x00000008
+    #define IRQF_TRIGGER_MASK	    (IRQF_TRIGGER_HIGH | IRQF_TRIGGER_LOW | \
+    				    IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING)
+    #define IRQF_TRIGGER_PROBE	    0x00000010
     
     #define IRQF_SHARED		0x00000080 ---------①
     /*-----------以下宏定义省略------------*/
 
+- **name**：中断的名字，中断申请成功后会在“/proc/interrupts”目录下看到对应的文件。这个名字我们暂时用不到，名字设置能反应中断功能即可。
+- **dev**：这个参数针对共享中断，先说一下如何指定为共享中断，如上代码（宏定义）所示，**IRQF_SHARED**宏的作用就是开启共享中断。
+  这里的“共享中断”指的是多个驱动程序共用同一个中断。如果使用了共享中断，中断发生后内核会依次调用这些驱动的“中断服务函数”，没错！是全部执行。
+  这样我们就要在中断服务函数中判断中断是否来自本驱动，我们可以用dev参数带回的硬件信息来判断（不建议使用dev参数本身作为判断依据，我们没有测试），
+  或者不使用dev,像单片机那样直接读取相应中断状态寄存器来判断。即使不用dev参数判断中断来自哪个驱动，在申请中断时也要加上dev参数
+  因为在注销驱动时内核会根据dev参数决定删除哪个中断服务函数。
 
-注意，这里的设置会覆盖设别树中的设置。
+注意，这里的设置会覆盖设备树中的设置。
 
-name
+**返回值**：
 
-
-中断的名字，中断申请成功后会在“/proc/interrupts”目录下看到对应的文件。这个名字我们暂时用不到，名字设置能反应中断功能即可。
-
-\*dev
-
-
-这个参数针对共享中断，先说一下如何如何指定为共享中断，如上代码（宏定义）所示，标号①处的宏就是开启共享中断。这里的“共享中断”指的是多个驱动程序共用同一个中断。如果使用了共享中断，中断发生后内核会依次调用这些驱动的“中断服务函数”，没错！是全部执行。这样我们就要在中断服务函数中判断中断是否来自本驱动
-，我们可以用dev参数带回的硬件信息来判断（不建议使用dev参数本身作为判断依据，我们没有测试），或者不使用dev,像STM32那样直接读取相应中断状态寄存器来判断。即使不用dev参数判断中断来自哪个驱动，在申请中断时也要加上dev参数（针对使用共享中断），因为在注销驱动时内核会根据dev参数决定删
-除哪个中断服务函数。
-
-返回值
-
-
-成功，返回0，失败，返回负数。
+- **成功**：返回0
+- **失败**：返回负数。
 
 驱动注销函数很简单，两个参数的作用和注册驱动函数相同。
 
@@ -286,13 +254,21 @@ name
 
 在申请中断时要指定一个中断处理函数，函数书写格式如下所示。
 
-irqreturn_t (*irq_handler_t)(int irq, void \* dev);
+.. code-block:: c 
+    :caption: 中断服务函数格式
+    :linenos:
 
-参数irq和dev的含义和中断申请函数相同。不同的是dev参数是内核“带回”的。如果使用了共享中断还根据dev带回的硬件信息判断中断是否来自本驱动，或者不使用dev,直接读取硬件寄存器判断中断是否来自本驱动。如果不是，应当立即跳出中断服务函数，是，则正常执行中断服务函数。
+    irqreturn_t (*irq_handler_t)(int irq, void * dev);
 
-返回值是irqreturn_t类型，可以发现它是一个枚举类型，如下所示。
+**参数**：
 
+- **irq**：用于指定“内核中断号”。
+- **dev**：在共享中断中，用来判断中断产生的驱动是哪个，具体介绍同上中断注册函数。
+  不同的是dev参数是内核“带回”的。如果使用了共享中断还得根据dev带回的硬件信息判断中断是否来自本驱动，或者不使用dev,
+  直接读取硬件寄存器判断中断是否来自本驱动。如果不是，应当立即跳出中断服务函数，是，则正常执行中断服务函数。
 
+**返回值**：
+  **irqreturn_t类型**，可以发现它是一个枚举类型，如下所示。
 
 .. code-block:: c 
     :caption: 中断服务函数返回值类型
@@ -307,11 +283,9 @@ irqreturn_t (*irq_handler_t)(int irq, void \* dev);
     typedef enum irqreturn irqreturn_t;
 
 
-
-如果是“共享中断”并且在中断服务函数中发现中断不是来自本驱动则应当返回IRQ_NONE，表示“中断不
-来自这个驱动，我不处理”。如果没有开启共享中断或者开启了并且中断来自本驱动则返回IRQ_HANDLED，表示中断
-请求已经被正常处理了。第三个参数涉及到我们后面会讲到的中断服务函数的“上半部分”和“下
-半部分”，如果在中断服务函数是使用“上半部分”和“下半部分”实现，则应当返回IRQ_WAKE_THREAD。
+如果是“共享中断”并且在中断服务函数中发现中断不是来自本驱动则应当返回IRQ_NONE，表示“中断不来自这个驱动，我不处理”。
+如果没有开启共享中断或者开启了并且中断来自本驱动则返回IRQ_HANDLED，表示中断请求已经被正常处理了。
+第三个参数涉及到我们后面会讲到的中断服务函数的“上半部分”和“下半部分”，如果在中断服务函数是使用“上半部分”和“下半部分”实现，则应当返回IRQ_WAKE_THREAD。
 
 中断的使能和禁用函数
 ''''''''''
@@ -325,7 +299,12 @@ irqreturn_t (*irq_handler_t)(int irq, void \* dev);
     void enable_irq(unsigned int irq)
     void disable_irq(unsigned int irq)
 
-函数很简单，只有一个参数，就是在中断申请、注销函数中介绍的那个“内核中断号”。
+**参数**：
+
+- **irq**：指定的“内核中断号”
+
+**返回值**：**无**
+
 
 关闭和开启全局中断相关函数（宏定义）
 ''''''''''''''''''
@@ -340,8 +319,8 @@ irqreturn_t (*irq_handler_t)(int irq, void \* dev);
     local_irq_restore(flags)
 
 
-
-由于“全局中断”的特殊性，通常情况下载关闭之前要使用local_irq_save保存当前中断状态，开启之后使用local_irq_restore宏恢复关闭之前的状态。flags是一个unsigned long 类型的数据。宏定义只用很简单，不再过多说明。
+由于“全局中断”的特殊性，通常情况下载关闭之前要使用local_irq_save保存当前中断状态，
+开启之后使用local_irq_restore宏恢复关闭之前的状态。flags是一个unsigned long 类型的数据。宏定义只用很简单，不再过多说明。
 
 了解了以函数的使用，就可以编写中断驱动。遗漏的内容我们将会在代码里介绍，驱动程序介绍如下。
 
@@ -354,7 +333,6 @@ irqreturn_t (*irq_handler_t)(int irq, void \* dev);
 ^^^^^^^
 
 按键的设备实际就是个GPIO加上了一个中断，用到了GPIO子系统相关内容，如果如果遗忘可以参考“pinctrl子系统和GPIO子系统”章节。如何添加中断信息也在本章的第一小节介绍了，这里只结合源码简单说明，源码如下所示：
-
 
 
 .. code-block:: c 
@@ -478,8 +456,6 @@ irqreturn_t (*irq_handler_t)(int irq, void \* dev);
 open函数实现button的初始化工作，代码如下：
 
 
-
-
 .. code-block:: c 
     :caption: open函数实现
     :linenos:
@@ -553,13 +529,11 @@ open函数实现button的初始化工作，代码如下：
 标号⑤，函数irq_of_parse_and_map解析并映射（map）中断函数。函数原型如下：
 
 
-
 .. code-block:: c 
     :caption: 解析并映射中断函数
     :linenos:
 
     unsigned int irq_of_parse_and_map(struct device_node *dev, int index)
-
 
 
 该函数的功能是从设备树中获取某一个中断，并且将中断ID转化为linux内核虚拟IRQ number 我们后面简称为kernel aiq
@@ -573,8 +547,6 @@ number或“内核中断号”，“内核中断号”是自己起的名字，�
 ''''''''
 
 在open函数申请中断时要指定中断服务函数，一个简答的中断服务函数如下。
-
-
 
 
 .. code-block:: c 
@@ -591,15 +563,12 @@ number或“内核中断号”，“内核中断号”是自己起的名字，�
     }
 
 
-
 从以上代码可以看到我们定义了一个整型原子变量用于保存按键状态，中断发送后，整型原子变量自增一。整型原子变量大于0表示有按键按下。
 
 .read和.release函数实现
 ''''''''''''''''''
 
 .read函数的工作是向用户空间返回按键状态值，.release函数实现退出之前的清理工作。函数实现源码如下：
-
-
 
 
 .. code-block:: c 
@@ -637,15 +606,12 @@ number或“内核中断号”，“内核中断号”是自己起的名字，�
     }
 
 
-
 可以看到在button_read函数中我们读取按键状态值，然后使用copy_to_user拷贝到用户空间，最后设置按键状态为0。button_release函数更简单，它只是释放.open函数中申请的中断和GPIO.
 
 测试应用程序实现
 ^^^^^^^^
 
 测试应用程序工作是读取按键状态然后打印状态，就这么简单，源码如下：
-
-
 
 .. code-block:: c 
     :caption: 测试应用程序
@@ -718,7 +684,6 @@ tasklet是基于软中断实现，它们有很多相似之处，我们把它两�
 软中断由软件发送中断指令产生，Linux4.xx支持的软中断非常有限，只有10个（不同版本的内核可能不同）在Linux内核中使用一个枚举变量列出所有可用的软中断，如下所示。
 
 
-
 .. code-block:: c 
     :caption: 软中断中断编号
     :linenos:
@@ -740,12 +705,9 @@ tasklet是基于软中断实现，它们有很多相似之处，我们把它两�
     };
 
 
-
 类比硬中断，这个枚举类型列出了软中断的中断编号，我们“注册”软中断以及触发软中断都会用到软中断的中断编号。
 
 软中断“注册”函数如下所示：
-
-
 
 
 .. code-block:: c 
@@ -757,13 +719,13 @@ tasklet是基于软中断实现，它们有很多相似之处，我们把它两�
     	softirq_vec[nr].action = action;
     }
 
+**参数**：
 
+- **nr**:用于指定要“注册”的软中断中断编号，参数“(*action)(struct softirq_action \*)”是一个函数指针类型的数据，指定软中断的中断服务函数。
 
-参数nr，用于指定要“注册”的软中断中断编号，参数“(*action)(struct softirq_action \*)”是一个函数指针类型的数据，指定软中断的中断服务函数。
+**返回值**：**无**
 
 我们再看函数实现，这里只有一个赋值语句，重点是softirq_vec变量，在内核源码中找到这个变量如下所示：
-
-
 
 
 .. code-block:: c 
@@ -773,7 +735,6 @@ tasklet是基于软中断实现，它们有很多相似之处，我们把它两�
     static struct softirq_action softirq_vec[NR_SOFTIRQS]
 
 这是一个长度为NR_SOFTIRQS的softirq_action类型数组，长度NR_SOFTIRQS在软中断的“中断编号”枚举类型中有定义，长度为10。这个数组是一个全局的数组，作用等同于硬中断的中断向量表。接着来看数组的类型“struct softirq_action”如下所示。
-
 
 
 .. code-block:: c 
@@ -786,12 +747,10 @@ tasklet是基于软中断实现，它们有很多相似之处，我们把它两�
     };
 
 
-它只有一个参数，就是注册软中断函数的参数open_softirq。至此我们知道数组softirq_vec就是软中断的中断向量表，所谓的注册软中断函数就是根据中断号将中断服务函数的地址写入softirq_vec数组的对应位置。
+它只有一个参数，就是注册软中断函数的参数open_softirq。至此我们知道数组softirq_vec就是软中断的中断向量表，
+所谓的注册软中断函数就是根据中断号将中断服务函数的地址写入softirq_vec数组的对应位置。
 
 软中断注册之后还要调用“触发”函数触发软中断，进而执行软中断中断服务函数，函数如下所示：
-
-
-
 
 .. code-block:: c 
     :caption: 中断interrupt-controller节点
@@ -799,14 +758,19 @@ tasklet是基于软中断实现，它们有很多相似之处，我们把它两�
 
     void raise_softirq(unsigned int nr);
 
+**参数**：
 
-参数nr是要触发的软中断。
+- **nr**：要触发的软中断。
+
+**返回值**：**无**
 
 tasklet
 '''''''
 
-tasklet是基于软中断实现，如果对效率没有特殊要求推荐是用tasklet实现中断分层。为什么这么说，根据之前讲解软中断的中断服务函数是一个全局的数组，在多CPU系统中，所有CPU都可以访问，所以在多CPU系统中需要用户自己考虑并发、可重入等问题，增加编程负担。软中断资源非常有限一些软中断是为特定
-的外设准备的（不是说只能用于特定外设）例如“NET_TX_SOFTIRQ,NET_RX_SOFTIRQ,”从名字可以看出它们用于网络的TX和RX。像网络这种对效率要求较高的场合还是会使用软中断实现中断分层的。
+tasklet是基于软中断实现，如果对效率没有特殊要求推荐是用tasklet实现中断分层。为什么这么说，根据之前讲解软中断的中断服务函数是一个全局的数组，
+在多CPU系统中，所有CPU都可以访问，所以在多CPU系统中需要用户自己考虑并发、可重入等问题，增加编程负担。
+软中断资源非常有限一些软中断是为特定的外设准备的（不是说只能用于特定外设）例如“NET_TX_SOFTIRQ,NET_RX_SOFTIRQ,”
+从名字可以看出它们用于网络的TX和RX。像网络这种对效率要求较高的场合还是会使用软中断实现中断分层的。
 
 相比软中断tasklet使用起来更简单，最重要的一点是在多CPU系统中同一时间只有一个CPU运行tasklet，所以并发、可重入问题就变得很容易处理（一个tasklet甚至不用去考虑）。而且使用时也比较简单，介绍如下。
 
@@ -814,8 +778,6 @@ tasklet_struct结构体
 
 
 在驱动中使用tasklet_struct结构体表示一个tasklet，结构体定义如下所示：
-
-
 
 
 .. code-block:: c 
@@ -832,24 +794,18 @@ tasklet_struct结构体
     };
 
 
-
 参数介绍如下：
 
-参数next，指向链表的下一个tasklet_struct，这个参数我们不需要自己去配置。
-
-参数state，保存tasklet状态，等于0表示tasklet还没有被调度，等于TASKLET_STATE_SCHED表示tasklet被调度正准备运行。等于TASKLET_STATE_RUN表示正在运行。
-
-参数count，引用计数器，如果为0表示tasklet可用否则表示tasklet被禁止。
-
-参数(*func)(unsigned long)，指定tasklet处理函数
-
-参数data，指定tasklet处理函数的参数。
+- **next**：指向链表的下一个tasklet_struct，这个参数我们不需要自己去配置。
+- **state**：保存tasklet状态，等于0表示tasklet还没有被调度，等于TASKLET_STATE_SCHED表示tasklet被调度正准备运行。等于TASKLET_STATE_RUN表示正在运行。
+- **count**：引用计数器，如果为0表示tasklet可用否则表示tasklet被禁止。
+- **func**：指定tasklet处理函数
+- **data**：指定tasklet处理函数的参数。
 
 tasklet初始化函数
 
 
 函数原型如下：
-
 
 
 .. code-block:: c 
@@ -865,17 +821,14 @@ tasklet初始化函数
     	t->data = data;
     }
 
-
-
-参数t指定要初始化的tasklet_struct结构体，参数“(*func)(unsigned long)”指定tasklet处理函数，等同于中断中的中断服务函数，data指定tasklet处理函数的参数。函数实现就是根据设置的参数填充tasklet_struct结构体结构体。
+- **t**：指定要初始化的tasklet_struct结构体
+- **func**：指定tasklet处理函数，等同于中断中的中断服务函数
+- **data**：指定tasklet处理函数的参数。函数实现就是根据设置的参数填充tasklet_struct结构体结构体。
 
 触发tasklet
 
 
 和软中断一样，需要一个触发函数触发tasklet，函数定义如下所示：
-
-
-
 
 .. code-block:: c 
     :caption: tasklet触发函数
@@ -887,18 +840,17 @@ tasklet初始化函数
     		__tasklet_schedule(t);
     }
 
-参数只有一个tasklet_struct结构体。
+**参数**：
+
+- **t**：tasklet_struct结构体。
 
 tasklet实现中断分层实验
 '''''''''''''''
 
 实验在按键中断程序基础上完成，按键中断原本不需要使用中断分层，这里只是以它为例简单介绍tasklet的具体使用方法。
-
 tasklet使用非常简单，主要包括定义tasklet结构体、初始化定义的tasklet结构体、实现tasklet中断处理函数、触发tasklet中断。
 
 下面结合源码介绍如下。注意，源码是在“按键中断程序”基础上添加tasklet相关代码，这里只列出了tasklet相关代码。
-
-
 
 .. code-block:: c 
     :caption: tasklet相关代码
@@ -985,7 +937,6 @@ tasklet使用非常简单，主要包括定义tasklet结构体、初始化定义
 '''''
 
 “工作队列”是一个“队列”，但是对于用户来说不必关心“队列”以及队列工作的内核线程，这些内容由内核帮我们完成，我们只需要定义一个具体的工作、初始化工作即可，在驱动中一个工作结构体代表一个工作，工作结构体如下所示：
-
 
 
 
