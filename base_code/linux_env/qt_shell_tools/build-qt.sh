@@ -83,6 +83,7 @@ do_tar_package () {
 
 #安装依赖项
 do_install_config_dependent () {
+   sudo apt install python -y
    sudo apt install g++ make qt3d5-dev-tools -y
    sudo apt install qml-module-qtquick-xmllistmodel -y
    sudo apt install qml-module-qtquick-virtualkeyboard qml-module-qtquick-privatewidgets qml-module-qtquick-dialogs qml -y
