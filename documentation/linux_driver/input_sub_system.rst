@@ -45,7 +45,7 @@ handlers（事件处理层）三部分。
 - **value**：根据设备类型的不同而含义不同。如果设备类型是按键，value表示的是松开或者按下。
 
 
-本章目的想要编写一个基于输入子系统和中断的按键驱动程序，重点在于了解Input Core为我们提供了哪些接口，并了解如何将
+本章目的是编写一个基于输入子系统和中断的按键驱动程序，重点在于了解Input Core为我们提供了哪些接口，并了解如何将
 按键信息以事件上报。
 
 
@@ -66,19 +66,19 @@ input.c模块入口函数和出口函数
     {
     	int err;
     
-    /*-------------第一部分-----------------*/
+    
     	err = class_register(&input_class);
     	if (err) {
     		pr_err("unable to register input_dev class\n");
     		return err;
     	}
     
-    /*-------------第二部分-----------------*/
+    
     	err = input_proc_init();
     	if (err)
     		goto fail1;
     
-    /*-------------第三部分-----------------*/
+    
     	err = register_chrdev_region(MKDEV(INPUT_MAJOR, 0),
     				     INPUT_MAX_CHAR_DEVICES, "input");
     	if (err) {
@@ -107,19 +107,19 @@ input.c模块入口函数和出口函数
 
 结合以上源码介绍如下：
 
-- 代码第6行：在/sys/class下创建input的类
-- 代码第13行：在/proc下面建立相关的文件
-- 代码18-19行：注册一个字符设备，从参数“MKDEV(INPUT_MAJOR,0)”我们可以知道，
+- 第6行：在/sys/class下创建input的类
+- 第13行：在/proc下面建立相关的文件
+- 第18-19行：注册一个字符设备，从参数“MKDEV(INPUT_MAJOR,0)”我们可以知道，
   input子系统内核驱动使用的是主设备号为INPUT_MAJOR（13）的字符设备。
   参数INPUT_MAX_CHAR_DEVICES（1024）创建次设备数量。我们在使用输入子系统时每注册一个“输入事件”就会占用一个次设备号，
   INPUT_MAX_CHAR_DEVICES决定最多支持1024个输入事件。
-- 代码32-38行：驱动出口函数，在退出函数中注销设备以及注册的类。
+- 第32-38行：驱动出口函数，在退出函数中注销设备以及注册的类。
 
 input_dev结构体
 ^^^^^^^^^^^^
 
 在输入子系统中input_dev代表一个具体的输入设备，后面将会根据具体的设备来初始化这个结构体，结构体成员介绍如下：
-（input_dev参数很多，有些不需要我们手动配置，所以这里只列出、介绍常用的参数，完整内容位于input.h文件）。
+(input_dev参数很多，有些不需要我们手动配置，所以这里只列出和介绍常用的参数，完整内容位于input.h文件)。
 
 
 .. code-block:: c 
@@ -142,8 +142,9 @@ input_dev结构体
         /*-----------以下内容省略----------------*/
     };
 
-结构体成员中最重要的是evbit、keybit、relbit等数组，这些数组设置了设备输入事件的类型和键值。
-参数evbit用于指定支持的事件类型，这要根据实际输入设备能够产生的事件来选择，可选选项如下所示。
+结构体成员中最重要的是 **evbit**、**keybit**、**relbit** 等数组，这些数组设置了设备输入事件的类型和键值。
+
+- **evbit**:用于指定支持的事件类型，这要根据实际输入设备能够产生的事件来选择，可选选项如下所示。
 
 .. code-block:: c 
     :caption: 输入子系统事件类型(内核源码\include\uapi\linux\input-event-codes.h)
@@ -167,9 +168,9 @@ input_dev结构体
 
 以上代码只介绍了几个我们常用的事件类型，
 完整的介绍可以参考内核源码目录下的“ **~/ Documentation/input/ event-codes.txt** ”内核文档。
-很明显，我们本章要使用的按键的事件类型属于EV_KEY。
+很明显，我们本章要使用的按键的事件类型属于 **EV_KEY** 。
 
-参数keybit，记录支持的键值，“键值”在程序中用于区分不同的按键，可选“减值”如下所示。
+- **keybit**：记录支持的键值，“键值”在程序中用于区分不同的按键，可选“键值”如下所示。
 
 
 .. code-block:: c 
@@ -187,8 +188,8 @@ input_dev结构体
 
 可以看出“键值”就是一些数字。只要实际设备与按键对应即可。例如本章的按键可以使用KEY_1、也可以使用KEY_4等。
 
-参数relbit、absbit…。这两个参数和上面的keybit都和参数evbit有关，如果evbit中只选择了EV_KEY，
-那么我们就不需要设置relbit（相对坐标）和absbit（绝对坐标）以及后面省略的内容。这些内容使用到时再具体介绍。
+- **relbit、absbit**：这两个参数和上面的keybit都和参数evbit有关，如果evbit中只选择了EV_KEY，
+  那么我们就不需要设置relbit（相对坐标）和absbit（绝对坐标）以及后面省略的内容。这些内容使用到时再具体介绍。
 
 总之，input_dev结构体成员很多，但是对应到一个具体的输入设备，只需要设置自己用到的其中一两个属性。
 
@@ -250,7 +251,7 @@ input_register_device函数将输入设备（input_dev）注册到输入子系�
 - 使用该函数注册的input_dev必须是使用input_allocate_device函数申请得到的。
 - 注册之前需要根据实际输入设备配置好input_dev结构体。
 - 如果注册失败必须调用input_free_device函数释放input_dev结构体。
-- 如果注册成功，在函数退出时只需要使用input_unregister_device函数注销input_dev结构体不需要再调用。
+- 如果注册成功，在函数退出时只需要使用input_unregister_device函数注销input_dev结构体不需要再调用
   input_free_device函数释放input_dev结构体。
 
 
@@ -261,13 +262,11 @@ input_register_device函数将输入设备（input_dev）注册到输入子系�
     void input_unregister_device(struct input_dev *dev)
 
 **参数：** **dev**：struct input_dev类型指针
+
 **返回值：** **无**
 
 
-
-
-
-input_unregister_device是注销函数，输入子系统的资源是有限的，不使用是应当注销。和刚刚说的那样，
+input_unregister_device是注销函数，输入子系统的资源是有限的，不使用是应当注销。
 调用input_unregister_device注销函数之后就不必调用input_free_device函数释放input_dev。
 
 上报事件函数和上报结束函数
@@ -277,10 +276,27 @@ input_unregister_device是注销函数，输入子系统的资源是有限的，
 
 
 .. code-block:: c 
-    :caption: 上报事件、以及发送上报结束事件(内核源码\drivers\input\input.h)
+    :caption: 上报事件函数(内核源码\drivers\input\input.h)
     :linenos:
 
     void input_event(struct input_dev *dev, unsigned int type, unsigned int code, int value);
+
+input_event函数用于上报事件，共有4个参数介绍如下。
+
+**参数**：
+
+- **dev**，指定输设备（input_dev结构体）。
+- **type**，事件类型。我们在根据实际输入设备配置input_dev结构体时会设置input_dev-> evbit参数，
+  用于设置输入设备能够产生的事件类型（可能是多个）。上报事件时要从“能够产生”的这些事件类型中选择。
+- **code**，编码。以按键为例，按键的编码就是我们设置的按键键值。
+- **value**，指定事件的值。
+
+**返回值：** **无**
+
+.. code-block:: c 
+    :caption: 上报按键事件及发送上报结束事件(内核源码\drivers\input\input.h)
+    :linenos:
+
     static inline void input_sync(struct input_dev *dev)
     {
     	input_event(dev, EV_SYN, SYN_REPORT, 0);
@@ -292,21 +308,14 @@ input_unregister_device是注销函数，输入子系统的资源是有限的，
     }
 
 
-
-input_event函数用于上报事件，共有4个参数介绍如下。
-
-- 参数dev，指定输设备（input_dev结构体）。
-- 参数type，事件类型。我们在根据实际输入设备配置input_dev结构体时会设置input_dev-> evbit参数，
-  用于设置输入设备能够产生的事件类型（可能是多个）。上报事件时要从“能够产生”的这些事件类型中选择。
-- 参数code，编码。以按键为例，按键的编码就是我们设置的按键键值。
-- 参数value，指定事件的值。
-
-函数input_sync用于发送同步信号，表示上报结束。
+函数input_sync用于发送同步信号，表示上报结束，
+函数input_report_key用于上报按键事件。
+它们都只是对input_event函数进行简单的封装，具体的参数和input_event相同。
 
 输入子系统实验
 ~~~~~~~
 
-本小节一按键为例介绍输入子系统的具体使用方法。本实验在上一章“中断实验”基础上完成。结合源码介绍如下。
+本小节以按键为例介绍输入子系统的具体使用方法。本实验在上一章“中断实验”基础上完成。结合源码介绍如下。
 
 设备树插件实现
 ^^^^^^^
@@ -425,24 +434,30 @@ input_event函数用于上报事件，共有4个参数介绍如下。
 
 驱动入口函数完成基本的初始化工作，结合代码各部分介绍如下：
 
-第一部分，这部分和“中断实验”相同，依次执行获取设备树节点、获取GPIO、申请GPIO、获取中断号、申请中断，
-需要注意的是这里中断类型为“上升和下降沿触发”。
+- 第9-49行：这部分和“中断实验”相同，依次执行获取设备树节点、获取GPIO、申请GPIO、获取中断号、申请中断，
+  需要注意的是这里中断类型为“上升和下降沿触发”。
 
-第二部分，申请输入子系统结构体，申请得到的input_dev结构体代表了一个输入设备，下面要根据实际的输入设备设置这个结构体。
+- 第50-58行：申请输入子系统结构体，申请得到的input_dev结构体代表了一个输入设备，
+  下面要根据实际的输入设备设置这个结构体。
 
-第三部分，设置输入事件类型。input_dev参数很多，其中最主要的是事件类型和事件对应的code。evbit每一位代表了一种事件类型，
-为1则表示支持，0表示不支持。例如我们这里要支持“按键”事件，那么就要将EV_KEY（等于0x01）位置1。
-内核提供了帮助宏BIT_MASK帮助我们开启某一“事件”。
+- 第62行：设置输入事件类型。input_dev参数很多，其中最主要的是事件类型和事件对应的code。
+  evbit每一位代表了一种事件类型，为1则表示支持，0表示不支持。例如我们这里要支持“按键”事件，
+  那么就要将EV_KEY（等于0x01）位置1。内核提供了帮助宏BIT_MASK帮助我们开启某一“事件”。
 
-设置支持的事件类型之后还要设置与之对应的“事件值”，内核文档中称为code。以按键为例，就是为按键选择键值
-（在程序中通过键值区分不同的按键），input_dev->keybit参数用于选择键值，例如在驱动中有6个按键，那么就要使能6个键值，
-同样input_dev->keybit每一位代表一个键值，我们可以直接设置某一位使能对应的键值，
-不过内核提供了很多帮助宏或函数帮助我们设置键值（也可用于设置其他类型事件的code），
-我们在程序中使用的是input_set_capability函数，原型如下：
+- 第63行：设置支持的事件类型之后还要设置与之对应的“事件值”，内核文档中称为code。以按键为例，就是为按键选择键值
+  (在程序中通过键值区分不同的按键)，input_dev->keybit参数用于选择键值，例如在驱动中有6个按键，那么就要使能6个键值，
+  同样input_dev->keybit每一位代表一个键值，我们可以直接设置某一位使能对应的键值，
+  不过内核提供了很多帮助宏或函数帮助我们设置键值（也可用于设置其他类型事件的code），
+  我们在程序中使用的是input_set_capability函数。：
 
+- 第67-75行：注册输入设备。注册成功后，输入设备被添加到输入子系统内核层，系统能够接受来自该设备的输入事件。
+  需要注意的是如果注册失败需要注销之前申请的资源然后退出
+
+
+input_set_capability函数，原型如下：
 
 .. code-block:: c 
-    :caption: code设置函数(内核源码\drivers\input\input.c)
+    :caption: input_set_capability函数(内核源码\drivers\input\input.c)
     :linenos:
 
     void input_set_capability(struct input_dev *dev, unsigned int type, unsigned int code)
@@ -499,15 +514,15 @@ input_event函数用于上报事件，共有4个参数介绍如下。
     }
 
 
+**参数**：
 
-参数dev指定要设置的input_dev结构体，也就是要设置的输入设备，参数type设置输入类型，可以看到，
-函数实现中根据type设置不同的input_dev结构体参数。例如type =EV_KEY，那么设置的是input_dev->keybit，也就是键值。
-参数code,不同类型的输入信号含义不同，如果是按键，则表示的是要设置的按键的键值。
+- **dev**：指定要设置的input_dev结构体，也就是要设置的输入设备，
+- **type**：设置输入类型，可以看到，函数实现中根据type设置不同的input_dev结构体参数。例如type =EV_KEY，
+  那么设置的是input_dev->keybit，也就是键值。
+- **code**：不同类型的输入信号含义不同，如果是按键，则表示的是要设置的按键的键值。
 
-回到驱动入口函数。
+**返回值：** **无**
 
-第四部分，注册输入设备。注册成功后，输入设备被添加到输入子系统内核层，系统能够接受来自该设备的输入事件。
-需要注意的是如果注册失败需要注销之前申请的资源然后退出。
 
 驱动出口函数
 ''''''
@@ -529,11 +544,11 @@ input_event函数用于上报事件，共有4个参数介绍如下。
     	/*释放输入子系统相关内容*/
     	input_unregister_device(button_input_dev);
     }
-    
+
+- 第6-7行：释放申请的引脚和中断
+- 第10行：释放申请的输入子系统
 
 
-
-出口函数中的函数我们已经介绍，这里不再赘述。
 
 中断服务函数
 ''''''
@@ -549,12 +564,12 @@ input_event函数用于上报事件，共有4个参数介绍如下。
     {
     	int button_satus = 0;
     
-    	/*-----------第一部分-------------*/
+    	
     	/*读取按键引脚的电平，根据读取得到的结果输入按键状态*/
     	button_satus = gpio_get_value(button_GPIO_number);
     	if(0 == button_satus)
     	{
-    		/*-----------第二部分-------------*/
+    		
     		input_report_key(button_input_dev, KEY_1, 0);
     		input_sync(button_input_dev);
     	}
@@ -567,9 +582,10 @@ input_event函数用于上报事件，共有4个参数介绍如下。
     	return IRQ_HANDLED;
     }
 
+- 第7行：读取按键对应引脚的电平。
+- 第8-18行：根据按键引脚状态向系统上报按键事件。
 
 
-结合以上代码介绍如下，第一部分，读取按键对应引脚的电平。第二部分，根据按键引脚状态向系统上报按键事件。
 
 测试应用程序实现
 ^^^^^^^^
@@ -631,9 +647,13 @@ input_event函数用于上报事件，共有4个参数介绍如下。
         return 0;
     }
 
+- 第1行：申请一个input_event类型的结构体变量，如我们在本章开头前所说的所有的输入设备传递的信息都会以事件的形式上报。
+- 第8行：这里的打开的文件**/dev/input/event1** 是输入子系统为我们生成的输入设备设备，即我们使用的按键。
+- 第21行：读取按键信息，read函数没有读取到上报输入事件则将一直等待。
+- 第27-37行：根据获取读取到的信息判断按键的状态。
 
-测试应用程序非常简单，基本是按照打开文件、读取状态、判断状态并打印状态。测试应用程序很简单，这里不再介绍。
-需要注意的是，read是阻塞读取的，意思是没有读取到上报输入事件则一直等待。
+测试应用程序的内容很简单，基本是按照打开文件、读取状态、判断状态并打印状态。
+
 
 下载验证
 ^^^^
@@ -645,15 +665,11 @@ input_event函数用于上报事件，共有4个参数介绍如下。
    :alt: 2
 
 
-
-
 此时会在“/dev/input”目录下生成设备节点文件。
 
 .. image:: ./media/inputs003.png
    :align: center
    :alt: 3
-
-
 
 
 驱动加载成功后直接运行测试应用程序命令“./test_app”.测试程序运行后等待按键按下，此时按下开发板的“KEY”按键，
