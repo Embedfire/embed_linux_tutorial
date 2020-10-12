@@ -40,7 +40,7 @@
 编译内核
 ------------------------------
 
-**注意：** 开发板已默认烧录4.19.71版本内核，本章节以及驱动章节都不需要再烧录我们编译的内核，编译内核是为了辅助编译驱动程序。
+**注意：** 开发板已默认烧录4.19.71版本内核，本章节都不需要烧录我们编译的内核，编译内核是为了辅助编译驱动程序。
 如果你有烧录内核的需求请参考 *制作系统镜像* 系列章节。
 
 获取内核源码
@@ -225,7 +225,7 @@ scp 命令用于 Linux 之间复制文件和目录，scp命令格式如下：
 设备树编译和加载
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Linux3.x以后的版本才引入了设备树，设备树用于描述一个硬件平台的板级细节。
-后面我们写的驱动需要依赖设备树，所以在这里先演示如何编译设备树、安装设备树。
+后面我们写的驱动需要依赖设备树，所以在这里先演示如何编译设备树、加载设备树。
 
 **演示的实验代码位于：base_code/linux_driver/device_tree**
 
@@ -286,6 +286,10 @@ Linux3.x以后的版本才引入了设备树，设备树用于描述一个硬件
 如果在内核源码中执行了make distclean 则必须执行第一条命令，它用于生成默认配置文件， 如果执行过一次就没有必要再次执行，当然再次执行也没有什么问题。
 第二条命令开始编译设备树， 参数“-j4”指定多少个线程编译，根据自己电脑实际情况设置，越大编译越快，当然也可以不设置，设备树编译本来就很快。
 
+.. image:: ./media/dtbo002.png
+   :align: center
+   :alt: dtc工具编译
+
 编译成功后生成的设备树文件（.dtb）位于源码目录下的 *内核源码/arch/arm/boot/dts*，
 开发板适配的设备树文件名为 *imx6ull-seeed-npi.dtb*。
 
@@ -300,7 +304,7 @@ Linux3.x以后的版本才引入了设备树，设备树用于描述一个硬件
 加载设备树
 ------------------------------
 
-同SCP或NFS将编译的设备树拷贝到开发板上。替换 */boot/dtbs/4.19.71-imx-r1/imx6ull-seeed-npi.dtb* 。
+通过SCP或NFS将编译的设备树拷贝到开发板上。替换 */boot/dtbs/4.19.71-imx-r1/imx6ull-seeed-npi.dtb* 。
 
 uboot在启动的时候负责该目录的设备文件加载到内存，供内核解析使用。重启开发板即可。
 
@@ -343,7 +347,11 @@ Linux4.4以后引入了动态设备树（Dynamic DeviceTree）。设备树插件
 
 编译设备树插件和编译设备树类似，这里使用内核中的dtc工具编译编译设备树插件。
 
-   内核构建目录/scripts/dtc/dtc -I dts -O dtb -o xxx.dtbo xxx.dts // 编译 dts 为 dtbo
+将xxx.dts 编译为 xxx.dtbo
+
+   内核构建目录/scripts/dtc/dtc -I dts -O dtb -o xxx.dtbo xxx.dts
+   
+例如，将imx-fire-rgb-led-overlay.dts编译为rgb.dtbo
 
    ../ebf-buster-linux/build_image/build/scripts/dtc/dtc -I dts -O dtb -o rgb.dtbo imx-fire-rgb-led-overlay.dts
 
