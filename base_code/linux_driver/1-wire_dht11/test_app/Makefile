@@ -1,4 +1,4 @@
-KERNEL_DIR = /home/book/embedfire/imx6ull/linuxcore/ebf-buster-linux-master
+KERNEL_DIR = /home/xiaojian/workspace/imx6ull/linux/linux4.19/company/ebf-buster-linux/ebf-buster-linux/build_image/build
 
 obj-m := dht11.o
 

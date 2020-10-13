@@ -162,9 +162,10 @@ dht11_read(struct file *filp, char *buf, size_t len, loff_t *offset)
     spin_unlock_irqrestore(&dht11_lock, flags);
     if(dev->checkFlag == true)  	{  		/* 将读取的温湿度数据拷贝到用户空间 */		
         sprintf((char *)userBuf, "temp:%d, hum:%d\r\n", dev->buffer[2], dev->buffer[0]);
-        // ret = copy_to_user(buf, dev->buffer, sizeof(dev->buffer)); 
+        // printk(KERN_ERR "Temperature : %d, Humi : %d\n", dev->buffer[2], dev->buffer[0]);
+        ret = copy_to_user(buf, dev->buffer, sizeof(dev->buffer)); 
         lenth = strlen(userBuf);
-        ret = copy_to_user(buf, userBuf, lenth);  		
+        // ret = copy_to_user(buf, userBuf, lenth);  		
         if(ret != 0)	{  			
             // printk(KERN_EMERG "copy to user err\n");  			
             return -EAGAIN;  		
