@@ -49,71 +49,10 @@ handlers（事件处理层）三部分。
 按键信息以事件上报。
 
 
-input子系统Input Core实现代码是“ **~/drivers/input/input.c** ”以及“ **~/include/linux/input.h** ”两个文件，
-实现了一些API，通过这些API就可以实现输入事件的注册、初始化、上报、注销等等工作。
-由于这两个文件内容较多，我们重点介绍常用的API函数，至于驱动的具体实现，我们简单了解即可。
+input子系统Input Core实现代码是“ **~/drivers/input/input.c** ”以及“ **~/include/linux/input.h** ”两个文件
+为我们提供了注册输入子系统的API，通过操作这些API就可以实现输入事件的注册、初始化、上报、注销等等工作。
+下面我们介绍输入子系统常用的API接口及数据结构。
 
-input.c模块入口函数和出口函数
-^^^^^^^
-
-打开input子系统内核实现代码，在源码的最后找到驱动的入口和出口函数如下所示。
-
-.. code-block:: c 
-    :caption: input子系统内核实现入口和出口函数(内核源码/drivers/input/input.c)
-    :linenos:
-
-    static int __init input_init(void)
-    {
-    	int err;
-    
-    
-    	err = class_register(&input_class);
-    	if (err) {
-    		pr_err("unable to register input_dev class\n");
-    		return err;
-    	}
-    
-    
-    	err = input_proc_init();
-    	if (err)
-    		goto fail1;
-    
-    
-    	err = register_chrdev_region(MKDEV(INPUT_MAJOR, 0),
-    				     INPUT_MAX_CHAR_DEVICES, "input");
-    	if (err) {
-    		pr_err("unable to register char major %d", INPUT_MAJOR);
-    		goto fail2;
-    	}
-    
-    	return 0;
-    
-     fail2:	input_proc_exit();
-     fail1:	class_unregister(&input_class);
-    	return err;
-    }
-    
-    static void __exit input_exit(void)
-    {
-    	input_proc_exit();
-    	unregister_chrdev_region(MKDEV(INPUT_MAJOR, 0),
-    				 INPUT_MAX_CHAR_DEVICES);
-    	class_unregister(&input_class);
-    }
-    
-    subsys_initcall(input_init);
-    module_exit(input_exit);
-
-
-结合以上源码介绍如下：
-
-- 第6行：在/sys/class下创建input的类
-- 第13行：在/proc下面建立相关的文件
-- 第18-19行：注册一个字符设备，从参数“MKDEV(INPUT_MAJOR,0)”我们可以知道，
-  input子系统内核驱动使用的是主设备号为INPUT_MAJOR（13）的字符设备。
-  参数INPUT_MAX_CHAR_DEVICES（1024）创建次设备数量。我们在使用输入子系统时每注册一个“输入事件”就会占用一个次设备号，
-  INPUT_MAX_CHAR_DEVICES决定最多支持1024个输入事件。
-- 第32-38行：驱动出口函数，在退出函数中注销设备以及注册的类。
 
 input_dev结构体
 ^^^^^^^^^^^^
@@ -127,10 +66,10 @@ input_dev结构体
     :linenos:
 
     struct input_dev {
-    	const char *name;  //设备名
-    	const char *phys;  
-    	const char *uniq;
-    	struct input_id id; //输入设备ID
+    	const char *name;  //提供给用户的输入设备的名称
+    	const char *phys;  //提供给编程者的设备节点的名称
+    	const char *uniq;   //指定唯一的ID号
+    	struct input_id id; //输入设备标识ID
     
     	unsigned long propbit[BITS_TO_LONGS(INPUT_PROP_CNT)];
     
@@ -139,7 +78,7 @@ input_dev结构体
     	unsigned long relbit[BITS_TO_LONGS(REL_CNT)]; //记录支持的相对坐标位图
     	unsigned long absbit[BITS_TO_LONGS(ABS_CNT)]; //记录支持的绝对坐标位图
     
-        /*-----------以下内容省略----------------*/
+        /*----------以下结构体成员省略----------------*/
     };
 
 结构体成员中最重要的是 **evbit**、**keybit**、**relbit** 等数组，这些数组设置了设备输入事件的类型和键值。
@@ -165,13 +104,11 @@ input_dev结构体
     #define EV_MAX			0x1f
     #define EV_CNT			(EV_MAX+1)
 
-
-以上代码只介绍了几个我们常用的事件类型，
+上面代码中前几个宏定义较为常用的输入事件类型，介绍如代码后面所示。
 完整的介绍可以参考内核源码目录下的“ **~/ Documentation/input/ event-codes.txt** ”内核文档。
-很明显，我们本章要使用的按键的事件类型属于 **EV_KEY** 。
+很明显，我们这章节要使用的按键的事件类型应该使用 **EV_KEY** 。
 
 - **keybit**：记录支持的键值，“键值”在程序中用于区分不同的按键，可选“键值”如下所示。
-
 
 .. code-block:: c 
     :caption: 输入子系统---按键键值(内核源码\include\uapi\linux\input-event-codes.h)
@@ -189,21 +126,48 @@ input_dev结构体
 可以看出“键值”就是一些数字。只要实际设备与按键对应即可。例如本章的按键可以使用KEY_1、也可以使用KEY_4等。
 
 - **relbit、absbit**：这两个参数和上面的keybit都和参数evbit有关，如果evbit中只选择了EV_KEY，
-  那么我们就不需要设置relbit（相对坐标）和absbit（绝对坐标）以及后面省略的内容。这些内容使用到时再具体介绍。
+  那么我们就不需要设置relbit（相对坐标）和absbit（绝对坐标）以及后面省略成员的内容。这些内容使用到时再具体介绍。
+  使用不同的输入事件类型需要设备不同的
 
 总之，input_dev结构体成员很多，但是对应到一个具体的输入设备，只需要设置自己用到的其中一两个属性。
 
 input_dev结构体的申请和释放
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
-根据之前讲解input_dev结构体代表了一个输入设备，它实际会占输入子系统的一个次设备号。使用input_dev结构之前要向系统申请，
-不使用时需要释放。input子系统提供了申请和释放函数，如下所示。
+一个input_dev结构体代表了一个输入设备，它实际会占输入子系统的一个次设备号。
+input子系统为我们提供了申请和释放input_dev结构体的函数。
+由于input_dev结构体的成员很多，初始化过程也相对麻烦，一般都使用input子系统为我们提供的接口函数来
+申请和释放input_dev结构体，如下所示。
 
 .. code-block:: c 
     :caption: input_dev申请函数(内核源码\drivers\input\input.c)
     :linenos:
 
     struct input_dev *input_allocate_device(void)
+    {
+        static atomic_t input_no = ATOMIC_INIT(-1);
+        struct input_dev *dev;
+
+        dev = kzalloc(sizeof(*dev), GFP_KERNEL);	//动态内存申请
+        if (dev) {
+            dev->dev.type = &input_dev_type;
+            dev->dev.class = &input_class;			//dev->dev为struct device类型结构体
+            device_initialize(&dev->dev);			//初始化dev->dev结构体内部成员
+            mutex_init(&dev->mutex);				//初始化互斥锁
+            spin_lock_init(&dev->event_lock);		//初始化自旋锁
+            timer_setup(&dev->timer, NULL, 0);		//初始化定时器
+            INIT_LIST_HEAD(&dev->h_list);			//初始化handle链表节点
+            INIT_LIST_HEAD(&dev->node);				//初始化输入设备链表节点
+
+            dev_set_name(&dev->dev, "input%lu",
+                    (unsigned long)atomic_inc_return(&input_no));  //设置设备名称
+
+            __module_get(THIS_MODULE);
+        }
+
+        return dev;
+    }
+    EXPORT_SYMBOL(input_allocate_device);
 
 
 **参数：** **无**
@@ -212,6 +176,9 @@ input_dev结构体的申请和释放
 
 - **成功：** struct input_dev类型指针
 - **失败：** NULL
+
+我们只需要知道如何调用这个函数来申请input_dev即可，想要更深入学习的同学们可以尝试去分析整个输入子系统的实现源码，
+对于输入子系统的源码分析就可以写一篇很长的文章了，这里并不展开详细的源码分析。
 
 .. code-block:: c 
     :caption: input_dev释放函数(内核源码\drivers\input\input.c)
@@ -224,13 +191,13 @@ input_dev结构体的申请和释放
 **返回值：** **无**
 
 
-申请和释放函数都比较简单。申请函数input_allocate_device执行成功后会返回申请得到的input_dev结构体的地址，
+申请和释放函数接口比较简单。申请函数input_allocate_device执行成功后会返回申请得到的input_dev结构体的地址，
 如果失败，返回NULL。释放函数input_free_device只有一个参数dev，用于指定要释放的input_dev结构体。
 
 注册和注销input_dev结构体
 ^^^^^^^^^^^^^^^^^
 
-input_dev申请成功后，我们需要根据自己的实际输入设备配置input_dev结构体，
+input_dev申请成功后，我们需要根据自己的实际输入设备配置input_dev结构体，具体配置在实验代码编写部分会详细说明，
 配置完成后还要使用注册和注销函数将input_dev注册到输入子系统。注册和注销函数如下：
 
 .. code-block:: c 
@@ -276,7 +243,7 @@ input_unregister_device是注销函数，输入子系统的资源是有限的，
 
 
 .. code-block:: c 
-    :caption: 上报事件函数(内核源码\drivers\input\input.h)
+    :caption: 通用的上报事件函数(内核源码\drivers\input\input.h)
     :linenos:
 
     void input_event(struct input_dev *dev, unsigned int type, unsigned int code, int value);
@@ -307,10 +274,10 @@ input_event函数用于上报事件，共有4个参数介绍如下。
     	input_event(dev, EV_KEY, code, !!value);
     }
 
+input子系统为不同的输入事件函数提供了不同的函数接口，这些函数接口只是对input_event函数进行简单的封装，
+具体的参数参照input_event函数。input_report_key用于上报按键事件，input_sync用于发送同步信号，表示上报结束。
 
-函数input_sync用于发送同步信号，表示上报结束，
-函数input_report_key用于上报按键事件。
-它们都只是对input_event函数进行简单的封装，具体的参数和input_event相同。
+
 
 输入子系统实验
 ~~~~~~~
@@ -327,15 +294,42 @@ input_event函数用于上报事件，共有4个参数介绍如下。
     :caption: 设备树插件修改
     :linenos:
 
-    /*----------------修改前---------------*/
-    status = "okay";            
-    interrupt-parent = <&gpio5>;
-    interrupts = <1 IRQ_TYPE_EDGE_RISING>;     // 指定中断，触发方式为上升沿触发。
-    
-    /*----------------修改后---------------*/
-    status = "okay";            
-    interrupt-parent = <&gpio5>;
-    interrupts = <1 IRQ_TYPE_EDGE_BOTH>;     // 指定中断，触发方式为上升、下降沿触发。
+    /dts-v1/;
+    /plugin/;
+    #include "imx6ul-pinfunc.h"
+    #include "./dt-bindings/interrupt-controller/irq.h"
+    #include "./dt-bindings/gpio/gpio.h"
+
+    / {
+        fragment@0 {
+            target-path = "/";          
+            __overlay__ {
+                button_interrupt {
+                        compatible = "button_interrupt";
+                        pinctrl-names = "default";
+                        pinctrl-0 = <&pinctrl_button>;
+                        button_gpio = <&gpio5 1 GPIO_ACTIVE_LOW>; 
+                        status = "okay";
+                        interrupt-parent = <&gpio5>;              
+                        interrupts = <1 IRQ_TYPE_EDGE_BOTH>;    //设备树修改内容，将上升沿触发修改为双边沿触发
+                };
+            };
+        };
+
+
+        fragment@1 {
+            target = <&iomuxc>;
+            __overlay__ {
+            pinctrl_button: buttongrp {
+                                fsl,pins = <
+                                        MX6UL_PAD_SNVS_TAMPER1__GPIO5_IO01  0x10b0
+                                >;
+                        };
+            };
+        };
+    };
+
+修改内容很简单只是将原来中断的触发方式修改为双边沿触发，其他的设备树内容不变。
 
 
 
@@ -658,7 +652,17 @@ input_set_capability函数，原型如下：
 下载验证
 ^^^^
 
-编译驱动和应用程序并拷贝到开发板。使用insmod命令加载驱动，如下所示：
+编译驱动和应用程序并拷贝到开发板，这里就不再赘述如何拷贝文件了。
+在加载模块之前，先查看 /boot/uEnv.txt 文件是否加载了板子上原有的与按键相关设备树插件。
+
+.. image:: ./media/inputs001.png
+   :align: center
+   :alt: 1
+
+在上图所示代码前添加'#'以注销掉与按键相关的设备树插件，并重启开发板。
+
+
+使用insmod命令加载驱动，如下所示：
 
 .. image:: ./media/inputs002.png
    :align: center
