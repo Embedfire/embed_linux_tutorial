@@ -234,31 +234,6 @@ Linux3.x以后的版本才引入了设备树，设备树用于描述一个硬件
 设备树编译
 ------------------------------
 
-单独使用dtc工具编译
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-设备树插件与设备树一样都是使用DTC工具编译，只不过设备树编译为.dtb。而设备树插件需要编译为.dtbo。
-我们可以使用DTC编译命令编译生成.dtbo，但是这样比较繁琐、容易出错。
-我们提供一个编译工具，帮助完成这些繁琐的工作，实现“一键式”编译。
-编译工具位于“~/linux_driver/dynamic_device_tree/ebf-linux-dtoverlays-master”。
-将ebf-linux-dtoverlays-master文件夹复制到linux主机的任意文件夹。使用之前要安装编译工具，执行如下命令安装。
-
-   sudo apt-get install device-tree-compiler
-
-要编译的设备树插件源文件放在“~/ebf-linux-dtoverlays-master/overlays/ebf”目录下，
-然后回到编译工具的根目录“~/ebf-linux-dtoverlays-master/”执行“make”即可。
-生成的.dtbo位于“~/ebf-linux-dtoverlays-master/output”目录下。
-
-例如本章的RGB设备树插件为“imx-fire-rgb-led-overlay.dts”将其拷贝到“~/ebf-linux-dtoverlays-master/overlays/ebf”目录下，
-编译之后就会在“~/ebf-linux-dtoverlays-master/output”目录下生成同名的.dtbo文件。
-得到.dtbo后，下一步就是将其加载到系统中。需要注意的是，如果你在执行“make”后出现下图报错，
-可以尝试先卸载device-tree-compiler（卸载命令为：“sudo apt-get autoremove device-tree-compiler”）,
-重新安装，然后在“ebf-linux-dtoverlays-master”目录下修改scripts/basic/fixdep文件的权限，
-修改权限命令为：“chmod 777 scripts/basic/fixdep”。
-
-.. image:: ./media/dtboerr001.png
-   :align: center
-   :alt: 02|
-
 使用内核中的dtc工具编译
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -342,7 +317,38 @@ Linux4.4以后引入了动态设备树（Dynamic DeviceTree）。设备树插件
 
 这里不做代码讲解，具体原理请参考 *使用设备树插件实现RGB灯驱动* 章节
 
-编译设备树插件
+单独使用dtc工具编译
+------------------------------
+设备树插件与设备树一样都是使用DTC工具编译，只不过设备树编译为.dtb。而设备树插件需要编译为.dtbo。
+我们可以使用DTC编译命令编译生成.dtbo，但是这样比较繁琐、容易出错。
+我们提供一个编译工具，帮助完成这些繁琐的工作，实现“一键式”编译。
+
+编译工具下载地址
+
+   git clone https://github.com/Embedfire/ebf-linux-dtoverlays.git
+   或者
+   git clone https://gitee.com/Embedfire/ebf-linux-dtoverlays.git
+
+使用之前要安装编译工具，执行如下命令安装。
+
+   sudo apt-get install device-tree-compiler
+
+要编译的设备树插件源文件放在 *ebf-linux-dtoverlays/overlays/ebf* 目录下，
+然后回到编译工具的根目录 *ebf-linux-dtoverlays/* 执行“make”即可。
+
+生成的.dtbo位于“~/ebf-linux-dtoverlays/output”目录下。
+
+例如本章的RGB设备树插件为“imx-fire-rgb-led-overlay.dts”将其拷贝到“ebf-linux-dtoverlays/overlays/ebf”目录下，
+编译之后就会在“ebf-linux-dtoverlays/output”目录下生成同名的.dtbo文件。得到.dtbo后，下一步就是将其加载到系统中。
+需要注意的是，如果你在执行“make”后出现下图报错，可以尝试先卸载device-tree-compiler（卸载命令为：“sudo apt-get autoremove device-tree-compiler”）,
+重新安装，然后在“ebf-linux-dtoverlays/basic/fixdep文件的权限，
+修改权限命令为：“chmod 777 scripts/basic/fixdep”。
+
+.. image:: ./media/dtboerr001.png
+   :align: center
+   :alt: 02|
+
+内核dtc工具编译设备树插件
 ------------------------------
 
 编译设备树插件和编译设备树类似，这里使用内核中的dtc工具编译编译设备树插件。

@@ -570,6 +570,7 @@ RGB灯的设备节点添加到了根节点的末尾，完整内容请参考本�
 将rgb_led节点添加到设备树中，并在内核源码目录执行如下命令。
 
 	make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- npi_v7_defconfig
+	
 	make ARCH=arm -j4 CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 
 最终会在内核源码/arch/arm/boot/dts下生成 imx6ull-seeed-npi.dtb这个设备树文件。
