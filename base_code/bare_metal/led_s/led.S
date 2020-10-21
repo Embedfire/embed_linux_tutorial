@@ -5,7 +5,7 @@
 _start:          //程序的开始
 	b reset      //跳转到reset标号处
 
-    reset:
+reset:
     mrc     p15, 0, r0, c1, c0, 0     /*读取CP15系统控制寄存器   */
     bic     r0,  r0, #(0x1 << 12)     /*  清除第12位（I位）禁用 I Cache  */
     bic     r0,  r0, #(0x1 <<  2)     /*  清除第 2位（C位）禁用 D Cache  */
