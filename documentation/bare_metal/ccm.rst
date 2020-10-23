@@ -82,7 +82,7 @@ i.MX 6U外部连接了两个晶振，分别用于提供32.768KHz和24MHz时钟�
 
 .. image:: media/CCM005.png
    :align: center
-   :alt: 24MHz参考时钟到ARM PLL(PLL 1)时钟
+   :alt: 24MHz参考时钟到ARM PLL(PLL 1)时钟 
 
 ARM PLL(PLL 1)只有一个控制寄存器CCM_ANALOG_PLL_ARMn，CCM_ANALOG_PLL_ARMn[BYPASS_CLK_SRC]用于选择输入钟源(Fin)，
 一般我们使用24MHz参考时钟，当然也可以选择外部引脚输入引脚（CLK1_N /CLK1_P）输入的外部时钟。CCM_ANALOG_PLL_ARMn[DIV_SELECT]位选择锁相环分频值(DIV_SELECT)。
@@ -149,8 +149,6 @@ PLL1输出时钟设置方法已经在55.3 时钟树简介，第一小节介绍�
 
 从上8可以看出，从PLL1到“ARM_CLK_ROOT”还要经过CACRR[ARM_PODF] 时钟分频寄存器。 
 进过上一步PLL1的输出时钟被设置为792MHz，所以这里设置CACRR[ARM_PODF] = 0，不分频。
-
-
 
 
 设置系统时钟实验
@@ -236,7 +234,6 @@ PLL1输出时钟设置方法已经在55.3 时钟树简介，第一小节介绍�
       CCM->CACRR &= ~(0x07 << 0); //清零分频寄存器   30秒大约闪烁45次
       // CCM->CACRR |= (0x07 << 0); //清零分频寄存器 30秒大约闪烁20次
 
-
       /********************第四部分***********************/
       /*设置PLL2(System PLL) 输出时钟*/
       /* Configure SYS PLL to 528M */
@@ -264,7 +261,6 @@ PLL1输出时钟设置方法已经在55.3 时钟树简介，第一小节介绍�
       CCM_ANALOG->PLL_ENET =  (0x1000);    //关闭PLL6
       CCM_ANALOG->PLL_USB2 =  (0x00);           //关闭PLL7
 
-
       /********************第五部分***********************/
       /******************PFD 输出时钟设置*******************/
       /*禁用PLL2 的所有PFD输出*/
@@ -290,7 +286,6 @@ PLL1输出时钟设置方法已经在55.3 时钟树简介，第一小节介绍�
       CCM_ANALOG->PFD_528 &= ~(0x8000U) ;    //开启PLL2 PFD1
       CCM_ANALOG->PFD_528 &= ~(0x800000U) ;  //开启PLL2 PFD2
       CCM_ANALOG->PFD_528 &= ~(0x80000000U); //开启PLL2 PFD3
-
 
       /********************第六部分***********************/
       /*禁用PLL3 的所有PFD输出*/
