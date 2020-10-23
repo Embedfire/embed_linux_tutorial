@@ -465,7 +465,7 @@ wifi配置前提
 - wifi与sd卡共用同一个sdio接口，进行配置wifi之前，要先通过fire-config工具来刷机。
   确认开发板可以正常从nandflash或者eMMC启动后，才能进行wifi的配置连接。
 
-- 刷机步骤完成后，修改跳线帽为下图中连接方式，确保wifi模块连接在该sdio接口上。
+- 刷机步骤完成后，修改两个跳线帽①与②为下图中连接方式，确保wifi模块连接在该sdio接口上。（第一款底板只需要盖①）
 
 .. image:: media/fire-config_wifi.png
    :align: center

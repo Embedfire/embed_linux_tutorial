@@ -153,13 +153,13 @@ github:
 
 ::
 
-   git clone https://github.com/Embedfire-imx6/embed_linux_tutorial
+   git clone https://github.com/Embedfire/embed_linux_tutorial
 
 gitee:
 
 ::
 
-   git clone https://gitee.com/Embedfire-imx6/embed_linux_tutorial
+   git clone https://gitee.com/Embedfire/embed_linux_tutorial
 
 在内核源码外编译
 ------------------------------
