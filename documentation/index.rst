@@ -165,9 +165,9 @@
    bare_metal/building_sdk_demo
    bare_metal/before_developing
    bare_metal/asemble_led
-   bare_metal/iar_led
    bare_metal/gcc_led
    bare_metal/beautify_led
+   bare_metal/iar_led
    bare_metal/gpio_key
    bare_metal/sorting_project
    bare_metal/interrupt
