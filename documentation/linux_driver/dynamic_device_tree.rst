@@ -121,24 +121,36 @@ Linux4.4以后引入了动态设备树（Dynamic DeviceTree），我们这里翻
 实验准备
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-使用内核中的dtc工具编译
->>>>>>>>>>>>>>>>>>>>>>>>>>>
+单独使用dtc工具编译
+>>>>>>>>>>>>>>>>>>>>>
 
-首先我们需要编译好内核，之前编译的内核位置在../ebf-buster-linux/build_image/build/，使用内核中的dtc工具
+设备树插件与设备树一样都是使用DTC工具编译，只不过设备树编译为.dtb。而设备树插件需要编译为.dtbo。
+我们可以使用DTC编译命令编译生成.dtbo，但是这样比较繁琐、容易出错。
+我们提供一个编译工具，帮助完成这些繁琐的工作，实现“一键式”编译。
 
-   内核构建目录/scripts/dtc/dtc -I dts -O dtb -o xxx.dtbo xxx.dts // 编译 dts 为 dtbo
+编译工具下载地址
 
-   ../ebf-buster-linux/build_image/build/scripts/dtc/dtc -I dts -O dtb -o rgb.dtbo imx-fire-rgb-led-overlay.dts
+   git clone https://github.com/Embedfire/ebf-linux-dtoverlays.git
+   
+   或者
+   
+   git clone https://gitee.com/Embedfire/ebf-linux-dtoverlays.git
 
-.. image:: ./media/dtbo001.png
-   :align: center
-   :alt: dtc工具编译
+要编译的设备树插件源文件放在 *ebf-linux-dtoverlays/overlays/ebf* 目录下，
+然后回到编译工具的根目录 *ebf-linux-dtoverlays/* 执行“make”即可。
+
+生成的.dtbo位于“~/ebf-linux-dtoverlays/output”目录下。
+
+例如本章的RGB设备树插件为“imx-fire-rgb-led-overlay.dts”将其拷贝到“ebf-linux-dtoverlays/overlays/ebf”目录下，
+编译之后就会在“ebf-linux-dtoverlays/output”目录下生成同名的.dtbo文件。得到.dtbo后，下一步就是将其加载到系统中。
+
+需要注意的是，如果你在执行“make”后出现下图报错，可以尝试先卸载device-tree-compiler（卸载命令为：“sudo apt-get autoremove device-tree-compiler”）,
+重新安装，然后在“ebf-linux-dtoverlays/basic/fixdep文件的权限，修改权限命令为：“chmod 777 scripts/basic/fixdep”。
 
 实验效果
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-上一小节我们编译生成了.dtbo。.dtbo 可以被动态的加载到系统，
-这一小节介绍两种将设备树插件加入系统的方法。
+上一小节我们编译生成了.dtbo。.dtbo 可以被动态的加载到系统，这一小节介绍两种将设备树插件加入系统的方法。
 
 使用echo命令加载
 >>>>>>>>>>>>>>>>>>>>>

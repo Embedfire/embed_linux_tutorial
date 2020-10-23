@@ -326,12 +326,10 @@ Linux4.4以后引入了动态设备树（Dynamic DeviceTree）。设备树插件
 编译工具下载地址
 
    git clone https://github.com/Embedfire/ebf-linux-dtoverlays.git
+   
    或者
+   
    git clone https://gitee.com/Embedfire/ebf-linux-dtoverlays.git
-
-使用之前要安装编译工具，执行如下命令安装。
-
-   sudo apt-get install device-tree-compiler
 
 要编译的设备树插件源文件放在 *ebf-linux-dtoverlays/overlays/ebf* 目录下，
 然后回到编译工具的根目录 *ebf-linux-dtoverlays/* 执行“make”即可。

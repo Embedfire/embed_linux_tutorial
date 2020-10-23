@@ -340,14 +340,6 @@ eLCDIF—液晶显示实验
 
 本教程同样适用于配套的7寸屏，它的分辨率和时序参数与5寸屏相同，驱动程序完全一样。
 
-
-配套源码以及下载工具:
-
-**本章的示例代码目录为：base_code/bare_metal/elcdif**
-
-**野火裸机下载工具download_tool路径为：base_code/bare_metal/download-tool/download-tool.tar.bz2**
-
-
 实验说明
 >>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -408,6 +400,13 @@ eLCDIF—液晶显示实验
 本章配套程序由串口章节的程序修改得到，主要增加了elcdf相关代码。这里只讲解核心的部分代码，有些变量的设置，
 头文件的包含等并没有涉及到，完整的代码请参考本章配套的工程。
 
+配套源码以及下载工具:
+
+**本章的示例代码目录为：base_code/bare_metal/elcdif**
+
+**野火裸机下载工具download_tool路径为：base_code/bare_metal/download-tool/download-tool.tar.bz2**
+
+
 添加源文件并修改makefile
 ---------------------------
 
@@ -463,7 +462,6 @@ elcdf相关代码将会放到elcdf.c和elcdf.h文件内。
            上拉/下拉选择: 100K欧姆下拉(
            选择了保持器此配置无效)
            滞回器配置: 禁止 */
-
 
    /****************************第二部分********************/
    /* elcdif 显示接口外部引脚初始化
@@ -530,7 +528,6 @@ elcdf时钟设置比较繁琐，我们需要从PLL开始设置elcdf的时钟。�
        // 配合CCM_ANALOG->PLL_VIDEO寄存器设置时钟分频
        CCM_ANALOG->MISC2 |= (0x3 << 30);
 
-
        CCM_ANALOG->PLL_VIDEO &= ~(0x7F); // 清零时钟分频
        CCM_ANALOG->PLL_VIDEO |= (0x1F);  //设置时钟分频为 31(
        十进制)
@@ -543,8 +540,7 @@ elcdf时钟设置比较繁琐，我们需要从PLL开始设置elcdf的时钟。�
        {
        }
 
-       /*------------------------第二部分---------------------------
-       */
+       /*------------------------第二部分---------------------------*/
        /*设置从PLL5  到 elcdf 
        根时钟所经过的时钟选择和时钟分频寄存器*/
        CCM->CSCDR2 &= ~(0x07 << 15); //清零
@@ -584,16 +580,15 @@ elcdf 的时钟初始化非常重要，不考虑LCD 支持的最高刷新频率�
 
    表 PLL 5输出前的时钟分频值设置
 
-   ============================= =================================== ===================
-   CCM_ANALOG_PLL_VIDEO_DENOM \    CCM_ANALOG_MISC2[VIDEO_DIV]寄存器值  PLL5 输出前的分频值
-   [POST_DIV_SELECT]寄存器值                               
-   ============================= =================================== ===================
-   2                             0                                   1
-   1                             0                                   2
-   2                             3                                   4
-   1                             3                                   8
-   0                             3                                   16
-   ============================= =================================== ===================
+   .. csv-table::  
+      :header: "CCM_ANALOG_PLL_VIDEO_DENOM寄存器值 ", "CCM_ANALOG_MISC2寄存器值","PLL5 输出前的分频值"
+      :widths: 15, 30, 30
+
+      "2","0","1"
+      "1","0","2"
+      "2","3","4"
+      "1","3","8"
+      "0","3","16"
 
    从上表中可以看出CCM_ANALOG_PLL_VIDEO_DENOM [POST_DIV_SELECT]寄存器和CCM_ANALOG_PLL_VIDEO_DENOM [POST_DIV_SELECT]寄存器共同决定了PLL 输出前的最后一次分频的分频系数。
    方便书写这里记为:
@@ -605,26 +600,24 @@ elcdf 的时钟初始化非常重要，不考虑LCD 支持的最高刷新频率�
 
 -  第二部分，设置从PLL5输出到elcdf根时钟所经过的时钟选择寄存器和时钟分频寄存器，时钟选择与时钟分频如下图所示。
 
-
    .. image:: media/LCD020.png
       :align: center
-      :alt: 未找到图片
+      :alt: PLL5
 
-   从上图中可以看出,PLL5输出的时钟要经过过两个时钟选择
-   寄存器和两个时钟分频寄存器，其中时钟选择寄存器的设置是固定的（对于本例程要选择PLL5），而时钟分频
-   根据自己需要即可。具体的寄存器在图 58-19中已经写出，这里不再赘述寄存器的具体设置方法。
+   从上图中可以看出,PLL5输出的时钟要经过过两个时钟选择寄存器和两个时钟分频寄存器，
+   其中时钟选择寄存器的设置是固定的（对于本例程要选择PLL5），而时钟分频根据自己需要即可。
+   具体的寄存器在图58-19中已经写出，这里不再赘述寄存器的具体设置方法。
 
 复位LCD 并开启背光
 ---------------------------
 
 LCD有一个复位引脚，正常情况下为高电平，低电平将复位LCD。这部分代码就是在初始化LCD之前想LCD发送一个复位信号，并开启LCD的背光。非常简单，仅仅是操作复位引脚以及LCD背光控制引脚的高低电平。具体代码如下所示。
 
-
 .. code-block:: c
    :caption: lcdif复位LCD并开启背光
    :linenos:
 
-      void BOARD_InitLcd(void)
+   void BOARD_InitLcd(void)
    {
        //大致设定elcdf复位信号的持续时间
        volatile uint32_t i = 0x100U;
@@ -658,12 +651,11 @@ elcdf接口初始化
 
 这部分代码完成elcdf接口初始化工作，主要是将LCD显示屏的一些参数填入到elcdf相关的配置寄存器。配置项很多，但是大多是把参数填入寄存器，非常简单，配置代码如下所示。
 
-
 .. code-block:: c
    :caption: elcdf初始化代码
    :linenos:
 
-      /******************第一部分*******************/
+   /******************第一部分*******************/
    #define APP_IMG_HEIGHT 480   // 显示屏高度，单位，像素
    #define APP_IMG_WIDTH 800    // 显示屏宽度，单位，像素
    #define APP_HSW 41    //表示水平同步信号的宽度，单位为同步时钟CLK的个数
@@ -717,7 +709,7 @@ elcdf接口初始化
        LCDIF->VDCTRL0 |= APP_VSW;
    
        /******************第四部分*******************/
-       //     以显示时钟为单位的周期。
+       //以显示时钟为单位的周期。
        //设置VSYNC 信号周期
        LCDIF->VDCTRL1 = APP_VSW + APP_IMG_HEIGHT + APP_VFP + APP_VBP;
    
@@ -736,8 +728,6 @@ elcdf接口初始化
        LCDIF->CUR_BUF = (uint32_t)s_frameBuffer[0];
        LCDIF->NEXT_BUF = (uint32_t)s_frameBuffer[0];
    }
-
-
 
 
 elcdf初始化代码大致分为了五部分，但是各部分之间并没有明显的区分，都是设置elcdf配置寄存器。具体的配置过程不再具体介绍，这里将会结合代码讲解配置参数的作用，读者只需要知道在哪里修改配置参数以及配置参数的作用即可。
@@ -769,73 +759,73 @@ elcdf初始化代码大致分为了五部分，但是各部分之间并没有明
    :caption: elcdf初始化代码
    :linenos:
 
-      /******************第一部分*******************/
-    static volatile unsigned char s_frameDone = false;  // elcdf 帧传输状态
-    extern uint32_t s_frameBuffer[2][APP_IMG_HEIGHT][APP_IMG_WIDTH];  // elcdif 显存
-   
-    /******************第二部分*******************/
-    /*
-    * elcdf 帧传输完成中断
-    */
-    void APP_LCDIF_IRQHandler(void)
-    {
-        uint32_t intStatus = 0;
-   
-        /*获取传输完成中断的状态，*/
-        intStatus = ((LCDIF->CTRL1) & (1 <<9));
-        /*清除 1 帧传输完成中断标志位*/
-        LCDIF->CTRL1_CLR = (1 << 9);
-   
-        if (intStatus)
-        {
-            s_frameDone = true;
-        }
-    }
-   
-    int main()
-    {
-        uint8_t ch; //用于暂存串口收到的字符
-   
-        uint32_t frameBufferIndex = 0;
-        /******************第三部分*******************/
-        system_clock_init();
-        rgb_led_init();           //初始化 RGB 灯，初始化后 默认所有灯都不亮。
-        interrupt_button2_init(); 
-        //初始化引脚，和引脚的中断方式以及开启引脚中断。
-        uart_init();
-        UART_WriteBlocking(UART1, txbuff, sizeof(txbuff) - 1);
-        /******************第四部分*******************/
-        lcdif_pin_config();         //初始 lcdif 引脚
-        lcdif_clock_init();         //初始化时钟
-        ELCDIF_RgbModeInit();  // 初始化 elcdf 位 RGB 888 模式
-   
-        SystemInstallIrqHandler(LCDIF_IRQn, \
+   /******************第一部分*******************/
+   static volatile unsigned char s_frameDone = false;  // elcdf 帧传输状态
+   extern uint32_t s_frameBuffer[2][APP_IMG_HEIGHT][APP_IMG_WIDTH];  // elcdif 显存
+
+   /******************第二部分*******************/
+   /*
+   * elcdf 帧传输完成中断
+   */
+   void APP_LCDIF_IRQHandler(void)
+   {
+      uint32_t intStatus = 0;
+
+      /*获取传输完成中断的状态，*/
+      intStatus = ((LCDIF->CTRL1) & (1 <<9));
+      /*清除 1 帧传输完成中断标志位*/
+      LCDIF->CTRL1_CLR = (1 << 9);
+
+      if (intStatus)
+      {
+         s_frameDone = true;
+      }
+   }
+
+   int main()
+   {
+      uint8_t ch; //用于暂存串口收到的字符
+
+      uint32_t frameBufferIndex = 0;
+      /******************第三部分*******************/
+      system_clock_init();
+      rgb_led_init();           //初始化 RGB 灯，初始化后 默认所有灯都不亮。
+      interrupt_button2_init(); 
+      //初始化引脚，和引脚的中断方式以及开启引脚中断。
+      uart_init();
+      UART_WriteBlocking(UART1, txbuff, sizeof(txbuff) - 1);
+      /******************第四部分*******************/
+      lcdif_pin_config();         //初始 lcdif 引脚
+      lcdif_clock_init();         //初始化时钟
+      ELCDIF_RgbModeInit();  // 初始化 elcdf 位 RGB 888 模式
+
+      SystemInstallIrqHandler(LCDIF_IRQn, \
       (system_irq_handler_t)(uint32_t)APP_LCDIF_IRQHandler, NULL); // 
-                                设置中断服务函数
-        GIC_EnableIRQ(LCDIF_IRQn); //开启中断
-   
-        /******************第五部分*******************/
-        APP_FillFrameBuffer(s_frameBuffer[frameBufferIndex]);
-   
-        LCDIF->CTRL1_SET |= (0x2000);  // 使能 elcdf 一帧传输完成中断
-        LCDIF->CTRL_SET |= 0x1;    //开启 elcdf 开始显示
-        LCDIF->CTRL_SET |= (1 << 17);
-        /******************第六部分*******************/
-        while (1)
-        {
-            frameBufferIndex ^= 1U;
-            APP_FillFrameBuffer(s_frameBuffer[frameBufferIndex]);
-   
-            LCDIF->NEXT_BUF = (uint32_t)s_frameBuffer[frameBufferIndex];
-   
-            s_frameDone = false;
-            /* Wait for previous frame complete. */
-            while (!s_frameDone)
-            {
-            }
-        }
-        return 0;
-    }
+                              设置中断服务函数
+      GIC_EnableIRQ(LCDIF_IRQn); //开启中断
+
+      /******************第五部分*******************/
+      APP_FillFrameBuffer(s_frameBuffer[frameBufferIndex]);
+
+      LCDIF->CTRL1_SET |= (0x2000);  // 使能 elcdf 一帧传输完成中断
+      LCDIF->CTRL_SET |= 0x1;    //开启 elcdf 开始显示
+      LCDIF->CTRL_SET |= (1 << 17);
+      /******************第六部分*******************/
+      while (1)
+      {
+         frameBufferIndex ^= 1U;
+         APP_FillFrameBuffer(s_frameBuffer[frameBufferIndex]);
+
+         LCDIF->NEXT_BUF = (uint32_t)s_frameBuffer[frameBufferIndex];
+
+         s_frameDone = false;
+         /* Wait for previous frame complete. */
+         while (!s_frameDone)
+         {
+         }
+      }
+      return 0;
+   }
 
 
 
@@ -843,20 +833,15 @@ elcdf初始化代码大致分为了五部分，但是各部分之间并没有明
 
 -  第一部分，定义帧传输状态变量和显存。
 
--  第二部分，定义帧传输完成中断的中断服务函数，和STM32相似，在中断服务函数
-   中检测中断状态并清除中断标志，如果是帧传输完成中断则设置s_frameDone变量为真。
+-  第二部分，定义帧传输完成中断的中断服务函数，和STM32相似，在中断服务函数中检测中断状态并清除中断标志，如果是帧传输完成中断则设置s_frameDone变量为真。
 
 -  第三部分，这是串口章节遗留的初始化代码，除系统时钟初始化代码外，其他初始化代码可以删除。
 
--  第四部分，初始化elcdif，初始化代码是我们之前讲过的三个初始化函
-   数，分别初始化了elcdif 的引脚、时钟、以及elcdif的配置参数。代码第41到44行 初始化ELCDF帧传输完成中断，使能中断。
+-  第四部分，初始化elcdif，初始化代码是我们之前讲过的三个初始化函数，分别初始化了elcdif 的引脚、时钟、以及elcdif的配置参数。代码第41到44行 初始化ELCDF帧传输完成中断，使能中断。
 
--  第五部分，使用APP_FillFrameBuffer函数填充显存，之后开启传输完成
-   中断。对比第四部分的中断，第四部分设置的是系统中断，表示某一个中断号对应
-   的中断被使能。这里设置的是elcdif 可以产生中断请求。一切准备就绪设置CTRL_SET控制寄存器开启elcdif显示。
+-  第五部分，使用APP_FillFrameBuffer函数填充显存，之后开启传输完成中断。对比第四部分的中断，第四部分设置的是系统中断，表示某一个中断号对应的中断被使能。这里设置的是elcdif 可以产生中断请求。一切准备就绪设置CTRL_SET控制寄存器开启elcdif显示。
 
--  第六部分，在while(1)中循环改变显
-   存内容，不断更新显示。
+-  第六部分，在while(1)中循环改变显存内容，不断更新显示。
 
 实验准备
 >>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -864,7 +849,7 @@ elcdf初始化代码大致分为了五部分，但是各部分之间并没有明
 编译试验代码
 ---------------------------
 
-程序编写完成后，在“button” 文件夹下执行make命令，makefile工具便会自动完成程序的编译、链接、格式转换等工作。
+程序编写完成后，在elcdf文件夹下执行make命令，makefile工具便会自动完成程序的编译、链接、格式转换等工作。
 正常情况下我们可以在当前目录看到生成的一些中间文件以及我们期待的.bin文件。
 
 烧录试验程序
@@ -873,7 +858,7 @@ elcdf初始化代码大致分为了五部分，但是各部分之间并没有明
 在编译下载官方SDK程序到开发板章节我们详细讲解了如何将二进制文件烧写到SD卡（烧写工具自动实现为二进制文件添加头）。这里再次说明下载步骤。
 
 -  将一张空SD卡（烧写一定会破坏SD卡中原有数据！！！烧写前请保存好SD卡中的数据），接入电脑后在虚拟机的右下角状态栏找到对应的SD卡。将其连接到虚拟机。
--  进入烧写工具目录，执行“./mkimage.sh <烧写文件路径>”命令,button.bin位于home目录下，则烧写命令为“./mkimage.sh /home/button.bin”。
+-  进入烧写工具目录，执行“./mkimage.sh <烧写文件路径>”命令,elcdf.bin位于home目录下，则烧写命令为“./mkimage.sh /home/elcdf.bin”。
 -  执行上一步后会列出linux下可烧写的磁盘，选择你插入的SD卡即可。这一步非常危险！！！一定要确定选择的是你插入的SD卡！！，如果选错很可能破坏你电脑磁盘内容，造成数据损坏！！！。确定磁盘后SD卡以“sd”开头，选择“sd”后面的字符即可。例如要烧写的sd卡是“sdb”则输入“b”即可。
 
 
