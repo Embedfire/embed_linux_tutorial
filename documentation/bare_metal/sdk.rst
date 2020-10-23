@@ -11,19 +11,13 @@ SDK（Software Development Kit）是NXP针对其官方评估
 
 
 SDK的下载提供很多选择，下载步骤比较复杂，在本章的配套例程
-文件夹中包含了SDK的原件（路径：~/embed_linux_tutorial/base_code/bare_metal/sdk_nxp），可
-直接使用。若想亲自到官网下载，请按
-如下步骤操作，不感兴趣可直接跳过该步骤：
+文件夹中包含了SDK的原件（路径：**~/embed_linux_tutorial/base_code/bare_metal/sdk_nxp** ），可
+直接使用。若想亲自到官网下载，请按如下步骤操作，不感兴趣可直接跳过该步骤：
 
 
-
-
-(1) 访问NXP官网下载链接：https://mcuxpresso.nxp.com/en/dashboardhttps://www.nxp.com/products/processors-and-microcontrollers/arm-processors/i.mx-applications-
-processors/i.mx-6-processors/i.mx-6ull-single-core-processor-with-arm-cortex-a7-core:i.MX6ULL?tab=Design_Tools_Tab
+(1) NXP官网链接：https://www.nxp.com 
 
 (2) 未登录的用户需要先登录NXP官网，没有帐号的需要先注册，具体如下所示。
-
-..
 
 
 .. image:: media/sdk002.png
@@ -31,21 +25,32 @@ processors/i.mx-6-processors/i.mx-6ull-single-core-processor-with-arm-cortex-a7-
    :alt: 未找到图片
 
 
-(3) 打开链接之后选择“TOOLS&SOFTWATE”如下所示。
+(4) 登录之后打开官网链接选择“DESIGN&Software”如下所示。
 
 
-.. image:: media/sdk003.png
+.. image:: media/sdk003.1.png
    :align: center
    :alt: 未找到图片
 
+(5) 点击View all查看所有芯片的SDK
 
-
-(4) 网页上可以看到多个下载选项我们选择“SDK2.2_iXMX6ULL_WIN”下载项目点击下载即可，如下所示。
-
-.. image:: media/sdk004.png
+.. image:: media/sdk003.2.png
    :align: center
    :alt: 未找到图片
 
+(6) 找到imx6ull芯片的SDK并点击DOWNLOAD
+
+.. image:: media/sdk003.3.png
+   :align: center
+   :alt: 未找到图片
+
+(7) 点击I ACCEPT之后便开始自动下载
+
+.. image:: media/sdk003.4.png
+   :align: center
+   :alt: 未找到图片
+
+下载完成之后是一个exe文件，打开之后可根据需求选择SDK的解压路径。
 
 
 SDK目录、文件简介
@@ -87,36 +92,31 @@ SDK的boards目录包含了NXP官方评估版MCIMX6ULL-EVK的各种示例程序�
 
 
 
--  driver_example包含了i.mx6主要片上外设的使用范例，非常详细。例
-   如在“boards\evkmcimx6ull\driver_examples”目录下包含各个外设的程序如下图所示。
+-  driver_examples包含了i.mx6主要片上外设的使用范例，非常详细。
+   在“boards\evkmcimx6ull\driver_examples”目录下包含各个外设的程序如下图所示。
 
 .. image:: media/sdk008.png
    :align: center
    :alt: 未找到图片
 
 
-
--  project_template包含了官方示例使用的一些必备文件，这些文件主要是针对官方评估板做了一些引脚定义、时钟配置等功能，具体如下所示。
+-  project_template包含了官方示例使用的一些必备文件，这些文件主要是针对官方评估板做了一些引脚定义、时钟配置等功能，
+   具体如下所示。
 
 .. image:: media/sdk009.png
    :align: center
    :alt: 未找到图片
 
 
-
--  rtos_examples包含了使用FreeRTOS实时操作系统的应用范例，具体如下所示，使用了操作系统可以进行多任务编程。
-
-..
-
+-  rtos_examples包含了使用FreeRTOS实时操作系统的应用范例，具体如下所示。
 
 .. image:: media/sdk010.png
    :align: center
    :alt: 未找到图片
 
 
-
-
--  usb_examples包含了各种USB程序示例，具体如下所示。USB设备种类繁多且驱动复杂，参考官方的这些示例能快速建立自己需要的USB应用。
+-  usb_examples包含了各种USB程序示例，具体如下所示。USB设备种类繁多且驱动复杂，
+   参考官方的这些示例能快速建立自己需要的USB应用。
 
 
 .. image:: media/sdk011.png
@@ -124,11 +124,22 @@ SDK的boards目录包含了NXP官方评估版MCIMX6ULL-EVK的各种示例程序�
    :alt: 未找到图片
 
 
-
 CMSIS：包含CMSIS标准相关的文件
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 在2.2版本的SDK中，CMSIS只有一个GCC 相关头文件，使用到时我们将会详细介绍。
+
+CORTEXA：Cortex相关头文件
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SDK目录下的CORTEXA文件夹包含了cortexa核适配iar、gcc的头文件，见下图。我们暂时不需要研究它们的作用。
+
+
+.. image:: media/sdk020.png
+   :align: center
+   :alt: 未找到图片
+
+
 
 devices：i.mx固件库
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -139,7 +150,6 @@ SDK中的devices目录包含的内容就是外设驱动固件库，该目录下�
 .. image:: media/sdk012.png
    :align: center
    :alt: 未找到图片
-
 
 
 对此目录下的内容说明如下：
@@ -155,14 +165,11 @@ MCIMX6Y2目录下的全局文件
    :alt: 未找到图片
 
 
-
 -  fsl_device_registers.h文件
 
 ..
 
    fsl_device_registers.h文件的具体内容如下。
-
-
 
 
 
@@ -188,15 +195,15 @@ MCIMX6Y2目录下的全局文件
 
 
 
-
-
-   固件库通常可以兼容很多型号的芯片，不同的芯片部分寄存器定义、芯片特性等内容可能会有差异。通过这样的条件编译代码，就可以根据宏来包含不同的头文件，达到兼容不同芯片的目的了。当前仅支持一种芯片。
+   固件库通常可以兼容很多型号的芯片，不同的芯片部分寄存器定义、芯片特性等内容可能会有差异。通过这样的条件编译代码，
+   就可以根据宏来包含不同的头文件，达到兼容不同芯片的目的了。当前仅支持一种芯片。
 
 -  MCIMX6Y2.h文件
 
 ..
 
-   它主要是包含i.MX6芯片的各种寄存器定义和中断编号定义，是非常重要，非常基础的一个头文件。所以在前面fsl_device_registers.h文件中就根据CPU型号把添加这个文件。该文件的部分内容如下。
+   它主要是包含i.MX6芯片的各种寄存器定义和中断编号定义，是非常重要，非常基础的一个头文件。
+   所以在前面fsl_device_registers.h文件中就根据CPU型号把添加这个文件。该文件的部分内容如下。
 
 
 .. code-block:: c
@@ -244,7 +251,6 @@ MCIMX6Y2目录下的全局文件
    system_MCIMX6Y2包含一个源文件和头文件。其中头文件system_MCIMX6Y2.h中主要包含时钟定义以及源文件相应函数的声明，具体如下所示。
 
 
-
 .. code-block:: c
    :caption: system_MCIMX6Y2.h文件中关于时钟频率的定义
    :linenos:  
@@ -272,7 +278,6 @@ gcc、iar目录
    :alt: 未找到图片
 
 
-
 在iar文件夹下startup_MCIMX6Y2.s文件，主要用于配置存储器分配和提供芯片启动时运行的代码指令，其他几个.icf文件根据芯片型号以及芯片所接的存储器类型选择，
 “MCIMX6Y2xxxxx”指定芯片型号，_ram适配nandFlash和eMMC，本教程配套开发板应当选择这种.icf文件。_flash适配norFlash。.icf是程序的分散加载文件，使用到时再详细介绍。
 
@@ -284,7 +289,6 @@ drivers目录是固件库的主体，有时我们把这些文件称为外设驱�
 .. image:: media/sdk015.png
    :align: center
    :alt: 未找到图片
-
 
 
 -  这些文件都使用fsl_xxx.c/h的命名格式，其中xxx是对应的片上
@@ -340,13 +344,13 @@ SDK中的middleware文件夹主要包含一些中间层软件，即这些软件�
 
 各个文件中间件的简要说明如下：
 
--  fatfs：这是一个嵌入式常用的文件系统，有了文件系统后能更好地管理存储器以及使用通用的文件形式来访问存储器。
+-  **fatfs** ：这是一个嵌入式常用的文件系统，有了文件系统后能更好地管理存储器以及使用通用的文件形式来访问存储器。
 
--  lwip：这是嵌入式常用网络TCP/IP协议栈，使用协议栈可以方便地接入网络。
+-  **lwip** ：这是嵌入式常用网络TCP/IP协议栈，使用协议栈可以方便地接入网络。
 
--  sdmmc：它是遵照SDIO协议编写的集成识别、读写SD存储卡功能的驱动。
+-  **sdmmc** ：它是遵照SDIO协议编写的集成识别、读写SD存储卡功能的驱动。
 
--  usb：包含了遵照USB协议编写的基本驱动，在它之上可方便地编写USB应用程序。
+-  **usb** ：包含了遵照USB协议编写的基本驱动，在它之上可方便地编写USB应用程序。
 
 rtos：实时操作系统
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -360,15 +364,7 @@ SDK目录下的rtos文件夹包含了FreeRTOS实时操作系统的源代码，�
 
 
 
-CORTEX：Cortex相关头文件
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-SDK目录下的CORTEXA文件夹包含了cortexa核适配iar、gcc的头文件，见下图。我们暂时不需要研究它们的作用。
-
-
-.. image:: media/sdk020.png
-   :align: center
-   :alt: 未找到图片
 
 
 tools：开发工具
@@ -382,19 +378,16 @@ tools：开发工具
 
 各个文件中间件的简要说明如下：
 
--  cmake_toolchain_files：提供cmake工具，用于生成arm gcc编译器需要的makefilew文件。
+-  **cmake_toolchain_files** ：提供cmake工具，用于生成arm gcc编译器需要的makefilew文件。
 
--  imgutil：提供图片压缩工具。
+-  **imgutil** ：提供图片压缩工具。
 
--  mfgtools与mfgtools-with-rootfs：提供MFG批量下载工具，
+-  **mfgtools** 与 **mfgtools-with-rootfs** ：提供MFG批量下载工具，
 
-mcimx6_DEBUG：调试工具
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-调试工具我们用不到，不必关心。
 
 其它
-^^
+^^^^^
 
 在SDK的根目录下还包含了几个.xml、.txt、.htm以及.bat文件，具
 体见图 45-21。.xml和txt文件它们主要是包含SDK第三方构件的一些版
@@ -406,6 +399,8 @@ mcimx6_DEBUG：调试工具
    :align: center
    :alt: 未找到图片
 
+
+到此我们对imx6ull的sdk文件夹做了详细的介绍，不同版本的SDK文件夹可能略微不同，但总体的框架是一样的。
 
 
 .. |sdk002| image:: media/sdk002.png
