@@ -80,16 +80,16 @@ setmem /32	0x021b001c =	0x00008000	// MMDC0_MDSCR, set the Configuration request
 setmem /32	0x021b0800 =	0xA1390003	// DDR_PHY_P0_MPZQHWCTRL, enable both one-time & periodic HW ZQ calibration.
 			
 // For target board, may need to run write leveling calibration to fine tune these settings.			
-setmem /32	0x021b080c  =	 0x00050003	
+setmem /32	0x021b080c  =	0x00000000	
 			
 //Read DQS Gating calibration			
-setmem /32	0x021b083c =	0x013C0140	// MPDGCTRL0 PHY0
+setmem /32	0x021b083c =	0x00000000	// MPDGCTRL0 PHY0
 			
 //Read calibration			
-setmem /32	0x021b0848 =	0x40402E30	// MPRDDLCTL PHY0
+setmem /32	0x021b0848 =	0x40404040	// MPRDDLCTL PHY0
 			
 //Write calibration                     			
-setmem /32	0x021b0850 =	0x4040322E	// MPWRDLCTL PHY0
+setmem /32	0x021b0850 =	0x40404040	// MPWRDLCTL PHY0
 			
 //read data bit delay: (3 is the reccommended default value, although out of reset value is 0)			
 setmem /32	0x021b081c =	0x33333333	// MMDC_MPRDDQBY0DL
@@ -205,4 +205,3 @@ setmem /32	0x021b001c =	0x00000000	// MMDC0_MDSCR, clear this register (especial
 			
 			
 			
-
