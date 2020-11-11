@@ -15,6 +15,7 @@
 
 ..    why_learning_linux
 ..    i_mx_series
+..    ssh_login
 ..    linux_brief
 ..    installing_linux
 ..    linux_directory

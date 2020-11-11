@@ -202,7 +202,7 @@ wifi_setting
 SSH_connect
 ^^^^^^^^^^^^^^^^
 
-远程登录会话
+使能和禁止远程登录会话
 
 
 flasher
@@ -216,106 +216,6 @@ Expand Filesystem
 扩展SD卡容量，解决SD卡镜像烧录完毕后，出现储存容量大幅减小的问题
 
 
-fire-config设置ssh
-~~~~~~~~~~~~~~~~~~~~~~
-
-1、上电启动开发板，开发板默认开启ssh服务。系统正常登录后，输入以下命令查看ssh服务是否已经运行：
-
-.. code-block:: sh
-   :emphasize-lines: 2
-   :linenos:
-
-   sudo systemctl status ssh
-
-如下图所示:active状态说明ssh服务正常运行
-
-.. image:: media/fire-config_ssh.png
-   :align: center
-   :alt: 查看ssh服务是否运行
-
-2、确保网络连接正常(注意wifi要先正确配置后才能使用)。输入以下命令查看当前主机的ip地址:
-
-.. code-block:: sh
-   :emphasize-lines: 2
-   :linenos:
-
-   ifconfig
-
-以太网ip地址如下图所示:
-
-.. image:: media/fire-config_ssh1.png
-   :align: center
-   :alt: 查看以太网ip地址
-
-正确配置wifi后，wifi的ip地址如下图所示:
-
-.. image:: media/fire-config_ssh2.png
-   :align: center
-   :alt: 查看wifi ip地址
-
-3、使用ssh客户端登录，这里使用vscode的Remote-SSH插件为例。
-vscode安装完Remote-SSH插件后，使用“ctrl+shift+P”快捷键打开命令面板，
-输入“Remote-SSH”迅速找到“Remote-ssh: connect to host”选项，
-如下图所示:
-
-.. image:: media/fire-config_ssh3.png
-   :align: center
-   :alt: Remote-SSH插件
-
-4、进一步选择“Add New SSH Host”选项，如下图
-
-.. image:: media/fire-config_ssh4.png
-   :align: center
-   :alt: Remote-SSH插件
-
-5、根据开发板的ip地址，在ssh登录框中输入登录命令，
-这里以本人实际开发环境中的以太网IP地址为例。
-
-.. image:: media/fire-config_ssh5.png
-   :align: center
-   :alt: Remote-SSH插件
-
-6、选择配置文件来保存主机ip和用户名，一般选择用户名下的config进行配置即可，
-如下图所示:
-
-.. image:: media/fire-config_ssh6.png
-   :align: center
-   :alt: Remote-SSH插件
-
-7、提示检查主机公钥指纹，选择“continue”,如下图:
-
-.. image:: media/fire-config_ssh7.png
-   :align: center
-   :alt: Remote-SSH插件
-
-8、输入主机用户的密码，debian用户默认密码为“temppwd”。
-如果弹出登录失败串口，点击“retry”选项，重复登录2~3次。
-
-.. image:: media/fire-config_ssh8.png
-   :align: center
-   :alt: Remote-SSH插件
-
-9、登录成功后，在菜单栏打开“Terminal”选项，新建一个终端。
-如下图:
-
-.. image:: media/fire-config_ssh9.png
-   :align: center
-   :alt: Remote-SSH插件
-
-10、输入“sudo fire-config”命令，选择“SSH-connect”项。
-如下图:
-
-.. image:: media/fire-config_ssh10.png
-   :align: center
-   :alt: Remote-SSH插件
-
-11、系统提示: “Would you like the SSH server to be enabled?”。选择<Yes>或<No>来
-分别对ssh进行使能和禁止即可。
-如下图:
-
-.. image:: media/fire-config_ssh11.png
-   :align: center
-   :alt: Remote-SSH插件
 
 
 fire-config使能硬件模块
@@ -360,6 +260,12 @@ fire-config刷机
 注意:
 **刷机不建议用ssh远程登录来操作，避免开发板重启后，
 ssh断开连接而不能及时看到相关的刷机信息提示**。
+
+
+fire-config刷机操作是当开发板从制作好的SD卡镜像启动后，可以这样方式将镜像重新刷至eMMC或者nandflash，
+因为开发板出厂在eMMC或者nandflash本身已经有镜像可运行，所以此步骤可以先跳过或者按自己需求做。
+
+
 
 1、开发板正常启动后，在串口终端登录debian系统。
 
@@ -462,10 +368,9 @@ fire-config连接wifi
 wifi配置前提
 ^^^^^^^^^^^^^
 
-- wifi与sd卡共用同一个sdio接口，进行配置wifi之前，要先通过fire-config工具来刷机。
-  确认开发板可以正常从nandflash或者eMMC启动后，才能进行wifi的配置连接。
+- wifi与sd卡共用同一个sdio接口，进行配置wifi之前，要确认开发板是从eMMC或者nandflash启动，不能在从SD卡启动时用wifi。
 
-- 刷机步骤完成后，修改两个跳线帽①与②为下图中连接方式，确保wifi模块连接在该sdio接口上。（第一款底板只需要盖①）
+- 修改两个跳线帽①与②为下图中连接方式，确保wifi模块连接在该sdio接口上。（第一款底板只需要盖①）
 
 .. image:: media/fire-config_wifi.png
    :align: center
@@ -534,6 +439,33 @@ wifi连接步骤
 .. image:: media/fire-config_wifi9.png
    :align: center
    :alt: fire-config配置wifi
+
+
+
+
+wifi常用操作命令
+^^^^^^^^^^^^^
+
+-  sudo ifconfig wlan0 down                关闭wifi使用
+
+-  sudo ifconfig wlan0 up                  启动wifi使用
+
+-  wpa_cli -i wlan0 status                 查看当前连接状态
+
+-  wpa_cli -i wlan0 list_networks          列出输入过的网络
+
+-  wpa_cli -i wlan0 disconnect      AAAA   断开当前连接AAAA名wifi(CURRENT)
+
+-  wpa_cli -i wlan0 resconnect      AAAA   重新连接AAAA或其他
+
+-  wpa_cli -i wlan0 select_network  BBBB   切换连接list_networks里面的BBBB wifi
+
+-  wpa_cli -i wlan0 remove_network  AAAA   删除不用的AAAA（删除前断开）
+
+
+
+
+
 
 
 fire-config修改液晶参数
