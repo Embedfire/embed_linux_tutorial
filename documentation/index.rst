@@ -24,7 +24,6 @@
    linux_basis/why_learning_linux
    linux_basis/how_to_learn_linux
    linux_basis/i_mx_series
-   linux_basis/ssh_login
    linux_basis/linux_brief
    linux_basis/installing_linux
    linux_basis/linux_directory
@@ -42,6 +41,7 @@
 
    linux_basis/ebf6ull_hardware
    linux_basis/board_startup
+   linux_basis/ssh_login
    linux_basis/system_information
    linux_basis/led_key_command_line_testing
    linux_basis/script_hardware_testing
