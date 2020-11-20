@@ -50,6 +50,14 @@ deb包一般分成两部分：
 
    sudo apt-get install build-essential debhelper make autoconf automake dpkg-dev fakeroot pbuilder gnupg
 
+
+获取deb包：
+
+.. code-block:: c
+
+   sudo apt-get download peripheral    下载后的路径在/var/cache/apt/archives
+
+
 创建deb包做需的目录结构，使用mkdir创建一个存放deb包的目录，目录名字可自己取，我创建的目录为peripheral_0.1.7_armhf，接着在peripheral_0.1.7_armhf目录下
 下创建DEBIAN目录，如下图所示：
 
@@ -118,7 +126,8 @@ deb包一般分成两部分：
    :alt: 未找到图片08|
 
 其中，home/xiaojian/debian目录表示该软件被安装后所在你文件系统中的目录，如果你想让软件安装到你文件系统中的/usr/lib目录下，那你可以建立/usr/lib目录结构代替我的home/xiaojian/debian目录结构。
-然后分别给予postinst、postrm、MyAdcSoftware.sh等文件可执行权限，chmod +x postinst、postrm、MyAdcSoftware.sh。
+然后分别给予postinst、postrm、control、MyAdcSoftware.sh等文件可执行权限，chmod +x postinst、postrm、control、MyAdcSoftware.sh。
+
 
 其中control文件所包含信息如下：
 
