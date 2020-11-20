@@ -36,8 +36,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define     WAIT   0
-#define     WAITPID  1
+
+//通过宏选择要测试wait示例还是waitpid示例
+#define     WAIT   1
+#define     WAITPID  0
 
 #if ((WAIT | WAITPID) == 0)
 #error "must choose a function to compile!"
@@ -120,7 +122,10 @@ int main()
     /*父进程*/
     else {
 
-        /*调用 waitpid，且父进程不阻塞*/
+        /*
+            调用 waitpid，且父进程不阻塞，
+            options设置为0的话将与wait示例完全一致 
+        */
         child_pid = waitpid(pid, &status, WUNTRACED);
 
         /*若发现子进程退出，打印出相应情况*/

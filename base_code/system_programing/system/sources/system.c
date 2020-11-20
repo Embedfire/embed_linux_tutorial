@@ -17,7 +17,7 @@ int main(void)
     printf("This is a system demo!\n\n");
 
     /*调用 system()函数*/
-    result = system("ls -l");
+    result = system("ls -l &");
 
     printf("Done!\n\n");
 

@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* 选择一个要测试的函数示例，把对应的宏为1即可 */
 #define     EXECL   1
 #define     EXECLP  0
 #define     EXECLE  0
@@ -58,6 +59,11 @@ int main(void)
 
     printf("this is a execl function test demo!\n\n");
 
+    /*
+        execl()函数用于执行参数path字符串所代表的文件路径（必须指定路径），
+        接下来是一系列可变参数，它们代表执行该文件时传递过去的 ``argv[0]、argv[1]… argv[n]`` ，
+        最后一个参数必须用空指针NULL作为结束的标志。
+    */
     err = execl("/bin/ls", "ls", "-la", NULL);
 
     if (err < 0) {
@@ -75,11 +81,18 @@ int main(void)
 
     printf("this is a execlp function test demo!\n\n");
 
+    /*
+        与execl的差异是，execlp()函数会从PATH环境变量所指的目录中
+        查找符合参数file的文件名（不需要指定完整路径）。
+    */
     err = execlp("ls", "ls", "-la", NULL);
 
     if (err < 0) {
         printf("execlp fail!\n\n");
     }
+
+    printf("Done!\n\n");
+
 }
 #endif
 
@@ -92,12 +105,16 @@ int main(void)
     };
 
     printf("this is a execle function test demo!\n\n");
-
+    /*
+        与execl的差异是，execle()函数会通过最后一个参数（envp）指定新程序使用的环境变量。
+    */
     err = execle("/bin/ls", "ls", "-la", NULL, envp);
 
     if (err < 0) {
         printf("execle fail!\n\n");
     }
+
+    printf("Done!\n\n");
 }
 #endif
 
@@ -111,11 +128,16 @@ int main(void)
 
     printf("this is a execv function test demo!\n\n");
 
+    /*
+       与execl的差异是，直接使用数组来装载要传递给子程序的参数/   
+    */
     err = execv("/bin/ls", argv);
 
     if (err < 0) {
         printf("execv fail!\n\n");
     }
+
+    printf("Done!\n\n");
 }
 #endif
 
@@ -129,11 +151,16 @@ int main(void)
 
     printf("this is a execvp function test demo!\n\n");
 
+    /*
+       是execlp，execv函数的结合体
+    */
     err = execvp("ls", argv);
 
     if (err < 0) {
         printf("execvp fail!\n\n");
     }
+
+    printf("Done!\n\n");
 }
 #endif
 
@@ -150,10 +177,16 @@ int main(void)
 
     printf("this is a execve function test demo!\n\n");
 
+
+    /*
+       是execle，execv函数的结合体
+    */
     err = execve("/bin/ls", argv, envp);
 
     if (err < 0) {
         printf("execve fail!\n\n");
     }
+
+    printf("Done!\n\n");
 }
 #endif
