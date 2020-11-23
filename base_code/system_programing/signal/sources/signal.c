@@ -114,6 +114,17 @@
 
 
 
+//通过宏选择要测试 默认处理 还是使用SIGNAL函数捕获的示例
+#define     DEFAULT_HANDLER     1
+#define     SIGNAL_HANDLER      0
+
+#if ((DEFAULT_HANDLER | SIGNAL_HANDLER) == 0)
+#error "must choose a function to compile!"
+#endif
+
+#if (DEFAULT_HANDLER & SIGNAL_HANDLER)
+#error "have and can only choose one of the functions to compile"
+#endif
 
 // int main(void)
 // {
@@ -148,7 +159,7 @@
 /** 信号处理函数 */
 void signal_handler(int sig)
 {
-    printf("\nthis signal numble is %d \n",sig);
+    printf("\nthis signal number is %d \n",sig);
 
     if (sig == SIGINT) {
         printf("I have get SIGINT!\n\n");
@@ -161,10 +172,12 @@ void signal_handler(int sig)
 
 int main(void)
 {
-    printf("\nthis is an alarm test function\n\n");
+    printf("\nthis is an singal test function\n\n");
 
+#if SIGNAL_HANDLER
     /** 设置信号处理的回调函数 */
     signal(SIGINT, signal_handler);
+#endif
 
     while (1) {
         printf("waiting for the SIGINT signal , please enter \"ctrl + c\"...\n");

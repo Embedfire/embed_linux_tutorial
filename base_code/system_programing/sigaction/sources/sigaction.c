@@ -98,7 +98,7 @@
 /** 信号处理函数 */
 void signal_handler(int sig)
 {
-    printf("\nthis signal numble is %d \n",sig);
+    printf("\nthis signal number is %d \n",sig);
 
     if (sig == SIGINT) {
         printf("I have get SIGINT!\n\n");
