@@ -223,13 +223,13 @@
    :caption: 投稿精选
    :titlesonly:
 
-   submission/rst-testfile
-   submission/ubuntu16-rootfs
-   submission/debian9-rootfs
-   submission/野火IMX6UL开发板SDK使用说明
-   submission/buildroot2017-1
-   submission/buildroot2017-2
-   submission/buildroot2017-3
+..   submission/rst-testfile
+..   submission/ubuntu16-rootfs
+..   submission/debian9-rootfs
+..   submission/野火IMX6UL开发板SDK使用说明
+..   submission/buildroot2017-1
+..   submission/buildroot2017-2
+..   submission/buildroot2017-3
 
 
 .. .. toctree::
