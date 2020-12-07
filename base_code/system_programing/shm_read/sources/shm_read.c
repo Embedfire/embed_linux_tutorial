@@ -49,7 +49,7 @@ int main(void)
 
 	while(running)//读取共享内存中的数据
 	{
-		/** 等待心信号量 */
+		/** 等待信号量 */
 		if(sem_p(semid) == 0)
 		{
 			printf("You wrote: %s", shm);

@@ -353,5 +353,4 @@ semctl函数主要是对信号量集的一系列控制操作，根据操作命�
     # 父进程等待子进程释放信号量后才打印
     The returned value is 16085 in the father process(PID = 16084)
 
-运行的现象就是
 
