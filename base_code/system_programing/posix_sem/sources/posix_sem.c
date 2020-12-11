@@ -27,29 +27,29 @@
 #include <semaphore.h>
 
 #define THREAD_NUMBER 3 /* 线程数 */
-#define REPEAT_NUMBER 3 /* 每个线程中的小任务数 */
-#define DELAY_TIME_LEVELS 3.0 /*小任务之间的最大时间间隔*/
+#define REPEAT_NUMBER 4 /* 每个线程中的小任务数 */
 
 sem_t sem[THREAD_NUMBER];
 
+/*线程函数*/
 void *thread_func(void *arg)
 {
     int num = (unsigned long long)arg;
     int delay_time = 0;
     int count = 0;
 
-    /* 进行 P 操作 */
+    /* 等待信号量，进行 P 操作 */
     sem_wait(&sem[num]);
 
     printf("Thread %d is starting\n", num);
     for (count = 0; count < REPEAT_NUMBER; count++)
     {
-        delay_time = (int)(rand() * DELAY_TIME_LEVELS/(RAND_MAX)) + 1;
-        sleep(delay_time);
-        printf("\tThread %d: job %d delay = %d\n",num, count, delay_time);
+        printf("\tThread %d: job %d \n",num, count);
+        sleep(1);
     }
 
     printf("Thread %d finished\n", num);
+    /*退出线程*/
     pthread_exit(NULL);
 }
 
@@ -58,46 +58,48 @@ void *thread_func(void *arg)
 int main(void)
 {
     pthread_t thread[THREAD_NUMBER];
-    int no = 0, res;
+    int i = 0, res;
     void * thread_ret;
-    srand(time(NULL));
 
-    for (no = 0; no < THREAD_NUMBER; no++)
+    /*创建三个线程，三个信号量*/
+    for (i = 0; i < THREAD_NUMBER; i++)
     {
-        sem_init(&sem[no], 0, 0);
-        res = pthread_create(&thread[no], NULL, thread_func, (void*)(unsigned long long)no);
+        /*创建信号量，初始信号量值为0*/
+        sem_init(&sem[i], 0, 0);
+        /*创建线程*/
+        res = pthread_create(&thread[i], NULL, thread_func, (void*)(unsigned long long)i);
 
         if (res != 0)
         {
-            printf("Create thread %d failed\n", no);
+            printf("Create thread %d failed\n", i);
             exit(res);
         }
     }
 
     printf("Create treads success\n Waiting for threads to finish...\n");
 
-    /* 对最后创建的线程的信号量进行 V 操作 */
-    sem_post(&sem[THREAD_NUMBER - 1]);
-    for (no = THREAD_NUMBER - 1; no >= 0; no--)
+    /*按顺序释放信号量 V操作*/
+    for (i = 0; i<THREAD_NUMBER ; i++)
     {
-        res = pthread_join(thread[no], &thread_ret);
+        /* 进行 V 操作 */
+        sem_post(&sem[i]);
+        /*等待线程执行完毕*/
+        res = pthread_join(thread[i], &thread_ret);
         if (!res)
         {
-            printf("Thread %d joined\n", no);
+            printf("Thread %d joined\n", i);
         }
         else
         {
-            printf("Thread %d join failed\n", no);
+            printf("Thread %d join failed\n", i);
         }
 
-        /* 进行 V 操作 */
-        sem_post(&sem[(no + THREAD_NUMBER - 1) % THREAD_NUMBER]);
     }
 
-    for (no = 0; no < THREAD_NUMBER; no++)
+    for (i = 0; i < THREAD_NUMBER; i++)
     {
         /* 删除信号量 */
-        sem_destroy(&sem[no]);
+        sem_destroy(&sem[i]);
     }
 
     return 0;

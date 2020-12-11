@@ -437,7 +437,7 @@ pthread_attr_destroy()函数原型：
 
 要注意的是，本示例中需要在Makefile中添加lpthread链接库的内容：
 
-.. code-block:: c
+.. code-block:: Makefile
     :caption: 添加lpthread链接（base_code/system_programing/thread/sources/Makefile文件）
 
     LINK = -lpthread
