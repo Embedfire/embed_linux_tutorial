@@ -219,7 +219,7 @@ shmctl()获取或设置属性函数
 
 .. code-block:: c
     :caption: 共享内存写进程（base_code/system_programing/shm_write/sources/shm_write.c文件）
-    :emphasize-lines: 26,33,57,67
+    :emphasize-lines: 26,33,56,67
     :linenos:
 
     #include <sys/types.h>
@@ -301,7 +301,7 @@ shmctl()获取或设置属性函数
 
 -   第26行，调用shmget()创建或获取一个大小为4096的共享内存。
 -   第33行，调用shmat()函数映射共享内存到当前进程，地址保存到shm指针。
--   第57行，使用strncpy函数把用户输入得到的字符拷贝至共享内存shm中。
+-   第56行，使用strncpy函数把用户输入得到的字符拷贝至共享内存shm中。
 
 代码中写入到共享内存后，通过释放信号量操作告知其它进程有可获取的资源，这是常用的共享内存临界段保护方法。
 

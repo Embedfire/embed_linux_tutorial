@@ -18,8 +18,10 @@ int main(int argc, char **argv)
 
     if (pid < 0) {
         printf("error in the fork!\n");
-    } else if (pid == 0) {
-        
+    } 
+    /* 子进程 */
+    else if (pid == 0) {
+        /*创建/打开一个初始值为1的信号量*/
         sem = sem_open(sem_name, O_CREAT, 0644, 1);
 
         if (sem == SEM_FAILED) {
@@ -29,19 +31,24 @@ int main(int argc, char **argv)
 
             exit(-1);
         }
-
+        /*获取信号量*/
         sem_wait(sem);
 
         for (int i = 0; i < 3; ++i) {
 
-            printf("childe process run: %d\n", i);
+            printf("child process run: %d\n", i);
+            /*睡眠释放CPU占用*/
             sleep(1);
         }
 
+    /*释放信号量*/
     sem_post(sem);
 
-    } else {
+    }
+    /* 父进程 */
+    else {
 
+        /*创建/打开一个初始值为1的信号量*/
         sem = sem_open(sem_name, O_CREAT, 0644, 1);
         
         if (sem == SEM_FAILED) {
@@ -51,22 +58,26 @@ int main(int argc, char **argv)
 
             exit(-1);
         }
-
+        /*申请信号量*/
         sem_wait(sem);
 
         for (int i = 0; i < 3; ++i) {
 
             printf("parent process run: %d\n", i);
+            /*睡眠释放CPU占用*/
             sleep(1);
         }
 
+        /*释放信号量*/
         sem_post(sem);
-
+        /*等待子进程结束*/
         wait(NULL);
-    }
 
-    sem_close(sem);
-    sem_unlink(sem_name);
+        /*关闭信号量*/
+        sem_close(sem);
+        /*删除信号量*/
+        sem_unlink(sem_name);
+    }
 
     return 0;
 }
