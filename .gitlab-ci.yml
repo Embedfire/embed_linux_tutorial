@@ -1,12 +1,17 @@
 variables:
   #要上传的PDF仓库地址，注意格式，使用ssh地址
-  GIT_ADDRESS: 
+  GIT_ADDRESS: ssh://
   #gitlab 邮箱
   GIT_USEREMAIL: hjw0415@outlook.com
   #gitlab 用户名
   GIT_USERNAME: hejiawen
   #OSS地址
   OSS_URL: oss://ebf-doc/linux/imx6/
+  #NAS地址 数量不匹配需要删改PDF-files任务中的内容
+  NAS_URL1: /home
+  NAS_URL2: /home
+  NAS_URL3: /home
+
 
 stages: # 分段
   - html
