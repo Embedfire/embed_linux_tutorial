@@ -97,7 +97,7 @@ make_deb.sh脚本包含了编译输出路径、编译器以及使用的配置文
 
 4、单独替换自己编译的内核到开发板
 
-在开发板中新建一个update-fire-kernel.sh文件，填入一下代码。
+在开发板中新建一个update-fire-kernel.sh文件，填入以下代码。
 
 .. code-block:: sh
    :linenos:
@@ -126,11 +126,12 @@ make_deb.sh脚本包含了编译输出路径、编译器以及使用的配置文
 
 
 将之前操作编译好的 ``build_image`` 路径里的linux-image-4.19.71-imx-r1_1stable_armhf.deb与脚本update-fire-kernel.sh放在开发板里同一目录下，执行
-.. code-block:: sh
-   :emphasize-lines: 1
-   :linenos:
 
-   sudo ./update-fire-kernel.sh linux-image-4.19.71-imx-r1_1stable_armhf.deb
+.. code-block:: sh
+   :linenos:
+   
+   sudo ./update-fire-kernel.sh ./linux-image-4.19.71-imx-r1_1stable_armhf.deb
+
 
 完毕后执行sudo reboot重启。
 
@@ -401,7 +402,7 @@ Debian系统镜像存放下面目录中
 
 3、按照上面的编译步骤，重新编译内核，把编译得到的内核安装包(linux-image-4.19.71-imx-r1_1stable_armhf.deb)，
 复制粘贴到ebf-image-builder项目中的Kernel文件夹下，重新在ebf-image-builder项目中编译得到新的.img格式系统镜像。
-或者按照 ``4.3. 编译4.19.71版本内核``节内容说明使用脚本单独替换内核到开发板。
+ **或者按照 “4.3. 编译4.19.71版本内核” 节内容说明使用脚本单独替换内核到开发板** 。
 
 
 
