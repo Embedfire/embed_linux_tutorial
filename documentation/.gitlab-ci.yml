@@ -1,12 +1,12 @@
 variables:
   #要上传的PDF仓库地址，注意格式，使用ssh地址
-  GIT_ADDRESS: ssh://git@EmbedfireNAS:30001/learning/git/autoupdate-test.git
+  GIT_ADDRESS: 
   #gitlab 邮箱
   GIT_USEREMAIL: hjw0415@outlook.com
   #gitlab 用户名
   GIT_USERNAME: hejiawen
   #OSS地址
-  OSS_URL: oss://ebf-doc/motor/motor_test/
+  OSS_URL: oss://ebf-doc/linux/imx6/
 
 stages: # 分段
   - html
@@ -24,6 +24,8 @@ make-html:
     - ENABLE
   stage: html
   script:
+    #进入makefile所在的目录
+    - cd documentation/
     #删除以前的缓存文件
     - make clean
     #rst转html
@@ -34,14 +36,18 @@ html-output:
     - ENABLE
   stage: htmloutput
   script:
+    #进入makefile所在的目录
+    - cd documentation/
     #同步到doc.embedfire.com
     - ossutil64 cp -r _build/html/ $OSS_URL --update
 
 make-latex:
   tags:
-    - ENABLE
+    - DISABLE
   stage: latex
   script:
+    #进入makefile所在的目录
+    - cd documentation/
     #删除以前的缓存文件
     - make clean
     #rst转latex文件
@@ -49,9 +55,11 @@ make-latex:
 
 make-pdf:
   tags:
-    - ENABLE
+    - DISABLE
   stage: pdf
   script:
+    #进入makefile所在的目录
+    - cd documentation/
     #复制相关资源文件
     - cp -r latexfile/*  _build/latex/  
     #使用python脚本处理latex文件
@@ -63,7 +71,7 @@ make-pdf:
     
 pdf-output:
   tags:
-    - ENABLE
+    - DISABLE
   stage: pdfoutput
   before_script:
 
@@ -73,6 +81,8 @@ pdf-output:
     - git config --global user.name "$GIT_USERNAME"
 
   script:
+    #进入makefile所在的目录
+    - cd documentation/
     #修改文件名称
     - python3 latexbuild2.py 
     #移动文件到指定位置 

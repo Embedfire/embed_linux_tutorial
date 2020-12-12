@@ -2,9 +2,9 @@
 
 import datetime, os, sys
 
-name = "EBF-AD7192 24位ADC模块用户手册"
+name = "i.MX Linux开发实战指南"
 #输出PDF文档 名称格式 type = 1：手册  type = 0：教程
-type = 1
+type = 0
 
 time = datetime.datetime.now().year * 10000 + datetime.datetime.now().month * 100 + datetime.datetime.now().day
 
