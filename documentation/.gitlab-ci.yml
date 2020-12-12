@@ -1,0 +1,112 @@
+variables:
+  #要上传的PDF仓库地址，注意格式，使用ssh地址
+  GIT_ADDRESS: ssh://git@EmbedfireNAS:30001/learning/git/autoupdate-test.git
+  #gitlab 邮箱
+  GIT_USEREMAIL: hjw0415@outlook.com
+  #gitlab 用户名
+  GIT_USERNAME: hejiawen
+  #OSS地址
+  OSS_URL: oss://ebf-doc/motor/motor_test/
+
+stages: # 分段
+  - html
+  - htmloutput
+  - latex
+  - pdf
+  - pdfoutput
+
+cache: # 缓存
+  paths:
+    - _build
+
+make-html:
+  tags:
+    - ENABLE
+  stage: html
+  script:
+    #删除以前的缓存文件
+    - make clean
+    #rst转html
+    - make html
+
+html-output:
+  tags:
+    - ENABLE
+  stage: htmloutput
+  script:
+    #同步到doc.embedfire.com
+    - ossutil64 cp -r _build/html/ $OSS_URL --update
+
+make-latex:
+  tags:
+    - ENABLE
+  stage: latex
+  script:
+    #删除以前的缓存文件
+    - make clean
+    #rst转latex文件
+    - make latex
+
+make-pdf:
+  tags:
+    - ENABLE
+  stage: pdf
+  script:
+    #复制相关资源文件
+    - cp -r latexfile/*  _build/latex/  
+    #使用python脚本处理latex文件
+    - python3 latexbuild.py
+    #latex文件生成pdf
+    - cd _build/latex/ && latexmk -r latexmkrc -pdf -f -dvi- -ps-  -interaction=nonstopmode
+    #允许错误运行
+    #allow_failure: true
+    
+pdf-output:
+  tags:
+    - ENABLE
+  stage: pdfoutput
+  before_script:
+
+    #- '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+    - git config --global user.email "$GIT_USEREMAIL"
+    - git config --global user.name "$GIT_USERNAME"
+
+  script:
+    #修改文件名称
+    - python3 latexbuild2.py 
+    #移动文件到指定位置 
+    - cp _build/latex/*.pdf ./
+    #网盘同步，在不同的仓库中都需要修改
+    # #F103拂晓
+    # - find /home/flyleaf/ebf_nas/公司共享/百度云对外发布资料/STM32产品线/STM32电机系列/野火【F103开发板-拂晓】光盘资料/A盘（资料盘）/1-程序源码_教程文档/6-[野火]《电机应用开发实战指南—基于STM32》/ -name "*.pdf" -print0 | xargs -0 rm
+    # - cp _build/latex/*.pdf /home/flyleaf/ebf_nas/公司共享/百度云对外发布资料/STM32产品线/STM32电机系列/野火【F103开发板-拂晓】光盘资料/A盘（资料盘）/1-程序源码_教程文档/6-[野火]《电机应用开发实战指南—基于STM32》/
+    # #F407骄阳
+    # - find /home/flyleaf/ebf_nas/公司共享/百度云对外发布资料/STM32产品线/STM32电机系列/野火【F407开发板-骄阳】光盘资料/A盘（资料盘）/1-程序源码_教程文档/8-[野火]《电机应用开发实战指南—基于STM32》/ -name "*.pdf" -print0 | xargs -0 rm
+    # - cp _build/latex/*.pdf /home/flyleaf/ebf_nas/公司共享/百度云对外发布资料/STM32产品线/STM32电机系列/野火【F407开发板-骄阳】光盘资料/A盘（资料盘）/1-程序源码_教程文档/8-[野火]《电机应用开发实战指南—基于STM32》//
+    # #H743繁星
+    # - find /home/flyleaf/ebf_nas/公司共享/百度云对外发布资料/STM32产品线/STM32电机系列/野火【H743开发板-繁星】光盘资料/A盘（资料盘）/1-程序源码_教程文档/8-[野火]《电机应用开发实战指南—基于STM32》/ -name "*.pdf" -print0 | xargs -0 rm
+    # - cp _build/latex/*.pdf /home/flyleaf/ebf_nas/公司共享/百度云对外发布资料/STM32产品线/STM32电机系列/野火【H743开发板-繁星】光盘资料/A盘（资料盘）/1-程序源码_教程文档/8-[野火]《电机应用开发实战指南—基于STM32》/
+    #上传到gitlab PDF文档仓库
+    #克隆仓库
+    - git clone $GIT_ADDRESS /docs/workdir
+    #修改复制pdf文件到拉取的git仓库
+    - cd _build/latex/ && rename 's/\.pdf/.pdf_bak/' *.pdf 
+    - cp ./*.pdf_bak /docs/workdir/
+    - cd /docs/workdir/
+    #从git删除原来的pdf文件，并将新文件添加
+    - git rm *.pdf
+    - rename   's/\.pdf_bak/.pdf/'  *.pdf_bak 
+    - git add *.pdf 
+    #提交推送
+    - git commit -m "gitlab-ci自动提交"
+    - git push
+
+  artifacts:
+    name: 'PDFfile' #下载压缩包文件名
+    paths: #文件路径
+      - ./*.pdf
+    expire_in: 1 day #保存时间
+    when: on_success #仅在job成功后上传
+
+
