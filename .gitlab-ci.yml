@@ -22,7 +22,7 @@ stages: # 分段
 
 cache: # 缓存
   paths:
-    - _build
+    - documentation/_build
 
 make-html:
   tags:
