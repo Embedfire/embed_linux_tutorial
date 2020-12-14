@@ -57,12 +57,14 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+/*要执行的线程*/
 void *test_thread(void *arg)
 {
     int num = (unsigned long long)arg; /** sizeof(void*) == 8 and sizeof(int) == 4 (64 bits) */
 
-    printf("arg is %d\n", num);
-
+    printf("This is test thread, arg is %d\n", num);
+    sleep(5);
+    /*退出线程*/
     pthread_exit(NULL);
 }
 
@@ -76,6 +78,7 @@ int main(void)
 
     printf("start create thread\n");
 
+    /*创建线程，线程为test_thread函数*/
     res = pthread_create(&thread, NULL, test_thread, (void*)(unsigned long long)(arg));
     if(res != 0)
     {
@@ -86,7 +89,7 @@ int main(void)
     printf("create treads success\n");
     printf("waiting for threads to finish...\n");
 
-
+    /*等待线程终止*/
     res = pthread_join(thread, &thread_return);
     if(res != 0)
     {
