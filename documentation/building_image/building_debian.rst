@@ -38,7 +38,7 @@
    :emphasize-lines: 1
    :linenos:
 
-   sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop
+   sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop libncurses5-dev
 
 
 3、在项目文件夹目录下使用root权限执行编译脚本compile_uboot.sh
@@ -97,7 +97,6 @@ make_deb.sh脚本包含了编译输出路径、编译器以及使用的配置文
 
 4、单独替换自己编译的内核到开发板
 
-先执行一下 ``sudo apt install ebf-modules`` ，
 在开发板中新建一个update-fire-kernel.sh文件，填入以下代码。
 
 .. code-block:: sh
