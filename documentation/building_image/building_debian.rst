@@ -97,6 +97,7 @@ make_deb.sh脚本包含了编译输出路径、编译器以及使用的配置文
 
 4、单独替换自己编译的内核到开发板
 
+先执行一下 ``sudo apt install ebf-modules`` ，
 在开发板中新建一个update-fire-kernel.sh文件，填入以下代码。
 
 .. code-block:: sh
@@ -130,9 +131,11 @@ make_deb.sh脚本包含了编译输出路径、编译器以及使用的配置文
 .. code-block:: sh
    :linenos:
    
+   #如果提示command not found，执行sudo chmod 777 ./update-fire-kernel.sh
+
    sudo ./update-fire-kernel.sh ./linux-image-4.19.71-imx-r1_1stable_armhf.deb
 
-
+   
 完毕后执行sudo reboot重启。
 
 
