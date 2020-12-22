@@ -39,7 +39,8 @@ static struct device xdev = {
 	.release = xdev_release,
 };
 
-/注销atic __init int xdev_init(void)
+//设备结构体以及属性文件结构体注册
+static __init int xdev_init(void)
 {
 	printk("xdev init\n");
 	device_register(&xdev);
