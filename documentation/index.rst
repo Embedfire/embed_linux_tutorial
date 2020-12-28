@@ -50,6 +50,7 @@
    install_image/install_debian_to_sd
    linux_basis/fire-config_brief
    linux_basis/ec20_4g_module
+   linux_basis/audio_video
 
 .. toctree::
    :maxdepth: 1
