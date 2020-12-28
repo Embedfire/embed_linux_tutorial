@@ -12,7 +12,7 @@
 
 uint8_t button_status = 0;  // 按键状态
 static volatile unsigned char s_frameDone = false;  // elcdf 帧传输状态
-extern uint32_t s_frameBuffer[2][APP_IMG_HEIGHT][APP_IMG_WIDTH];  // elcdf 显存
+
 
 /*提示字符串*/
 uint8_t txbuff[] = "Uart polling example\r\nBoard will send back received characters\r\n";

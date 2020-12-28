@@ -35,6 +35,14 @@ int main()
     while (1)
     {
         UART_ReadBlocking(UART1, &ch, 1);
+        if (ch == '\r') /*添加回车换行\n\r*/
+        {
+        UART_WriteBlocking(UART1, '\n', 1);
+        }
+        if (ch == '\n')
+        {
+        UART_WriteBlocking(UART1, '\r', 1);
+        }
         UART_WriteBlocking(UART1, &ch, 1);
     }
 

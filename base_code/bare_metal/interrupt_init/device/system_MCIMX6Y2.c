@@ -60,8 +60,8 @@ void SystemInit(void)
 
   /* Set vector base address */
   GIC_Init();
-  __set_VBAR((uint32_t)__VECTOR_TABLE);
 
+  __set_VBAR((uint32_t)__VECTOR_TABLE);
   // rgb_led_init();
   // blue_led_on;
  #if ((__FPU_PRESENT == 1) && (__FPU_USED == 1))

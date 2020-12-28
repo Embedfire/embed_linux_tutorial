@@ -2,14 +2,10 @@
 #include "MCIMX6Y2.h"
 #include "system_MCIMX6Y2.h"
 
-/* 外部 XTAL (OSC) 时钟频率 */
-uint32_t g_xtalFreq = 24000000;
-/*外部 RTC XTAL 时钟频率 */
-uint32_t g_rtcXtalFreq = 32768;
 
 void system_clock_init(void)
 {
-    /******************* PLL 输出时钟设置************************/
+    /******************* 第一层时钟设置--晶振时钟***********************/
     if ((CCM->CCSR & (0x01 << 2)) == 0) //CPU 使用的是 ARM PLL
     {
         /*将CPU时钟切换到XTAL (OSC) 时钟*/                   
@@ -21,7 +17,7 @@ void system_clock_init(void)
     CCM_ANALOG->PLL_ARM |= (0x42 << 0);
 
 
-
+    /******************* 第二层时钟设置--PLL根时钟***********************/
     /*将CPU 时钟重新切换到 ARM PLL*/
     CCM->CCSR &= ~(0x01 << 2);
 
@@ -57,7 +53,7 @@ void system_clock_init(void)
     CCM_ANALOG->PLL_USB2 =  (0x00);           //关闭PLL7
 
  
-    /******************PFD 输出时钟设置*******************/
+    /******************第三层时钟设置--PFD*******************/
     /*禁用PLL2 的所有PFD输出*/
     CCM_ANALOG->PFD_528 |=(0x80U) ;      //关闭PLL2 PFD0
     CCM_ANALOG->PFD_528 |=(0x8000U) ;    //关闭PLL2 PFD1
@@ -106,7 +102,7 @@ void system_clock_init(void)
     CCM_ANALOG->PFD_480 &= ~(0x80000000U); //开启PLL3 PFD3
   
 
-    /******************常用外设根时钟设置****************/
+    /******************第四层时钟设置--外设****************/
     CCM->CSCDR1 &= ~(0x01 << 6); //设置UART选择 PLL3 / 6 = 80MHz
     CCM->CSCDR1 &= ~(0x3F);     //清零
     CCM->CSCDR1 |= ~(0x01 << 0); //设置串口根时钟分频值为1，UART根时钟频率为：80M / (dev + 1) = 40MHz
