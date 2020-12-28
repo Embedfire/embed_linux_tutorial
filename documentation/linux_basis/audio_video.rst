@@ -99,7 +99,7 @@ DSP，SAI 主要特性如下：
 ~~~~~~~
 
 1.使能音频设备树插件
-^^^^^^^^^^^^^^^^^^^^
+
 执行sudo fire-config命令，选中device选项，如下图：
 
 .. image:: ./media/fire-config-device.png
@@ -115,7 +115,7 @@ DSP，SAI 主要特性如下：
 选择"enable"后，重启开发板。
 
 2.重启后，使用lsmod命令确认音频驱动模块加载成功，如下图:
-^^^^^^^^^^^^^^^^^^^^
+
 .. image:: ./media/audio_driver.png
    :align: center
    :alt: 1
@@ -126,7 +126,7 @@ DSP，SAI 主要特性如下：
 这其实是由于音频驱动没有编译进内核引起的。在检查声卡设备的时候，音频驱动模块尚没加载进内核。
 
 3.查看/dev/snd目录
-^^^^^^^^^^^^^^^^^^^^
+
 
 .. image:: ./media/audio_dev.png
    :align: center
