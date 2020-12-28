@@ -262,8 +262,8 @@ fire-config刷机
 ssh断开连接而不能及时看到相关的刷机信息提示**。
 
 
-fire-config刷机操作是当开发板从制作好的SD卡镜像启动后，可以这样方式将镜像重新刷至eMMC或者nandflash，
-因为开发板出厂在eMMC或者nandflash本身已经有镜像可运行，所以此步骤可以先跳过或者按自己需求做。
+fire-config刷机操作是指当开发板从制作好的SD卡镜像启动后，可以这样方式将镜像重新刷至eMMC或者nandflash，
+因为开发板出厂在eMMC或者nandflash本身已经有镜像可运行，所以当制作好一份SD卡此步骤可以先跳过或者按自己需求做。
 
 
 
@@ -446,21 +446,23 @@ wifi连接步骤
 wifi常用操作命令
 ^^^^^^^^^^^^^
 
--  sudo ifconfig wlan0 down                关闭wifi使用
+.. code:: bash
 
--  sudo ifconfig wlan0 up                  启动wifi使用
+    sudo ifconfig wlan0 down                关闭wifi使用
 
--  wpa_cli -i wlan0 status                 查看当前连接状态
+    sudo ifconfig wlan0 up                  启动wifi使用
 
--  wpa_cli -i wlan0 list_networks          列出输入过的网络
+    wpa_cli -i wlan0 status                 查看当前连接状态
 
--  wpa_cli -i wlan0 disconnect      AAAA   断开当前连接AAAA名wifi(CURRENT)
+    wpa_cli -i wlan0 list_networks          列出输入过的网络
 
--  wpa_cli -i wlan0 resconnect      AAAA   重新连接AAAA或其他
+    wpa_cli -i wlan0 disconnect      AP1   断开当前连接AP1名wifi(CURRENT)
 
--  wpa_cli -i wlan0 select_network  BBBB   切换连接list_networks里面的BBBB wifi
+    wpa_cli -i wlan0 resconnect      AP1   重新连接AP1或其他
 
--  wpa_cli -i wlan0 remove_network  AAAA   删除不用的AAAA（删除前断开）
+    wpa_cli -i wlan0 select_network  AP2   切换连接list_networks里面的AP2 wifi
+
+    wpa_cli -i wlan0 remove_network  AP1   删除不用的AP2（删除前断开）
 
 
 

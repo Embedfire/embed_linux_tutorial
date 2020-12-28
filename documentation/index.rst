@@ -72,45 +72,6 @@
    linux_app/i2c_bus
    linux_app/spi_bus
 
-.. toctree::
-   :maxdepth: 1
-   :caption: 制作系统镜像
-   :numbered:
-
-
-   building_image/image_composition
-   building_image/building_NXP_firmware
-   building_image/burning_NXP_firmware
-   building_image/building_debian
-   building_image/debian_starting_procedure
-   building_image/using_systemd
-   building_image/image_backup
-   building_image/image_modify
-
-
-   #building_image/building_kernel
-   #building_image/building_uboot
-   #building_image/building_rootfs
-   #building_image/using_buildroot
-   #building_image/using_yocto
-   #building_image/building_debian
-
-.. toctree::
-   :maxdepth: 1
-   :caption: 环境搭建
-   :numbered:
-
-   linux_env/qt_cross_compiling
-   linux_env/python37_env
-   linux_env/pyqt5_env
-   linux_env/python_ssd1306
-   linux_env/python_gpio
-   linux_env/python_serial
-   linux_env/using_sqlite
-   linux_env/using_qtsqlite
-   linux_env/using_php
-   linux_env/java_env
-   linux_env/opencv
 
 .. toctree::
    :maxdepth: 1
@@ -118,8 +79,8 @@
    :numbered:
 
    system_programing/process
-   system_programing/pipe
    system_programing/signal
+   system_programing/pipe
    system_programing/msg_queuq
    system_programing/systemV_sem
    system_programing/shm
@@ -129,33 +90,6 @@
    system_programing/tcp_ip
    system_programing/socket
    system_programing/socket_io
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Linuxn内核调试
-   :numbered:
-
-   linux_debug/gdb_use
-   linux_debug/core_dump
-   linux_debug/backtrace
-   linux_debug/strace
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Linux物联网编程
-   :numbered:
-
-   linux_iot/linux_http
-   linux_iot/linux_http_client
-   linux_iot/linux_http_server
-   linux_iot/canopen
-   linux_iot/modbus
-   linux_iot/ATGM332D
-   linux_iot/bluetooth
-   linux_iot/mqtt
-   linux_iot/mqtt-client
-   linux_iot/mqtt-baidu
-   linux_iot/mqtt-onenet
 
 
 .. toctree::
@@ -177,6 +111,7 @@
    bare_metal/uart
    bare_metal/ddr
    bare_metal/elcdif
+
 
 .. toctree::
    :maxdepth: 1
@@ -208,8 +143,74 @@
    linux_driver/add_lcd_device_tree.rst
    linux_driver/touch_screen.rst
 
-   
 
+.. toctree::
+   :maxdepth: 1
+   :caption: 制作系统镜像
+   :numbered:
+
+
+   building_image/image_composition
+   building_image/building_NXP_firmware
+   building_image/burning_NXP_firmware
+   building_image/building_debian
+   building_image/debian_starting_procedure
+   building_image/using_systemd
+   building_image/image_backup
+   building_image/image_modify
+
+
+   #building_image/building_kernel
+   #building_image/building_uboot
+   #building_image/building_rootfs
+   #building_image/using_buildroot
+   #building_image/using_yocto
+   #building_image/building_debian
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: 环境搭建
+   :numbered:
+
+   linux_env/qt_cross_compiling
+   linux_env/python37_env
+   linux_env/pyqt5_env
+   linux_env/python_ssd1306
+   linux_env/python_gpio
+   linux_env/python_serial
+   linux_env/using_sqlite
+   linux_env/using_qtsqlite
+   linux_env/using_php
+   linux_env/java_env
+   linux_env/opencv
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Linuxn内核调试
+   :numbered:
+
+   linux_debug/gdb_use
+   linux_debug/core_dump
+   linux_debug/backtrace
+   linux_debug/strace
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Linux物联网编程
+   :numbered:
+
+   linux_iot/linux_http
+   linux_iot/linux_http_client
+   linux_iot/linux_http_server
+   linux_iot/canopen
+   linux_iot/modbus
+   linux_iot/ATGM332D
+   linux_iot/bluetooth
+   linux_iot/mqtt
+   linux_iot/mqtt-client
+   linux_iot/mqtt-baidu
+   linux_iot/mqtt-onenet
 
 
 .. toctree::
@@ -224,13 +225,13 @@
    :caption: 投稿精选
    :titlesonly:
 
-   submission/rst-testfile
-   submission/ubuntu16-rootfs
-   submission/debian9-rootfs
-   submission/野火IMX6UL开发板SDK使用说明
-   submission/buildroot2017-1
-   submission/buildroot2017-2
-   submission/buildroot2017-3
+..   submission/rst-testfile
+..   submission/ubuntu16-rootfs
+..   submission/debian9-rootfs
+..   submission/野火IMX6UL开发板SDK使用说明
+..   submission/buildroot2017-1
+..   submission/buildroot2017-2
+..   submission/buildroot2017-3
 
 
 .. .. toctree::

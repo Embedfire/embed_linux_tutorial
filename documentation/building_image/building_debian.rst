@@ -38,7 +38,7 @@
    :emphasize-lines: 1
    :linenos:
 
-   sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop
+   sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop libncurses5-dev
 
 
 3、在项目文件夹目录下使用root权限执行编译脚本compile_uboot.sh
@@ -93,6 +93,53 @@ make_deb.sh脚本包含了编译输出路径、编译器以及使用的配置文
 
    make menuconfig   KCONFIG_CONFIG=arch/arm/configs/npi_v7_defconfig   ARCH=arm   CROSS_COMPILE=arm-linux-gnueabihf-
    #配置完成后选择save保存，再运行./make_deb.sh脚本即可以新的配置编译内核。
+
+
+4、单独替换自己编译的内核到开发板
+
+在开发板中新建一个update-fire-kernel.sh文件，填入以下代码。
+
+.. code-block:: sh
+   :linenos:
+
+   #!/bin/sh -e
+
+   _do () {
+            $@ || ( cp -rf /tmp/boot /; echo "kernel update failed: $@"; exit -1; )
+   }
+
+   if [ ! -f /boot/vmlinuz* ]; then
+	   echo "error:fire kernel no exit!"
+   else
+	   cp -rf /boot /tmp	
+
+      _do dpkg -r linux-image-$(uname -r)
+	
+	   _do dpkg -i $1
+
+	   if [ -f /boot/vmlinuz* ]; then
+		   rm -rf /tmp/boot
+	   else
+		   cp -rf /tmp/boot /
+	   fi
+   fi
+
+
+将之前操作编译好的 ``build_image`` 路径里的linux-image-4.19.71-imx-r1_1stable_armhf.deb与脚本update-fire-kernel.sh放在开发板里同一目录下，执行
+
+.. code-block:: sh
+   :linenos:
+   
+   #如果提示command not found，执行sudo chmod 777 ./update-fire-kernel.sh
+
+   sudo ./update-fire-kernel.sh ./linux-image-4.19.71-imx-r1_1stable_armhf.deb
+
+   
+完毕后执行sudo reboot重启。
+
+
+
+
 
 制作Debian系统镜像
 =============================
@@ -357,19 +404,23 @@ Debian系统镜像存放下面目录中
 
 3、按照上面的编译步骤，重新编译内核，把编译得到的内核安装包(linux-image-4.19.71-imx-r1_1stable_armhf.deb)，
 复制粘贴到ebf-image-builder项目中的Kernel文件夹下，重新在ebf-image-builder项目中编译得到新的.img格式系统镜像。
+ **或者按照 “4.3. 编译4.19.71版本内核” 节内容说明使用脚本单独替换内核到开发板** 。
 
-修改启动脚本
+
+
+修改启动脚本和开机背景图
 """"""""
 
-把新的.img格式系统镜像烧录到sd卡中，启动开发板。此时会出现一个现象，logo一闪而过，这是因为内核启动后，
-会执行文件系统的启动脚本，而此时文件系统的启动脚本中 ``/opt/scripts/boot/psplash.sh``\
-会去执行相应的应用程序 ``/usr/bin/psplash`` ，这就是绘制开机的进度条与背景。那么你的开机logo将被刷掉，
-而只要不让这个启动脚本运行这个 ``/usr/bin/psplash`` 应用程序就可以解决问题了，
-那么我们在开发板中使用vi编辑器修改脚本 ``/opt/scripts/boot/psplash.sh`` 。
+启动开发板，内核启动后会执行文件系统的启动脚本，而此时文件系统的启动脚本中 ``/opt/scripts/boot/psplash.sh``\
+会去执行相应的应用程序 ``/usr/bin/psplash`` ，这就是绘制开机的进度条与背景。
+
 
 如下图:
 
-.. figure:: media/stop_psplash.png
-   :alt: 停止进度条
+.. figure:: media/psplash_bmp.png
+   :alt: 开机背景图
 
-将其最后一行屏蔽掉，然后重启开发板，就可以看见你的logo了并且没有了进度条程序。
+
+
+psplash程序使用了/lib/firmware路径里的logo.bmp，可以将自己的图片用windows系统自带画图软件另存为24位bmp放/lib/firmware里面替换。
+

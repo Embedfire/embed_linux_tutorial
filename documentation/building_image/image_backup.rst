@@ -104,38 +104,11 @@
 
 下面介绍两种将刚刚备份的.img镜像烧到空的SD卡的方法(仅想获得.img文件的用户请忽略)：
 
-第一种方法：
 
-将带镜像的SD卡取出，注意我们有两张SD卡，不要混淆了，一张是我们搭建好环境的SD卡，一张是用于备份的空的SD卡。
-
-接着把格式化好的空的SD卡再插入读卡器，接入ubuntu中，再输入df -h命令查看一下是否正确识别到了该SD卡，以及查看该SD卡挂在哪个设备下。
-
-.. image:: media/image_backup007.png
-   :align: center
-   :alt: 未找到图片00|
-
-接着我们再使用dd命令将备份在ubuntu中的imx6ull_bakcup.img镜像拷贝到空的SD卡中。(若备份的镜像仍无法正常运行，请将bs=1024k改为bs=1M并去掉conv参数)
-
-.. code:: bash
-
-   sudo dd if=./imx6ull_backup.img of=/dev/sdc count=1100 bs=1024k conv=sync
-
-.. image:: media/image_backup008.png
-   :align: center
-   :alt: 未找到图片00|
-
-注意if和of所指定的文件和上面dd命令指定的文件的是相反的，大家拷贝前一定要检查清楚，不能随意使用dd命令，关于dd命令的详细介绍，大家可以参考网速的相关帖子。
-
-第二种方法：
-
-为了减少大家对dd命令的错误使用率，我这里介绍第二种方法，
-将前面从带镜像的SD卡中备份出的imx6ull_bakcup.img镜像拷贝到windows中，大家可以使用FileZila软件进行拷贝，或者通过共享文件夹的形式，总之
-就是要将ubuntu中的imx6ull_bakcup.img搬到windows中去。我这里使用FileZila软件将imx6ull_bakcup.img拷贝到windows的桌面上，接着打开Etcher软件，
-选择刚刚的镜像,具体烧录步骤请参考 `烧录Debian镜像至SD卡`_。
+得到img文件后，就可以使用这个img文件烧录到其它卡上了，具体烧录步骤请参考前面的说明 `烧录Debian镜像至SD卡`_。
 
 .. _烧录Debian镜像至SD卡: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/install_image/install_debian_to_sd.html
 
-这两种方法大家根据自己的喜好选择！
 
 
 产品量产，且需将制作好的SD卡镜像备份到emmc或nand中

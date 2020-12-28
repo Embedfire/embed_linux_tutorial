@@ -1,10 +1,3 @@
-/*
- * @Author: jiejie
- * @Github: https://github.com/jiejieTop
- * @Date: 2020-02-10 16:51:42
- * @LastEditTime: 2020-02-10 16:57:21
- * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
- */
 /** msg.c */
 
 #include <sys/types.h>
@@ -52,11 +45,15 @@ int main()
 
     } while(strncmp(msg.msg_text, "quit", 4));
 
-    /*从系统内核中移走消息队列 */
+    /*从系统内核中删除消息队列 */
     if ((msgctl(qid, IPC_RMID, NULL)) < 0)
     {
         perror("msgctl");
         exit(1);
+    }
+    else
+    {
+        printf("Delete msg qid: %d.\n", qid);
     }
 
     exit(0);

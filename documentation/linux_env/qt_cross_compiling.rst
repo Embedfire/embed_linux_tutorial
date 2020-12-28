@@ -1082,12 +1082,42 @@ Full Feature QT_App版本
 
    install_qt_creator025
 
-编译野火提供的Debian Qt Demo
+编译野火提供的 Qt Demo
 ----------------------------
 
-因为本次实验是使用Qt
-5.11.3去编译demo，demo略微有改动，demo存放在ebf_linux_qt_demo代码仓库的debian_buster分支，我们可以从github或者gitee上拉取对应的仓库到本地，然后使用Qt
-Creator去编译：
+野火提供的Qt Demo已经开源，仓库地址在
+https://github.com/Embedfire/ebf_linux_qt_demo和https://gitee.com/Embedfire/ebf_linux_qt_demo。
+
+仓库主要包含两个分支，master和debian_buster。其中master是在Windows下可以直接编译的，
+debian_buster主要用在Ubuntu和开发板。
+
+编译Windows版本
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Windos下Qt的环境配置很简单，我们就不过多讲解。
+
+直接下载源码构建即可。源码下载地址如下，-b master 表示主分支，当然也可以省略。
+
+**github**
+
+.. code:: bash
+
+    git clone -b master https://github.com/Embedfire/ebf_linux_qt_demo/
+
+**gitee**
+
+.. code:: bash
+
+    git clone -b master https://gitee.com/Embedfire/ebf_linux_qt_demo/
+
+接着用Qt打开工程编译即可。
+
+编译开发板版本
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+编译环境使用Qt5.11.3，也就是我们前面搭建的交叉编译环境。
+
+首先从github或者gitee上拉取对应的仓库到本地，-b debian_buster 表示获取debian_buster分支代码。
 
 从github拉取：
 
@@ -1210,11 +1240,11 @@ Creator中。
 
    install_qt_creator034
 
-在PC上运行野火提供的Debian Qt Demo
+编译Ubuntu版本
 ----------------------------------
 
-有同学又想在PC上运行野火提供的Debian Qt
-Demo，其实非常简单，我们只需要选择不同的构建套件即可，比如我们将QtUi、Skin、FireApp等工程的构建套件选择为 ``Desktop Qt 5.11.3 GCC 64bit`` 即可，这个构建套件是我们在安装的时候自动选择的，具体见：
+有同学又想在Ubuntu上运行野火提供的Debian QtDemo，其实非常简单，我们只需要选择不同的构建套件即可，
+比如我们将QtUi、Skin、FireApp等工程的构建套件选择为 ``Desktop Qt 5.11.3 GCC 64bit`` 即可，这个构建套件是我们在安装的时候自动选择的，具体见：
 
 .. figure:: media/install_qt_creator035.png
    :alt: install_qt_creator035
@@ -1273,11 +1303,78 @@ FireApp工程构建后运行：
 
    install_qt_creator042
 
+使用命令行编译野火提供的 Qt Demo
+----------------------------------
+
+导出Qt交叉编译的环境变量
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+    export PATH=/opt/qt-everywhere-src-5.11.3/bin:$PATH
+
+输入命令验证Qt版本
+~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+    qmake -v 
+
+若环境变量设置正确，则会出现以下信息
+
+.. code:: bash
+
+    QMake version 3.1
+    Using Qt version 5.11.3 in /opt/qt-everywhere-src-5.11.3/lib
+
+    以上是验证SDK安装是否成功！！
+
+下载qt源码
+~~~~~~~~~~
+
+**github**
+
+.. code:: bash
+
+    git clone -b master https://github.com/Embedfire/ebf_linux_qt_demo/
+
+**gitee**
+
+.. code:: bash
+
+    git clone -b master https://gitee.com/Embedfire/ebf_linux_qt_demo/
+
+编译
+~~~~
+
+.. code:: bash
+
+    ./build.sh
+
+如果 ``build.sh`` 不是可执行文件，可以使用以下命令添加可执行权限
+
+.. code:: bash
+
+    chmod +x build.sh
+
+输出
+~~~~
+
+在当前目录下会创建一个 ``run_dir`` 目录，存在 ``App  libqui  libskin`` 文件，App是可以直接在开发板上运行的！
+与此同时，还会打包一个 ``fire-app-xxxx.tar.bz2`` 文件，大家可以拷贝到对应的目录下解压替换掉旧的 ``App`` 。
+
+清除相关内容
+~~~~~~~~~~~~
+
+.. code:: bash
+
+    make distclean
+
 
 开发板运行qml程序
 -----------------------------
-   QML是Qt推出的Qt Quick技术的一部分，是一种新增的简便易学的语言。
-   QML是一种陈述性语言，用来描述一个程序的用户界面
+
+QML是Qt推出的Qt Quick技术的一部分，是一种新增的简便易学的语言。QML是一种陈述性语言，用来描述一个程序的用户界面
 
    
 移植使用qml qchart的程序
@@ -1375,74 +1472,4 @@ https://packages.debian.org/buster/libs/
    :alt: qml_chart011.jpg
 
    qml_chart011.jpg
-
-
-
-
-使用命令行编译
---------------
-
-导出Qt交叉编译的环境变量
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code:: bash
-
-    export PATH=/opt/qt-everywhere-src-5.11.3/bin:$PATH
-
-输入命令验证Qt版本
-~~~~~~~~~~~~~~~~~~
-
-.. code:: bash
-
-    qmake -v 
-
-若环境变量设置正确，则会出现以下信息
-
-.. code:: bash
-
-    QMake version 3.1
-    Using Qt version 5.11.3 in /opt/qt-everywhere-src-5.11.3/lib
-
-    以上是验证SDK安装是否成功！！
-
-下载qt源码
-~~~~~~~~~~
-
-**github**
-
-.. code:: bash
-
-    git clone -b master https://github.com/Embedfire/ebf_linux_qt_demo/
-
-**gitee**
-
-.. code:: bash
-
-    git clone -b master https://gitee.com/Embedfire/ebf_linux_qt_demo/
-
-编译
-~~~~
-
-.. code:: bash
-
-    ./build.sh
-
-如果 ``build.sh`` 不是可执行文件，可以使用以下命令添加可执行权限
-
-.. code:: bash
-
-    chmod +x build.sh
-
-输出
-~~~~
-
-在当前目录下会创建一个 ``run_dir`` 目录，存在 ``App  libqui  libskin`` 文件，App是可以直接在开发板上运行的！
-与此同时，还会打包一个 ``fire-app-xxxx.tar.bz2`` 文件，大家可以拷贝到对应的目录下解压替换掉旧的 ``App`` 。
-
-清除相关内容
-~~~~~~~~~~~~
-
-.. code:: bash
-
-    make distclean
 

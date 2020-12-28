@@ -99,7 +99,7 @@ ARM-GCC和开发板的HelloWorld
 
          #安装完成后使用如下命令查看版本
 
-         arm-linux-gnueabihf-gcc –v
+         arm-linux-gnueabihf-gcc -v  或 arm-linux-gnueabihf-gcc --version 
 
 可以看到下图的内容，它表明交叉编译工具链安装成功了，输出信息表明了它是7.4.0版本的编译器，其中的 “Target:arm-linux-gnueabihf”也表明了它的目标架构。
 
@@ -281,7 +281,7 @@ i.MX6ULL带有fpu，对于soft-float和hard-float模式都支持，不过本开�
 
          #安装完成后使用如下命令查看版本
 
-         arm-linux-gnueabi-gcc -v
+         arm-linux-gnueabi-gcc -v  或  arm-linux-gnueabi-gcc --version
 
 .. image:: media/armgcc008.png
    :align: center

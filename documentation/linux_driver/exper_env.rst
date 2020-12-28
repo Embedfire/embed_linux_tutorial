@@ -153,7 +153,9 @@ gitee:
    :align: center
    :alt: 实验环境
 
-**注意：**  该目录下的Makefile中指定的目录 "KERNEL_DIR=../ebf-buster-linux/build_image/build"要与前面编译的内核所在目录一致。
+**注意：  该目录下的Makefile中 "KERNEL_DIR=../ebf-buster-linux/build_image/build"为引用之前编译内核脚本make_deb.sh中指定的编译目录，
+因为内核仓库有提交更新过，make_deb.sh指定编译目录与视频中有差异，以实际脚本内容为准，同理之后编译设备树、设备树插件Makefile的KERNEL_DIR也要注意**
+
 
 切换到module/hellomodule目录下，直接执行make命令，即可编译程序。
 
@@ -185,6 +187,7 @@ gitee:
 - **第8行：** all只是个标号，可以自己定义，是make的默认执行目标。
 - **第9行：** $(MAKE):MAKE是Makefile中的宏变量，要引用宏变量要使用符号。这里实际上就是指向make程序，所以这里也可以把$(MAKE)换成make.-C:是make命令的一个选项，-C作用是changedirectory. -C dir 就是转到dir目录。M=$(CURDIR)：返回当前目录。这句话的意思是：当make执行默认的目标all时，-C(KVDIR)指明跳转到内核源码目录下去执行那里的Makefile,-C $(KERNEL_DIR)指明跳转到内核源码目录下去执行那里的Makefile,M=(CURDIR)表示又返回到当前目录来执行当前的Makefile.
 - **第11行：** clean 就是删除后面这些由make生成的文件。
+
 
 
 查看module/hellomodule/文件夹，新增hellomodule.ko，这就是我们自己编写、编译的内核驱动模块。

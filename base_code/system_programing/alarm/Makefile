@@ -1,6 +1,6 @@
 
 #生成可执行文件的名称
-Target = system_demo
+Target = alarm_demo
 ARCH ?= x86
 #编译器CC
 #根据传入的参数ARCH，确定使用的编译器

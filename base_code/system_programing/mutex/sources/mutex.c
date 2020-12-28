@@ -40,11 +40,10 @@
 #include <pthread.h>
 
 #define THREAD_NUMBER 3 /* 线程数 */
-#define sleep_TIME_LEVELS 4.0 /*小任务之间的最大时间间隔*/
 
 pthread_mutex_t mutex;
 
-void *thrd_func(void *arg)
+void *thread_func(void *arg)
 {
     int num = (unsigned long long)arg; /** sizeof(void*) == 8 and sizeof(int) == 4 (64 bits) */
     int sleep_time = 0;
@@ -53,7 +52,7 @@ void *thrd_func(void *arg)
     /* 互斥锁上锁 */
     res = pthread_mutex_lock(&mutex);
     if (res)
-    {
+    {   /*获取失败*/
         printf("Thread %d lock failed\n", num);
 
         /* 互斥锁解锁 */
@@ -64,9 +63,8 @@ void *thrd_func(void *arg)
 
     printf("Thread %d is hold mutex\n", num);
 
-    sleep_time = (int)(rand() * sleep_TIME_LEVELS/(RAND_MAX)) + 1;
-    printf("\tThread %d: sleep %d S\n",num, sleep_time);
-    sleep(sleep_time);
+    /*睡眠一定时间*/
+    sleep(2);
 
     printf("Thread %d freed mutex\n\n", num);
 
@@ -88,7 +86,8 @@ int main(void)
     pthread_mutex_init(&mutex, NULL);
     for (num = 0; num < THREAD_NUMBER; num++)
     {
-        res = pthread_create(&thread[num], NULL, thrd_func, (void*)(unsigned long long)num);
+        /*创建线程*/
+        res = pthread_create(&thread[num], NULL, thread_func, (void*)(unsigned long long)num);
         if (res != 0)
         {
             printf("Create thread %d failed\n", num);
@@ -96,12 +95,13 @@ int main(void)
         }
     }
 
-
     for (num = 0; num < THREAD_NUMBER; num++)
-    {
+    {    
+        /*等待线程结束*/
         pthread_join(thread[num], NULL);
     }
 
+    /*销毁互斥锁*/
     pthread_mutex_destroy(&mutex);
     
     return 0;

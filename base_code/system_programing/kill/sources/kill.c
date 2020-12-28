@@ -1,11 +1,4 @@
-/*
- * @Author: jiejie
- * @Github: https://github.com/jiejieTop
- * @Date: 2020-02-10 16:51:42
- * @LastEditTime: 2020-02-10 16:57:00
- * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
- */
-/** signal.c */
+/** kill.c */
 
 #include <unistd.h>
 #include <stdio.h>
