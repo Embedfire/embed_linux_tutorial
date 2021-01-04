@@ -17,12 +17,26 @@
 
     df -h
 
+如下图：表示当前系统占用357M硬盘空间，用户需要确保u盘容量大于357M
+
+.. image:: media/check_system_vol.png
+   :align: center
+   :alt: 未找到图片00|
+
+
 2.插入u盘，确保当前系统识别到相应设备文件，设备文件为:/dev/sdx(x为具体英文字母)，如果系统只有一个u盘设备，
 那么该设备文件通常为:/dev/sda,用户可通过输入以下命令确认:
 
 .. code:: bash
 
     ls /dev/sd*
+
+如下图：表示u盘被设别为/dev/sda
+
+.. image:: media/check_sd_card.png
+   :align: center
+   :alt: 未找到图片00|
+
 
 建议大家在插入u盘前后，都输入该命令查看系统识别的存储设备，确保新增的设备文件为u盘设备。
 
@@ -37,7 +51,18 @@
 
    sudo /opt/scripts/tools/backup/backup_rootfs.sh /dev/sda
 
-执行该文件后，系统将自动开始备份，用户耐心等待备份过程结束即可。
+执行该文件后，系统将自动开始备份，如下图：
+
+.. image:: media/backup_begin.png
+   :align: center
+   :alt: 未找到图片00|
+
+用户耐心等待备份过程结束即可，如下图：
+
+.. image:: media/backup_end.png
+   :align: center
+   :alt: 未找到图片00|
+
 
 4. 下面给用户讲解该备份脚本的根文件系统备份原理，该脚本的内容如下所示:
 
@@ -123,4 +148,4 @@ mfg工具烧录rootfs.tar
 首先，打开野火最新提供的mfg烧录工具，把rootfs.tar文件拷贝到mfgtools-release/Profiles/Linux/OS Firmware/release目录下，
 替换旧的系统文件，按照"烧录NXP官方固件"章节进行重新烧写系统即可。
 
-注意:此处根文件系统的命名，需要与mfgtools-release/cfg.ini文件中my_rootfs的变量值相同！
+注意:此处根文件系统的命名(如rootfs.tar)，需要与mfgtools-release/cfg.ini文件中my_rootfs的变量值相同！

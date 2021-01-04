@@ -158,7 +158,7 @@
    building_image/using_systemd
    building_image/image_backup
    building_image/image_modify
-
+   building_image/backup_rootfs
 
    #building_image/building_kernel
    #building_image/building_uboot
