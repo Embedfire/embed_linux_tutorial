@@ -46,7 +46,7 @@ html-output:
     #同步到doc.embedfire.com
     - ossutil64 cp -r _build/html/ $OSS_URL --update
 
-make-latex:
+.make-latex:
   tags:
     - DISABLE
   stage: latex
@@ -58,7 +58,7 @@ make-latex:
     #rst转latex文件
     - make latex
 
-make-pdf:
+.make-pdf:
   tags:
     - DISABLE
   stage: pdf
@@ -74,7 +74,7 @@ make-pdf:
     #允许错误运行
     #allow_failure: true
     
-pdf-output:
+.pdf-output:
   tags:
     - DISABLE
   stage: pdfoutput
