@@ -69,7 +69,9 @@ html_static_path = ['_static']
 # default hightlight languate
 highlight_language = "sh"
 
+html_show_sourcelink = False
 
+html_show_sphinx = False
 ###########################################################################
 #                        embedfire pdf - configuration                    #
 ###########################################################################

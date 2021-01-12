@@ -1,0 +1,29 @@
+{% extends "!layout.html" %}
+
+{%- block content %}
+<div class="rst-content style-external-links">
+  {% include "breadcrumbs.html" %}
+  <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+  {%- block document %}
+   <div itemprop="articleBody">
+    {% block body %}{% endblock %}
+   </div>
+   {% if self.comments()|trim %}
+   <div class="articleComments">
+    {% block comments %}{% endblock %}
+   </div>
+   {% endif%}
+  </div>
+  {%- endblock %}
+  <footer>
+    <hr/>
+    <div role="contentinfo">
+      <p>
+        {% trans copyright=copyright|e %}&copy; Copyright {{ copyright }}{% endtrans %}
+        <br><a href="https://beian.miit.gov.cn" target="_blank">粤ICP备18017226号-1</a>
+      </p>
+    </div>
+  </footer>
+</div>
+{%- endblock %}
+
