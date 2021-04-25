@@ -1026,7 +1026,7 @@ Full Feature QT_App版本
 
 而如果你选择的是动态版本的Qt镜像 ``Full Feature QT_App`` ，则无需安装qt-app，因为在系统中就已经存在了qt相关的环境，并且在 ``/home/debian`` 路径下就也存在了qt-app应用程序。
 
-**将我们编译例程的可执行文件analogclock放到qt-app目录下** ，然后编辑run.sh脚本，主要是修改脚本中的最后一行，将运行官方的App改为自己的Qt例程analogclock。（编辑可以使用nano编辑器进行编辑）
+行文件analogclock放到qt-app目录下** ，然后编辑run.sh脚本，主要是修改脚本中的最后一行，将运行官方的App改为自己的Qt例程analogclock。（编辑可以使用nano编辑器进行编辑）**将我们编译例程的可执
 
 .. code:: bash
 

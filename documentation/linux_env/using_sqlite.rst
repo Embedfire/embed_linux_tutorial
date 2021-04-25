@@ -20,8 +20,8 @@ SQL 数据库，据官网统计活跃使用的SQLite数据库超过1万亿，更
 
 大家可以参考官网的介绍： https://www.sqlite.org/index.html
 
-安装SQLite
-----------
+开发板安装SQLite
+--------------------
 
 我们要在Debian开发板上安装SQLite，使用的版本是SQLite3。
 
@@ -49,6 +49,162 @@ SQLite
     Preparing to unpack .../sqlite3_3.27.2-3_armhf.deb ...
     Unpacking sqlite3 (3.27.2-3) ...
     Setting up sqlite3 (3.27.2-3) ...
+
+交叉编译SQLite
+--------------------
+上面在开发板上apt安装了的sqlite的环境。
+但是很多时候操作sqlite的程序是在PC机上写的所以，我们还需要搭建一个sqlite3的开发环境，也就是需要交叉编译sqlite。
+
+野火直接提供了一键安装脚本，build-sqlite3.sh。
+执行脚本之前，请先确认是否安装 arm-gcc 交叉编译工具链
+
+`具体参考 <https://doc.embedfire.com/linux/qt/embed/zh/latest/ebf_qt/install/install_arm.html#arm-gcc>`_
+
+.. code:: bash
+
+    #!/bin/sh
+
+    HOST=arm-linux-gnueabihf
+    SCRIPT_PATH=$(pwd)
+
+    #修改源码包解压后的名称
+    MAJOR_NAME=sqlite-autoconf
+
+    #修改需要下载的源码前缀和后缀
+    OPENSRC_VER_PREFIX=335
+    OPENSRC_VER_SUFFIX=0500
+
+    PACKAGE_NAME=${MAJOR_NAME}-${OPENSRC_VER_PREFIX}${OPENSRC_VER_SUFFIX}
+
+    echo $PACKAGE_NAME
+
+    #定义压缩包名称
+    COMPRESS_PACKAGE=${PACKAGE_NAME}.tar.gz
+
+    #定义编译后安装--生成的文件,文件夹位置路径
+    INSTALL_PATH=/opt/${MAJOR_NAME}
+
+    #添加交叉编译工具链路径
+    # CROSS_CHAIN_PREFIX=/opt/arm-gcc/bin/arm-linux-gnueabihf
+    CROSS_CHAIN_PREFIX=/opt/gcc-arm-linux-gnueabihf-8.3.0/bin/arm-linux-gnueabihf
+
+    #无需修改--下载地址
+    #https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz
+    #https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.bz2
+
+    DOWNLOAD_LINK=https://www.sqlite.org/2021/${COMPRESS_PACKAGE}
+    echo ${DOWNLOAD_LINK}
+
+    #下载源码包
+    do_download_src () {
+    echo "\033[1;33mstart download ${PACKAGE_NAME}...\033[0m"
+
+    if [ ! -f "${COMPRESS_PACKAGE}" ];then
+        if [ ! -d "${PACKAGE_NAME}" ];then
+            wget -c ${DOWNLOAD_LINK}
+        fi
+    fi
+
+    echo "\033[1;33mdone...\033[0m"
+    }
+
+    #解压源码包
+    do_tar_package () {
+    echo "\033[1;33mstart unpacking the ${PACKAGE_NAME} package ...\033[0m"
+    if [ ! -d "${PACKAGE_NAME}" ];then
+        tar -xf ${COMPRESS_PACKAGE}
+    fi
+    echo "\033[1;33mdone...\033[0m"
+    cd ${PACKAGE_NAME}
+    }
+
+    #配置选项
+    do_configure () {
+    echo "\033[1;33mstart configure ${PACKAGE_NAME}...\033[0m"
+
+    mkdir -p ${INSTALL_PATH}/config
+    mkdir -p ${INSTALL_PATH}/plugin
+
+    export CC=${CROSS_CHAIN_PREFIX}-gcc
+
+    ./configure \
+    --prefix=${INSTALL_PATH} \
+    --host=${HOST}
+
+    echo "\033[1;33mdone...\033[0m"
+    }
+
+
+    #编译并且安装
+    do_make_install () {
+    echo "\033[1;33mstart make and install ${PACKAGE_NAME} ...\033[0m"
+    make && make install
+    echo "\033[1;33mdone...\033[0m"
+    }
+
+    #删除下载的文件
+    do_delete_file () {
+    cd ${SCRIPT_PATH}
+    if [ -f "${PACKAGE_NAME}" ];then
+        sudo rm -f ${PACKAGE_NAME}
+    fi
+    }
+
+    do_download_src
+    do_tar_package
+    do_configure
+    do_make_install
+    # do_delete_file
+
+    exit $?
+
+整个脚本的核心就是使用wget命令将sqlite源码下载到本地，脚本中使用的源码版本为sqlite-autoconf-3350500.tar.gz。
+最新源码版本 `参考 <https://www.sqlite.org/download.html>`_ ,修改脚本中的*OPENSRC_VER_PREFIX*和*OPENSRC_VER_SUFFIX*
+就可以更改源码版本。
+
+源码下载成功之后通过tar解压到指定目录，脚本自动在该目录中执行 *./config* 和 *make install*，
+最终将sqlite安装到目录（/opt/${PACKAGE_NAME}， 实际上就是/opt/sqlite-autoconf目录下）。
+
+脚本成功执行之后，我们在/opt/sqlite-autoconf下就能找到对应的lib和头文件。
+
+环境搭建成功，接着我们来编写测试程序验证sqlite开发环境。
+
+新建文件 sqlite.c ，加入下面的代码。
+
+.. code:: c
+
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <sqlite3.h>
+
+    int main(int argc,char *argv[])
+    {
+    sqlite3 *db;
+    char *ErrMsg = 0;
+    int rc;
+
+    rc = sqlite3_open("./test.db",&db);
+    if(rc){
+        fprintf(stderr, "无法打开数据库:%s\n", sqlite3_errmsg(db));
+        exit(0);
+    }
+    else
+    {
+        fprintf(stderr, "成功打开数据库!\n");
+
+    }
+    sqlite3_close(db);
+    }
+
+这段代码仅仅是在打开一个sqlite数据库，如果数据不存在则创建数据库，存在则打开，然后关闭该数据库。程序比较简单主要用于测试sqlite环境。
+
+编译程序如下：
+
+.. code:: sh
+
+    arm-linux-gnueabihf-gcc sqlite_test.c -o sqlite_test -I /opt/sqlite-autoconf/include -L /opt/sqlite-autoconf/lib -lsqlite3
+
+编译的时候编译工具会去找头文件和链接sqlite的库，最终生成程序sqlite_test，将该程序拷贝到开发板就能运行，运行的时候会在同级目录下创建一个test.db数据库。
 
 SQLite命令
 ----------
