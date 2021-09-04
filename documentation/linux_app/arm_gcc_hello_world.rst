@@ -150,7 +150,7 @@ readelf工具在系统安装GCC编译工具链时一起被安装了，我们可�
    :align: center
    :alt: 未找到图片5|
 
-使有readelf查看交叉编译器生成的hello程序
+使用readelf查看交叉编译器生成的hello程序
 
 可看到hello程序的系统架构为ARM平台，标志中表明了它是hard-float类型的EABI接口。
 
